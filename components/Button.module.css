@@ -1,0 +1,92 @@
+.btn {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: 14px;
+  padding: 10px 22px;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 150ms ease;
+}
+
+/* PRIMARY TEAL (Marketing) */
+.btn-primary-teal {
+  background: var(--teal-500);
+  color: white;
+}
+
+.btn-primary-teal:hover {
+  background: var(--teal-700);
+}
+
+.btn-primary-teal:active {
+  transform: scale(0.98);
+}
+
+/* PRIMARY BLUE (Admin) */
+.btn-primary-blue {
+  background: var(--navy-500);
+  color: white;
+}
+
+.btn-primary-blue:hover {
+  background: var(--navy-600);
+}
+
+.btn-primary-blue:active {
+  transform: scale(0.98);
+}
+
+/* OUTLINE BLUE */
+.btn-outline-blue {
+  background: transparent;
+  color: var(--navy-500);
+  border: 2px solid var(--navy-500);
+  padding: 8px 20px;
+}
+
+.btn-outline-blue:hover {
+  background: var(--tint-150);
+}
+
+.btn-outline-blue:active {
+  transform: scale(0.98);
+}
+
+/* TEXT BLUE (Tertiary) */
+.btn-text-blue {
+  background: transparent;
+  color: var(--navy-500);
+  padding: 6px 10px;
+}
+
+.btn-text-blue:hover {
+  color: var(--navy-600);
+}
+
+/* SIZES */
+.btn-sm {
+  font-size: 13px;
+  padding: 8px 18px;
+}
+
+.btn-md {
+  font-size: 14px;
+  padding: 10px 22px;
+}
+
+.btn-lg {
+  font-size: 15px;
+  padding: 14px 32px;
+}
+
+/* DISABLED STATE */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

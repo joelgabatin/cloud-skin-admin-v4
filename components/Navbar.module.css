@@ -1,0 +1,131 @@
+.navbar {
+  height: 80px;
+  background: var(--background);
+  box-shadow: 0 1px 3px rgba(26, 58, 92, 0.06);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 32px;
+}
+
+.logoRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--navy-500) 0%, var(--navy-400) 100%);
+  object-fit: contain;
+  padding: 4px;
+}
+
+.brandInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #4A4A4A;
+  line-height: 1;
+}
+
+.tagline {
+  font-family: var(--font-display);
+  font-weight: var(--weight-regular);
+  font-size: 7px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: #888;
+  margin-top: 3px;
+  line-height: 1;
+}
+
+.links {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  justify-content: center;
+}
+
+.link {
+  font-family: var(--font-display);
+  font-weight: var(--weight-medium);
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  color: var(--navy-800);
+  text-decoration: none;
+  position: relative;
+  transition: color 150ms ease;
+}
+
+.link:hover {
+  color: var(--teal-500);
+}
+
+.link.active {
+  color: var(--teal-500);
+}
+
+.link.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  background: var(--teal-500);
+  border-radius: var(--radius-full);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+.account {
+  font-family: var(--font-display);
+  font-weight: var(--weight-medium);
+  font-size: 13px;
+  color: var(--navy-500);
+  text-decoration: none;
+  padding: 0 !important;
+  display: inline;
+}
+
+.account:hover {
+  color: var(--navy-600);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 16px;
+    gap: 16px;
+  }
+
+  .links {
+    display: none;
+  }
+
+  .wordmark {
+    font-size: 11px;
+  }
+
+  .tagline {
+    font-size: 6px;
+  }
+}
