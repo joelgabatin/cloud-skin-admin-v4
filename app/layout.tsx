@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { DM_Sans, Inter, JetBrains_Mono, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
+import { AuthProvider } from '@/lib/auth-context'
 
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-display' })
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' })
@@ -12,8 +13,8 @@ const cormorantGaramond = Cormorant_Garamond({
 })
 
 export const metadata: Metadata = {
-  title: 'Cloud Skin Clinic + Wellness',
-  description: 'Design System - Admin Portal',
+  title: 'Cloud Skin Admin Portal',
+  description: 'Cloud Skin Clinic + Wellness - Admin Dashboard',
 }
 
 export default function RootLayout({
@@ -23,7 +24,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${dmSans.variable} ${inter.variable} ${jetBrainsMono.variable} ${cormorantGaramond.variable}`}>
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   )
 }

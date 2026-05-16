@@ -1,0 +1,88 @@
+.dashboardLayout {
+  display: flex;
+  height: 100vh;
+  background: #fff;
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #F5F8FA;
+  padding: 24px;
+  scrollbar-width: thin;
+  scrollbar-color: #D0E8F5 transparent;
+}
+
+.content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: #D0E8F5;
+  border-radius: 3px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background: #B8D4EC;
+}
+
+/* Loading State */
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #F5F8FA;
+}
+
+.spinner {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: #2D6A9F;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboardLayout {
+    flex-direction: column;
+  }
+
+  .mainContent {
+    flex: 1;
+  }
+
+  .content {
+    padding: 12px;
+  }
+}
