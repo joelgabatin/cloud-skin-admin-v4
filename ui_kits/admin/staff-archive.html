@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Staff Archive</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+
+  /* ============ LAYOUT (shared shell) ============ */
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill-side { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* ============ TOOLBAR ============ */
+  .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .search-input { position: relative; width: 280px; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; pointer-events: none; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 32px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+
+  /* ============ TABLE ============ */
+  .section-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .table-wrap { overflow: visible; background: #fff; border-radius: 12px; }
+  table { width: 100%; background: #fff; border-collapse: collapse; min-width: 900px; }
+  thead { background: #F8FBFD; }
+  tbody { background: #fff; }
+  tr.row { background: #fff; }
+  tr.row:hover td { background: #F8FBFD; }
+  .table-wrap { overflow: visible; }
+  table { width: 100%; border-collapse: collapse; min-width: 900px; }
+  th { padding: 10px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 12px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr.row:hover td { background: #F8FBFF; }
+  tr.row:last-child td { border-bottom: none; }
+  .name-cell { display: flex; align-items: center; gap: 10px; }
+  .avatar-sm { width: 36px; height: 36px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 600; font-size: 12px; flex-shrink: 0; }
+  .sname { font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .role-badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .role-practitioner { background: #DCFCE7; color: #15803D; }
+  .role-receptionist { background: #F5F3FF; color: #6D28D9; }
+  .actions { display: inline-flex; align-items: center; gap: 6px; position: relative; }
+  .action-btn { width: 28px; height: 28px; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .action-btn.res { background: #EFF6FF; color: #0284C7; }
+  .action-btn.del { background: #FEF2F2; color: #DC2626; }
+  .action-btn .lucide { width: 13px; height: 13px; }
+  .menu { position: absolute; top: 100%; right: 0; margin-top: 4px; background: #fff; border: 1px solid #D0E8F5; border-radius: 8px; box-shadow: 0 4px 12px rgba(26,58,92,0.15); min-width: 160px; z-index: 50; display: none; }
+  .menu.open { display: block; }
+  /* Menu flips above the button when it's the last row so the tooltip isn't clipped by the table edge. */
+  tbody tr.row:last-child .menu, tbody tr.row.menu-up .menu { top: auto; bottom: 100%; margin-top: 0; margin-bottom: 6px; }
+  .menu button { display: block; width: 100%; padding: 10px 16px; background: none; border: none; text-align: left; cursor: pointer; font-family: var(--font-body); font-size: 13px; color: #EF4444; }
+  .menu button:hover { background: #F8FBFF; }
+
+  /* ============ CONFIRM MODAL ============ */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(26,58,92,0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 24px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: 16px; max-width: 400px; width: 100%; box-shadow: 0 8px 32px rgba(26,58,92,0.18); overflow: hidden; }
+  .modal-body { padding: 24px; text-align: center; }
+  .confirm-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .confirm-icon.del { background: #FEE2E2; color: #EF4444; }
+  .confirm-icon.res { background: #EFF6FF; color: #0284C7; }
+  .confirm-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: #1A2E40; margin-bottom: 8px; }
+  .confirm-text { font-size: 13px; color: #5A7A96; margin: 0; }
+  .modal-foot { padding: 16px 24px; border-top: 1px solid #D0E8F5; display: flex; justify-content: flex-end; gap: 10px; }
+  .btn-cancel { height: 38px; padding: 0 20px; background: none; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 14px; color: #5A7A96; }
+  .btn-confirm { height: 38px; padding: 0 20px; border: none; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #fff; }
+  .btn-confirm.del { background: #EF4444; }
+  .btn-confirm.res { background: #0284C7; }
+
+.staff-menu { position: absolute; top: 100%; right: 0; margin-top: 4px; background: #fff; border: 1px solid #D0E8F5; border-radius: 8px; box-shadow: 0 4px 12px rgba(26,58,92,0.15); min-width: 160px; z-index: 50; display: none; overflow: hidden; }
+.staff-menu.open { display: block; }
+.staff-menu button { display: block; width: 100%; padding: 10px 16px; background: none; border: none; text-align: left; cursor: pointer; font-family: var(--font-body); font-size: 13px; border-bottom: 1px solid #F0F6FC; color: #1A2E40; }
+.staff-menu button:last-child { border-bottom: none; }
+.staff-menu button:hover { background: #F8FBFF; }
+.staff-actions-cell { position: relative; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside id="sidebar-mount" class="sidebar"></aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Staff Archive</div>
+        <div class="topbar-crumb">Admin / Staff Archive</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Staff Archive">
+      <div class="toolbar">
+        <div class="search-input">
+          <i data-lucide="search"></i>
+          <input placeholder="Search archived staff...">
+        </div>
+      </div>
+      <style>
+        .arch-filter-bar { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #F0F6FC; flex-wrap: wrap; }
+        .arch-fb-lbl { font-family: var(--font-display); font-weight: 500; font-size: 12px; color: #5A7A96; }
+        .arch-fb-pill { height: 32px; padding: 0 14px; border-radius: 6px; background: #fff; border: 1px solid #CBD5E1; color: #1A2E40; font-family: var(--font-display); font-weight: 500; font-size: 12px; cursor: pointer; }
+        .arch-fb-pill:hover { background: #F0F6FC; }
+        .arch-fb-pill.active { background: #2D6A9F; color: #fff; border-color: #2D6A9F; }
+      </style>
+      <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Staff Member</th><th>Role</th><th>Email</th><th>Phone</th><th>Specialty</th><th>Archived Date</th><th>Actions</th>
+            </tr></thead>
+            <tbody>
+              <tr class="row">
+                <td><div class="name-cell"><div class="avatar-sm" style="background:#9D174D">RC</div><span class="sname">Rosa Cruz</span></div></td>
+                <td><span class="role-badge role-receptionist">Receptionist</span></td>
+                <td>r.cruz@cloudskin.com</td>
+                <td>+63 922-600-0006</td>
+                <td>—</td>
+                <td>Feb 15, 2025</td>
+                <td><div class="actions"><a href="staff-detail.html" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#F0F6FC;border-radius:6px;color:#2D6A9F;text-decoration:none;margin-right:4px;"><i data-lucide="eye" style="width:14px;height:14px;"></i></a><button class="action-btn res" data-act="restore" title="Restore"><i data-lucide="rotate-ccw"></i></button><div class="menu"><button data-act="delete">Delete Permanently</button></div></div></td>
+              </tr>
+              <tr class="row">
+                <td><div class="name-cell"><div class="avatar-sm" style="background:#065F46">CB</div><span class="sname">Carlos Blanco</span></div></td>
+                <td><span class="role-badge role-practitioner">Practitioner</span></td>
+                <td>c.blanco@cloudskin.com</td>
+                <td>+63 923-700-0007</td>
+                <td>Cosmetology</td>
+                <td>Jan 10, 2025</td>
+                <td><div class="actions"><a href="staff-detail.html" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#F0F6FC;border-radius:6px;color:#2D6A9F;text-decoration:none;margin-right:4px;"><i data-lucide="eye" style="width:14px;height:14px;"></i></a><button class="action-btn res" data-act="restore" title="Restore"><i data-lucide="rotate-ccw"></i></button><div class="menu"><button data-act="delete">Delete Permanently</button></div></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ CONFIRM MODAL ============ -->
+<div id="confirm-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-body">
+      <div id="confirm-icon" class="confirm-icon res">
+        <i id="icon-restore" data-lucide="rotate-ccw" style="width:28px;height:28px"></i>
+        <i id="icon-delete" data-lucide="trash-2" style="width:28px;height:28px;display:none"></i>
+      </div>
+      <div id="confirm-title" class="confirm-title">Restore Staff Member?</div>
+      <p id="confirm-text" class="confirm-text">This staff member will be restored to the active staff list.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" id="confirm-cancel">Cancel</button>
+      <button id="confirm-do" class="btn-confirm res">Restore</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const overlay = document.getElementById('confirm-modal');
+  const confirmIcon = document.getElementById('confirm-icon');
+  const iconRestore = document.getElementById('icon-restore');
+  const iconDelete = document.getElementById('icon-delete');
+  const confirmTitle = document.getElementById('confirm-title');
+  const confirmText = document.getElementById('confirm-text');
+  const confirmDo = document.getElementById('confirm-do');
+
+  function showRestore() {
+    confirmIcon.className = 'confirm-icon res';
+    iconRestore.style.display = '';
+    iconDelete.style.display = 'none';
+    confirmTitle.textContent = 'Restore Staff Member?';
+    confirmText.textContent = 'This staff member will be restored to the active staff list.';
+    confirmDo.className = 'btn-confirm res';
+    confirmDo.textContent = 'Restore';
+    overlay.classList.add('open');
+  }
+  function showDelete() {
+    confirmIcon.className = 'confirm-icon del';
+    iconRestore.style.display = 'none';
+    iconDelete.style.display = '';
+    confirmTitle.textContent = 'Delete Staff Member Permanently?';
+    confirmText.textContent = 'This action cannot be undone. The staff member record will be permanently deleted.';
+    confirmDo.className = 'btn-confirm del';
+    confirmDo.textContent = 'Delete Permanently';
+    overlay.classList.add('open');
+  }
+  function closeConfirm() { overlay.classList.remove('open'); }
+
+  document.querySelectorAll('[data-act="restore"]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); showRestore(); }));
+  document.querySelectorAll('[data-act="menu"]').forEach(b => b.addEventListener('click', e => {
+    e.stopPropagation();
+    document.querySelectorAll('.menu.open').forEach(m => { if (m !== b.nextElementSibling) m.classList.remove('open'); });
+    b.nextElementSibling.classList.toggle('open');
+  }));
+  document.querySelectorAll('[data-act="delete"]').forEach(b => b.addEventListener('click', e => {
+    e.stopPropagation();
+    document.querySelectorAll('.menu.open').forEach(m => m.classList.remove('open'));
+    showDelete();
+  }));
+  document.addEventListener('click', () => document.querySelectorAll('.menu.open').forEach(m => m.classList.remove('open')));
+  document.getElementById('confirm-cancel').addEventListener('click', closeConfirm);
+  confirmDo.addEventListener('click', closeConfirm);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeConfirm(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeConfirm(); });
+
+  lucide.createIcons();
+</script>
+<script>
+/* __MW_TOGGLE__ */
+(function(){
+  // Find every parent .nav-item that is followed by a [data-submenu-for] block and wire up click toggle
+  document.querySelectorAll('aside.sidebar .nav-item').forEach(function(item){
+    var next = item.nextElementSibling;
+    if (!next || !next.hasAttribute || !next.hasAttribute('data-submenu-for')) return;
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', function(e){
+      // Don't navigate if it's a link
+      if (item.tagName === 'A') e.preventDefault();
+      var isOpen = next.style.display !== 'none';
+      next.style.display = isOpen ? 'none' : 'block';
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+})();
+</script>
+<script src="_sidebar.js"></script>
+<script src="_staff-table.js"></script>
+<script>
+(function(){
+  document.querySelectorAll('.arch-fb-pill').forEach(function (p) {
+    p.addEventListener('click', function () {
+      document.querySelectorAll('.arch-fb-pill').forEach(function (o) { o.classList.remove('active'); });
+      p.classList.add('active');
+      var r = p.getAttribute('data-r');
+      document.querySelectorAll('tr.row').forEach(function (row) {
+        var role = (row.children[1] && row.children[1].textContent || '').trim().toLowerCase();
+        row.style.display = (r === 'all' || role === r) ? '' : 'none';
+      });
+    });
+  });
+})();
+</script>
+<script>
+(function(){
+  // Remove any auto-injected staff-menu-trigger
+  document.querySelectorAll(".staff-menu-trigger, .staff-menu").forEach(function(el){ el.remove(); });
+  // Add a delete button next to restore in every actions cell that lacks one.
+  document.querySelectorAll("tr td .actions").forEach(function(cell){
+    if (cell.querySelector(".archive-delete-btn")) return;
+    var btn = document.createElement("button");
+    btn.className = "archive-delete-btn";
+    btn.style.cssText = "width:28px;height:28px;background:#FEF2F2;border:none;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#DC2626;";
+    btn.innerHTML = '<i data-lucide="trash-2" style="width:13px;height:13px;"></i>';
+    btn.addEventListener("click", function(e){
+      e.stopPropagation();
+      var row = btn.closest("tr");
+      var name = row && (row.querySelector(".sname, .name-text, .name") || {}).textContent || "this staff";
+      if (confirm("Delete " + name + " permanently? This cannot be undone.")) row.remove();
+    });
+    cell.appendChild(btn);
+  });
+  if (window.lucide) window.lucide.createIcons();
+})();
+</script>
+</body>
+</html>

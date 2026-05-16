@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Inbox</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+* { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; height: 100vh; overflow: hidden; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  /* Workspace layout */
+  .workspace { flex: 1; display: grid; grid-template-columns: minmax(340px, 35%) 1fr; min-height: 0; }
+  @media (max-width: 900px) { .workspace { grid-template-columns: 1fr; } }
+
+  /* ---- Left panel: message list ---- */
+  .list-panel { background: #fff; border-right: 1px solid #D0E8F5; display: flex; flex-direction: column; min-height: 0; }
+  .list-head { padding: 18px 20px 12px; border-bottom: 1px solid #E5EFF7; }
+  .list-head .title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .list-head .title { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: #1A2E40; display: inline-flex; align-items: center; gap: 8px; }
+  .list-head .title .lucide { width: 18px; height: 18px; color: #2D6A9F; }
+  .list-head .unread-tag { background: #FEE2E2; color: #DC2626; font-family: var(--font-display); font-weight: 600; font-size: 11px; padding: 3px 9px; border-radius: 9999px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .list-head .gmail-sync { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: #DCFCE7; color: #15803D; border-radius: 9999px; font-family: var(--font-display); font-size: 11px; font-weight: 600; }
+  .list-head .gmail-sync[hidden] { display: none !important; }
+  .list-head .gmail-sync .live { width: 6px; height: 6px; border-radius: 50%; background: #15803D; box-shadow: 0 0 0 0 rgba(21,128,61,0.5); animation: pulse 1.6s infinite; }
+  @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(21,128,61,0.5); } 50% { box-shadow: 0 0 0 5px rgba(21,128,61,0); } }
+  .list-head .search { position: relative; }
+  .list-head .search .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .list-head .search input { width: 100%; height: 36px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #F8FBFD; }
+  .list-head .search input:focus { background: #fff; border-color: #2D6A9F; }
+  .filter-tabs { display: flex; gap: 2px; padding: 10px 16px 0; overflow-x: auto; align-items: center; }
+  .filter-tabs button { background: none; border: none; padding: 8px 10px; font-family: var(--font-display); font-size: 12px; font-weight: 600; color: #5A7A96; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; }
+  .filter-tabs button:hover { color: #1A2E40; }
+  .filter-tabs button.active { color: #2D6A9F; border-bottom-color: #2D6A9F; }
+  .filter-tabs button .count { background: #F1F5F9; color: #475569; padding: 1px 7px; border-radius: 9999px; font-size: 10.5px; font-weight: 700; }
+  .filter-tabs button.active .count { background: #DBEAFE; color: #1D4ED8; }
+
+  .conv-list { flex: 1; overflow-y: auto; padding: 4px 0 0; position: relative; }
+
+  /* Showing X of Y counter below search */
+  .showing-count { padding: 8px 20px 0; font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; display: flex; align-items: center; gap: 6px; }
+  .showing-count b { color: #1A2E40; font-family: var(--font-display); font-weight: 600; }
+
+  /* Infinite scroll sentinel: spinner / load-more / end-of-list / scroll progress */
+  .scroll-sentinel { padding: 16px 20px 22px; }
+  .load-spinner { display: flex; align-items: center; justify-content: center; gap: 10px; font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; padding: 4px 0; }
+  .load-spinner .ring { width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid #BFE0F5; border-top-color: #2D6A9F; animation: spin 0.9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .scroll-progress { position: relative; height: 3px; background: #EBF6FD; border-radius: 9999px; overflow: hidden; margin-bottom: 12px; }
+  .scroll-progress::after { content: ''; position: absolute; left: -40%; top: 0; bottom: 0; width: 40%; background: linear-gradient(90deg, transparent, #2D6A9F, transparent); animation: slide 1.2s ease-in-out infinite; }
+  @keyframes slide { 0% { left: -40%; } 100% { left: 100%; } }
+  .load-more-btn { width: 100%; height: 38px; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .load-more-btn:hover { background: #EBF6FD; border-color: #93C5FD; }
+  .load-more-btn .lucide { width: 13px; height: 13px; }
+  .end-of-list { display: flex; align-items: center; gap: 10px; font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; }
+  .end-of-list .rule { flex: 1; height: 1px; background: #E5EFF7; }
+  .end-of-list .ttl { white-space: nowrap; }
+
+  /* Subtle flash animation for newly-loaded rows */
+  .conv.new-row { animation: newRowFlash 1200ms ease-out; }
+  @keyframes newRowFlash {
+    0%   { background: #EBF6FD; }
+    100% { background: transparent; }
+  }
+  .conv { display: grid; grid-template-columns: 36px 1fr auto; gap: 10px; padding: 12px 18px 12px 22px; border-bottom: 1px solid #F0F6FC; cursor: pointer; position: relative; align-items: flex-start; }
+  .conv:hover { background: #F8FBFD; }
+  .conv.active { background: #EBF6FD; border-left: 3px solid #2D6A9F; padding-left: 19px; }
+  .conv.unread { background: #FFFFFE; }
+  .conv.unread::before { content: ''; position: absolute; left: 6px; top: 19px; width: 6px; height: 6px; border-radius: 50%; background: #2D6A9F; }
+  .conv .av { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 12px; color: #fff; flex-shrink: 0; }
+  .conv .body { min-width: 0; }
+  .conv .name { font-family: var(--font-display); font-size: 13px; color: #1A2E40; font-weight: 600; }
+  .conv.unread .name { font-weight: 700; }
+  .conv .preview { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 320px; }
+  .conv .meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+  .conv .ts { font-family: var(--font-display); font-size: 11px; color: #9BBAD4; }
+  .conv .src { display: inline-flex; align-items: center; gap: 3px; font-family: var(--font-display); font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 6px; border-radius: 9999px; }
+  .conv .src.contact { background: #DBEAFE; color: #1D4ED8; }
+  .conv .src.email { background: #FEE2E2; color: #DC2626; }
+  .conv .src .lucide { width: 10px; height: 10px; }
+  .conv .row2 { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .conv .status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .conv .status-dot.open { background: #15803D; }
+  .conv .status-dot.replied { background: #2D6A9F; }
+  .conv .status-dot.closed { background: #9BBAD4; }
+  .conv .stat-label { font-family: var(--font-display); font-size: 10.5px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.04em; }
+
+  /* ---- Right panel: thread ---- */
+  .thread-panel { background: #F8FBFD; display: flex; flex-direction: column; min-height: 0; }
+  .thread-head { background: #fff; padding: 18px 24px; border-bottom: 1px solid #D0E8F5; display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+  .thread-head .av { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #fff; flex-shrink: 0; }
+  .thread-head .info { flex: 1; min-width: 200px; }
+  .thread-head .info .nm { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: #1A2E40; }
+  .thread-head .info .em { font-family: var(--font-mono); font-size: 12px; color: #5A7A96; margin-top: 3px; }
+  .thread-head .info .subj { font-family: var(--font-body); font-size: 13px; color: #1A2E40; margin-top: 5px; font-style: italic; }
+  .thread-head .actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .thread-head .actions .badge { background: #DCFCE7; color: #15803D; padding: 4px 12px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .btn { height: 34px; padding: 0 12px; border-radius: 7px; cursor: pointer; font-family: var(--font-display); font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; border: 1.5px solid transparent; text-decoration: none; white-space: nowrap; }
+  .btn .lucide { width: 13px; height: 13px; }
+  .btn-outline { background: #fff; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-outline:hover { background: #F0F6FC; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 14px; }
+  .btn-primary:hover { background: #1A5685; }
+  .btn-ghost-red { background: none; color: #DC2626; border: none; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 12px; padding: 0; }
+  .btn-ghost-red:hover { text-decoration: underline; }
+
+  .source-bar { padding: 10px 24px; background: #fff; border-bottom: 1px solid #E5EFF7; display: flex; gap: 8px; align-items: center; font-family: var(--font-body); font-size: 12px; color: #5A7A96; }
+  .source-bar .lucide { width: 14px; height: 14px; color: #2D6A9F; }
+  .source-bar.email .lucide { color: #DC2626; }
+  .source-bar b { color: #1A2E40; font-family: var(--font-display); font-weight: 600; }
+
+  .thread-body { flex: 1; overflow-y: auto; padding: 18px 24px; display: flex; flex-direction: column; gap: 14px; }
+
+  /* Contact form data card (shown only for contact-form selections) */
+  .form-card { background: #fff; border: 1px solid #D0E8F5; border-radius: 12px; padding: 18px 20px; }
+  .form-card .ttl { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-display); font-weight: 700; font-size: 12px; color: #1D4ED8; text-transform: uppercase; letter-spacing: 0.05em; padding-bottom: 12px; border-bottom: 1px solid #E5EFF7; margin-bottom: 14px; }
+  .form-card .ttl .lucide { width: 14px; height: 14px; }
+  .form-card .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px 24px; }
+  .form-card .form-grid .k { font-family: var(--font-display); font-size: 10.5px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+  .form-card .form-grid .v { font-family: var(--font-display); font-size: 13.5px; font-weight: 600; color: #1A2E40; }
+  .form-card .form-grid .v.mono { font-family: var(--font-mono); font-weight: 500; color: #2D6A9F; }
+  .form-card .form-grid .full { grid-column: 1 / -1; }
+  .form-card .form-grid .v.msg { font-family: var(--font-body); font-weight: 400; color: #1A2E40; line-height: 1.55; white-space: pre-wrap; }
+
+  /* Email view (replaces form card for Gmail messages) */
+  .email-card { background: #fff; border: 1px solid #D0E8F5; border-radius: 12px; padding: 18px 20px; }
+  .email-card .ttl { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-display); font-weight: 700; font-size: 12px; color: #DC2626; text-transform: uppercase; letter-spacing: 0.05em; padding-bottom: 12px; border-bottom: 1px solid #E5EFF7; margin-bottom: 14px; }
+  .email-card .email-meta { display: grid; grid-template-columns: 60px 1fr; gap: 4px 10px; margin-bottom: 14px; font-size: 12.5px; }
+  .email-card .email-meta .k { font-family: var(--font-display); font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.04em; font-size: 11px; padding-top: 2px; }
+  .email-card .email-meta .v { font-family: var(--font-body); color: #1A2E40; }
+  .email-card .email-body { font-family: var(--font-body); font-size: 13.5px; color: #1A2E40; line-height: 1.6; white-space: pre-wrap; }
+
+  /* Message bubbles */
+  .msg-bubble { display: grid; grid-template-columns: 32px 1fr; gap: 10px; align-items: flex-start; }
+  .msg-bubble.admin { grid-template-columns: 1fr 32px; }
+  .msg-bubble .av { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 11.5px; color: #fff; }
+  .msg-bubble .content { background: #fff; border: 1px solid #E5EFF7; border-radius: 12px 12px 12px 4px; padding: 12px 16px; max-width: 75%; }
+  .msg-bubble.admin .content { background: #EBF6FD; border-color: #BFE0F5; border-radius: 12px 12px 4px 12px; justify-self: end; }
+  .msg-bubble .sender { font-family: var(--font-display); font-weight: 700; font-size: 12.5px; color: #1A2E40; }
+  .msg-bubble .ts { font-family: var(--font-body); font-size: 11px; color: #9BBAD4; margin-left: 8px; }
+  .msg-bubble .txt { font-family: var(--font-body); font-size: 13px; color: #1A2E40; margin-top: 4px; line-height: 1.55; white-space: pre-wrap; }
+
+  /* Reply box */
+  .reply-box { background: #fff; border-top: 1px solid #D0E8F5; padding: 14px 24px; }
+  .reply-box .tools { display: flex; gap: 4px; padding-bottom: 8px; }
+  .reply-box .tools button { width: 30px; height: 30px; background: none; border: none; border-radius: 6px; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .reply-box .tools button:hover { background: #F0F6FC; color: #2D6A9F; }
+  .reply-box .tools button .lucide { width: 14px; height: 14px; }
+  .reply-box textarea { width: 100%; min-height: 90px; padding: 12px 14px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; resize: vertical; line-height: 1.5; }
+  .reply-box textarea:focus { border-color: #2D6A9F; }
+  .reply-box .foot { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .reply-box .foot .from-note { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; }
+  .reply-box .foot .from-note b { color: #1A2E40; font-family: var(--font-display); font-weight: 600; }
+  .reply-box .foot .spacer { flex: 1; }
+
+  /* Empty state */
+  .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 40px; text-align: center; color: #9BBAD4; }
+  .empty-state .lucide { width: 36px; height: 36px; opacity: 0.5; }
+  .empty-state .ttl { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #5A7A96; }
+  .empty-state .sub { font-family: var(--font-body); font-size: 12.5px; }
+
+  /* Status dot tooltip on hover */
+  .conv .status-cell { position: relative; }
+  .conv .status-tip { position: absolute; left: -8px; top: 50%; transform: translate(-100%, -50%) translateX(-2px); width: 220px; background: #1A2E40; color: #fff; padding: 10px 12px; border-radius: 8px; font-family: var(--font-body); font-size: 11.5px; line-height: 1.45; box-shadow: 0 6px 18px rgba(15,30,48,0.30); opacity: 0; pointer-events: none; transition: opacity 120ms ease-out, transform 120ms ease-out; z-index: 50; text-align: left; }
+  .conv .status-tip::after { content: ''; position: absolute; left: 100%; top: 50%; transform: translateY(-50%); border: 6px solid transparent; border-left-color: #1A2E40; }
+  .conv .status-cell:hover .status-tip, .conv .status-cell:focus-within .status-tip { opacity: 1; transform: translate(-100%, -50%) translateX(-6px); }
+  .conv .status-tip .tip-title { font-family: var(--font-display); font-size: 12px; font-weight: 700; color: #fff; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 4px; letter-spacing: 0.03em; }
+  .conv .status-tip .tip-title .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .conv .status-tip .tip-body { color: #C9D9E8; }
+  .conv .status-tip .tip-foot { color: #93AEC8; font-size: 10.5px; font-style: italic; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.10); }
+
+  /* Status Guide button + modal */
+  .status-guide-btn { background: #fff; border: 1.5px solid #D0E8F5; color: #5A7A96; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; padding: 0 9px; height: 28px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; margin-left: auto; align-self: center; }
+  .status-guide-btn:hover { background: #EBF6FD; color: #2D6A9F; border-color: #93C5FD; }
+  .status-guide-btn .lucide { width: 12px; height: 12px; }
+  .sg-modal { position: fixed; inset: 0; background: rgba(15,30,48,0.55); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 200; }
+  .sg-modal[hidden] { display: none !important; }
+  .sg-card { background: #fff; border-radius: 12px; width: 100%; max-width: 520px; max-height: calc(100vh - 48px); overflow: hidden; box-shadow: 0 20px 60px rgba(15,30,48,0.35); display: flex; flex-direction: column; border-top: 3px solid #2D6A9F; }
+  .sg-head { display: flex; align-items: flex-start; gap: 14px; padding: 22px 24px 14px; }
+  .sg-head .icon-plate { width: 40px; height: 40px; border-radius: 50%; background: #EBF6FD; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .sg-head h2 { margin: 0; font-family: var(--font-display); font-size: 17px; font-weight: 700; color: #1A2E40; }
+  .sg-head .sub { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-top: 3px; line-height: 1.45; }
+  .sg-close { margin-left: auto; width: 32px; height: 32px; border-radius: 8px; background: none; border: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .sg-close:hover { background: #F0F6FC; color: #1A2E40; }
+  .sg-body { padding: 4px 24px 18px; overflow-y: auto; }
+  .sg-item { display: flex; align-items: flex-start; gap: 14px; padding: 13px 0; border-bottom: 1px solid #E5EFF7; }
+  .sg-item:last-of-type { border-bottom: none; }
+  .sg-item .dotwrap { padding-top: 5px; flex-shrink: 0; }
+  .sg-item .dotwrap .d { width: 12px; height: 12px; border-radius: 50%; display: block; }
+  .sg-item .d.open { background: #15803D; }
+  .sg-item .d.replied { background: #2D6A9F; }
+  .sg-item .d.assigned { background: #7C3AED; }
+  .sg-item .d.closed { background: #94A3B8; }
+  .sg-item .d.spam { background: #DC2626; }
+  .sg-item .label { font-family: var(--font-display); font-size: 13.5px; font-weight: 700; color: #1A2E40; margin-bottom: 3px; }
+  .sg-item .desc { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; line-height: 1.55; }
+  .sg-info { margin: 14px 0 4px; background: #EBF6FD; border: 1px solid #93C5FD; border-radius: 10px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; font-family: var(--font-body); font-size: 12.5px; color: #1E40AF; line-height: 1.5; }
+  .sg-info .lucide { width: 16px; height: 16px; color: #2D6A9F; flex-shrink: 0; margin-top: 1px; }
+  .sg-foot { padding: 14px 24px 18px; border-top: 1px solid #E5EFF7; background: #F8FBFD; display: flex; justify-content: flex-end; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 18px; height: 38px; border-radius: 8px; border: none; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-primary:hover { background: #1A5685; }
+
+  /* Spam-specific styling */
+  .conv .src.spam { background: #FEE2E2; color: #DC2626; }
+  .conv .status-dot.spam { background: #DC2626; }
+  .conv.is-spam { opacity: 0.72; }
+  .conv.is-spam .name { color: #5A7A96; }
+  .conv.is-spam .preview { font-style: italic; }
+  .conv.is-spam.active { opacity: 1; }
+  .spam-banner { background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 0; padding: 10px 18px; display: flex; gap: 10px; align-items: center; font-family: var(--font-body); font-size: 12px; color: #92400E; line-height: 1.4; }
+  .spam-banner[hidden] { display: none !important; }
+  .spam-banner .lucide { width: 15px; height: 15px; color: #B45309; flex-shrink: 0; }
+  .spam-banner b { font-family: var(--font-display); font-weight: 700; color: #78350F; }
+  .spam-banner .clear-link { margin-left: auto; background: none; border: none; color: #DC2626; font-family: var(--font-display); font-size: 12px; font-weight: 700; cursor: pointer; padding: 0; }
+  .spam-banner .clear-link:hover { text-decoration: underline; }
+
+  .spam-info-bar { background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .spam-info-bar .ic { width: 32px; height: 32px; border-radius: 50%; background: #FEE2E2; color: #DC2626; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .spam-info-bar .ic .lucide { width: 16px; height: 16px; }
+  .spam-info-bar .body { flex: 1; min-width: 220px; }
+  .spam-info-bar .ttl { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #991B1B; }
+  .spam-info-bar .sub { font-family: var(--font-body); font-size: 12px; color: #991B1B; margin-top: 2px; }
+  .spam-info-bar .actions { display: flex; gap: 8px; }
+  .btn-danger { background: #DC2626; color: #fff; padding: 0 12px; height: 32px; border-radius: 7px; border: none; cursor: pointer; font-family: var(--font-display); font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .btn-danger:hover { background: #B91C1C; }
+  .btn-danger .lucide, .btn-outline .lucide { width: 13px; height: 13px; }
+
+  .spam-tint { background: #FFF5F5 !important; border-color: #FCA5A5 !important; }
+  .no-reply-note { background: #fff; border-top: 1px solid #D0E8F5; padding: 18px 24px; text-align: center; font-family: var(--font-body); font-size: 12.5px; color: #9BBAD4; line-height: 1.5; }
+  .no-reply-note b { color: #5A7A96; font-family: var(--font-display); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title" id="page-title">Inbox</div>
+        <div class="topbar-crumb" id="page-crumb">Admin / Messages / Inbox</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="workspace" data-screen-label="01 Unified Inbox">
+      <!-- Left: conversation list -->
+      <div class="list-panel">
+        <div class="list-head">
+          <div class="title-row">
+            <span class="title"><i data-lucide="inbox"></i> <span id="panel-title">Inbox</span></span>
+            <span class="unread-tag" id="unread-tag">5 unread</span>
+            <span class="gmail-sync" id="gmail-sync" hidden><span class="live"></span> Connected</span>
+          </div>
+          <div class="search"><i data-lucide="search"></i><input placeholder="Search messages…"></div>
+        </div>
+        <div class="showing-count" id="showing-count"></div>
+        <div class="filter-tabs" id="filter-tabs"><!-- rendered by JS --></div>
+        <div class="spam-banner" id="spam-banner" hidden style="border-top:1px solid #FCD34D;">
+          <i data-lucide="alert-triangle"></i>
+          <div><b>Spam messages</b> are permanently deleted after 30 days. Review regularly.</div>
+          <button class="clear-link" type="button">Delete All Spam</button>
+        </div>
+        <div class="conv-list" id="conv-list"><!-- rendered by JS --></div>
+      </div>
+
+      <!-- Right: open conversation -->
+      <div class="thread-panel" id="thread-panel"><!-- rendered by JS --></div>
+    </section>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+
+<!-- Status Guide modal -->
+<div id="status-guide-modal" class="sg-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sg-title">
+  <div class="sg-card">
+    <div class="sg-head">
+      <div class="icon-plate"><i data-lucide="info"></i></div>
+      <div style="flex:1;">
+        <h2 id="sg-title">Message Status Guide</h2>
+        <div class="sub">What each status means in your inbox.</div>
+      </div>
+      <button class="sg-close" type="button" id="sg-close" aria-label="Close guide"><i data-lucide="x"></i></button>
+    </div>
+    <div class="sg-body">
+      <div class="sg-item">
+        <div class="dotwrap"><span class="d open"></span></div>
+        <div><div class="label">Open</div><div class="desc">New or unresolved message requiring your attention. Every new message starts as Open automatically.</div></div>
+      </div>
+      <div class="sg-item">
+        <div class="dotwrap"><span class="d replied"></span></div>
+        <div><div class="label">Replied</div><div class="desc">You have sent at least one reply. Conversation still active — returns to Open if the sender responds again.</div></div>
+      </div>
+      <div class="sg-item">
+        <div class="dotwrap"><span class="d assigned"></span></div>
+        <div><div class="label">Assigned</div><div class="desc">Handed to a specific staff member to handle. Still active but now their responsibility.</div></div>
+      </div>
+      <div class="sg-item">
+        <div class="dotwrap"><span class="d closed"></span></div>
+        <div><div class="label">Closed</div><div class="desc">Fully resolved. No further action needed. Can be reopened anytime if the sender follows up.</div></div>
+      </div>
+      <div class="sg-item">
+        <div class="dotwrap"><span class="d spam"></span></div>
+        <div><div class="label">Spam</div><div class="desc">Flagged as junk. Hidden from the main inbox and auto-deleted after 30 days. Move to Inbox if marked by mistake.</div></div>
+      </div>
+      <div class="sg-info">
+        <i data-lucide="info"></i>
+        <div>Hover over any status dot in your inbox to see a quick description. Click the dot to change the status directly.</div>
+      </div>
+    </div>
+    <div class="sg-foot">
+      <button class="btn-primary" type="button" id="sg-ok">Got it</button>
+    </div>
+  </div>
+</div>
+<script>
+  // ---------- Mock conversation data ----------
+  // Each conversation has: id, source ('contact-form' | 'email'), sender, email, phone (form only),
+  // subjectLine, formSubject (form only), preview, ts, dateLong, status, unread, assigned,
+  // avatarColor, avatarInitials, thread:[{from:'them'|'admin', text, ts}], formBody (form only)
+  var CONVOS = [
+    {
+      id: 1, source: 'contact-form', sender: 'Sarah Johnson', email: 'sarah.johnson@gmail.com',
+      phone: '+63 917 555 0123', subjectLine: 'Question about Hydra Facial',
+      formSubject: 'Product Question', page: 'cloudskin.com/contact',
+      preview: 'Hi, I would like to ask about the pricing for Hydra Facial…',
+      ts: '2m ago', dateLong: 'May 13, 2026 · 2:30 PM',
+      status: 'open', unread: true, assigned: 'Admin User',
+      avColor: '#2D6A9F', avInitials: 'SJ',
+      formBody: 'Hi, I would like to ask about the pricing for Hydra Facial. I saw on your Instagram that you have a May promo — is it still active? Also, do you do consultations on Sundays?',
+      thread: [
+        { from: 'them',  text: 'Hi, I would like to ask about the pricing for Hydra Facial. I saw on your Instagram that you have a May promo — is it still active? Also, do you do consultations on Sundays?', ts: 'May 13 · 2:30 PM' }
+      ]
+    },
+    {
+      id: 2, source: 'email', sender: 'Miguel Cruz', email: 'miguel.cruz@gmail.com',
+      subjectLine: 'Re: Appointment request for May 18',
+      preview: 'Thank you for confirming. Just to double-check the time slot…',
+      ts: '15m ago', dateLong: 'May 13, 2026 · 2:14 PM',
+      status: 'replied', unread: true, assigned: 'A. Cruz (Reception)',
+      avColor: '#7C3AED', avInitials: 'MC',
+      thread: [
+        { from: 'them',  text: 'Hi Cloud Skin team,\n\nIs the 4:00 PM slot on May 18 still available for a Botox touch-up? Last time I was with Dr. Santos and would prefer to stay with her.\n\nThanks,\nMiguel', ts: 'May 13 · 10:42 AM' },
+        { from: 'admin', text: 'Hi Miguel! Yes, 4:00 PM on May 18 with Dr. Santos is open. I have tentatively reserved it — please reply to confirm and we will send the calendar invite.\n\nBest,\nAdmin · Cloud Skin Clinic', ts: 'May 13 · 1:55 PM' },
+        { from: 'them',  text: 'Thank you for confirming. Just to double-check the time slot — should I be there 15 mins early like before? Also, do I need to skip blood thinners again?', ts: 'May 13 · 2:14 PM' }
+      ]
+    },
+    {
+      id: 3, source: 'email', sender: 'Walk-in Inquiry', email: 'walkin.health@yahoo.com',
+      subjectLine: 'IV drip availability this weekend',
+      preview: 'Hello, is your wellness IV available without prior booking on Sat…',
+      ts: '1h ago', dateLong: 'May 13, 2026 · 1:18 PM',
+      status: 'open', unread: true, assigned: null,
+      avColor: '#B45309', avInitials: 'WI',
+      thread: [
+        { from: 'them', text: 'Hello, is your wellness IV available without prior booking on Saturday? We are visiting Baguio for the weekend and would like to come in around lunchtime.', ts: 'May 13 · 1:18 PM' }
+      ]
+    },
+    {
+      id: 4, source: 'contact-form', sender: 'Ana Reyes', email: 'ana.reyes@gmail.com',
+      phone: '+63 919 345 6789', subjectLine: 'Anti-aging package details',
+      formSubject: 'Appointment Inquiry', page: 'cloudskin.com/packages',
+      preview: 'Hello! I\u2019m interested in your Anti-Aging Package. Could you provide details…',
+      ts: '3h ago', dateLong: 'May 13, 2026 · 11:14 AM',
+      status: 'replied', unread: false, assigned: 'Admin User',
+      avColor: '#15803D', avInitials: 'AR',
+      formBody: 'Hello! I\u2019m interested in your Anti-Aging Package. Could you provide details about what\u2019s included and whether there are any ongoing promotions for May?',
+      thread: [
+        { from: 'them',  text: 'Hello! I\u2019m interested in your Anti-Aging Package. Could you provide details about what\u2019s included and whether there are any ongoing promotions for May?', ts: 'May 13 · 11:14 AM' },
+        { from: 'admin', text: 'Hi Ana! Our Anti-Aging Package (₱18,500) covers a HydraFacial, a Botox touch-up (50u), and a Vitamin C IV drip — all bookable across 3 months. May promo: 10% off when you pre-book the full package. I\u2019ll send the brochure to your email shortly.', ts: 'May 13 · 12:02 PM' }
+      ]
+    },
+    {
+      id: 5, source: 'contact-form', sender: 'Carlos Garcia', email: 'carlos.garcia@gmail.com',
+      phone: '+63 920 456 7890', subjectLine: 'Follow-up appointment',
+      formSubject: 'Appointment Inquiry', page: 'cloudskin.com/contact',
+      preview: 'I had a facial treatment last month and I\u2019d like to schedule a follow-up…',
+      ts: 'Yesterday', dateLong: 'May 12, 2026 · 4:20 PM',
+      status: 'closed', unread: false, assigned: 'A. Cruz (Reception)',
+      avColor: '#DC2626', avInitials: 'CG',
+      formBody: 'I had a facial treatment last month and I\u2019d like to schedule a follow-up. When would be the best time to come back?',
+      thread: [
+        { from: 'them',  text: 'I had a facial treatment last month and I\u2019d like to schedule a follow-up. When would be the best time to come back?', ts: 'May 12 · 4:20 PM' },
+        { from: 'admin', text: 'Hi Carlos! A 4-week follow-up is ideal. I see your last visit was April 16 — May 14 onward works great. Want me to pencil you in for May 16 at 2 PM?', ts: 'May 12 · 5:01 PM' },
+        { from: 'them',  text: 'Yes, May 16 at 2 PM works. Thanks!', ts: 'May 13 · 8:30 AM' }
+      ]
+    },
+    {
+      id: 6, source: 'email', sender: 'Sofia Cruz', email: 'sofia.cruz@gmail.com',
+      subjectLine: 'Gift certificate inquiry',
+      preview: 'I want to purchase a gift certificate for my mother\u2019s birthday…',
+      ts: 'Yesterday', dateLong: 'May 12, 2026 · 2:08 PM',
+      status: 'open', unread: true, assigned: 'Admin User',
+      avColor: '#2D6A9F', avInitials: 'SC',
+      thread: [
+        { from: 'them',  text: 'Hi! I want to purchase a gift certificate for my mother\u2019s birthday. Do you offer gift cards and how can I avail one? Ideally I would like to gift her a HydraFacial.', ts: 'May 12 · 2:08 PM' },
+        { from: 'admin', text: 'Hi Sofia! Yes, we offer printed and digital gift certificates from ₱1,500 up. For a HydraFacial gift card it would be ₱2,500. You can pay via GCash or in clinic and we will email you the certificate with a unique code.', ts: 'May 12 · 3:12 PM' }
+      ]
+    },
+    {
+      id: 7, source: 'email', sender: 'Pharmaco Sales', email: 'sales@pharmaco.ph',
+      subjectLine: '[Promo] May injectables price list',
+      preview: 'Dear Cloud Skin, please find attached the updated May injectables price…',
+      ts: 'May 11', dateLong: 'May 11, 2026 · 10:22 AM',
+      status: 'open', unread: true, assigned: null,
+      avColor: '#475569', avInitials: 'PC',
+      thread: [
+        { from: 'them', text: 'Dear Cloud Skin Team,\n\nPlease find attached the updated May injectables price list. Filler 1mL is now ₱1,500 (down from ₱1,600), and Botox 50u remains at ₱2,500.\n\nLet us know if you would like to place an order before May 31.\n\nBest,\nPharmaco Sales Team', ts: 'May 11 · 10:22 AM' }
+      ]
+    },
+    {
+      id: 8, source: 'contact-form', sender: 'Jaime Lim', email: 'jaime.lim@hotmail.com',
+      phone: '+63 921 567 8901', subjectLine: 'Complaint — long wait time',
+      formSubject: 'Complaint', page: 'cloudskin.com/contact',
+      preview: 'Last Saturday I waited 45 minutes past my appointment time…',
+      ts: 'May 10', dateLong: 'May 10, 2026 · 6:45 PM',
+      status: 'closed', unread: false, assigned: 'Admin User',
+      avColor: '#DC2626', avInitials: 'JL',
+      formBody: 'Last Saturday I waited 45 minutes past my appointment time before being seen. I understand things happen but no one updated me. Please let me know how this will be addressed.',
+      thread: [
+        { from: 'them',  text: 'Last Saturday I waited 45 minutes past my appointment time before being seen. I understand things happen but no one updated me. Please let me know how this will be addressed.', ts: 'May 10 · 6:45 PM' },
+        { from: 'admin', text: 'Hi Jaime, I am so sorry for that experience. I have spoken with the team and we are tightening our buffer between appointments. As a small gesture, I would like to offer you 15% off your next visit. Apologies again.', ts: 'May 11 · 9:18 AM' }
+      ]
+    },
+    {
+      id: 101, source: 'email', sender: 'Unknown Sender', email: 'fastcash.deals@xmail.tld',
+      subjectLine: 'Earn money fast with our new program',
+      preview: 'Earn money fast with our exclusive global investment program…',
+      ts: 'May 12', dateLong: 'May 12, 2026 · 4:18 AM',
+      status: 'spam', unread: false, assigned: null,
+      avColor: '#94A3B8', avInitials: '??',
+      thread: [
+        { from: 'them', text: 'Earn money fast with our exclusive global investment program. Limited slots available for May. Click here to claim your bonus before midnight.\n\n100% guaranteed returns. No risk.', ts: 'May 12 · 4:18 AM' }
+      ]
+    },
+    {
+      id: 102, source: 'email', sender: 'noreply@promo.com', email: 'noreply@promo.com',
+      subjectLine: 'Congratulations you have won!!!',
+      preview: 'CONGRATULATIONS YOU HAVE WON A PRIZE OF $10,000…',
+      ts: 'May 11', dateLong: 'May 11, 2026 · 11:42 PM',
+      status: 'spam', unread: false, assigned: null,
+      avColor: '#94A3B8', avInitials: 'NR',
+      thread: [
+        { from: 'them', text: 'CONGRATULATIONS YOU HAVE WON A PRIZE OF $10,000 IN OUR INTERNATIONAL LOTTERY. Reply with your bank details and a copy of your ID to claim your prize within 24 hours.', ts: 'May 11 · 11:42 PM' }
+      ]
+    }
+  ];
+
+  // ---------- Padded conversation data ----------
+  // Adds 39 lighter email conversations so the inbox has 47 total non-spam items
+  // and the infinite-scroll behavior has something to actually load.
+  (function () {
+    var padSenders = [
+      ['Alex Garcia','alex.garcia@gmail.com','AG','#2D6A9F'], ['Jenna Lim','jenna.lim@gmail.com','JL','#7C3AED'],
+      ['Mark Dela Cruz','mark.dc@gmail.com','MD','#15803D'], ['Trish Mendoza','trish.m@gmail.com','TM','#B45309'],
+      ['Paolo Reyes','paolo.r@gmail.com','PR','#DC2626'], ['Kira Tan','kira.tan@gmail.com','KT','#0EA5E9'],
+      ['Joel Aquino','joel.a@gmail.com','JA','#7C3AED'], ['Liza Castillo','liza.c@gmail.com','LC','#15803D'],
+      ['Drew Ramos','drew.r@gmail.com','DR','#2D6A9F'], ['Belle Santos','belle.s@gmail.com','BS','#DC2626']
+    ];
+    var padSubjects = [
+      'Booking inquiry for next week', 'Question about IV drip program', 'Pricing for laser hair removal',
+      'Follow-up on consultation', 'Anti-aging package availability', 'Botox aftercare question',
+      'Walk-in consultation hours', 'Skin assessment booking', 'Acne treatment options',
+      'Saturday availability', 'Promo code question', 'Treatment package upgrade',
+      'Maintenance facial frequency', 'Sensitive skin product line', 'Membership renewal',
+      'Gift certificate balance', 'Group booking inquiry', 'Cancellation policy',
+      'Same-day appointment request', 'Body contouring consultation', 'Dermal filler retouch',
+      'Sunscreen recommendations', 'Pregnancy-safe treatments', 'Post-treatment redness',
+      'Vitamin IV pricing', 'Couples treatment booking', 'Glutathione drip booking',
+      'PRP treatment availability', 'Microneedling follow-up', 'Chemical peel timing',
+      'Sensitive areas patch test', 'Eyebrow microblading', 'Hydrafacial vs Glasskin',
+      'Loyalty program details', 'Gift voucher redemption', 'Refund inquiry',
+      'Insurance reimbursement question', 'Allergy patch test request', 'Annual checkup booking'
+    ];
+    var statusPool = ['open','open','open','open','open','open','replied','replied','closed'];
+    var dayPool = ['May 11','May 10','May 9','May 9','May 8','May 7','May 6','May 5','May 4','May 3','May 2','May 1','Apr 30','Apr 28','Apr 27'];
+    for (var i = 0; i < 39; i++) {
+      var s = padSenders[i % padSenders.length];
+      var subj = padSubjects[i];
+      var status = statusPool[i % statusPool.length];
+      var day = dayPool[i % dayPool.length];
+      CONVOS.push({
+        id: 200 + i, source: 'email', sender: s[0], email: s[1],
+        subjectLine: subj,
+        preview: 'Hi Cloud Skin team, I had a quick question — looking forward to your reply.',
+        ts: day, dateLong: day + ', 2026 \u00b7 ' + (8 + (i % 9)) + ':' + (i*7 % 60 < 10 ? '0' : '') + (i*7 % 60) + ' AM',
+        status: status, unread: false, assigned: null,
+        avColor: s[3], avInitials: s[2],
+        thread: [
+          { from: 'them', text: 'Hi! ' + subj + ' — could you share a bit more info?\n\nThanks,\n' + s[0].split(' ')[0], ts: day + ' \u00b7 morning' }
+        ]
+      });
+    }
+  })();
+
+  // ---------- Context-aware tab definitions ----------
+  var TABS_FOR_SECTION = {
+    'inbox':        [['all','All'],['unread','Unread'],['contact-form','Contact Form'],['email','Email'],['assigned','Assigned']],
+    'contact-form': [['all','All'],['unread','Unread'],['open','Open'],['replied','Replied'],['closed','Closed']],
+    'email':        [['all','All'],['unread','Unread'],['open','Open'],['replied','Replied'],['closed','Closed']],
+    'assigned':     [['all','All'],['unread','Unread'],['contact-form','Contact Form'],['email','Email']],
+    'closed':       [['all','All'],['contact-form','Contact Form'],['email','Email']],
+    'spam':         [['all','All'],['contact-form','Contact Form'],['email','Email']]
+  };
+  var INITIAL_VISIBLE = { inbox: 8, email: 4 }; // others auto-show everything
+  var BATCH_SIZE = 20;
+
+  // ---------- State ----------
+  // section  = which sidebar item is active
+  // subFilter = which filter-tab is active inside that section
+  var state = {
+    section: 'inbox',
+    subFilter: 'all',
+    selectedId: null,
+    visibleCount: 0,
+    loading: false,
+    flashFrom: -1,  // index into the visible slice from which rows should briefly flash
+    hasScrolled: false  // gate observer-triggered loadMore until the user actually scrolls
+  };
+
+  function readFilterFromURL() {
+    var p = (new URLSearchParams(location.search)).get('filter') || 'inbox';
+    state.section = p;
+    state.subFilter = 'all';
+    state.visibleCount = INITIAL_VISIBLE[p] != null ? INITIAL_VISIBLE[p] : 9999;
+  }
+
+  function sectionFiltered() {
+    switch (state.section) {
+      case 'contact-form': return CONVOS.filter(function (c) { return c.source === 'contact-form' && c.status !== 'spam'; });
+      case 'email':        return CONVOS.filter(function (c) { return c.source === 'email' && c.status !== 'spam'; });
+      case 'assigned':     return CONVOS.filter(function (c) { return c.assigned === 'Admin User' && c.status !== 'spam'; });
+      case 'closed':       return CONVOS.filter(function (c) { return c.status === 'closed'; });
+      case 'spam':         return CONVOS.filter(function (c) { return c.status === 'spam'; });
+      default:             return CONVOS.filter(function (c) { return c.status !== 'spam'; });
+    }
+  }
+
+  function filteredConvos() {
+    var list = sectionFiltered();
+    switch (state.subFilter) {
+      case 'unread':       return list.filter(function (c) { return c.unread; });
+      case 'open':         return list.filter(function (c) { return c.status === 'open'; });
+      case 'replied':      return list.filter(function (c) { return c.status === 'replied'; });
+      case 'closed':       return list.filter(function (c) { return c.status === 'closed'; });
+      case 'contact-form': return list.filter(function (c) { return c.source === 'contact-form'; });
+      case 'email':        return list.filter(function (c) { return c.source === 'email'; });
+      case 'assigned':     return list.filter(function (c) { return c.assigned === 'Admin User'; });
+      default:             return list;
+    }
+  }
+
+  function computeTabCounts() {
+    var l = sectionFiltered();
+    return {
+      'all': l.length,
+      'unread': l.filter(function (c) { return c.unread; }).length,
+      'open': l.filter(function (c) { return c.status === 'open'; }).length,
+      'replied': l.filter(function (c) { return c.status === 'replied'; }).length,
+      'closed': l.filter(function (c) { return c.status === 'closed'; }).length,
+      'contact-form': l.filter(function (c) { return c.source === 'contact-form'; }).length,
+      'email': l.filter(function (c) { return c.source === 'email'; }).length,
+      'assigned': l.filter(function (c) { return c.assigned === 'Admin User'; }).length
+    };
+  }
+
+  function renderList() {
+    var fullList = filteredConvos();
+    var visible = fullList.slice(0, state.visibleCount);
+
+    // Select first item if nothing selected (or current selection isn't in filtered set)
+    if (!state.selectedId || !visible.find(function (c) { return c.id === state.selectedId; })) {
+      state.selectedId = visible.length ? visible[0].id : null;
+    }
+    var container = document.getElementById('conv-list');
+    if (!fullList.length) {
+      container.innerHTML = '<div class="empty-state" style="padding:60px 20px;"><i data-lucide="inbox"></i><div class="ttl">No messages</div><div class="sub">Nothing here yet.</div></div>';
+      if (window.lucide) window.lucide.createIcons();
+      updateShowingCount(0, 0);
+      return;
+    }
+
+    // Save scroll position so loading more doesn't yank the user away.
+    var oldScroll = container.scrollTop;
+
+    var rowsHtml = visible.map(function (c, idx) {
+      var srcChip;
+      if (c.status === 'spam') {
+        srcChip = '<span class="src spam"><i data-lucide="ban"></i> Spam</span>';
+      } else if (c.source === 'contact-form') {
+        srcChip = '<span class="src contact"><i data-lucide="clipboard-list"></i> Contact Form</span>';
+      } else {
+        srcChip = '<span class="src email"><i data-lucide="mail"></i> Gmail</span>';
+      }
+      var statusKey = c.status;
+      var statusLabel = statusKey === 'open' ? 'Open' : statusKey === 'replied' ? 'Replied' : statusKey === 'spam' ? 'Spam' : 'Closed';
+      var TIP = {
+        open:    { title:'Open',    body:'New or unresolved message. Needs your attention or a reply.',                foot:'All new messages start as Open.' },
+        replied: { title:'Replied', body:'You have responded to this message. Still active \u2014 sender may reply again.', foot:'Returns to Open if sender responds.' },
+        closed:  { title:'Closed',  body:'Conversation fully resolved. No further action needed.',                       foot:'Can be reopened anytime.' },
+        spam:    { title:'Spam',    body:'Flagged as junk. Hidden from main inbox.',                                     foot:'Auto-deleted after 30 days.' }
+      };
+      var t = TIP[statusKey] || TIP.open;
+      var tipDotColor = { open:'#15803D', replied:'#2D6A9F', closed:'#94A3B8', spam:'#DC2626' }[statusKey] || '#94A3B8';
+      var tipHtml = '<div class="status-tip" role="tooltip">'
+        + '<div class="tip-title"><span class="dot" style="background:' + tipDotColor + ';"></span>' + t.title + '</div>'
+        + '<div class="tip-body">' + t.body + '</div>'
+        + '<div class="tip-foot">' + t.foot + '</div>'
+        + '</div>';
+      var rowCls = 'conv'
+        + (c.unread ? ' unread' : '')
+        + (c.id === state.selectedId ? ' active' : '')
+        + (c.status === 'spam' ? ' is-spam' : '')
+        + (state.flashFrom >= 0 && idx >= state.flashFrom ? ' new-row' : '');
+      return '<div class="' + rowCls + '" data-id="' + c.id + '">'
+        + '<div class="av" style="background:' + c.avColor + ';">' + c.avInitials + '</div>'
+        + '<div class="body">'
+        + '<div class="name">' + c.sender + '</div>'
+        + '<div class="preview">' + c.subjectLine + ' \u2014 ' + c.preview + '</div>'
+        + '<div class="row2"><span class="status-cell"><span class="status-dot ' + statusKey + '"></span>' + tipHtml + '</span><span class="stat-label">' + statusLabel + '</span></div>'
+        + '</div>'
+        + '<div class="meta"><span class="ts">' + c.ts + '</span>' + srcChip + '</div>'
+        + '</div>';
+    }).join('');
+
+    // Sentinel — spinner / load-more / end-of-list
+    var sentinelHtml = renderSentinel(fullList.length, visible.length);
+    container.innerHTML = rowsHtml + '<div class="scroll-sentinel" id="scroll-sentinel">' + sentinelHtml + '</div>';
+
+    // Restore scroll position (only meaningful when re-rendering after load-more).
+    container.scrollTop = oldScroll;
+
+    container.querySelectorAll('.conv').forEach(function (el) {
+      el.addEventListener('click', function () {
+        state.selectedId = parseInt(el.getAttribute('data-id'), 10);
+        var c = CONVOS.find(function (x) { return x.id === state.selectedId; });
+        if (c) c.unread = false;
+        // Selection change doesn't trigger flash on the rest.
+        state.flashFrom = -1;
+        renderList();
+        renderThread();
+      });
+    });
+
+    // Wire the load-more button if present.
+    var lmBtn = document.getElementById('load-more-btn');
+    if (lmBtn) lmBtn.addEventListener('click', loadMore);
+
+    // Clear flash markers after one render so the animation only fires once.
+    if (state.flashFrom >= 0) state.flashFrom = -1;
+
+    setupScrollObserver();
+    updateShowingCount(fullList.length, visible.length);
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  function renderSentinel(total, visibleN) {
+    if (state.loading) {
+      return '<div class="scroll-progress"></div>'
+        + '<div class="load-spinner"><span class="ring"></span>Loading more messages\u2026</div>';
+    }
+    if (visibleN >= total) {
+      var label = '\u2014 You have reached the end \u00b7 ' + total + ' total ' + (state.section === 'contact-form' ? 'contact form ' : state.section === 'email' ? 'email ' : '') + (total === 1 ? 'message' : 'messages') + ' \u2014';
+      return '<div class="end-of-list"><span class="rule"></span><span class="ttl">' + label + '</span><span class="rule"></span></div>';
+    }
+    var nextBatch = Math.min(BATCH_SIZE, total - visibleN);
+    return '<button class="load-more-btn" type="button" id="load-more-btn">Load ' + nextBatch + ' more messages <i data-lucide="chevron-down"></i></button>';
+  }
+
+  function updateShowingCount(total, visibleN) {
+    var el = document.getElementById('showing-count');
+    if (!el) return;
+    if (!total) { el.innerHTML = ''; return; }
+    el.innerHTML = 'Showing <b>' + visibleN + '</b> of <b>' + total + '</b> ' + (total === 1 ? 'message' : 'messages');
+  }
+
+  var _observer = null;
+  function setupScrollObserver() {
+    if (_observer) _observer.disconnect();
+    var sentinel = document.getElementById('scroll-sentinel');
+    var root = document.getElementById('conv-list');
+    if (!sentinel || !root || !window.IntersectionObserver) return;
+    _observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting && !state.loading && state.hasScrolled) {
+          var full = filteredConvos();
+          if (state.visibleCount < full.length) loadMore();
+        }
+      });
+    }, { root: root, rootMargin: '120px' });
+    _observer.observe(sentinel);
+  }
+
+  function loadMore() {
+    if (state.loading) return;
+    var full = filteredConvos();
+    if (state.visibleCount >= full.length) return;
+    state.loading = true;
+    renderList(); // shows spinner state in sentinel
+    setTimeout(function () {
+      var prevVisible = state.visibleCount;
+      state.visibleCount = Math.min(state.visibleCount + BATCH_SIZE, full.length);
+      state.loading = false;
+      state.flashFrom = prevVisible; // index from which to flash new rows
+      renderList();
+    }, 700);
+  }
+
+  function renderTabs() {
+    var tabs = TABS_FOR_SECTION[state.section] || TABS_FOR_SECTION.inbox;
+    var counts = computeTabCounts();
+    var html = tabs.map(function (t) {
+      var key = t[0], label = t[1];
+      var cnt = counts[key];
+      var cntHtml = (cnt !== undefined) ? '<span class="count">' + cnt + '</span>' : '';
+      return '<button data-f="' + key + '" class="' + (state.subFilter === key ? 'active' : '') + '">' + label + ' ' + cntHtml + '</button>';
+    }).join('');
+    html += '<button class="status-guide-btn" id="open-status-guide" type="button" title="Learn what each status means"><i data-lucide="info"></i> Status Guide</button>';
+    var bar = document.getElementById('filter-tabs');
+    bar.innerHTML = html;
+    bar.querySelectorAll('button[data-f]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        state.subFilter = b.getAttribute('data-f');
+        state.selectedId = null;
+        state.visibleCount = INITIAL_VISIBLE[state.section] != null ? INITIAL_VISIBLE[state.section] : 9999;
+        state.flashFrom = -1;
+        state.hasScrolled = false;  // reset so the new filter starts at its initial slice
+        renderTabs();
+        renderList();
+        renderThread();
+      });
+    });
+    document.getElementById('open-status-guide').addEventListener('click', _openSG);
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  function renderThread() {
+    var panel = document.getElementById('thread-panel');
+    var c = CONVOS.find(function (x) { return x.id === state.selectedId; });
+    if (!c) {
+      panel.innerHTML = '<div class="empty-state"><i data-lucide="mail-question"></i><div class="ttl">Pick a conversation</div><div class="sub">Select a message from the list to view its thread.</div></div>';
+      if (window.lucide) window.lucide.createIcons();
+      return;
+    }
+
+    // Status badge
+    var statusClass = c.status;
+    var statusText = c.status.charAt(0).toUpperCase() + c.status.slice(1);
+    var statusStyles = {
+      open:    'background:#DCFCE7;color:#15803D;',
+      replied: 'background:#DBEAFE;color:#1D4ED8;',
+      closed:  'background:#F1F5F9;color:#475569;'
+    };
+
+    // Source bar
+    var sourceBar = c.source === 'contact-form'
+      ? '<div class="source-bar"><i data-lucide="clipboard-list"></i><div><b>Contact Form submission</b> \u00b7 Received ' + c.dateLong + ' \u00b7 from <b>' + c.page + '</b></div></div>'
+      : '<div class="source-bar email"><i data-lucide="mail"></i><div><b>Via Gmail</b> \u00b7 support@cloudskin.com \u00b7 ' + c.dateLong + '</div></div>';
+
+    // Spam takes a completely different rendering path — red info bar, tinted body, no reply box.
+    if (c.status === 'spam') {
+      // Build the message bubble inline (the only message is the original spam content).
+      var spamBubble = '<div class="msg-bubble">'
+        + '<div class="av" style="background:' + c.avColor + ';">' + c.avInitials + '</div>'
+        + '<div class="content spam-tint"><div><span class="sender">' + c.sender + '</span><span class="ts">' + (c.thread[0] && c.thread[0].ts || '') + '</span></div>'
+        + '<div class="txt">' + (c.thread[0] && c.thread[0].text || '') + '</div></div>'
+        + '</div>';
+      panel.innerHTML =
+        '<div class="thread-head">'
+        + '<div class="av" style="background:' + c.avColor + ';">' + c.avInitials + '</div>'
+        + '<div class="info"><div class="nm">' + c.sender + '</div><div class="em">' + c.email + '</div><div class="subj">' + c.subjectLine + '</div></div>'
+        + '<div class="actions">'
+        + '<span class="badge" style="background:#FEE2E2;color:#DC2626;">Spam</span>'
+        + '</div></div>'
+        + '<div class="thread-body">'
+        + '<div class="spam-info-bar">'
+        + '<div class="ic"><i data-lucide="ban"></i></div>'
+        + '<div class="body">'
+        + '<div class="ttl">Marked as spam</div>'
+        + '<div class="sub">Deletes permanently on <b>June 12, 2026</b>. Items in Spam are not searchable from the main inbox.</div>'
+        + '</div>'
+        + '<div class="actions">'
+        + '<button class="btn btn-outline" type="button"><i data-lucide="corner-up-left"></i> Not Spam \u2014 Move to Inbox</button>'
+        + '<button class="btn-danger" type="button"><i data-lucide="trash-2"></i> Delete Permanently</button>'
+        + '</div>'
+        + '</div>'
+        + spamBubble
+        + '</div>'
+        + '<div class="no-reply-note">'
+        + '<b>Spam messages cannot be replied to.</b><br>Move to Inbox first if this is a legitimate message.'
+        + '</div>';
+      if (window.lucide) window.lucide.createIcons();
+      return;
+    }
+
+    // Detail card (form data or email view)
+    var detailCard = '';
+    if (c.source === 'contact-form') {
+      detailCard = '<div class="form-card">'
+        + '<div class="ttl"><i data-lucide="clipboard-list"></i> Contact Form Submission</div>'
+        + '<div class="form-grid">'
+        + '<div><div class="k">Name</div><div class="v">' + c.sender + '</div></div>'
+        + '<div><div class="k">Email</div><div class="v mono">' + c.email + '</div></div>'
+        + '<div><div class="k">Phone</div><div class="v mono">' + (c.phone || '—') + '</div></div>'
+        + '<div><div class="k">Subject</div><div class="v">' + (c.formSubject || c.subjectLine) + '</div></div>'
+        + '<div class="full"><div class="k">Message</div><div class="v msg">' + (c.formBody || '') + '</div></div>'
+        + '<div><div class="k">Submitted</div><div class="v">' + c.dateLong + '</div></div>'
+        + '<div><div class="k">Page</div><div class="v mono">' + c.page + '</div></div>'
+        + '</div></div>';
+    } else {
+      detailCard = '<div class="email-card">'
+        + '<div class="ttl"><i data-lucide="mail"></i> Email \u2014 inbound</div>'
+        + '<div class="email-meta">'
+        + '<div class="k">From</div><div class="v"><b>' + c.sender + '</b> &lt;<span style="font-family:var(--font-mono);color:#2D6A9F;">' + c.email + '</span>&gt;</div>'
+        + '<div class="k">To</div><div class="v" style="font-family:var(--font-mono);color:#2D6A9F;">support@cloudskin.com</div>'
+        + '<div class="k">Subject</div><div class="v" style="font-weight:600;color:#1A2E40;">' + c.subjectLine + '</div>'
+        + '<div class="k">Date</div><div class="v">' + c.dateLong + '</div>'
+        + '</div>'
+        + '<div class="email-body">' + (c.thread[0] ? c.thread[0].text : '') + '</div>'
+        + '</div>';
+    }
+
+    // Conversation bubbles (only show thread if more than one message, or for both sources show all)
+    var bubbles = c.thread.map(function (m, idx) {
+      // For email + contact-form the first message is already shown in the detail card; show only subsequent.
+      if (idx === 0) return '';
+      var av = m.from === 'admin'
+        ? '<div class="av" style="background:#2D6A9F;">AU</div>'
+        : '<div class="av" style="background:' + c.avColor + ';">' + c.avInitials + '</div>';
+      var label = m.from === 'admin' ? 'Admin User' : c.sender;
+      var html = '<div class="msg-bubble ' + m.from + '">';
+      if (m.from === 'them') html += av;
+      html += '<div class="content"><div><span class="sender">' + label + '</span><span class="ts">' + m.ts + '</span></div><div class="txt">' + m.text + '</div></div>';
+      if (m.from === 'admin') html += av;
+      html += '</div>';
+      return html;
+    }).join('');
+
+    // From note for reply box
+    var fromNote = c.source === 'email'
+      ? 'Replying via Gmail as <b>support@cloudskin.com</b>'
+      : 'Reply will be sent to <b>' + c.email + '</b>';
+
+    // CC link only on email replies
+    var ccLink = c.source === 'email'
+      ? '<button class="btn-outline btn" type="button" style="height:30px;padding:0 10px;font-size:11.5px;"><i data-lucide="plus"></i> CC</button>'
+      : '';
+
+    // Compose header
+    panel.innerHTML =
+      '<div class="thread-head">'
+      + '<div class="av" style="background:' + c.avColor + ';">' + c.avInitials + '</div>'
+      + '<div class="info"><div class="nm">' + c.sender + '</div><div class="em">' + c.email + '</div><div class="subj">' + c.subjectLine + '</div></div>'
+      + '<div class="actions">'
+      + '<span class="badge" style="' + statusStyles[statusClass] + '">' + statusText + '</span>'
+      + '<button class="btn btn-outline" type="button"><i data-lucide="user-plus"></i> Assign To <i data-lucide="chevron-down"></i></button>'
+      + '<button class="btn btn-outline" type="button"><i data-lucide="archive"></i> Close Thread</button>'
+      + '<button class="btn-ghost-red" type="button">Mark Spam</button>'
+      + '</div></div>'
+      + sourceBar
+      + '<div class="thread-body">'
+        + detailCard
+        + bubbles
+      + '</div>'
+      + '<div class="reply-box">'
+      + '<div class="tools">'
+        + '<button type="button" title="Bold"><i data-lucide="bold"></i></button>'
+        + '<button type="button" title="Italic"><i data-lucide="italic"></i></button>'
+        + '<button type="button" title="Link"><i data-lucide="link"></i></button>'
+        + '<button type="button" title="Attach"><i data-lucide="paperclip"></i></button>'
+      + '</div>'
+      + '<textarea placeholder="Type your reply\u2026"></textarea>'
+      + '<div class="foot">'
+        + '<div class="from-note">' + fromNote + '</div>'
+        + ccLink
+        + '<div class="spacer"></div>'
+        + '<button class="btn btn-outline" type="button"><i data-lucide="save"></i> Save Draft</button>'
+        + '<button class="btn btn-primary" type="button"><i data-lucide="send"></i> Send Reply</button>'
+      + '</div>'
+      + '</div>';
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  function syncHeader() {
+    var titles = { 'inbox': 'Inbox', 'contact-form': 'Contact Forms', 'email': 'Email', 'assigned': 'Assigned to Me', 'closed': 'Closed', 'spam': 'Spam' };
+    var label = titles[state.section] || 'Inbox';
+    document.getElementById('page-title').textContent = label;
+    document.getElementById('page-crumb').textContent = 'Admin / Messages / ' + label;
+    document.getElementById('panel-title').textContent = label;
+    document.title = 'Cloud Skin Admin — ' + label;
+
+    // Recompute unread / count tag based on section.
+    var list = sectionFiltered();
+    var unread = list.filter(function (c) { return c.unread; }).length;
+    var ut = document.getElementById('unread-tag');
+    if (state.section === 'spam') {
+      ut.textContent = list.length + ' message' + (list.length === 1 ? '' : 's');
+      ut.hidden = false;
+      ut.style.background = '#FEE2E2';
+      ut.style.color = '#DC2626';
+    } else {
+      ut.style.background = '';
+      ut.style.color = '';
+      if (unread > 0) {
+        ut.textContent = unread + ' unread';
+        ut.hidden = false;
+      } else {
+        ut.hidden = true;
+      }
+    }
+    // Show Gmail sync indicator only on Email section; spam banner only on Spam.
+    document.getElementById('gmail-sync').hidden = (state.section !== 'email');
+    var spamBan = document.getElementById('spam-banner');
+    if (spamBan) spamBan.hidden = (state.section !== 'spam');
+  }
+
+  // Module-level shared modal helpers so renderTabs can wire them on each redraw.
+  var _sgModal = null;
+  function _openSG() { if (!_sgModal) _sgModal = document.getElementById('status-guide-modal'); _sgModal.hidden = false; document.body.style.overflow = 'hidden'; if (window.lucide) window.lucide.createIcons(); }
+  function _closeSG() { if (!_sgModal) _sgModal = document.getElementById('status-guide-modal'); _sgModal.hidden = true; document.body.style.overflow = ''; }
+
+  // ---------- Init ----------
+  (function () {
+    readFilterFromURL();
+    // Pre-select an appropriate message for each section so the right panel demos the variant.
+    var defaults = { 'inbox': 1, 'contact-form': 1, 'email': 2, 'assigned': 1, 'closed': 5, 'spam': 101 };
+    state.selectedId = defaults[state.section] || null;
+    syncHeader();
+    renderTabs();
+    renderList();
+    renderThread();
+
+    // Flip hasScrolled true the first time the user actually scrolls the message list.
+    // This prevents the IntersectionObserver from auto-loading all batches on initial
+    // render when the sentinel happens to be in view because the list is shorter than
+    // its container.
+    var listEl = document.getElementById('conv-list');
+    if (listEl) {
+      listEl.addEventListener('scroll', function () {
+        if (listEl.scrollTop > 0) state.hasScrolled = true;
+      }, { passive: true });
+    }
+
+    // Static Status Guide modal close/ok/backdrop/Esc (the open trigger is wired in renderTabs).
+    _sgModal = document.getElementById('status-guide-modal');
+    document.getElementById('sg-close').addEventListener('click', _closeSG);
+    document.getElementById('sg-ok').addEventListener('click', _closeSG);
+    _sgModal.addEventListener('click', function (e) { if (e.target === _sgModal) _closeSG(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !_sgModal.hidden) _closeSG(); });
+  })();
+</script>
+</body>
+</html>

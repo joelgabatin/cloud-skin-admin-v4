@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Reviews</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; }
+  /* __SUBMENU_STYLES__ */
+  .nav-item .chev { transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; text-decoration: none; }
+  .submenu .nav-item:hover { background: #254d70; color: #fff; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .submenu .nav-item .lucide { width: 16px; height: 16px; }
+
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill-side { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 24px; }
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .stat-card { background: #fff; border-radius: 12px; padding: 16px 20px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .stat-card .l { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-bottom: 8px; }
+  .stat-card .v { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+
+  .toolbar { display: flex; gap: 16px; align-items: center; }
+  .search-input { flex: 1; display: flex; align-items: center; gap: 8px; background: #fff; border-radius: 8px; padding: 8px 14px; border: 1.5px solid #D0E8F5; }
+  .search-input .lucide { color: #5A7A96; width: 16px; height: 16px; }
+  .search-input input { flex: 1; border: none; background: none; outline: none; font-family: var(--font-body); font-size: 14px; color: #1A2E40; }
+  .filter-pills { display: flex; gap: 8px; }
+  .filter-pill { padding: 8px 16px; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 500; color: #5A7A96; text-transform: capitalize; }
+  .filter-pill.active { background: #2D6A9F; border-color: #2D6A9F; color: #fff; }
+
+  .section-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #F0F6FC; padding: 12px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; }
+  td { padding: 14px 16px; border-bottom: 1px solid #F0F6FC; font-size: 13px; color: #5A7A96; }
+  tr:last-child td { border-bottom: none; }
+  .patient-cell .pn { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #1A2E40; }
+  .patient-cell .pe { font-size: 12px; color: #5A7A96; }
+  .stars { display: inline-flex; gap: 2px; }
+  .stars .star { width: 14px; height: 14px; }
+  .stars .star.f { color: #F59E0B; fill: #F59E0B; }
+  .stars .star.e { color: #D0E8F5; }
+  .status-badge { display: inline-block; padding: 4px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; text-transform: capitalize; }
+  .status-pending { background: #FEF3C7; color: #D97706; }
+  .status-approved { background: #D1FAE5; color: #16A34A; }
+  .status-rejected { background: #FEE2E2; color: #DC2626; }
+  .row-actions { display: inline-flex; gap: 8px; }
+  .row-action { padding: 6px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; }
+  .row-action.up { background: #D1FAE5; color: #16A34A; }
+  .row-action.dn { background: #FEE2E2; color: #DC2626; }
+  .row-action .lucide { width: 14px; height: 14px; color: #5A7A96; }
+  .row-action.up .lucide { color: #16A34A; }
+  .row-action.dn .lucide { color: #DC2626; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside id="sidebar-mount" class="sidebar"></aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Reviews</div>
+        <div class="topbar-crumb">Admin / Reviews</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Reviews">
+      <div class="stat-row">
+        <div class="stat-card"><div class="l">Total Reviews</div><div class="v">6</div></div>
+        <div class="stat-card"><div class="l">Pending Review</div><div class="v">2</div></div>
+        <div class="stat-card"><div class="l">Average Rating</div><div class="v">4.0</div></div>
+        <div class="stat-card"><div class="l">5-Star Reviews</div><div class="v">3</div></div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-input"><i data-lucide="search"></i><input placeholder="Search reviews..."></div>
+        <div class="filter-pills" id="filter">
+          <button class="filter-pill active" data-f="all">all</button>
+          <button class="filter-pill" data-f="pending">pending</button>
+          <button class="filter-pill" data-f="approved">approved</button>
+          <button class="filter-pill" data-f="rejected">rejected</button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <table>
+          <thead><tr><th>Patient</th><th>Service</th><th>Practitioner</th><th>Rating</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="rows">
+            <tr data-status="pending">
+              <td><div class="patient-cell"><div class="pn">Maria Santos</div><div class="pe">maria.santos@email.com</div></div></td>
+              <td>Hydra Facial</td>
+              <td>Dr. Sarah Chen</td>
+              <td><div class="stars"><i class="star f" data-lucide="star" data-fill="true"></i><i class="star f" data-lucide="star" data-fill="true"></i><i class="star f" data-lucide="star" data-fill="true"></i><i class="star f" data-lucide="star" data-fill="true"></i><i class="star f" data-lucide="star" data-fill="true"></i></div></td>
+              <td>2025-04-28</td>
+              <td><span class="status-badge status-pending">pending</span></td>
+              <td><div class="row-actions"><button class="row-action" title="View"><i data-lucide="eye"></i></button><button class="row-action up" title="Approve"><i data-lucide="thumbs-up"></i></button><button class="row-action dn" title="Reject"><i data-lucide="thumbs-down"></i></button></div></td>
+            </tr>
+            <tr data-status="approved">
+              <td><div class="patient-cell"><div class="pn">Ana Reyes</div><div class="pe">ana.reyes@email.com</div></div></td>
+              <td>Botox Treatment</td>
+              <td>Dr. Michael Santos</td>
+              <td><div class="stars"><i class="star f" data-lucide="star"></i><i class="star f" data-lucide="star"></i><i class="star f" data-lucide="star"></i><i class="star f" data-lucide="star"></i><i class="star f" data-lucide="star"></i></div></td>
+              <td>2025-04-27</td>
+              <td><span class="status-badge status-approved">approved</span></td>
+              <td><div class="row-actions"><button class="row-action" title="View"><i data-lucide="eye"></i></button></div></td>
+            </tr>
+            <tr data-status="approved">
+              <td><div class="patient-cell"><div class="pn">Sofia Cruz</div><div class="pe">sofia.cruz@email.com</div></div></td>
+              <td>Chemical Peel</td>
+              <td>Dr. Sarah Chen</td>
+              <td><div class="stars"><i class="star f" data-lucide="star"></i><i class="star f" data-lucide="star"></i><i class="star f" data-lucide="star"></i><i class="star f" data-lucide="star"></i><i class="star e" data-lucide="star"></i></div></td>
+              <td>2025-04-26</td>
+              <td><span class="status-badge status-approved">approved</span></td>
+              <td><div class="row-actions"><button class="row-action" title="View"><i data-lucide="eye"></i></button></div></td>
+            </tr>
+            <tr data-status="pending">
+              <td><div class="patient-cell"><div class="pn">Carlos Garcia</div><div class="pe">carlos.garcia@email.com</div></div></td>
+              <td>Laser Resurfacing</td>
+              <td>Dr. Michael Santos</td>
+              <td><div class="stars"><i class="star f" data-lucide="star"></i><i class="star f" data-lucide="star"></i><i class="star f" data-lucide="star"></i><i class="star e" data-lucide="star"></i><i class="star e" data-lucide="star"></i></div></td>
+              <td>2025-04-25</td>
+              <td><span class="status-badge status-pending">pending</span></td>
+              <td><div class="row-actions"><button class="row-action" title="View"><i data-lucide="eye"></i></button><button class="row-action up" title="Approve"><i data-lucide="thumbs-up"></i></button><button class="row-action dn" title="Reject"><i data-lucide="thumbs-down"></i></button></div></td>
+            </tr>
+            <tr data-status="approved">
+              <td><div class="patient-cell"><div class="pn">Isabella Santos</div><div class="pe">isabella.santos@email.com</div></div></td>
+              <td>Dermal Fillers</td>
+              <td>Dr. Sarah Chen</td>
+              <td><div class="stars"><i class="star f" data-lucide="star"></i><i class="star f" data-lucide="star"></i><i class="star f" data-lucide="star"></i><i class="star f" data-lucide="star"></i><i class="star f" data-lucide="star"></i></div></td>
+              <td>2025-04-24</td>
+              <td><span class="status-badge status-approved">approved</span></td>
+              <td><div class="row-actions"><button class="row-action" title="View"><i data-lucide="eye"></i></button></div></td>
+            </tr>
+            <tr data-status="rejected">
+              <td><div class="patient-cell"><div class="pn">Juan Dela Cruz</div><div class="pe">juan.delacruz@email.com</div></div></td>
+              <td>Acne Treatment</td>
+              <td>Dr. Michael Santos</td>
+              <td><div class="stars"><i class="star f" data-lucide="star"></i><i class="star f" data-lucide="star"></i><i class="star e" data-lucide="star"></i><i class="star e" data-lucide="star"></i><i class="star e" data-lucide="star"></i></div></td>
+              <td>2025-04-23</td>
+              <td><span class="status-badge status-rejected">rejected</span></td>
+              <td><div class="row-actions"><button class="row-action" title="View"><i data-lucide="eye"></i></button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // Fix star fills
+  document.querySelectorAll('.stars .star.f').forEach(s => s.setAttribute('fill', '#F59E0B'));
+  // Filter
+  document.querySelectorAll('#filter .filter-pill').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#filter .filter-pill').forEach(o => o.classList.toggle('active', o === b));
+    const f = b.dataset.f;
+    document.querySelectorAll('#rows tr').forEach(r => {
+      r.style.display = (f === 'all' || r.dataset.status === f) ? '' : 'none';
+    });
+  }));
+  lucide.createIcons();
+  // Re-apply star colors after lucide replaces
+  document.querySelectorAll('.stars .star').forEach(s => {
+    const svg = s.querySelector?.('svg') || s;
+    if (s.classList.contains('f')) svg.setAttribute && svg.setAttribute('fill', '#F59E0B');
+  });
+</script>
+<script>
+/* __MW_TOGGLE__ */
+(function(){
+  // Find every parent .nav-item that is followed by a [data-submenu-for] block and wire up click toggle
+  document.querySelectorAll('aside.sidebar .nav-item').forEach(function(item){
+    var next = item.nextElementSibling;
+    if (!next || !next.hasAttribute || !next.hasAttribute('data-submenu-for')) return;
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', function(e){
+      // Don't navigate if it's a link
+      if (item.tagName === 'A') e.preventDefault();
+      var isOpen = next.style.display !== 'none';
+      next.style.display = isOpen ? 'none' : 'block';
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+})();
+</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

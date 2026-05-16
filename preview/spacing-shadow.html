@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 36px 28px; background: #fff; display: flex; flex-direction: column; gap: 24px; }
+  .row { display: flex; align-items: center; gap: 20px; }
+  .demo { width: 96px; height: 64px; background: #fff; border-radius: 12px; flex-shrink:0; }
+  .meta { display:flex; flex-direction:column; }
+  .name { font-family: var(--font-display); font-weight:600; font-size:13px; color: var(--navy-800); }
+  .formula { font-family: var(--font-mono); font-size: 10px; color: var(--slate-500); }
+</style>
+</head>
+<body>
+<div class="row"><div class="demo" style="box-shadow:0 1px 3px rgba(26,58,92,0.06)"></div><div class="meta"><span class="name">shadow-xs</span><span class="formula">0 1px 3px rgba(26,58,92,0.06)</span><span class="formula">navbar at rest</span></div></div>
+<div class="row"><div class="demo" style="box-shadow:0 1px 4px rgba(26,58,92,0.08), 0 2px 8px rgba(26,58,92,0.04)"></div><div class="meta"><span class="name">shadow-sm</span><span class="formula">stat card, dashboard panels</span></div></div>
+<div class="row"><div class="demo" style="box-shadow:0 4px 12px rgba(26,58,92,0.08)"></div><div class="meta"><span class="name">shadow-md</span><span class="formula">testimonial, dropdown</span></div></div>
+<div class="row"><div class="demo" style="box-shadow:0 8px 24px rgba(26,58,92,0.12)"></div><div class="meta"><span class="name">shadow-lg</span><span class="formula">hover state — service cards</span></div></div>
+<div class="row"><div class="demo" style="box-shadow:0 16px 48px rgba(26,58,92,0.16)"></div><div class="meta"><span class="name">shadow-xl</span><span class="formula">mobile drawer, side hero</span></div></div>
+<div class="row"><div class="demo" style="box-shadow:0 24px 64px rgba(26,58,92,0.20)"></div><div class="meta"><span class="name">shadow-hero</span><span class="formula">main banner photo only</span></div></div>
+</body>
+</html>

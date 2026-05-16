@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Vouchers</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; }
+  /* __SUBMENU_STYLES__ */
+  .nav-item .chev { transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; text-decoration: none; }
+  .submenu .nav-item:hover { background: #254d70; color: #fff; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .submenu .nav-item .lucide { width: 16px; height: 16px; }
+
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill-side { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; }
+  .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .filter-pill { height: 38px; padding: 0 14px; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 500; color: #5A7A96; }
+  .filter-pill.active { background: #2D6A9F; border-color: #2D6A9F; color: #fff; }
+  .search-input { position: relative; }
+  .search-input .lucide { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #9BBAD4; width: 14px; height: 14px; }
+  .search-input input { width: 220px; height: 38px; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px 0 32px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .btn-primary { height: 38px; padding: 0 18px; background: #2D6A9F; border: none; border-radius: 8px; color: #fff; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; margin-left: auto; }
+  .btn-primary .lucide { width: 14px; height: 14px; }
+
+  .section-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+  th { background: #F0F6FC; padding: 10px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #F8FBFF; }
+  .campaign-name { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #1A2E40; margin-bottom: 2px; }
+  .campaign-id { font-size: 11px; color: #9BBAD4; }
+  .discount-value { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #1A2E40; }
+  .discount-type { font-size: 11px; color: #9BBAD4; }
+  .codes-count { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #2D6A9F; }
+  .codes-label { font-size: 12px; color: #9BBAD4; margin-left: 4px; }
+  .used-row { display: flex; align-items: center; gap: 8px; }
+  .used-num { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .total-num { font-size: 12px; color: #9BBAD4; }
+  .progress-bar { height: 3px; background: #F0F6FC; border-radius: 9999px; overflow: hidden; width: 80px; margin-top: 6px; }
+  .progress-bar > div { height: 100%; background: #2D6A9F; border-radius: 9999px; }
+  .status-badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .actions { display: inline-flex; gap: 6px; position: relative; }
+  .action-btn { width: 28px; height: 28px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #5A7A96; }
+  .action-btn.view { color: #2D6A9F; }
+  .action-btn .lucide { width: 13px; height: 13px; }
+  .menu { position: absolute; top: 100%; right: 0; margin-top: 4px; background: #fff; border: 1px solid #D0E8F5; border-radius: 8px; box-shadow: 0 4px 12px rgba(26,58,92,0.15); min-width: 140px; z-index: 50; display: none; }
+  .menu.open { display: block; }
+  .menu button { display: block; width: 100%; padding: 10px 16px; background: none; border: none; text-align: left; cursor: pointer; font-family: var(--font-body); font-size: 13px; border-bottom: 1px solid #F0F6FC; }
+  .menu button:last-child { border-bottom: none; }
+  .menu button:hover { background: #F8FBFF; }
+  .menu .archive { color: #F97316; }
+  .menu .delete { color: #EF4444; }
+
+  /* Modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(26,58,92,0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 24px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: 16px; max-width: 520px; width: 100%; box-shadow: 0 8px 32px rgba(26,58,92,0.18); overflow: hidden; }
+  .modal-head { padding: 20px 24px; border-bottom: 1px solid #D0E8F5; display: flex; justify-content: space-between; align-items: center; }
+  .modal-head h2 { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: #1A2E40; margin: 0; }
+  .modal-head button { background: none; border: none; cursor: pointer; color: #5A7A96; display: flex; }
+  .modal-body { padding: 24px; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-family: var(--font-display); font-weight: 500; font-size: 13px; color: #1A2E40; margin-bottom: 6px; }
+  .field input, .field select { width: 100%; height: 40px; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; box-sizing: border-box; background: #fff; }
+  .helper { font-size: 11px; color: #9BBAD4; margin-top: 4px; }
+  .radio-row { display: flex; gap: 10px; }
+  .radio-card { flex: 1; padding: 10px 12px; border: 1.5px solid #D0E8F5; border-radius: 8px; background: #fff; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  .radio-card.active { border-color: #2D6A9F; background: #EBF6FD; }
+  .radio-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #9BBAD4; flex-shrink: 0; position: relative; }
+  .radio-card.active .radio-dot { border-color: #2D6A9F; background: #2D6A9F; }
+  .radio-card.active .radio-dot::after { content:""; position:absolute; inset:3px; border-radius:50%; background:#fff; }
+  .radio-card span { font-family: var(--font-display); font-size: 12px; font-weight: 500; color: #5A7A96; }
+  .radio-card.active span { color: #2D6A9F; }
+  .field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .modal-foot { padding: 16px 24px; border-top: 1px solid #D0E8F5; display: flex; justify-content: flex-end; gap: 10px; }
+  .btn-cancel { height: 38px; padding: 0 20px; background: none; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 14px; color: #5A7A96; }
+  .btn-solid { height: 38px; padding: 0 20px; background: #2D6A9F; border: none; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #fff; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside id="sidebar-mount" class="sidebar"></aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Vouchers</div>
+        <div class="topbar-crumb">Admin / Vouchers</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Vouchers">
+      <div class="toolbar">
+        <button class="filter-pill active" data-f="All">All</button>
+        <button class="filter-pill" data-f="active">Active</button>
+        <button class="filter-pill" data-f="inactive">Inactive</button>
+        <div class="search-input"><i data-lucide="search"></i><input placeholder="Search campaigns..."></div>
+        <button class="btn-primary" id="open-create"><i data-lucide="plus"></i> Create Voucher Campaign</button>
+      </div>
+
+      <div class="section-card">
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>Campaign Name</th><th>Discount</th><th>Eligible Services</th><th>Expiry Date</th><th>Codes Generated</th><th>Used / Total</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="rows">
+              <tr data-status="active">
+                <td><div class="campaign-name">Welcome Campaign</div><div class="campaign-id">ID: VB001</div></td>
+                <td><div class="discount-value">20%</div><div class="discount-type">Percentage</div></td>
+                <td>All Services</td>
+                <td>Dec 31, 2026</td>
+                <td><span class="codes-count">100</span><span class="codes-label">codes</span></td>
+                <td><div class="used-row"><span class="used-num">45</span><span style="color:#9BBAD4">/</span><span class="total-num">100</span></div><div class="progress-bar"><div style="width:45%"></div></div></td>
+                <td><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td>
+                <td><div class="actions"><button class="action-btn view"><i data-lucide="eye"></i></button><button class="action-btn" data-act="menu"><i data-lucide="more-vertical"></i></button><div class="menu"><button class="archive">Archive</button><button class="delete">Delete</button></div></div></td>
+              </tr>
+              <tr data-status="active">
+                <td><div class="campaign-name">Summer Promo</div><div class="campaign-id">ID: VB002</div></td>
+                <td><div class="discount-value">25%</div><div class="discount-type">Percentage</div></td>
+                <td>Laser, Injectables</td>
+                <td>Aug 31, 2026</td>
+                <td><span class="codes-count">50</span><span class="codes-label">codes</span></td>
+                <td><div class="used-row"><span class="used-num">8</span><span style="color:#9BBAD4">/</span><span class="total-num">50</span></div><div class="progress-bar"><div style="width:16%"></div></div></td>
+                <td><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td>
+                <td><div class="actions"><button class="action-btn view"><i data-lucide="eye"></i></button><button class="action-btn" data-act="menu"><i data-lucide="more-vertical"></i></button><div class="menu"><button class="archive">Archive</button><button class="delete">Delete</button></div></div></td>
+              </tr>
+              <tr data-status="active">
+                <td><div class="campaign-name">Anniversary Special</div><div class="campaign-id">ID: VB003</div></td>
+                <td><div class="discount-value">₱500</div><div class="discount-type">Fixed Amount</div></td>
+                <td>Skin Treatments</td>
+                <td>Jun 30, 2026</td>
+                <td><span class="codes-count">20</span><span class="codes-label">codes</span></td>
+                <td><div class="used-row"><span class="used-num">12</span><span style="color:#9BBAD4">/</span><span class="total-num">20</span></div><div class="progress-bar"><div style="width:60%"></div></div></td>
+                <td><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td>
+                <td><div class="actions"><button class="action-btn view"><i data-lucide="eye"></i></button><button class="action-btn" data-act="menu"><i data-lucide="more-vertical"></i></button><div class="menu"><button class="archive">Archive</button><button class="delete">Delete</button></div></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Create Voucher Modal -->
+<div id="modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Create Voucher Campaign</h2>
+      <button id="close-modal"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label>Campaign Name</label><input placeholder="e.g. Anniversary Promo"></div>
+      <div class="field"><label>Number of Vouchers to Generate</label><input type="number" min="1" max="1000" placeholder="20"><div class="helper">Unique voucher codes will be auto-generated</div></div>
+      <div class="field">
+        <label>Discount Type</label>
+        <div class="radio-row" id="disc-type">
+          <label class="radio-card active" data-t="percentage"><div class="radio-dot"></div><span>Percentage (%)</span></label>
+          <label class="radio-card" data-t="fixed"><div class="radio-dot"></div><span>Fixed Amount (₱)</span></label>
+        </div>
+      </div>
+      <div class="field-grid-2">
+        <div class="field"><label>Discount Value (%)</label><input type="number" placeholder="20"></div>
+        <div class="field"><label>Expiry Date</label><input type="date"></div>
+      </div>
+      <div class="field">
+        <label>Eligible Services</label>
+        <select><option>All Services</option><option>Skin Treatments</option><option>Injectables</option><option>Laser</option><option>Hair</option><option>Wellness</option></select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" id="cancel-modal">Cancel</button>
+      <button class="btn-solid" id="generate-modal">Generate Vouchers</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Filter
+  document.querySelectorAll('.filter-pill').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.filter-pill').forEach(o => o.classList.toggle('active', o === b));
+    const f = b.dataset.f;
+    document.querySelectorAll('#rows tr').forEach(r => r.style.display = (f === 'All' || r.dataset.status === f) ? '' : 'none');
+  }));
+
+  // Action menu
+  document.querySelectorAll('[data-act="menu"]').forEach(b => b.addEventListener('click', e => {
+    e.stopPropagation();
+    document.querySelectorAll('.menu.open').forEach(m => { if (m !== b.nextElementSibling) m.classList.remove('open'); });
+    b.nextElementSibling.classList.toggle('open');
+  }));
+  document.addEventListener('click', () => document.querySelectorAll('.menu.open').forEach(m => m.classList.remove('open')));
+
+  // Modal
+  const modal = document.getElementById('modal');
+  document.getElementById('open-create').addEventListener('click', () => modal.classList.add('open'));
+  const close = () => modal.classList.remove('open');
+  document.getElementById('close-modal').addEventListener('click', close);
+  document.getElementById('cancel-modal').addEventListener('click', close);
+  document.getElementById('generate-modal').addEventListener('click', close);
+  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+
+  // Discount type radio
+  document.querySelectorAll('#disc-type .radio-card').forEach(c => c.addEventListener('click', () => {
+    document.querySelectorAll('#disc-type .radio-card').forEach(o => o.classList.toggle('active', o === c));
+    // Update discount value label
+    const label = document.querySelector('.field-grid-2 .field label');
+    if (label) label.textContent = c.dataset.t === 'percentage' ? 'Discount Value (%)' : 'Discount Value (₱)';
+  }));
+
+  lucide.createIcons();
+</script>
+<script>
+/* __MW_TOGGLE__ */
+(function(){
+  // Find every parent .nav-item that is followed by a [data-submenu-for] block and wire up click toggle
+  document.querySelectorAll('aside.sidebar .nav-item').forEach(function(item){
+    var next = item.nextElementSibling;
+    if (!next || !next.hasAttribute || !next.hasAttribute('data-submenu-for')) return;
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', function(e){
+      // Don't navigate if it's a link
+      if (item.tagName === 'A') e.preventDefault();
+      var isOpen = next.style.display !== 'none';
+      next.style.display = isOpen ? 'none' : 'block';
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+})();
+</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

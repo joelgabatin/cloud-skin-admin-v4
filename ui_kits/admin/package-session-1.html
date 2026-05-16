@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — HydraFacial Workflow</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: #1A2E40; }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #0F1E2E; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg,#2D6A9F,#5BC0EB); display: flex; align-items: center; justify-content: center; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-crumb a { color: #2D6A9F; text-decoration: none; }
+
+  .page { padding: 24px 32px 60px; display: flex; flex-direction: column; gap: 14px; }
+  .back-link { color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; text-decoration: none; width: fit-content; }
+  .back-link .lucide { width: 14px; height: 14px; }
+  .title-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .title-row h1 { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; margin: 0; }
+  .badge { padding: 4px 10px; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 11px; display: inline-block; }
+  .badge.orange { background: #FED7AA; color: #C2410C; }
+  .badge.green { background: #DCFCE7; color: #15803D; }
+  .badge.blue { background: #DBEAFE; color: #1D4ED8; }
+
+  .svc-banner { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: #EFF6FF; border-left: 4px solid #2D6A9F; border-radius: 8px; }
+  .svc-banner .ic { width: 24px; height: 24px; border-radius: 6px; background: rgba(45,106,159,0.12); color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; }
+  .svc-banner .ic .lucide { width: 14px; height: 14px; }
+  .svc-banner .ttl { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #2D6A9F; }
+  .svc-banner .desc { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-left: 4px; }
+  .svc-banner .chip { margin-left: auto; padding: 4px 10px; background: #F0F6FC; color: #2D6A9F; border-radius: 6px; font-family: var(--font-display); font-weight: 700; font-size: 11.5px; }
+  .svc-banner .reset { margin-left: 10px; background: #fff; border: 1px solid #D0E8F5; color: #5A7A96; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; cursor: pointer; }
+  .svc-banner .reset:hover { background: #F0F6FC; color: #DC2626; border-color: #FCA5A5; }
+
+  .step-card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(26,58,92,0.06); border: 1px solid #E5EFF7; overflow: hidden; }
+  .nodes { display: flex; padding: 22px 22px 14px; gap: 0; overflow-x: auto; }
+  .node { flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 74px; position: relative; cursor: pointer; }
+  .node .circle { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 12px; z-index: 2; background: #fff; border: 2px solid #E5EFF7; color: #9BBAD4; transition: all 120ms; }
+  .node.done .circle { background: #15803D; border-color: #15803D; color: #fff; }
+  .node.done .circle .lucide { width: 14px; height: 14px; }
+  .node.active .circle { background: #2D6A9F; border-color: #2D6A9F; color: #fff; box-shadow: 0 0 0 4px rgba(45,106,159,0.18); }
+  .node .lbl { font-family: var(--font-display); font-size: 10.5px; color: #5A7A96; margin-top: 6px; text-align: center; line-height: 1.3; max-width: 84px; }
+  .node.active .lbl { color: #2D6A9F; font-weight: 700; }
+  .node.done .lbl { color: #1A2E40; font-weight: 600; }
+  .node .conn { position: absolute; top: 15px; height: 2px; background: #E5EFF7; left: 50%; right: -50%; z-index: 1; }
+  .node.done .conn { background: #15803D; }
+  .node:last-child .conn { display: none; }
+
+  .step-nav { padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; background: #F8FBFD; border-top: 1px solid #F0F6FC; border-bottom: 1px solid #F0F6FC; }
+  .viewing { font-family: var(--font-body); font-size: 13px; color: #1A2E40; }
+  .viewing .pfx { color: #5A7A96; }
+  .arrows { display: flex; gap: 6px; }
+  .arr-btn { width: 28px; height: 28px; border: 1px solid #D0E8F5; background: #fff; border-radius: 6px; cursor: pointer; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; }
+  .arr-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .arr-btn .lucide { width: 13px; height: 13px; }
+
+  .content-panel { padding: 22px 24px; }
+  .content-panel h2 { font-family: var(--font-display); font-weight: 700; font-size: 17px; color: #1A2E40; margin: 0 0 4px; }
+  .content-panel .subtext { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-bottom: 16px; }
+  .pane { display: none !important; }
+  .pane[data-active], .pane.is-active { display: block !important; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  @media (max-width: 700px) { .grid-3 { grid-template-columns: 1fr; } }
+
+  label.fld-lbl { display: block; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 5px; }
+  input[type="text"], input[type="number"], input[type="date"], select, textarea { width: 100%; height: 38px; padding: 0 11px; border: 1px solid #D1E3F3; border-radius: 7px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  textarea { height: auto; padding: 9px 11px; min-height: 70px; resize: vertical; line-height: 1.5; }
+  input:focus, select:focus, textarea:focus { border-color: #2D6A9F; }
+  .field { margin-bottom: 12px; }
+
+  .sec-lbl { font-family: var(--font-display); font-weight: 700; font-size: 11px; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin: 14px 0 8px; }
+  .note { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 7px; padding: 10px 12px; font-size: 12px; color: #5A7A96; line-height: 1.5; margin-top: 8px; }
+  .info-box { background: #F0F6FC; border: 1px solid #BFD8EB; border-radius: 8px; padding: 10px 14px; font-family: var(--font-body); font-size: 12.5px; color: #1E40AF; margin-bottom: 14px; display: flex; gap: 8px; align-items: flex-start; }
+  .info-box .lucide { width: 14px; height: 14px; color: #2D6A9F; flex-shrink: 0; margin-top: 2px; }
+  .info-box b { color: #1A2E40; font-family: var(--font-display); font-weight: 700; }
+
+  .chk-list { display: flex; flex-direction: column; gap: 6px; }
+  .chk-list label { display: flex; align-items: center; gap: 8px; font-family: var(--font-body); font-size: 12.5px; color: #1A2E40; cursor: pointer; }
+  .chk-list input { width: 14px; height: 14px; accent-color: #2D6A9F; }
+
+  .chk-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chk-chip { padding: 6px 12px; border: 1.5px solid #D1E3F3; background: #fff; color: #5A7A96; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; user-select: none; }
+  .chk-chip.on { background: #2D6A9F; color: #fff; border-color: #2D6A9F; }
+
+  table.simple { width: 100%; border-collapse: collapse; border: 1px solid #E5EFF7; border-radius: 8px; overflow: hidden; }
+  table.simple th { padding: 10px 12px; font-family: var(--font-display); font-size: 10.5px; font-weight: 700; color: #5A7A96; background: #F0F6FC; text-transform: uppercase; letter-spacing: 0.04em; text-align: left; }
+  table.simple td { padding: 9px 12px; font-family: var(--font-body); font-size: 12.5px; color: #1A2E40; border-top: 1px solid #F0F6FC; }
+  table.simple input { height: 30px; padding: 0 8px; font-size: 12px; }
+
+  .sig-canvas { width: 100%; max-width: 360px; height: 110px; background: #fff; border: 1.5px dashed #BFD8EB; border-radius: 6px; cursor: crosshair; display: block; }
+  .sig-actions { display: flex; gap: 8px; margin-top: 8px; max-width: 360px; }
+  .btn-ghost-sm { background: #fff; border: 1px solid #D0E8F5; color: #5A7A96; padding: 5px 12px; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; cursor: pointer; }
+  .btn-ghost-sm:hover { background: #F0F6FC; }
+
+  .btn-row { display: flex; justify-content: space-between; gap: 10px; padding: 16px 24px; background: #F8FBFD; border-top: 1px solid #F0F6FC; }
+  .btn { height: 38px; padding: 0 16px; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; cursor: pointer; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .btn-ghost { background: #fff; color: #5A7A96; border-color: #D0E8F5; }
+  .btn-ghost:hover { background: #F0F6FC; }
+  .btn-primary { background: #2D6A9F; color: #fff; }
+  .btn-primary:hover { background: #1A5685; }
+  .btn-green { background: #15803D; color: #fff; }
+  .btn-green:hover { background: #166534; }
+  .btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 20px; right: 20px; background: #15803D; color: #fff; padding: 9px 16px; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.18); opacity: 0; transition: opacity 200ms; z-index: 1000; pointer-events: none; }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">HydraFacial — Session 1</div>
+        <div class="topbar-crumb">Admin / Patients / <a href="patient-profile.html?id=P001">Sarah Johnson</a> / Packages / <a href="package-details.html">Premium Facial Package</a> / Session 1</div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 HydraFacial Workflow">
+      <a class="back-link" href="package-details.html"><i data-lucide="arrow-left"></i> Back to Premium Facial Package</a>
+      <div class="title-row">
+        <h1>HydraFacial — Session 1 of 6</h1>
+        <span class="badge orange" id="header-status">In Progress</span>
+        <span class="badge orange">Pending Payment</span>
+        <span style="background:#fff;border:1px solid #2D6A9F;border-radius:6px;padding:4px 10px;font-family:var(--font-display);font-weight:600;font-size:12px;color:#2D6A9F;display:inline-flex;align-items:center;gap:5px;"><i data-lucide="package" style="width:13px;height:13px;color:#2D6A9F;"></i> Session 1 of 6</span>
+      </div>
+
+      <div class="step-card">
+        <div style="padding:14px 18px 0;">
+          <div class="svc-banner">
+            <span class="ic"><i data-lucide="info"></i></span>
+            <span class="ttl">Clinical Aesthetic</span>
+            <span class="desc">Patient: Sarah Johnson · Practitioner: Dr. Reyes · Demo workflow with localStorage persistence.</span>
+            <span class="chip" id="completion-chip">0 / 8 steps</span>
+            <button class="reset" id="reset-btn"><i data-lucide="rotate-ccw" style="width:11px;height:11px;vertical-align:-1px;"></i> Reset Demo</button>
+          </div>
+        </div>
+
+        <div class="nodes" id="nodes"></div>
+
+        <div class="step-nav">
+          <span class="viewing"><span class="pfx">Viewing:</span> <b id="viewing-label">Step 1 — Service Info</b></span>
+          <div class="arrows"><button class="arr-btn" id="prev-step"><i data-lucide="chevron-left"></i></button><button class="arr-btn" id="next-step"><i data-lucide="chevron-right"></i></button></div>
+        </div>
+
+        <div class="content-panel">
+          <!-- Step 1 -->
+          <div class="pane" data-pane="1" data-active>
+            <h2>Service Info</h2>
+            <div class="subtext">Confirm the service details for this session.</div>
+            <div class="info-box"><i data-lucide="info"></i><div><b>Patient:</b> Sarah Johnson · <b>Service:</b> HydraFacial · <b>Date:</b> May 25, 2026 · <b>Practitioner:</b> Dr. Reyes</div></div>
+            <div class="grid-2">
+              <div class="field"><label class="fld-lbl">Service Name</label><input type="text" id="f-service" value="HydraFacial"></div>
+              <div class="field"><label class="fld-lbl">Category</label><input type="text" id="f-category" value="Treatments"></div>
+              <div class="field"><label class="fld-lbl">Duration (min)</label><input type="number" id="f-duration" value="90"></div>
+              <div class="field"><label class="fld-lbl">Amount Charged (₱)</label><input type="number" id="f-charged" value="4999"></div>
+            </div>
+            <div class="field"><label class="fld-lbl">Service Description</label><textarea id="f-description" rows="2">Korean glass-skin microneedling with exosome booster for fine pore refinement and hydration boost.</textarea></div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="pane" data-pane="2">
+            <h2>Schedule</h2>
+            <div class="subtext">Appointment scheduling details.</div>
+            <div class="grid-2">
+              <div class="field"><label class="fld-lbl">Date</label><input type="date" id="f-date" value="2026-05-25"></div>
+              <div class="field"><label class="fld-lbl">Time</label><input type="text" id="f-time" value="2:00 PM"></div>
+              <div class="field"><label class="fld-lbl">Practitioner</label><select id="f-pract"><option>Dr. Reyes</option><option>Dr. Santos</option><option>Dr. Angela Lim</option></select></div>
+              <div class="field"><label class="fld-lbl">Room</label><select id="f-room"><option>Room 2</option><option>Room 1</option><option>Room 3</option></select></div>
+            </div>
+            <div class="field"><label class="fld-lbl">Scheduling Notes</label><textarea id="f-sched-notes" rows="2" placeholder="Any special prep, equipment reservations, or scheduling notes…"></textarea></div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="pane" data-pane="3">
+            <h2>Consent &amp; History</h2>
+            <div class="subtext">Confirm consent forms and review patient history before proceeding.</div>
+
+            <div class="sec-lbl">Consent Forms</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <!-- ROW 1 General Consent -->
+              <div style="background:#fff;border:1px solid #E5EFF7;border-radius:8px;padding:12px 16px;display:flex;align-items:flex-start;gap:12px;">
+                <div style="width:24px;height:24px;border-radius:50%;background:#15803D;color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="check" style="width:13px;height:13px;"></i></div>
+                <div style="flex:1;">
+                  <div style="font-family:var(--font-display);font-weight:700;font-size:14px;color:#1A2E40;">General Consent Form</div>
+                  <div style="font-family:var(--font-body);font-size:12px;color:#5A7A96;margin-top:2px;">Signed by patient — April 1, 2026 at 10:15 AM.</div>
+                </div>
+                <div style="display:flex;gap:6px;">
+                  <button class="btn-ghost-sm" data-open-modal="consent-general"><i data-lucide="eye" style="width:12px;height:12px;"></i> View Signed Form</button>
+                  <button class="btn-ghost-sm"><i data-lucide="download" style="width:12px;height:12px;"></i> Download</button>
+                </div>
+              </div>
+
+              <!-- ROW 2 Medical History -->
+              <div style="background:#fff;border:1px solid #E5EFF7;border-radius:8px;padding:12px 16px;">
+                <div style="display:flex;align-items:flex-start;gap:12px;">
+                  <div style="width:24px;height:24px;border-radius:50%;background:#15803D;color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="check" style="width:13px;height:13px;"></i></div>
+                  <div style="flex:1;">
+                    <div style="font-family:var(--font-display);font-weight:700;font-size:14px;color:#1A2E40;">Medical History Questionnaire</div>
+                    <div style="font-family:var(--font-body);font-size:12px;color:#5A7A96;margin-top:2px;">Completed by patient — April 1, 2026 at 10:08 AM.</div>
+                  </div>
+                  <div style="display:flex;gap:6px;">
+                    <button class="btn-ghost-sm" data-open-modal="history-questionnaire"><i data-lucide="eye" style="width:12px;height:12px;"></i> View Responses</button>
+                    <button class="btn-ghost-sm"><i data-lucide="download" style="width:12px;height:12px;"></i> Download</button>
+                  </div>
+                </div>
+                <div style="background:#FFF8E7;border-radius:6px;padding:8px 12px;font-family:var(--font-body);font-size:11.5px;color:#92400E;margin-top:10px;display:flex;align-items:center;gap:6px;"><i data-lucide="alert-triangle" style="width:13px;height:13px;color:#B45309;"></i> <b style="font-family:var(--font-display);font-weight:700;">2 flagged items:</b> Hypertension (monitored) · Aspirin daily.</div>
+              </div>
+            </div>
+
+            <div class="sec-lbl">History Notes</div>
+            <textarea id="f-history-notes" rows="3" placeholder="Allergies, medications, prior reactions…">No known allergies. No active acne. Last facial 3 months ago — no adverse reactions.</textarea>
+          </div>
+
+          <!-- Step 4 — Doctor's Order -->
+          <div class="pane" data-pane="4">
+            <h2>Doctor's Order</h2>
+            <div class="subtext">Select a protocol template to auto-fill the procedure plan, then review and adjust for this patient.</div>
+
+            <div class="sec-lbl">Protocol Template</div>
+            <div class="field">
+              <label class="fld-lbl">Choose template</label>
+              <select id="do-template">
+                <option value="">— Select a template —</option>
+                <option value="glass-skin-standard">HydraFacial — Standard Protocol (Default)</option>
+                <option value="glass-skin-sensitive">HydraFacial — Sensitive Skin Protocol</option>
+                <option value="glass-skin-prp">HydraFacial + PRP Booster</option>
+              </select>
+              <div class="helper" id="do-tpl-helper" style="font-size:11.5px;color:#5A7A96;margin-top:4px;">Selecting a template will auto-fill the order fields below. You can still edit any field afterwards.</div>
+            </div>
+            <div id="do-tpl-chips" style="display:none;flex-wrap:wrap;gap:6px;margin:6px 0 14px;"></div>
+
+            <div class="sec-lbl">Treatment Plan</div>
+            <div class="grid-2">
+              <div class="field"><label class="fld-lbl">Procedure</label><input type="text" id="do-procedure" value="HydraFacial"></div>
+              <div class="field"><label class="fld-lbl">Topical Anesthesia</label><input type="text" id="do-anesthesia" placeholder="e.g. EMLA 30 min before"></div>
+              <div class="field"><label class="fld-lbl">Needle Depth (mm)</label><input type="text" id="do-depth" placeholder="1.5"></div>
+              <div class="field"><label class="fld-lbl">Passes</label><input type="number" id="do-passes" placeholder="2"></div>
+              <div class="field"><label class="fld-lbl">Speed</label><select id="do-speed"><option>Low</option><option selected>Medium</option><option>High</option></select></div>
+              <div class="field"><label class="fld-lbl">Serum / Booster</label><input type="text" id="do-serum" placeholder="e.g. Exosome booster"></div>
+            </div>
+            <div class="field"><label class="fld-lbl">Treatment Areas</label><input type="text" id="do-areas" placeholder="Full face, neck"></div>
+            <div class="field"><label class="fld-lbl">Special Instructions</label><textarea id="do-instructions" rows="2" placeholder="Avoid breakouts, reduce energy on periorbital area, etc."></textarea></div>
+
+            <div class="sec-lbl">Pre-Procedure Protocol</div>
+            <div style="font-family:var(--font-body);font-size:11.5px;color:#9BBAD4;margin:-4px 0 10px;font-style:italic;">These steps will auto-load as the checklist in Nurse's Notes (Step 7).</div>
+            <div id="pre-protocol-list" style="display:flex;flex-direction:column;gap:6px;">
+              <div class="proto-row" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fff;border:1px solid #E5EFF7;border-radius:8px;"><i data-lucide="grip-vertical" style="width:14px;height:14px;color:#BFD8EB;cursor:grab;"></i><span style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#2D6A9F;width:18px;">1</span><input type="text" value="Apply EMLA 5% topical anesthetic to full face and neck" style="flex:1;height:36px;"><select style="width:150px;height:36px;"><option selected>30 min before</option><option>15 min before</option><option>10 min before</option><option>5 min before</option><option>Immediately before</option><option>No timing</option></select><button class="btn-ghost-sm" style="padding:0;width:28px;height:28px;border-radius:6px;color:#DC2626;border-color:#FCA5A5;">×</button></div>
+              <div class="proto-row" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fff;border:1px solid #E5EFF7;border-radius:8px;"><i data-lucide="grip-vertical" style="width:14px;height:14px;color:#BFD8EB;cursor:grab;"></i><span style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#2D6A9F;width:18px;">2</span><input type="text" value="Draw 10ml blood for PRP preparation" style="flex:1;height:36px;"><select style="width:150px;height:36px;"><option selected>30 min before</option><option>15 min before</option><option>10 min before</option><option>5 min before</option><option>Immediately before</option><option>No timing</option></select><button class="btn-ghost-sm" style="padding:0;width:28px;height:28px;border-radius:6px;color:#DC2626;border-color:#FCA5A5;">×</button></div>
+              <div class="proto-row" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fff;border:1px solid #E5EFF7;border-radius:8px;"><i data-lucide="grip-vertical" style="width:14px;height:14px;color:#BFD8EB;cursor:grab;"></i><span style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#2D6A9F;width:18px;">3</span><input type="text" value="Cleanse face, remove all makeup and skincare" style="flex:1;height:36px;"><select style="width:150px;height:36px;"><option>30 min before</option><option>15 min before</option><option selected>10 min before</option><option>5 min before</option><option>Immediately before</option><option>No timing</option></select><button class="btn-ghost-sm" style="padding:0;width:28px;height:28px;border-radius:6px;color:#DC2626;border-color:#FCA5A5;">×</button></div>
+              <div class="proto-row" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fff;border:1px solid #E5EFF7;border-radius:8px;"><i data-lucide="grip-vertical" style="width:14px;height:14px;color:#BFD8EB;cursor:grab;"></i><span style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#2D6A9F;width:18px;">4</span><input type="text" value="Remove anesthetic, pat dry — do not wipe aggressively" style="flex:1;height:36px;"><select style="width:150px;height:36px;"><option>30 min before</option><option>15 min before</option><option>10 min before</option><option selected>5 min before</option><option>Immediately before</option><option>No timing</option></select><button class="btn-ghost-sm" style="padding:0;width:28px;height:28px;border-radius:6px;color:#DC2626;border-color:#FCA5A5;">×</button></div>
+              <div class="proto-row" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fff;border:1px solid #E5EFF7;border-radius:8px;"><i data-lucide="grip-vertical" style="width:14px;height:14px;color:#BFD8EB;cursor:grab;"></i><span style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#2D6A9F;width:18px;">5</span><input type="text" value="Position patient and apply eye protection" style="flex:1;height:36px;"><select style="width:150px;height:36px;"><option>30 min before</option><option>15 min before</option><option>10 min before</option><option>5 min before</option><option selected>Immediately before</option><option>No timing</option></select><button class="btn-ghost-sm" style="padding:0;width:28px;height:28px;border-radius:6px;color:#DC2626;border-color:#FCA5A5;">×</button></div>
+            </div>
+            <a style="color:#2D6A9F;font-family:var(--font-display);font-weight:600;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-top:8px;"><i data-lucide="plus" style="width:13px;height:13px;"></i> Add Step</a>
+
+            <div class="sec-lbl">Post-Procedure Protocol</div>
+            <div style="font-family:var(--font-body);font-size:11.5px;color:#9BBAD4;margin:-4px 0 10px;font-style:italic;">These steps will auto-load as the Aftercare Applied checklist in Treatment Notes (Step 8).</div>
+            <div id="post-protocol-list" style="display:flex;flex-direction:column;gap:6px;">
+              <div class="proto-row" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fff;border:1px solid #E5EFF7;border-radius:8px;"><i data-lucide="grip-vertical" style="width:14px;height:14px;color:#BFD8EB;cursor:grab;"></i><span style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#2D6A9F;width:18px;">1</span><input type="text" value="Apply chilled saline compress to full face" style="flex:1;height:36px;"><label style="font-family:var(--font-body);font-size:11px;color:#5A7A96;display:inline-flex;align-items:center;gap:4px;">Duration <input type="text" value="10 min" style="width:60px;height:32px;font-size:12px;"></label><button class="btn-ghost-sm" style="padding:0;width:28px;height:28px;border-radius:6px;color:#DC2626;border-color:#FCA5A5;">×</button></div>
+              <div class="proto-row" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fff;border:1px solid #E5EFF7;border-radius:8px;"><i data-lucide="grip-vertical" style="width:14px;height:14px;color:#BFD8EB;cursor:grab;"></i><span style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#2D6A9F;width:18px;">2</span><input type="text" value="Apply PRP serum evenly across treated area" style="flex:1;height:36px;"><button class="btn-ghost-sm" style="padding:0;width:28px;height:28px;border-radius:6px;color:#DC2626;border-color:#FCA5A5;">×</button></div>
+              <div class="proto-row" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fff;border:1px solid #E5EFF7;border-radius:8px;"><i data-lucide="grip-vertical" style="width:14px;height:14px;color:#BFD8EB;cursor:grab;"></i><span style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#2D6A9F;width:18px;">3</span><input type="text" value="Apply hyaluronic acid finishing serum" style="flex:1;height:36px;"><button class="btn-ghost-sm" style="padding:0;width:28px;height:28px;border-radius:6px;color:#DC2626;border-color:#FCA5A5;">×</button></div>
+              <div class="proto-row" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#F8FBFD;border:1px solid #E5EFF7;border-radius:8px;"><i data-lucide="grip-vertical" style="width:14px;height:14px;color:#BFD8EB;cursor:grab;"></i><span style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#2D6A9F;width:18px;">4</span><input type="text" value="Give verbal aftercare instructions to patient" style="flex:1;height:36px;" readonly><i data-lucide="lock" style="width:14px;height:14px;color:#9BBAD4;" title="Locked — standard item"></i></div>
+              <div class="proto-row" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#F8FBFD;border:1px solid #E5EFF7;border-radius:8px;"><i data-lucide="grip-vertical" style="width:14px;height:14px;color:#BFD8EB;cursor:grab;"></i><span style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#2D6A9F;width:18px;">5</span><input type="text" value="Hand printed aftercare sheet to patient" style="flex:1;height:36px;" readonly><i data-lucide="lock" style="width:14px;height:14px;color:#9BBAD4;" title="Locked — standard item"></i></div>
+            </div>
+            <a style="color:#2D6A9F;font-family:var(--font-display);font-weight:600;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-top:8px;"><i data-lucide="plus" style="width:13px;height:13px;"></i> Add Step</a>
+            <div style="background:#F0F6FC;border-radius:6px;padding:8px 12px;font-family:var(--font-body);font-size:12px;color:#5A7A96;margin-top:10px;display:flex;align-items:center;gap:6px;"><i data-lucide="info" style="width:13px;height:13px;color:#2D6A9F;"></i> Locked items appear in all Treatment Notes regardless of service. They ensure standard aftercare documentation is never skipped.</div>
+
+            <div class="sec-lbl">Physician Sign-off</div>
+            <div class="grid-2">
+              <div class="field"><label class="fld-lbl">Ordering Physician</label><input type="text" id="do-physician" value="Dr. Reyes" readonly></div>
+              <div class="field"><label class="fld-lbl">Order Date</label><input type="date" id="do-date" value="2026-05-25"></div>
+              <div class="field"><label class="fld-lbl">Order Status</label><select id="do-status"><option selected>Draft</option><option>Pending Review</option><option>Finalized</option></select></div>
+              <div class="field"><label class="fld-lbl">Estimated Duration (min)</label><input type="number" id="do-duration" value="90"></div>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="pane" data-pane="5">
+            <h2>Vital Signs</h2>
+            <div class="subtext">Record patient vitals before the procedure begins.</div>
+            <div class="grid-3">
+              <div class="field"><label class="fld-lbl">BP Systolic</label><input type="number" id="v-systolic" placeholder="120"></div>
+              <div class="field"><label class="fld-lbl">BP Diastolic</label><input type="number" id="v-diastolic" placeholder="80"></div>
+              <div class="field"><label class="fld-lbl">Heart Rate (bpm)</label><input type="number" id="v-hr" placeholder="78"></div>
+              <div class="field"><label class="fld-lbl">SpO₂ (%)</label><input type="number" id="v-spo2" placeholder="98"></div>
+              <div class="field"><label class="fld-lbl">Weight (kg)</label><input type="number" id="v-weight" placeholder="58"></div>
+              <div class="field"><label class="fld-lbl">Height (cm)</label><input type="number" id="v-height" placeholder="162"></div>
+            </div>
+            <div class="field"><label class="fld-lbl">Vitals Notes</label><textarea id="f-vitals-notes" rows="2" placeholder="Any abnormal findings before procedure…"></textarea></div>
+          </div>
+
+          <!-- Step 6 -->
+          <div class="pane" data-pane="6">
+            <h2>Doctor's Notes</h2>
+            <div class="subtext">Clinical observations and assessment by the attending physician.</div>
+
+            <div class="sec-lbl">Pre-Treatment Assessment</div>
+            <div class="field"><textarea id="dn-pre" rows="5" placeholder="Skin condition observed, Fitzpatrick type, contraindications confirmed, patient presentation today — e.g., mild sensitivity on cheeks, no active breakouts, no contraindications identified…"></textarea></div>
+
+            <div class="sec-lbl">Treatment Rationale</div>
+            <div class="field"><textarea id="dn-rationale" rows="4" placeholder="Why this approach was chosen or adjusted for this patient today — e.g., standard Glass Skin protocol applied, reduced needle depth to 0.5mm due to thin skin noted on forehead…"></textarea></div>
+
+            <div class="sec-lbl">Intra-Procedure Observations</div>
+            <div class="field"><textarea id="dn-intra" rows="5" placeholder="Patient tolerance, skin response, anything observed during the procedure — e.g., mild erythema post first pass, patient tolerated well, no adverse skin response…"></textarea></div>
+
+            <div class="sec-lbl">Post-Treatment Assessment</div>
+            <div class="field"><textarea id="dn-post" rows="4" placeholder="Immediate results observed right after — e.g., expected post-procedure redness and mild swelling present, skin surface intact, no bruising…"></textarea></div>
+
+            <div class="sec-lbl">Complications / Adverse Reactions</div>
+            <label class="cb-row"><input type="checkbox" id="dn-no-complications" checked> No complications or adverse reactions during this session</label>
+            <div class="field"><textarea id="dn-complications" rows="3" placeholder="Describe complication in detail — onset, response taken, outcome…" style="background:#F8FBFD;color:#9BBAD4;" disabled>No complications recorded.</textarea></div>
+
+            <div class="sec-lbl">Follow-up Instructions</div>
+            <div class="field"><textarea id="dn-followup-notes" rows="4" placeholder="Medical aftercare and restrictions — e.g., avoid sun exposure 1 week, use SPF 50 daily, no active skincare ingredients for 5 days, return if excessive redness persists beyond 48 hours…"></textarea></div>
+            <div class="grid-2" style="margin-top:8px;">
+              <div class="field"><label class="fld-lbl">Follow-up Date</label><input type="date" id="dn-followup-date"></div>
+              <div class="field"><label class="fld-lbl">Follow-up Type</label><select id="dn-followup-type"><option>In-Person</option><option>Phone Call</option><option>No Follow-up Needed</option></select></div>
+            </div>
+
+            <div class="sec-lbl">Next Session Adjustment</div>
+            <div class="field"><textarea id="dn-next-session" rows="3" placeholder="What to change or maintain next visit — e.g., same protocol, increase needle depth to 0.75mm if skin responds well to this session…"></textarea></div>
+
+            <hr style="border:none;border-top:1px solid #E5EFF7;margin:20px 0 12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+              <div style="font-family:var(--font-body);font-size:12px;color:#5A7A96;"><b style="font-family:var(--font-display);font-weight:600;color:#1A2E40;">Attending Physician:</b> Dr. Reyes</div>
+              <div style="text-align:right;">
+                <button class="btn btn-primary" id="sign-doctor-notes"><i data-lucide="lock"></i> Sign &amp; Lock Notes</button>
+                <div style="font-family:var(--font-body);font-size:11px;color:#9BBAD4;margin-top:4px;font-style:italic;">Locked notes require admin override to edit.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 7 -->
+          <div class="pane" data-pane="7">
+            <h2>Nurse's Notes</h2>
+            <div class="subtext">Nursing care, medical items administered, monitoring, and discharge documentation.</div>
+
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;margin-bottom:14px;font-family:var(--font-body);font-size:12px;color:#15803D;"><i data-lucide="check-circle" style="width:14px;height:14px;"></i> Pre-procedure checklist auto-loaded from Doctor's Order by Dr. Reyes.</div>
+
+            <div class="sec-lbl">Pre-Procedure Checklist</div>
+            <div style="font-family:var(--font-body);font-size:11.5px;color:#9BBAD4;margin:-4px 0 10px;font-style:italic;">Confirm each preparation step was completed as ordered by the physician.</div>
+            <div class="chk-list">
+              <label class="check-row" style="display:flex;align-items:center;gap:8px;padding:8px 0;"><input type="checkbox" id="nc-1" checked><span style="flex:1;">Apply EMLA 5% topical anesthetic to full face and neck<div style="font-size:10px;color:#2D6A9F;margin-top:2px;">From Doctor's Order</div></span><input type="text" id="nc-1-time" value="09:00 AM" style="width:90px;height:32px;font-size:12px;"><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:10px;">Done</span></label>
+              <label class="check-row" style="display:flex;align-items:center;gap:8px;padding:8px 0;"><input type="checkbox" id="nc-2" checked><span style="flex:1;">Draw 10ml blood for PRP preparation<div style="font-size:10px;color:#2D6A9F;margin-top:2px;">From Doctor's Order</div></span><input type="text" id="nc-2-time" value="09:05 AM" style="width:90px;height:32px;font-size:12px;"><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:10px;">Done</span></label>
+              <label class="check-row" style="display:flex;align-items:center;gap:8px;padding:8px 0;"><input type="checkbox" id="nc-3" checked><span style="flex:1;">Cleanse face, remove all makeup and skincare<div style="font-size:10px;color:#2D6A9F;margin-top:2px;">From Doctor's Order</div></span><input type="text" id="nc-3-time" value="09:25 AM" style="width:90px;height:32px;font-size:12px;"><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:10px;">Done</span></label>
+              <label class="check-row" style="display:flex;align-items:center;gap:8px;padding:8px 0;"><input type="checkbox" id="nc-4" checked><span style="flex:1;">Remove anesthetic, pat dry gently<div style="font-size:10px;color:#2D6A9F;margin-top:2px;">From Doctor's Order</div></span><input type="text" id="nc-4-time" value="09:28 AM" style="width:90px;height:32px;font-size:12px;"><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:10px;">Done</span></label>
+              <label class="check-row" style="display:flex;align-items:center;gap:8px;padding:8px 0;"><input type="checkbox" id="nc-5"><span style="flex:1;">Position patient and apply eye protection<div style="font-size:10px;color:#2D6A9F;margin-top:2px;">From Doctor's Order</div></span><input type="text" id="nc-5-time" placeholder="Time done" style="width:90px;height:32px;font-size:12px;"><span style="background:#FED7AA;color:#C2410C;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:10px;">Pending</span></label>
+            </div>
+            <div class="field" style="margin-top:10px;"><label class="fld-lbl">Pre-Procedure Notes</label><textarea id="nn-pre-notes" rows="3" placeholder="Any additional preparations or patient concerns before starting…"></textarea></div>
+
+            <div class="sec-lbl">Medications &amp; Products Administered</div>
+            <div style="font-family:var(--font-body);font-size:11.5px;color:#9BBAD4;margin:-4px 0 10px;font-style:italic;">Medical items administered by the nurse only. Treatment products are recorded by the aesthetician in Step 8.</div>
+            <table style="width:100%;border-collapse:collapse;font-size:12.5px;border:1px solid #E5EFF7;border-radius:8px;overflow:hidden;">
+              <thead><tr><th style="padding:10px;text-align:left;background:#F0F6FC;font-family:var(--font-display);font-size:11px;font-weight:700;color:#5A7A96;text-transform:uppercase;">Product / Medication</th><th style="padding:10px;text-align:left;background:#F0F6FC;font-family:var(--font-display);font-size:11px;font-weight:700;color:#5A7A96;text-transform:uppercase;">Amount</th><th style="padding:10px;text-align:left;background:#F0F6FC;font-family:var(--font-display);font-size:11px;font-weight:700;color:#5A7A96;text-transform:uppercase;">Route</th><th style="padding:10px;text-align:left;background:#F0F6FC;font-family:var(--font-display);font-size:11px;font-weight:700;color:#5A7A96;text-transform:uppercase;">Time Given</th><th style="background:#F0F6FC;"></th></tr></thead>
+              <tbody>
+                <tr><td style="padding:8px;"><input type="text" value="Numbing cream (EMLA 5%)" style="height:32px;width:100%;font-size:12px;"></td><td style="padding:8px;"><input type="text" value="5g" style="height:32px;width:100%;font-size:12px;"></td><td style="padding:8px;"><input type="text" value="Topical" style="height:32px;width:100%;font-size:12px;"></td><td style="padding:8px;"><input type="text" value="09:00 AM" style="height:32px;width:100%;font-size:12px;"></td><td style="padding:8px;text-align:right;"><button class="btn-ghost-sm" style="padding:0;width:24px;height:24px;color:#DC2626;border-color:#FCA5A5;">×</button></td></tr>
+                <tr style="background:#FAFBFC;"><td style="padding:8px;"><input type="text" value="Blood draw (PRP prep)" style="height:32px;width:100%;font-size:12px;"></td><td style="padding:8px;"><input type="text" value="10ml" style="height:32px;width:100%;font-size:12px;"></td><td style="padding:8px;"><input type="text" value="Venipuncture" style="height:32px;width:100%;font-size:12px;"></td><td style="padding:8px;"><input type="text" value="09:05 AM" style="height:32px;width:100%;font-size:12px;"></td><td style="padding:8px;text-align:right;"><button class="btn-ghost-sm" style="padding:0;width:24px;height:24px;color:#DC2626;border-color:#FCA5A5;">×</button></td></tr>
+              </tbody>
+            </table>
+            <a style="color:#2D6A9F;font-family:var(--font-display);font-weight:600;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-top:8px;"><i data-lucide="plus" style="width:13px;height:13px;"></i> Add Item</a>
+            <div style="background:#FFF8E7;border-radius:6px;padding:8px 12px;font-family:var(--font-body);font-size:12px;color:#92400E;margin-top:10px;display:flex;align-items:center;gap:6px;"><i data-lucide="alert-triangle" style="width:13px;height:13px;color:#B45309;"></i> Only include medical and nursing items here. Aesthetic products (serums, masks, boosters) are recorded in Treatment Notes.</div>
+
+            <div class="sec-lbl">Patient Monitoring During Procedure</div>
+            <div class="field"><textarea rows="4" placeholder="Patient tolerance and comfort during the procedure — e.g., patient tolerated well, mild discomfort on forehead during second pass, no signs of distress, breathing normal throughout…"></textarea></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;flex-wrap:wrap;gap:8px;">
+              <span style="font-family:var(--font-body);font-size:12px;color:#5A7A96;">Patient-reported comfort level</span>
+              <div style="display:inline-flex;gap:8px;align-items:flex-start;">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:3px;"><button type="button" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #D0E8F5;background:#fff;color:#5A7A96;font-family:var(--font-display);font-weight:700;font-size:12px;cursor:pointer;">1</button><span style="font-size:9.5px;color:#9BBAD4;">Poor</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:3px;"><button type="button" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #D0E8F5;background:#fff;color:#5A7A96;font-family:var(--font-display);font-weight:700;font-size:12px;cursor:pointer;">2</button><span style="font-size:9.5px;color:transparent;">.</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:3px;"><button type="button" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #D0E8F5;background:#fff;color:#5A7A96;font-family:var(--font-display);font-weight:700;font-size:12px;cursor:pointer;">3</button><span style="font-size:9.5px;color:transparent;">.</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:3px;"><button type="button" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #2D6A9F;background:#2D6A9F;color:#fff;font-family:var(--font-display);font-weight:700;font-size:12px;cursor:pointer;">4</button><span style="font-size:9.5px;color:transparent;">.</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:3px;"><button type="button" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #D0E8F5;background:#fff;color:#5A7A96;font-family:var(--font-display);font-weight:700;font-size:12px;cursor:pointer;">5</button><span style="font-size:9.5px;color:#9BBAD4;">Excellent</span></div>
+              </div>
+            </div>
+
+            <div class="sec-lbl">Post-Procedure Patient Care</div>
+            <div style="font-family:var(--font-body);font-size:11.5px;color:#9BBAD4;margin:-4px 0 10px;font-style:italic;">Patient recovery and care steps after the procedure. Finishing skin products are recorded by the aesthetician in Step 8.</div>
+            <div class="chk-list">
+              <label><input type="checkbox" id="npc-1" checked> Chilled saline compress applied (10 minutes)</label>
+              <label><input type="checkbox" id="npc-2" checked> Patient monitored post-procedure</label>
+              <label><input type="checkbox" id="npc-3" checked> Patient rested in treatment room (15 minutes)</label>
+              <label><input type="checkbox" id="npc-4"> Ice pack offered — declined by patient</label>
+              <label><input type="checkbox" id="npc-5"> Pain relief offered</label>
+            </div>
+            <div class="field" style="margin-top:10px;"><label class="fld-lbl">Post-Care Notes</label><textarea rows="2" placeholder="Additional observations or care steps not listed above…"></textarea></div>
+
+            <div class="sec-lbl">Medical Aftercare Instructions</div>
+            <div style="font-family:var(--font-body);font-size:11.5px;color:#9BBAD4;margin:-4px 0 10px;font-style:italic;">Medical and safety instructions communicated to the patient before leaving the treatment room.</div>
+            <div class="chk-list">
+              <label><input type="checkbox" checked> Warned about expected redness and swelling</label>
+              <label><input type="checkbox" checked> Advised no sun exposure for 7 days</label>
+              <label><input type="checkbox" checked> Advised no active skincare ingredients for 5 days</label>
+              <label><input type="checkbox" checked> Advised to contact clinic if unusual symptoms develop</label>
+              <label><input type="checkbox"> Medication prescribed — see Doctor's Notes</label>
+            </div>
+
+            <div class="sec-lbl">Patient Condition on Discharge</div>
+            <div class="grid-2">
+              <div class="field"><label class="fld-lbl">Discharge Status</label><div style="display:flex;align-items:center;gap:8px;"><select id="nd-status" style="flex:1;"><option selected>Stable &amp; Ambulatory</option><option>Needs Monitoring</option><option>Adverse Event</option></select><span style="background:#DCFCE7;color:#15803D;padding:3px 9px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:10.5px;">Stable</span></div></div>
+              <div class="field"><label class="fld-lbl">Discharge Time</label><input type="text" id="nd-time" value="11:15 AM"></div>
+            </div>
+            <div class="field"><textarea id="nd-notes" rows="3" placeholder="Patient condition when leaving the treatment room — e.g., patient ambulatory and comfortable, post-procedure redness present and explained as expected, no concerns raised…"></textarea></div>
+
+            <hr style="border:none;border-top:1px solid #E5EFF7;margin:20px 0 12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+              <div style="font-family:var(--font-body);font-size:12px;color:#5A7A96;"><b style="font-family:var(--font-display);font-weight:600;color:#1A2E40;">Recorded by:</b> Nurse John Reyes</div>
+              <div style="text-align:right;">
+                <button class="btn btn-primary" id="sign-nurse-notes"><i data-lucide="lock"></i> Sign &amp; Lock Nurse's Notes</button>
+                <div style="font-family:var(--font-body);font-size:11px;color:#9BBAD4;margin-top:4px;font-style:italic;max-width:280px;">Locking confirms all information is accurate. Admin override required to make changes after locking.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 8 -->
+          <div class="pane" data-pane="8">
+            <h2>Treatment Notes</h2>
+            <div class="subtext">Final practitioner documentation — settings, products used, tolerance, and post-procedure outcome.</div>
+
+            <div class="sec-lbl">Device &amp; Technique Settings</div>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">
+              <div class="field"><label class="fld-lbl">Needle Depth</label><input type="text" id="ts-depth" value="0.5 mm"></div>
+              <div class="field"><label class="fld-lbl">Speed</label><input type="text" id="ts-speed" value="3"></div>
+              <div class="field"><label class="fld-lbl">Passes</label><input type="text" id="ts-passes" value="2"></div>
+              <div class="field"><label class="fld-lbl">Pen Mode</label><select id="ts-mode"><option selected>Stamp</option><option>Glide</option><option>Hybrid</option></select></div>
+              <div class="field"><label class="fld-lbl">Intensity</label><select id="ts-intensity"><option>Light</option><option selected>Moderate</option><option>High</option></select></div>
+            </div>
+            <div style="font-family:var(--font-body);font-size:11.5px;color:#9BBAD4;margin-top:6px;font-style:italic;">Settings recorded for this session. Adjust only if different from Doctor's Order.</div>
+
+            <div class="sec-lbl">Treatment Areas</div>
+            <div class="chk-chips" id="chips-tn-areas">
+              <span class="chk-chip on" data-chip="tn-area-fullface">Full Face</span>
+              <span class="chk-chip on" data-chip="tn-area-forehead">Forehead</span>
+              <span class="chk-chip on" data-chip="tn-area-cheeks">Cheeks</span>
+              <span class="chk-chip on" data-chip="tn-area-nose">Nose</span>
+              <span class="chk-chip on" data-chip="tn-area-chin">Chin</span>
+              <span class="chk-chip" data-chip="tn-area-perioral">Perioral</span>
+              <span class="chk-chip" data-chip="tn-area-neck">Neck</span>
+              <span class="chk-chip" data-chip="tn-area-decollete">Décolletage</span>
+            </div>
+            <div class="field" style="margin-top:8px;"><label class="fld-lbl">Area Notes</label><textarea id="tn-area-notes" rows="2" placeholder="Note any areas skipped, reduced intensity areas, or special observations per zone…"></textarea></div>
+
+            <div class="sec-lbl">Products Used</div>
+            <table class="simple">
+              <thead><tr><th>Product</th><th>Qty</th><th>Unit</th><th>Batch No.</th><th>Expiry Date</th></tr></thead>
+              <tbody>
+                <tr><td><input id="p1-name" value="Hyaluronic Serum"></td><td><input id="p1-qty" value="1" style="width:60px;"></td><td><input id="p1-unit" value="vial" style="width:80px;"></td><td><input id="p1-batch" value="HS-22405"></td><td><input type="month" id="p1-exp" value="2026-12" style="width:130px;"></td></tr>
+                <tr><td><input id="p2-name" value="Exosome Booster"></td><td><input id="p2-qty" value="1" style="width:60px;"></td><td><input id="p2-unit" value="amp" style="width:80px;"></td><td><input id="p2-batch" value="EX-1188"></td><td><input type="month" id="p2-exp" value="2026-08" style="width:130px;"></td></tr>
+                <tr><td><input id="p3-name" value="Microneedling Cartridge"></td><td><input id="p3-qty" value="1" style="width:60px;"></td><td><input id="p3-unit" value="pc" style="width:80px;"></td><td><input id="p3-batch" value="MC-99"></td><td><input type="month" id="p3-exp" value="2027-03" style="width:130px;"></td></tr>
+              </tbody>
+            </table>
+            <a style="color:#2D6A9F;font-family:var(--font-display);font-weight:600;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-top:8px;"><i data-lucide="plus" style="width:13px;height:13px;"></i> Add Product</a>
+            <div style="font-family:var(--font-body);font-size:11.5px;color:#C2410C;margin-top:6px;font-style:italic;">Quantities will deduct from inventory on save. Verify before continuing.</div>
+
+            <div class="sec-lbl">Patient Tolerance</div>
+            <div class="field"><textarea id="tn-tolerance" rows="4" placeholder="How the patient responded during the procedure — e.g., tolerated well, mild discomfort on forehead during second pass, no adverse reaction, remained calm throughout…"></textarea></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;flex-wrap:wrap;gap:8px;">
+              <span style="font-family:var(--font-body);font-size:12px;color:#5A7A96;">Patient-reported comfort level</span>
+              <div id="comfort-rating" style="display:inline-flex;gap:8px;align-items:flex-start;">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:3px;"><button type="button" data-rate="1" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #D0E8F5;background:#fff;color:#5A7A96;font-family:var(--font-display);font-weight:700;font-size:12px;cursor:pointer;">1</button><span style="font-size:9.5px;color:#9BBAD4;">Poor</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:3px;"><button type="button" data-rate="2" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #D0E8F5;background:#fff;color:#5A7A96;font-family:var(--font-display);font-weight:700;font-size:12px;cursor:pointer;">2</button><span style="font-size:9.5px;color:transparent;">.</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:3px;"><button type="button" data-rate="3" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #D0E8F5;background:#fff;color:#5A7A96;font-family:var(--font-display);font-weight:700;font-size:12px;cursor:pointer;">3</button><span style="font-size:9.5px;color:transparent;">.</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:3px;"><button type="button" data-rate="4" class="sel" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #2D6A9F;background:#2D6A9F;color:#fff;font-family:var(--font-display);font-weight:700;font-size:12px;cursor:pointer;">4</button><span style="font-size:9.5px;color:transparent;">.</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:3px;"><button type="button" data-rate="5" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #D0E8F5;background:#fff;color:#5A7A96;font-family:var(--font-display);font-weight:700;font-size:12px;cursor:pointer;">5</button><span style="font-size:9.5px;color:#9BBAD4;">Excellent</span></div>
+              </div>
+            </div>
+
+            <div class="sec-lbl">Aftercare Applied</div>
+            <div class="chk-list">
+              <label><input type="checkbox" id="tn-ac-1" checked> Soothing mask applied post-procedure</label>
+              <label><input type="checkbox" id="tn-ac-2" checked> Hyaluronic serum applied</label>
+              <label><input type="checkbox" id="tn-ac-3" checked> SPF 50 applied</label>
+              <label><input type="checkbox" id="tn-ac-4"> LED light therapy (post-procedure)</label>
+              <label><input type="checkbox" id="tn-ac-5"> Cooling device used</label>
+              <label><input type="checkbox" id="tn-ac-6" checked> Verbal aftercare instructions given to patient</label>
+              <label><input type="checkbox" id="tn-ac-7" checked> Printed aftercare sheet handed</label>
+            </div>
+            <div class="field" style="margin-top:10px;"><label class="fld-lbl">Aftercare Notes</label><textarea id="tn-ac-notes" rows="2" placeholder="Additional aftercare steps or product applications not listed above…"></textarea></div>
+
+            <div class="sec-lbl">Session Summary</div>
+            <div class="field"><textarea id="f-summary" rows="3" placeholder="Brief summary of session outcome, patient response, recommended follow-up interval…"></textarea></div>
+
+            <div class="sec-lbl">Next Session Recommendation</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+              <div class="field"><label class="fld-lbl">Recommended Interval</label><select id="tn-interval"><option>2 Weeks</option><option selected>1 Month</option><option>6 Weeks</option><option>3 Months</option><option>No Follow-up</option></select></div>
+              <div class="field"><label class="fld-lbl">Next Session Focus</label><input type="text" id="tn-focus" placeholder="e.g., increase depth to 0.75mm, add neck area…"></div>
+              <div class="field"><label class="fld-lbl">Priority</label><select id="tn-priority"><option selected>Routine</option><option>Urgent</option><option>Optional</option></select></div>
+            </div>
+
+            <div class="sec-lbl">Practitioner Sign-off</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:14px 16px;background:#F8FBFD;border:1px solid #E5EFF7;border-radius:8px;">
+              <div>
+                <div style="font-family:var(--font-body);font-size:12px;color:#5A7A96;">Completed by:</div>
+                <div style="font-family:var(--font-display);font-weight:600;font-size:14px;color:#1A2E40;margin-top:2px;">Dr. Reyes</div>
+                <div style="font-family:var(--font-body);font-size:11.5px;color:#9BBAD4;margin-top:2px;">May 25, 2026 — 11:30 AM</div>
+              </div>
+              <div style="text-align:right;">
+                <button class="btn btn-primary" id="lock-treatment-notes"><i data-lucide="lock"></i> Complete &amp; Lock Treatment Notes</button>
+                <div style="font-family:var(--font-body);font-size:11px;color:#9BBAD4;margin-top:4px;font-style:italic;max-width:280px;">Locking confirms all information is accurate. Admin override required to make changes after locking.</div>
+              </div>
+            </div>
+          </div></new_string>
+</invoke>
+
+          <!-- Step 9 -->
+          <div class="pane" data-pane="9">
+            <h2>Finalize</h2>
+            <div class="subtext">Record payment and complete the session.</div>
+            <div class="grid-2">
+              <div class="field"><label class="fld-lbl">Amount Charged (₱)</label><input type="number" id="p-charged" value="4999" readonly style="background:#F0F6FC;"></div>
+              <div class="field"><label class="fld-lbl">Discount (₱)</label><input type="number" id="p-discount" placeholder="0"></div>
+              <div class="field"><label class="fld-lbl">Amount Paid (₱)</label><input type="number" id="p-paid" placeholder="4999"></div>
+              <div class="field"><label class="fld-lbl">Payment Method</label><select id="p-method"><option>Cash</option><option>GCash</option><option>Card</option><option>Online Bank Transfer</option></select></div>
+              <div class="field"><label class="fld-lbl">Receipt No.</label><input type="text" id="p-receipt" placeholder="CSC-2026-…"></div>
+              <div class="field"><label class="fld-lbl">Transaction Date</label><input type="date" id="p-tx-date" value="2026-05-25"></div>
+            </div>
+            <div class="field"><label class="fld-lbl">Payment Notes</label><textarea id="p-notes" rows="2"></textarea></div>
+            <div class="info-box" style="margin-top:10px;"><i data-lucide="check-circle"></i><div>Click <b>Mark Session Complete</b> below to finalize this service record.</div></div>
+            <button class="btn btn-green" id="finalize-btn" style="margin-top:10px;"><i data-lucide="check-circle"></i> Mark Session Complete</button>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="back-btn"><i data-lucide="arrow-left"></i> Previous Step</button>
+          <button class="btn btn-primary" id="next-btn">Save &amp; Continue <i data-lucide="arrow-right"></i></button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast">✓ Saved</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+
+<script>
+(function () {
+  // ===== Storage key (per-patient + per-service) =====
+  var params = new URLSearchParams(location.search);
+  var key = 'workflow:' + (params.get('patient') || 'P001') + ':' + (params.get('service') || 'glass-skin-microneedling');
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
+  state.completed = state.completed || {};
+  state.current = state.current || 1;
+  function save() { try { localStorage.setItem(key, JSON.stringify(state)); } catch (e) {} flash(); }
+
+  // ===== Build stepper nodes =====
+  // Renumber the 4 panes after Doctor's Order (Vitals/Doctor's Notes/Nurse's Notes/Treatment Notes/Finalize) so they line up with the 9-step stepper.
+  (function shiftPanes() {
+    var maps = [['5','5'],['6','6'],['7','7'],['8','8']]; // already correct
+    // The Finalize pane was originally data-pane="8"; move it to 9.
+    var finalize = document.querySelector('[data-pane-alias="9"]');
+    if (finalize) finalize.setAttribute('data-pane','9');
+    var byNum = { '4': null, '5': null, '6': null, '7': null, '8': null };
+  })();
+
+  var STEPS = [
+    {n:1, lbl:'Service Info'}, {n:2, lbl:'Schedule'}, {n:3, lbl:'Consent & History'},
+    {n:4, lbl:"Doctor's Order"}, {n:5, lbl:'Vital Signs'},
+    {n:6, lbl:"Doctor's Notes"}, {n:7, lbl:"Nurse's Notes"}, {n:8, lbl:'Treatment Notes'}, {n:9, lbl:'Finalize'}
+  ];
+  var host = document.getElementById('nodes');
+  STEPS.forEach(function (s) {
+    var d = document.createElement('div');
+    d.className = 'node';
+    d.dataset.step = s.n;
+    d.innerHTML = '<div class="circle">' + s.n + '</div><div class="lbl">' + s.lbl + '</div><span class="conn"></span>';
+    d.addEventListener('click', function () { show(s.n); });
+    host.appendChild(d);
+  });
+
+  // ===== Wire inputs to localStorage =====
+  document.querySelectorAll('input, select, textarea').forEach(function (el) {
+    var id = el.id;
+    if (!id) return;
+    if (state[id] !== undefined) {
+      if (el.type === 'checkbox') el.checked = state[id];
+      else el.value = state[id];
+    }
+    var ev = (el.type === 'checkbox' || el.tagName === 'SELECT') ? 'change' : 'input';
+    el.addEventListener(ev, function () {
+      state[id] = el.type === 'checkbox' ? el.checked : el.value;
+      save();
+    });
+  });
+  document.querySelectorAll('.chk-chip').forEach(function (c) {
+    var id = c.dataset.chip;
+    if (state[id]) c.classList.add('on');
+    c.addEventListener('click', function () {
+      c.classList.toggle('on');
+      state[id] = c.classList.contains('on');
+      save();
+    });
+  });
+
+  // ===== Signature canvas =====
+  var canvas = document.getElementById('sig-pad');
+  if (canvas) {
+    var ctx = canvas.getContext('2d');
+    function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; ctx.strokeStyle = '#1A3A5C'; ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      if (state.sigData) { var img = new Image(); img.onload = function () { ctx.drawImage(img, 0, 0); }; img.src = state.sigData; } }
+    setTimeout(resize, 50);
+    window.addEventListener('resize', resize);
+    var drawing = false, last = null;
+    function pos(e) { var r = canvas.getBoundingClientRect(); var t = e.touches ? e.touches[0] : e; return { x: t.clientX - r.left, y: t.clientY - r.top }; }
+    function start(e) { e.preventDefault(); drawing = true; last = pos(e); }
+    function move(e) { if (!drawing) return; var p = pos(e); ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke(); last = p; }
+    function end() { drawing = false; }
+    canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); canvas.addEventListener('mouseup', end); canvas.addEventListener('mouseleave', end);
+    canvas.addEventListener('touchstart', start); canvas.addEventListener('touchmove', move); canvas.addEventListener('touchend', end);
+    document.getElementById('sig-clear').addEventListener('click', function () { ctx.clearRect(0,0,canvas.width,canvas.height); delete state.sigData; save(); });
+    document.getElementById('sig-save').addEventListener('click', function () { state.sigData = canvas.toDataURL('image/png'); save(); });
+  }
+
+  // ===== Show / navigate =====
+  var labels = {}; STEPS.forEach(function (s) { labels[s.n] = s.lbl; });
+  function show(n) {
+    state.current = n; save();
+    document.querySelectorAll('.node').forEach(function (x) { x.classList.toggle('active', parseInt(x.dataset.step,10) === n); });
+    document.querySelectorAll('[data-pane]').forEach(function (p) {
+      if (parseInt(p.dataset.pane,10) === n) p.setAttribute('data-active',''); else p.removeAttribute('data-active');
+    });
+    document.getElementById('viewing-label').textContent = 'Step ' + n + ' — ' + labels[n];
+    document.getElementById('prev-step').disabled = n === 1;
+    document.getElementById('next-step').disabled = n === 9;
+    document.getElementById('back-btn').disabled = n === 1;
+    if (n === 9) document.getElementById('next-btn').innerHTML = '<i data-lucide="check"></i> Save Step';
+    else document.getElementById('next-btn').innerHTML = 'Save &amp; Continue <i data-lucide="arrow-right"></i>';
+    if (window.lucide) window.lucide.createIcons();
+    paintCompletion();
+  }
+  function paintCompletion() {
+    var count = 0;
+    document.querySelectorAll('.node').forEach(function (x) {
+      var n = parseInt(x.dataset.step,10);
+      var done = !!state.completed[n];
+      x.classList.toggle('done', done);
+      if (done) { x.querySelector('.circle').innerHTML = '<i data-lucide="check"></i>'; count++; }
+      else if (parseInt(x.dataset.step,10) !== state.current) x.querySelector('.circle').textContent = n;
+    });
+    document.getElementById('completion-chip').textContent = count + ' / 9 steps';
+    if (count === 9) {
+      var h = document.getElementById('header-status'); h.textContent = 'Completed'; h.className = 'badge green';
+    }
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  document.getElementById('prev-step').addEventListener('click', function () { if (state.current > 1) show(state.current - 1); });
+  document.getElementById('next-step').addEventListener('click', function () { if (state.current < 9) show(state.current + 1); });
+  document.getElementById('back-btn').addEventListener('click', function () { if (state.current > 1) show(state.current - 1); });
+  document.getElementById('next-btn').addEventListener('click', function () {
+    state.completed[state.current] = true; save();
+    if (state.current < 9) show(state.current + 1);
+    else { paintCompletion(); flash('✓ Step saved'); }
+  });
+  document.getElementById('finalize-btn').addEventListener('click', function () {
+    for (var i = 1; i <= 9; i++) state.completed[i] = true;
+    save(); paintCompletion();
+    flash('🎉 Session completed!');
+  });
+
+  document.getElementById('reset-btn').addEventListener('click', function () {
+    if (!confirm('Reset all workflow data for this demo? Everything you typed will be cleared.')) return;
+    try { localStorage.removeItem(key); } catch (e) {}
+    location.reload();
+  });
+
+  // ===== Toast =====
+  var toast = document.getElementById('toast');
+  var tt = null;
+  function flash(msg) {
+    if (msg) toast.textContent = msg;
+    else toast.textContent = '✓ Saved';
+    toast.classList.add('show');
+    clearTimeout(tt);
+    tt = setTimeout(function () { toast.classList.remove('show'); }, 900);
+  }
+
+  // Init
+  show(state.current);
+  paintCompletion();
+
+  // ===== Doctor's Order: template auto-fill =====
+  var TEMPLATES = {
+    'glass-skin-standard': {
+      label: 'HydraFacial — Standard Protocol',
+      chips: ['1.5 mm depth', 'Medium speed', '2 passes', 'Full face', 'Exosome booster'],
+      fields: {
+        'do-procedure': 'HydraFacial',
+        'do-anesthesia': 'EMLA 5% — apply 30 min before',
+        'do-depth': '1.5',
+        'do-passes': '2',
+        'do-speed': 'Medium',
+        'do-serum': 'Hyaluronic + Exosome booster',
+        'do-areas': 'Full face',
+        'do-instructions': 'Avoid active acne areas. Reduce depth to 1.0mm on periorbital margin. Standard glass-skin protocol.',
+        'do-duration': '90'
+      }
+    },
+    'glass-skin-sensitive': {
+      label: 'HydraFacial — Sensitive Skin Protocol',
+      chips: ['1.0 mm depth', 'Low speed', '1 pass', 'Avoid periorbital', 'Calming serum'],
+      fields: {
+        'do-procedure': 'HydraFacial',
+        'do-anesthesia': 'EMLA 5% — apply 45 min before',
+        'do-depth': '1.0',
+        'do-passes': '1',
+        'do-speed': 'Low',
+        'do-serum': 'Centella + Hyaluronic calming serum',
+        'do-areas': 'Full face (avoid periorbital + thin skin areas)',
+        'do-instructions': 'Sensitive skin variant. Reduced depth and single pass. Apply chilled compress immediately post-procedure.',
+        'do-duration': '75'
+      }
+    },
+    'glass-skin-prp': {
+      label: 'HydraFacial + PRP Booster',
+      chips: ['1.5 mm depth', 'Medium speed', '2 passes', 'PRP add-on', 'Full face + neck'],
+      fields: {
+        'do-procedure': 'HydraFacial + PRP',
+        'do-anesthesia': 'EMLA 5% — apply 30 min before. Draw 10ml blood for PRP.',
+        'do-depth': '1.5',
+        'do-passes': '2',
+        'do-speed': 'Medium',
+        'do-serum': 'PRP (10ml prepared) + Exosome booster',
+        'do-areas': 'Full face + Neck',
+        'do-instructions': 'PRP add-on protocol. Apply PRP during 2nd pass for enhanced absorption. PRP consent must be signed in Step 3.',
+        'do-duration': '120'
+      }
+    }
+  };
+
+  var tplSel = document.getElementById('do-template');
+  var chipsHost = document.getElementById('do-tpl-chips');
+  var helper = document.getElementById('do-tpl-helper');
+  function renderTplChips(t) {
+    chipsHost.innerHTML = '';
+    if (!t || !t.chips) { chipsHost.style.display = 'none'; return; }
+    chipsHost.style.display = 'flex';
+    t.chips.forEach(function (c) {
+      var s = document.createElement('span');
+      s.style.cssText = 'padding:4px 10px;background:#F0F6FC;color:#2D6A9F;border-radius:6px;font-family:var(--font-display);font-weight:600;font-size:11.5px;';
+      s.textContent = c;
+      chipsHost.appendChild(s);
+    });
+  }
+  function applyTemplate(key) {
+    var t = TEMPLATES[key];
+    if (!t) { renderTplChips(null); helper.textContent = 'Selecting a template will auto-fill the order fields below. You can still edit any field afterwards.'; helper.style.color = '#5A7A96'; return; }
+    Object.keys(t.fields).forEach(function (fid) {
+      var el = document.getElementById(fid);
+      if (!el) return;
+      el.value = t.fields[fid];
+      state[fid] = t.fields[fid];
+    });
+    renderTplChips(t);
+    helper.textContent = '✓ Template applied: ' + t.label + '. All fields below have been auto-filled — you can still edit any value.';
+    helper.style.color = '#15803D';
+    state['do-template'] = key;
+    save();
+  }
+  if (tplSel) {
+    tplSel.addEventListener('change', function () { applyTemplate(tplSel.value); });
+    if (state['do-template']) { tplSel.value = state['do-template']; renderTplChips(TEMPLATES[state['do-template']]); if (TEMPLATES[state['do-template']]) { helper.textContent = '✓ Template applied: ' + TEMPLATES[state['do-template']].label + '. Editable below.'; helper.style.color = '#15803D'; } }
+  }
+})();
+</script>
+<!-- ============ MODALS ============ -->
+<div id="consent-modals" style="position:fixed;inset:0;background:rgba(15,30,48,0.55);display:none;align-items:flex-start;justify-content:center;padding:40px 20px;z-index:200;overflow-y:auto;"></div>
+<template id="tpl-consent-general">
+  <div style="background:#fff;border-radius:12px;width:100%;max-width:640px;box-shadow:0 20px 60px rgba(15,30,48,0.35);display:flex;flex-direction:column;max-height:calc(100vh - 80px);font-family:var(--font-body);">
+    <div style="padding:18px 22px;border-bottom:1px solid #E5EFF7;display:flex;align-items:center;gap:10px;">
+      <h2 style="font-family:var(--font-display);font-weight:600;font-size:18px;color:#1A2E40;margin:0;">General Consent Form</h2>
+      <span style="background:#DCFCE7;color:#15803D;padding:3px 9px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:10.5px;">Signed</span>
+      <button class="modal-close" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#5A7A96;padding:6px;border-radius:6px;"><i data-lucide="x"></i></button>
+    </div>
+    <div style="padding:14px 22px;background:#F0F6FC;border-radius:0;font-family:var(--font-body);font-size:12px;color:#5A7A96;margin:14px 22px 0;border-radius:8px;">Patient: <b style="color:#1A2E40;font-family:var(--font-display);font-weight:600;">Sarah Johnson</b> · Signed: April 1, 2026 at 10:15 AM · IP recorded · Document version: v1.2</div>
+    <div style="padding:18px 22px;overflow-y:auto;max-height:400px;">
+      <h3 style="font-family:var(--font-display);font-weight:600;font-size:13px;color:#1A2E40;text-transform:uppercase;margin:0 0 8px;letter-spacing:0.04em;">General Consent to Treatment</h3>
+      <p style="font-family:var(--font-body);font-size:13px;color:#1A2E40;line-height:1.6;margin:0 0 14px;">I, Sarah Johnson, hereby consent to receive aesthetic and medical treatments at Cloud Skin Clinic + Wellness as recommended by the attending physician. I understand that all procedures will be performed by qualified practitioners and that I have the right to withdraw consent at any time before the procedure begins.</p>
+      <h4 style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#2D6A9F;text-transform:uppercase;margin:14px 0 6px;letter-spacing:0.04em;">Disclosure of Medical Information</h4>
+      <p style="font-family:var(--font-body);font-size:13px;color:#1A2E40;line-height:1.6;margin:0 0 12px;">I confirm that all medical history, allergies, and medications I have disclosed are accurate. I agree to inform the clinic of any changes.</p>
+      <h4 style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#2D6A9F;text-transform:uppercase;margin:14px 0 6px;letter-spacing:0.04em;">Risks &amp; Complications</h4>
+      <p style="font-family:var(--font-body);font-size:13px;color:#1A2E40;line-height:1.6;margin:0 0 12px;">I understand that all procedures carry inherent risks including redness, swelling, sensitivity, and rare reactions. These have been explained to me.</p>
+      <h4 style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#2D6A9F;text-transform:uppercase;margin:14px 0 6px;letter-spacing:0.04em;">Photography Consent</h4>
+      <p style="font-family:var(--font-body);font-size:13px;color:#1A2E40;line-height:1.6;margin:0 0 12px;">I do <b>NOT</b> consent to use of my photographs beyond my personal clinical record.</p>
+      <hr style="border:none;border-top:1px solid #E5EFF7;margin:18px 0 12px;">
+      <div style="font-family:var(--font-display);font-weight:700;font-size:11px;color:#5A7A96;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Patient Signature</div>
+      <div style="width:280px;height:80px;border:1.5px dashed #BFD8EB;background:#F8F9FA;border-radius:6px;display:flex;align-items:center;justify-content:center;">
+        <svg viewBox="0 0 240 60" width="240" height="60"><path d="M20 42 q 8 -22 18 -8 q 6 10 -2 18 q -10 6 -8 -8 q 6 -14 22 0 q 4 6 -4 12 M 76 36 q 6 -20 16 -6 q 8 12 -4 18 q -8 4 -6 -6 q 4 -10 18 -2 M 108 24 v 22 M 108 24 l 14 22 M 122 24 l -14 22 M 144 38 q 6 -16 14 -6 q 8 8 -2 16 q -8 4 -10 -4 q -2 -10 14 -10 M 174 40 q 4 -14 12 -4 q 6 8 -2 14 q -8 4 -10 -2 q -2 -10 14 -8 M 200 36 q 4 -16 14 -4 q 6 8 -2 14 q -8 4 -10 -2" fill="none" stroke="#1A3A5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="font-family:var(--font-body);font-size:11.5px;color:#5A7A96;margin-top:6px;">Signed digitally on April 1, 2026 at 10:15 AM.</div>
+      <div style="font-family:var(--font-display);font-weight:700;font-size:11px;color:#5A7A96;text-transform:uppercase;letter-spacing:0.05em;margin:14px 0 6px;">Witness / Staff</div>
+      <div style="font-family:var(--font-body);font-size:12.5px;color:#1A2E40;">Witnessed by: Receptionist — Maria Santos · April 1, 2026.</div>
+    </div>
+    <div style="padding:14px 22px;border-top:1px solid #E5EFF7;background:#F8FBFD;display:flex;justify-content:flex-end;gap:10px;">
+      <button class="modal-close btn-ghost-sm">Close</button>
+      <button class="btn btn-primary" style="height:36px;"><i data-lucide="download" style="width:13px;height:13px;"></i> Download PDF</button>
+    </div>
+  </div>
+</template>
+<template id="tpl-history-questionnaire">
+  <div style="background:#fff;border-radius:12px;width:100%;max-width:640px;box-shadow:0 20px 60px rgba(15,30,48,0.35);display:flex;flex-direction:column;max-height:calc(100vh - 80px);font-family:var(--font-body);">
+    <div style="padding:18px 22px;border-bottom:1px solid #E5EFF7;display:flex;align-items:center;gap:10px;">
+      <h2 style="font-family:var(--font-display);font-weight:600;font-size:18px;color:#1A2E40;margin:0;">Medical History Questionnaire</h2>
+      <span style="background:#DCFCE7;color:#15803D;padding:3px 9px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:10.5px;">Completed</span>
+      <button class="modal-close" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#5A7A96;padding:6px;border-radius:6px;"><i data-lucide="x"></i></button>
+    </div>
+    <div style="padding:14px 22px;background:#F0F6FC;font-family:var(--font-body);font-size:12px;color:#5A7A96;margin:14px 22px 0;border-radius:8px;">Patient: <b style="color:#1A2E40;font-family:var(--font-display);font-weight:600;">Sarah Johnson</b> · Completed: April 1, 2026 at 10:08 AM.</div>
+    <div style="padding:18px 22px;overflow-y:auto;max-height:400px;">
+      <div style="background:#FFF8E7;border-radius:8px;padding:12px 14px;margin-bottom:16px;">
+        <div style="font-family:var(--font-display);font-weight:700;font-size:13px;color:#92400E;margin-bottom:4px;">2 Items Require Attention</div>
+        <div style="font-family:var(--font-body);font-size:12px;color:#92400E;line-height:1.5;">· Aspirin 81mg daily — advise doctor before proceeding<br>· Hypertension (monitored) — confirm with doctor</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div><div style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;">Do you have any known allergies?</div><div style="font-family:var(--font-body);font-size:13px;color:#1A2E40;margin-top:3px;">No known allergies.</div></div>
+        <div><div style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;display:flex;align-items:center;gap:6px;">Are you currently taking any medications? <span style="background:#FFF8E7;color:#B45309;padding:2px 8px;border-radius:4px;font-family:var(--font-display);font-weight:700;font-size:10px;display:inline-flex;align-items:center;gap:3px;"><i data-lucide="alert-triangle" style="width:10px;height:10px;"></i> Flagged</span></div><div style="font-family:var(--font-body);font-size:13px;color:#1A2E40;margin-top:3px;">Aspirin 81mg daily (for cardiovascular maintenance).</div></div>
+        <div><div style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;display:flex;align-items:center;gap:6px;">Do you have any existing medical conditions? <span style="background:#FFF8E7;color:#B45309;padding:2px 8px;border-radius:4px;font-family:var(--font-display);font-weight:700;font-size:10px;display:inline-flex;align-items:center;gap:3px;"><i data-lucide="alert-triangle" style="width:10px;height:10px;"></i> Flagged</span></div><div style="font-family:var(--font-body);font-size:13px;color:#1A2E40;margin-top:3px;">Hypertension — currently monitored and controlled.</div></div>
+        <div><div style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;">Have you had any previous aesthetic procedures?</div><div style="font-family:var(--font-body);font-size:13px;color:#1A2E40;margin-top:3px;">Yes — Diamond Glow Facial, October 2025. No adverse reactions.</div></div>
+        <div><div style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;">Do you have a history of keloid scarring?</div><div style="font-family:var(--font-body);font-size:13px;color:#1A2E40;margin-top:3px;">No.</div></div>
+        <div><div style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;">Are you pregnant or breastfeeding?</div><div style="font-family:var(--font-body);font-size:13px;color:#1A2E40;margin-top:3px;">No.</div></div>
+        <div><div style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;">Do you have any skin conditions?</div><div style="font-family:var(--font-body);font-size:13px;color:#1A2E40;margin-top:3px;">Mild sensitivity on cheeks — no active conditions.</div></div>
+        <div><div style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;">Have you used isotretinoin in the past 12 months?</div><div style="font-family:var(--font-body);font-size:13px;color:#1A2E40;margin-top:3px;">No.</div></div>
+      </div>
+    </div>
+    <div style="padding:14px 22px;border-top:1px solid #E5EFF7;background:#F8FBFD;display:flex;justify-content:flex-end;gap:10px;">
+      <button class="modal-close btn-ghost-sm">Close</button>
+      <button class="btn btn-primary" style="height:36px;"><i data-lucide="download" style="width:13px;height:13px;"></i> Download PDF</button>
+    </div>
+  </div>
+</template>
+<script>
+(function () {
+  var host = document.getElementById('consent-modals');
+  document.querySelectorAll('[data-open-modal]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var tpl = document.getElementById('tpl-' + b.getAttribute('data-open-modal'));
+      if (!tpl) return;
+      host.innerHTML = '';
+      host.appendChild(tpl.content.cloneNode(true));
+      host.style.display = 'flex';
+      if (window.lucide) window.lucide.createIcons();
+      host.querySelectorAll('.modal-close').forEach(function (c) {
+        c.addEventListener('click', function () { host.style.display = 'none'; host.innerHTML = ''; });
+      });
+    });
+  });
+  host.addEventListener('click', function (e) { if (e.target === host) { host.style.display = 'none'; host.innerHTML = ''; } });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { host.style.display = 'none'; host.innerHTML = ''; } });
+})();
+</script>
+</body>
+</html>

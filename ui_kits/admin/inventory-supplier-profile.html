@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Supplier Profile</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+* { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  /* Queue cart icon */
+  .queue-cart { position: relative; background: none; border: 1.5px solid #D0E8F5; width: 38px; height: 38px; border-radius: 8px; color: #2D6A9F; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+  .queue-cart:hover { background: #EBF6FD; border-color: #93C5FD; }
+  .queue-cart .count { position: absolute; top: -7px; right: -7px; min-width: 20px; height: 20px; padding: 0 5px; background: #2D6A9F; color: #fff; border-radius: 9999px; font-family: var(--font-display); font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; border: 2px solid #fff; }
+
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .back-link { background: none; border: none; cursor: pointer; color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; padding: 0; text-decoration: none; width: fit-content; }
+
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .badge.success { background: #DCFCE7; color: #15803D; }
+  .badge.warning { background: #FEF3C7; color: #B45309; }
+  .badge.danger  { background: #FEE2E2; color: #DC2626; }
+  .badge.info    { background: #DBEAFE; color: #1D4ED8; }
+  .badge.slate   { background: #F1F5F9; color: #475569; }
+  .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  /* Profile header card */
+  .profile-card { background: #fff; border-radius: 12px; padding: 24px 28px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+  .profile-card .ic { width: 56px; height: 56px; border-radius: 12px; background: #EBF6FD; color: #2D6A9F; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .profile-card .ic .lucide { width: 26px; height: 26px; }
+  .profile-card .body { flex: 1; min-width: 240px; }
+  .profile-card h1 { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #1A2E40; margin: 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .profile-card .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px 24px; margin-top: 14px; }
+  .profile-card .contact-grid .k { font-family: var(--font-display); font-size: 10.5px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+  .profile-card .contact-grid .v { font-family: var(--font-display); font-size: 13.5px; font-weight: 600; color: #1A2E40; }
+  .profile-card .actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+  .btn { height: 38px; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; text-decoration: none; white-space: nowrap; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-outline { background: #fff; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-outline:hover { background: #F0F6FC; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 18px; }
+  .btn-primary:hover { background: #1A5685; }
+  .btn-success { background: #DCFCE7; color: #15803D; border: 1.5px solid #86EFAC; padding: 0 16px; cursor: default; }
+  .btn-iconmini { width: 38px; height: 38px; padding: 0; justify-content: center; }
+
+  /* Stats */
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media (max-width: 1024px) { .stat-row { grid-template-columns: repeat(2, 1fr); } }
+  .stat-card { background: #fff; border-radius: 10px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; flex-direction: column; gap: 8px; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-card .lbl { font-size: 11px; color: #5A7A96; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #2D6A9F; display: flex; align-items: center; justify-content: center; }
+  .stat-card .iplate.violet { background: #EDE9FE; color: #7C3AED; }
+  .stat-card .iplate.success { background: #DCFCE7; color: #15803D; }
+  .stat-card .iplate.warning { background: #FEF3C7; color: #B45309; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .stat-card .sub { font-size: 12px; color: #5A7A96; }
+
+  /* Tabs */
+  .tabbar { background: #fff; border-radius: 10px 10px 0 0; padding: 0 20px; display: flex; gap: 4px; border-bottom: 1px solid #D0E8F5; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .tab { padding: 14px 18px; font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #5A7A96; cursor: pointer; border: none; background: none; border-bottom: 3px solid transparent; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .tab:hover { color: #1A2E40; }
+  .tab.active { color: #2D6A9F; border-bottom-color: #2D6A9F; }
+  .tab .count { background: #F1F5F9; color: #475569; padding: 1px 7px; border-radius: 9999px; font-size: 11px; font-weight: 700; }
+  .tab.active .count { background: #DBEAFE; color: #1D4ED8; }
+
+  /* Info banner (Screen 3) */
+  .info-banner { background: #EBF6FD; border: 1px solid #93C5FD; border-radius: 10px; padding: 12px 16px; display: flex; gap: 10px; align-items: center; }
+  .info-banner .lucide { width: 16px; height: 16px; color: #2D6A9F; flex-shrink: 0; }
+  .info-banner .txt { font-family: var(--font-body); font-size: 13px; color: #1E40AF; }
+  .info-banner .txt b { color: #1A2E40; }
+  .info-banner a { color: #2D6A9F; font-family: var(--font-display); font-weight: 600; text-decoration: none; }
+  .info-banner a:hover { text-decoration: underline; }
+
+  /* Action bar */
+  .actbar { background: #fff; padding: 14px 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; border-bottom: 1px solid #E5EFF7; }
+  .search-input { position: relative; flex: 1; max-width: 320px; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .search-input input { width: 100%; height: 36px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .field-select { height: 36px; padding: 0 30px 0 12px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; min-width: 160px; }
+
+  /* Table */
+  .section-card { background: #fff; border-radius: 0 0 10px 10px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 11px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #E5EFF7; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #F8FBFD; }
+  .nm { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .sku { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; font-weight: 600; }
+  .mono { font-family: var(--font-mono); font-size: 12.5px; color: #5A7A96; }
+  .price { font-family: var(--font-display); font-size: 13.5px; font-weight: 700; color: #1A2E40; }
+
+  /* Queue button states (mirrors inventory.html tones) */
+  .queue-btn { height: 30px; padding: 0 10px; border-radius: 7px; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; border: 1.5px solid; background: #fff; white-space: nowrap; transition: background 120ms, color 120ms, border-color 120ms; }
+  .queue-btn .lucide { width: 12px; height: 12px; }
+  .queue-btn.tone-subtle { color: #94A3B8; border-color: #E2E8F0; }
+  .queue-btn.tone-subtle:hover { color: #2D6A9F; border-color: #93C5FD; background: #F8FBFD; }
+  .queue-btn.tone-amber { color: #B45309; border-color: #FCD34D; background: #FFFBEB; }
+  .queue-btn.tone-amber:hover { background: #FEF3C7; }
+  .queue-btn.tone-red { color: #DC2626; border-color: #FCA5A5; background: #FEF2F2; font-weight: 700; }
+  .queue-btn.tone-red:hover { background: #FEE2E2; }
+  .queue-btn.in-queue { color: #15803D; border-color: #86EFAC; background: #DCFCE7; }
+
+  .footnote { font-family: var(--font-body); font-size: 12px; color: #9BBAD4; padding: 14px 20px; display: flex; align-items: center; gap: 6px; }
+  .footnote .lucide { width: 13px; height: 13px; }
+
+  .kebab-btn { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #D0E8F5; background: #fff; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .kebab-btn:hover { background: #F0F6FC; color: #2D6A9F; }
+  .kebab-btn .lucide { width: 14px; height: 14px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">DermaCare Distributors</div>
+        <div class="topbar-crumb" id="topbar-crumb">Admin / Inventory / Suppliers / DermaCare Distributors</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <a class="queue-cart" href="inventory-po-queue.html" aria-label="PO Queue" title="View PO Queue">
+          <i data-lucide="shopping-cart"></i>
+          <span class="count" id="queue-cart-count">6</span>
+        </a>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Supplier Profile">
+      <a class="back-link" href="inventory-suppliers.html"><i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Back to Suppliers</a>
+
+      <!-- Profile card -->
+      <div class="profile-card">
+        <div class="ic"><i data-lucide="building-2"></i></div>
+        <div class="body">
+          <h1><span id="sup-name">DermaCare Distributors</span> <span class="badge success"><span class="dot"></span>Active</span></h1>
+          <div class="contact-grid">
+            <div><div class="k">Contact Person</div><div class="v" id="sup-contact">Maria Reyes</div></div>
+            <div><div class="k">Phone</div><div class="v" id="sup-phone">+63 917 123 4567</div></div>
+            <div><div class="k">Email</div><div class="v" id="sup-email">maria@dermacare.ph</div></div>
+            <div><div class="k">Payment Terms</div><div class="v" id="sup-terms">Net 30</div></div>
+            <div><div class="k">Address</div><div class="v" id="sup-addr">Makati City, Metro Manila</div></div>
+            <div><div class="k">Onboarded</div><div class="v">Feb 8, 2024 · 1y 3mo</div></div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-outline" type="button"><i data-lucide="pencil"></i> Edit Supplier</button>
+          <button class="kebab-btn" type="button" title="More actions"><i data-lucide="more-vertical"></i></button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="top"><span class="lbl">Total Products Linked</span><div class="iplate"><i data-lucide="package"></i></div></div>
+          <div class="value">8</div>
+          <div class="sub">Across 4 categories</div>
+        </div>
+        <div class="stat-card">
+          <div class="top"><span class="lbl">Total Purchase Orders</span><div class="iplate violet"><i data-lucide="clipboard-list"></i></div></div>
+          <div class="value">12</div>
+          <div class="sub">2 currently in progress</div>
+        </div>
+        <div class="stat-card">
+          <div class="top"><span class="lbl">Total Spent (All Time)</span><div class="iplate success"><i data-lucide="banknote"></i></div></div>
+          <div class="value">₱284,500</div>
+          <div class="sub">Avg. ₱23,708 per PO</div>
+        </div>
+        <div class="stat-card">
+          <div class="top"><span class="lbl">Last Order</span><div class="iplate warning"><i data-lucide="calendar"></i></div></div>
+          <div class="value" style="font-size:18px;">May 13, 2026</div>
+          <div class="sub">PO-2026-0042 · Partially Received</div>
+        </div>
+      </div>
+
+      <!-- Tabs + content -->
+      <div>
+        <div class="tabbar">
+          <a class="tab" href="#"><i data-lucide="layout-dashboard"></i> Overview</a>
+          <a class="tab active" href="#"><i data-lucide="package"></i> Products <span class="count">8</span></a>
+          <a class="tab" href="#"><i data-lucide="clipboard-list"></i> Purchase Orders <span class="count">12</span></a>
+          <a class="tab" href="#"><i data-lucide="trending-up"></i> Price History</a>
+        </div>
+
+        <div class="section-card">
+          <!-- Screen 3 info banner -->
+          <div class="info-banner" id="queue-banner" hidden style="margin:14px 18px 0;border-radius:10px;">
+            <i data-lucide="info"></i>
+            <div class="txt"><b>3 products</b> from this supplier are already in your PO Queue. <a href="inventory-po-queue.html">Go to PO Queue →</a></div>
+          </div>
+
+          <div class="actbar">
+            <div class="search-input"><i data-lucide="search"></i><input placeholder="Search products from this supplier…"></div>
+            <select class="field-select"><option>All Categories</option><option>Skincare</option><option>Injectable</option><option>Treatment</option><option>Supplements</option></select>
+            <div style="margin-left:auto;display:flex;gap:8px;">
+              <button class="btn btn-outline" type="button"><i data-lucide="link"></i> Link Product</button>
+              <button class="btn btn-primary" type="button" id="add-low-btn"><i data-lucide="plus"></i> Add All Low Stock to PO Queue</button>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Product Name</th>
+                <th>SKU</th>
+                <th>Category</th>
+                <th style="text-align:right;">Last Price</th>
+                <th>Last Ordered</th>
+                <th style="text-align:right;">Total Units</th>
+                <th>Current Stock</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="products-tbody"></tbody>
+          </table>
+
+          <div class="footnote"><i data-lucide="info"></i> Products are automatically linked when a Purchase Order from this supplier is completed.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+  // --- Supplier dataset (varies by ?supplier=…) ---
+  var SUPPLIERS = {
+    dermacare: {
+      name: 'DermaCare Distributors',
+      contact: 'Maria Reyes', phone: '+63 917 123 4567', email: 'maria@dermacare.ph',
+      terms: 'Net 30', address: 'Makati City, Metro Manila',
+      products: [
+        { name:'Retinol Cream',           sku:'SKIN-002',  cat:'Skincare',    price:180,  last:'May 13, 2026', units:340, stock:0,  status:'no' },
+        { name:'Filler 1mL',              sku:'INJ-002',   cat:'Injectable',  price:1600, last:'May 13, 2026', units:85,  stock:3,  status:'low' },
+        { name:'Chemical Peel Solution',  sku:'TREAT-001', cat:'Treatment',   price:280,  last:'May 13, 2026', units:210, stock:4,  status:'low' },
+        { name:'Botox 50u',               sku:'INJ-001',   cat:'Injectable',  price:2500, last:'May 8, 2026',  units:45,  stock:12, status:'ok' },
+        { name:'Hyaluronic Serum',        sku:'SKIN-008',  cat:'Skincare',    price:220,  last:'Apr 20, 2026', units:180, stock:42, status:'ok' },
+        { name:'Vitamin C Serum',         sku:'SKIN-015',  cat:'Skincare',    price:200,  last:'Apr 20, 2026', units:95,  stock:6,  status:'verylow' },
+        { name:'Kojic Acid Soap',         sku:'SKIN-030',  cat:'Skincare',    price:120,  last:'Mar 15, 2026', units:420, stock:85, status:'full' },
+        { name:'Evening Primrose',        sku:'SUPP-009',  cat:'Supplements', price:1200, last:'Mar 10, 2026', units:60,  stock:28, status:'ok' }
+      ]
+    },
+    medsupply: {
+      name: 'MedSupply PH',
+      contact: 'Juan Santos', phone: '+63 917 555 0142', email: 'juan@medsupply.ph',
+      terms: 'Net 15', address: 'Quezon City, Metro Manila',
+      products: [
+        { name:'Botox 50u',         sku:'INJ-001',  cat:'Injectable', price:2500, last:'May 13, 2026', units:120, stock:2,  status:'no' },
+        { name:'SPF 50 Sunscreen',  sku:'SKIN-021', cat:'Skincare',   price:150,  last:'May 13, 2026', units:280, stock:8,  status:'ok' }
+      ]
+    },
+    wellness: {
+      name: 'Wellness Depot',
+      contact: 'Ana Reyes', phone: '+63 917 222 8810', email: 'ana@wellnessdepot.ph',
+      terms: 'Cash on Delivery', address: 'Pasig City, Metro Manila',
+      products: [
+        { name:'Glutathione IV Drip', sku:'WELL-007', cat:'Wellness',    price:5000, last:'May 13, 2026', units:40, stock:0, status:'no' },
+        { name:'Collagen Supplement', sku:'WELL-003', cat:'Supplements', price:800,  last:'Apr 28, 2026', units:75, stock:95, status:'full' }
+      ]
+    }
+  };
+
+  // Stock badge helper
+  var STOCK_BADGES = {
+    no:      { cls:'danger',  txt:'No Stock' },
+    low:     { cls:'warning', txt:'Low' },
+    verylow: { cls:'warning', txt:'Very Low' },
+    ok:      { cls:'success', txt:'OK' },
+    full:    { cls:'success', txt:'Full' }
+  };
+  function toneFor(status) {
+    if (status === 'no') return 'tone-red';
+    if (status === 'low' || status === 'verylow') return 'tone-amber';
+    return 'tone-subtle';
+  }
+  function fmt(n) { return '₱' + n.toLocaleString('en-US'); }
+
+  // Render based on URL params: ?supplier=dermacare|medsupply|wellness  ?queued=1
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var key = (params.get('supplier') || 'dermacare').toLowerCase();
+    var queued = params.get('queued') === '1';
+    var s = SUPPLIERS[key] || SUPPLIERS.dermacare;
+
+    // Header bindings
+    document.getElementById('topbar-title').textContent = s.name;
+    document.getElementById('topbar-crumb').textContent = 'Admin / Inventory / Suppliers / ' + s.name;
+    document.title = 'Cloud Skin Admin — ' + s.name;
+    document.getElementById('sup-name').textContent = s.name;
+    document.getElementById('sup-contact').textContent = s.contact;
+    document.getElementById('sup-phone').textContent = s.phone;
+    document.getElementById('sup-email').textContent = s.email;
+    document.getElementById('sup-terms').textContent = s.terms;
+    document.getElementById('sup-addr').textContent = s.address;
+
+    // SKUs that are pre-staged in the queue (Screen 3) — only urgent items from DermaCare.
+    var QUEUED = queued ? ['SKIN-002','INJ-002','TREAT-001'] : [];
+    document.getElementById('queue-cart-count').textContent = queued ? '3' : '6';
+    if (queued) {
+      document.getElementById('queue-banner').hidden = false;
+      var addLow = document.getElementById('add-low-btn');
+      addLow.className = 'btn btn-success';
+      addLow.disabled = true;
+      addLow.innerHTML = '<i data-lucide="check"></i> Low Stock Items Added';
+    }
+
+    // Products table rows
+    var tbody = document.getElementById('products-tbody');
+    var html = '';
+    s.products.forEach(function (p) {
+      var sb = STOCK_BADGES[p.status];
+      var tone = toneFor(p.status);
+      var isQueued = QUEUED.indexOf(p.sku) !== -1;
+      var btn = isQueued
+        ? '<button class="queue-btn in-queue" type="button"><i data-lucide="check"></i> In Queue</button>'
+        : '<button class="queue-btn ' + tone + '" type="button"><i data-lucide="plus"></i> Add to PO Queue</button>';
+      html += '<tr>'
+        + '<td><span class="nm">' + p.name + '</span></td>'
+        + '<td><span class="sku">' + p.sku + '</span></td>'
+        + '<td><span class="badge slate">' + p.cat + '</span></td>'
+        + '<td style="text-align:right;"><span class="price">' + fmt(p.price) + '</span></td>'
+        + '<td><span class="mono">' + p.last + '</span></td>'
+        + '<td style="text-align:right;"><span class="mono" style="color:#1A2E40;font-weight:600;">' + p.units + '</span></td>'
+        + '<td><span class="badge ' + sb.cls + '"><span class="dot"></span>' + sb.txt + ' \u00b7 ' + p.stock + '</span></td>'
+        + '<td style="text-align:right;">' + btn + '</td>'
+        + '</tr>';
+    });
+    tbody.innerHTML = html;
+    if (window.lucide) window.lucide.createIcons();
+
+    // Toggle queue button per row
+    tbody.querySelectorAll('.queue-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var on = btn.classList.toggle('in-queue');
+        // Strip tone classes when adding to queue; restore based on row when removing.
+        if (on) {
+          btn.classList.remove('tone-subtle','tone-amber','tone-red');
+          btn.innerHTML = '<i data-lucide="check"></i> In Queue';
+        } else {
+          // Re-derive tone from the stock badge in the same row.
+          var row = btn.closest('tr');
+          var sb = row.querySelector('.badge');
+          var t = 'tone-subtle';
+          if (sb.classList.contains('danger')) t = 'tone-red';
+          else if (sb.classList.contains('warning')) t = 'tone-amber';
+          btn.classList.add(t);
+          btn.innerHTML = '<i data-lucide="plus"></i> Add to PO Queue';
+        }
+        if (window.lucide) window.lucide.createIcons();
+      });
+    });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Active Staff</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+
+  /* ============ LAYOUT (shared shell) ============ */
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* ============ TOOLBAR ============ */
+  .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .search-input { position: relative; width: 280px; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; pointer-events: none; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 32px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .role-filters { display: inline-flex; gap: 6px; }
+  .role-filter { height: 38px; padding: 0 14px; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 500; color: #5A7A96; }
+  .role-filter.active { background: #2D6A9F; border-color: #2D6A9F; color: #fff; }
+  .btn-primary { height: 40px; padding: 0 18px; background: #2D6A9F; border: none; border-radius: 8px; color: #fff; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; margin-left: auto; }
+  .btn-primary .lucide { width: 14px; height: 14px; }
+
+  /* ============ TABLE ============ */
+  .section-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .table-wrap { overflow: visible; }
+  table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+  th { padding: 10px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 12px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr.row:hover td { background: #F8FBFF; }
+  tr.row:last-child td { border-bottom: none; }
+  .name-cell { display: flex; align-items: center; gap: 10px; }
+  .avatar-sm { width: 36px; height: 36px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 600; font-size: 12px; flex-shrink: 0; }
+  .sname { font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .role-badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .role-admin { background: #EBF6FD; color: #2D6A9F; }
+  .role-practitioner { background: #DCFCE7; color: #15803D; }
+  .role-receptionist { background: #F5F3FF; color: #6D28D9; }
+  .status-badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .actions { display: inline-flex; align-items: center; gap: 6px; position: relative; }
+  .action-btn { width: 28px; height: 28px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #5A7A96; }
+  .action-btn.del { background: #FEF2F2; color: #DC2626; }
+  .action-btn .lucide { width: 13px; height: 13px; }
+  .menu { position: absolute; top: 100%; right: 0; margin-top: 4px; background: #fff; border: 1px solid #D0E8F5; border-radius: 8px; box-shadow: 0 4px 12px rgba(26,58,92,0.15); min-width: 140px; z-index: 50; display: none; }
+  .menu.open { display: block; }
+  tbody tr.row:last-child .menu, tbody tr.row.menu-up .menu { top: auto; bottom: 100%; margin-top: 0; margin-bottom: 6px; }
+  .menu button { display: block; width: 100%; padding: 10px 16px; background: none; border: none; text-align: left; cursor: pointer; font-family: var(--font-body); font-size: 13px; border-bottom: 1px solid #F0F6FC; }
+  .menu button:last-child { border-bottom: none; }
+  .menu button:hover { background: #F8FBFF; }
+
+  /* ============ MODAL ============ */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(26,58,92,0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 24px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: 16px; max-width: 540px; width: 100%; box-shadow: 0 8px 32px rgba(26,58,92,0.18); overflow: hidden; }
+  .modal-head { padding: 20px 24px; border-bottom: 1px solid #D0E8F5; display: flex; justify-content: space-between; align-items: center; }
+  .modal-head h2 { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: #1A2E40; margin: 0; }
+  .modal-head button { background: none; border: none; cursor: pointer; color: #5A7A96; display: flex; }
+  .modal-body { padding: 24px; }
+  .field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-family: var(--font-display); font-weight: 500; font-size: 13px; color: #1A2E40; margin-bottom: 6px; }
+  .field input { width: 100%; height: 40px; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; }
+  .role-radio-row { display: flex; gap: 10px; }
+  .role-radio { flex: 1; padding: 10px 12px; border: 1.5px solid #D0E8F5; border-radius: 8px; background: #fff; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  .role-radio.active { border-color: #2D6A9F; background: #EBF6FD; }
+  .role-radio .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #9BBAD4; flex-shrink: 0; position: relative; }
+  .role-radio.active .dot { border-color: #2D6A9F; background: #2D6A9F; }
+  .role-radio.active .dot::after { content:""; position:absolute; inset:3px; border-radius:50%; background:#fff; }
+  .role-radio span { font-family: var(--font-display); font-size: 13px; font-weight: 500; color: #5A7A96; text-transform: capitalize; }
+  .role-radio.active span { color: #2D6A9F; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; }
+  .toggle { width: 40px; height: 22px; border-radius: 9999px; background: #2D6A9F; cursor: pointer; position: relative; padding: 2px; display: flex; align-items: center; }
+  .toggle .knob { width: 18px; height: 18px; border-radius: 50%; background: #fff; margin-left: auto; transition: margin 150ms; }
+  .toggle.off { background: #CBD5E1; }
+  .toggle.off .knob { margin-left: 0; }
+  .modal-foot { padding: 16px 24px; border-top: 1px solid #D0E8F5; display: flex; justify-content: flex-end; gap: 10px; }
+  .btn-cancel { height: 38px; padding: 0 20px; background: none; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 14px; color: #5A7A96; }
+  .btn-solid { height: 38px; padding: 0 20px; background: #2D6A9F; border: none; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #fff; }
+
+  /* Confirm modal */
+  .confirm-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .confirm-icon.del { background: #FEE2E2; color: #EF4444; }
+  .confirm-icon.arc { background: #FEF3C7; color: #F97316; }
+  .confirm-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: #1A2E40; margin-bottom: 8px; text-align: center; }
+  .confirm-text { font-size: 13px; color: #5A7A96; text-align: center; margin: 0; }
+  .btn-confirm { height: 38px; padding: 0 20px; border: none; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #fff; }
+  .btn-confirm.del { background: #EF4444; }
+  .btn-confirm.arc { background: #F97316; }
+
+.staff-menu { position: absolute; top: 100%; right: 0; margin-top: 4px; background: #fff; border: 1px solid #D0E8F5; border-radius: 8px; box-shadow: 0 4px 12px rgba(26,58,92,0.15); min-width: 160px; z-index: 50; display: none; overflow: hidden; }
+.staff-menu.open { display: block; }
+.staff-menu button { display: block; width: 100%; padding: 10px 16px; background: none; border: none; text-align: left; cursor: pointer; font-family: var(--font-body); font-size: 13px; border-bottom: 1px solid #F0F6FC; color: #1A2E40; }
+.staff-menu button:last-child { border-bottom: none; }
+.staff-menu button:hover { background: #F8FBFF; }
+.staff-actions-cell { position: relative; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside id="sidebar-mount" class="sidebar"></aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Active Staff</div>
+        <div class="topbar-crumb">Admin / Active Staff</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Active Staff">
+      <div class="toolbar">
+        <div class="search-input">
+          <i data-lucide="search"></i>
+          <input placeholder="Search staff...">
+        </div>
+        <a class="btn-primary" id="open-add" href="staff-new.html" style="text-decoration:none;"><i data-lucide="plus"></i> Add Staff</a>
+      </div>
+
+      <div class="section-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Staff Member</th><th>Role</th><th>Email</th><th>Phone</th><th>Specialty</th><th>Status</th><th>Date Added</th><th>Actions</th>
+            </tr></thead>
+            <tbody>
+              <tr class="row" data-role="admin">
+                <td><div class="name-cell"><div class="avatar-sm" style="background:#2D6A9F">AU</div><span class="sname">Admin User</span></div></td>
+                <td><span class="role-badge role-admin">Admin</span></td>
+                <td>admin@cloudskin.com</td>
+                <td>+63 917-000-0001</td>
+                <td>—</td>
+                <td><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td>
+                <td>Jan 1, 2023</td>
+                <td><div class="actions"><a href="staff-detail.html" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:#F0F6FC;border-radius:6px;color:#2D6A9F;text-decoration:none;margin-right:4px;"><i data-lucide="eye" style="width:14px;height:14px;"></i></a><div class="menu"><button style="color:#F97316" data-act="archive">Archive</button><button style="color:#EF4444" data-act="delete">Delete</button></div></div></td>
+              </tr>
+              <tr class="row" data-role="practitioner">
+                <td><div class="name-cell"><div class="avatar-sm" style="background:#16A34A">MS</div><span class="sname">Dr. Maria Santos</span></div></td>
+                <td><span class="role-badge role-practitioner">Practitioner</span></td>
+                <td>m.santos@cloudskin.com</td>
+                <td>+63 917-100-0001</td>
+                <td>Dermatology</td>
+                <td><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td>
+                <td>Mar 1, 2024</td>
+                <td><div class="actions"><a href="staff-detail.html" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:#F0F6FC;border-radius:6px;color:#2D6A9F;text-decoration:none;margin-right:4px;"><i data-lucide="eye" style="width:14px;height:14px;"></i></a><div class="menu"><button style="color:#F97316" data-act="archive">Archive</button><button style="color:#EF4444" data-act="delete">Delete</button></div></div></td>
+              </tr>
+              <tr class="row" data-role="practitioner">
+                <td><div class="name-cell"><div class="avatar-sm" style="background:#7C3AED">AR</div><span class="sname">Dr. Ana Reyes</span></div></td>
+                <td><span class="role-badge role-practitioner">Practitioner</span></td>
+                <td>a.reyes@cloudskin.com</td>
+                <td>+63 918-200-0002</td>
+                <td>Aesthetic Medicine</td>
+                <td><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td>
+                <td>Jan 15, 2024</td>
+                <td><div class="actions"><a href="staff-detail.html" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:#F0F6FC;border-radius:6px;color:#2D6A9F;text-decoration:none;margin-right:4px;"><i data-lucide="eye" style="width:14px;height:14px;"></i></a><div class="menu"><button style="color:#F97316" data-act="archive">Archive</button><button style="color:#EF4444" data-act="delete">Delete</button></div></div></td>
+              </tr>
+              <tr class="row" data-role="practitioner">
+                <td><div class="name-cell"><div class="avatar-sm" style="background:#EA580C">JL</div><span class="sname">Dr. James Lim</span></div></td>
+                <td><span class="role-badge role-practitioner">Practitioner</span></td>
+                <td>j.lim@cloudskin.com</td>
+                <td>+63 919-300-0003</td>
+                <td>Laser Specialist</td>
+                <td><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td>
+                <td>Jun 1, 2023</td>
+                <td><div class="actions"><a href="staff-detail.html" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:#F0F6FC;border-radius:6px;color:#2D6A9F;text-decoration:none;margin-right:4px;"><i data-lucide="eye" style="width:14px;height:14px;"></i></a><div class="menu"><button style="color:#F97316" data-act="archive">Archive</button><button style="color:#EF4444" data-act="delete">Delete</button></div></div></td>
+              </tr>
+              <tr class="row" data-role="receptionist">
+                <td><div class="name-cell"><div class="avatar-sm" style="background:#0891B2">MG</div><span class="sname">Maria Gonzales</span></div></td>
+                <td><span class="role-badge role-receptionist">Receptionist</span></td>
+                <td>m.gonzales@cloudskin.com</td>
+                <td>+63 920-400-0004</td>
+                <td>—</td>
+                <td><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td>
+                <td>Feb 1, 2025</td>
+                <td><div class="actions"><a href="staff-detail.html" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;background:#F0F6FC;border-radius:6px;color:#2D6A9F;text-decoration:none;margin-right:4px;"><i data-lucide="eye" style="width:14px;height:14px;"></i></a><div class="menu"><button style="color:#F97316" data-act="archive">Archive</button><button style="color:#EF4444" data-act="delete">Delete</button></div></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ ADD / EDIT STAFF MODAL ============ -->
+<div id="staff-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="staff-modal-title">Add Staff Account</h2>
+      <button id="staff-modal-close"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="field-grid-2">
+        <div class="field"><label>Full Name</label><input placeholder="e.g. Dr. Maria Santos"></div>
+        <div class="field"><label>Email Address</label><input placeholder="staff@cloudskin.com"></div>
+        <div class="field"><label>Phone Number</label><input placeholder="+63 9XX-XXX-XXXX"></div>
+        <div class="field"><label>Date of Birth</label><input placeholder="Jan 1, 1990"></div>
+      </div>
+      <div class="field">
+        <label>Role</label>
+        <div class="role-radio-row" id="role-radio-row">
+          <div class="role-radio active" data-r="practitioner"><div class="dot"></div><span>Practitioner</span></div>
+          <div class="role-radio" data-r="receptionist"><div class="dot"></div><span>Receptionist</span></div>
+        </div>
+      </div>
+      <div class="field" id="specialty-field"><label>Specialty</label><input placeholder="e.g. Dermatology"></div>
+      <div class="field toggle-row">
+        <label style="margin:0">Account Status</label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;color:#5A7A96" id="status-label">Active</span>
+          <div class="toggle" id="status-toggle"><div class="knob"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" id="staff-cancel">Cancel</button>
+      <button class="btn-solid" id="staff-save">Save Staff Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CONFIRM MODAL ============ -->
+<div id="confirm-modal" class="modal-overlay">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-body" style="text-align:center">
+      <div id="confirm-icon" class="confirm-icon arc"><i data-lucide="trash-2" style="width:28px;height:28px"></i></div>
+      <div id="confirm-title" class="confirm-title">Archive Staff Member?</div>
+      <p id="confirm-text" class="confirm-text">This staff member will be moved to the archive. You can restore them later.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" id="confirm-cancel">Cancel</button>
+      <button id="confirm-do" class="btn-confirm arc">Archive</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Role filter pills
+  document.querySelectorAll('#role-filters button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#role-filters button').forEach(o => o.classList.toggle('active', o === b));
+      const r = b.dataset.r;
+      document.querySelectorAll('tr.row').forEach(row => {
+        const show = r === 'All' || row.dataset.role === r.toLowerCase();
+        row.style.display = show ? '' : 'none';
+      });
+    });
+  });
+
+  // Staff modal
+  const staffModal = document.getElementById('staff-modal');
+  const staffTitle = document.getElementById('staff-modal-title');
+  const staffSave = document.getElementById('staff-save');
+  function openAdd() {
+    staffTitle.textContent = 'Add Staff Account';
+    staffSave.textContent = 'Save Staff Account';
+    staffModal.classList.add('open');
+  }
+  function openEdit() {
+    staffTitle.textContent = 'Edit Staff Account';
+    staffSave.textContent = 'Save Changes';
+    staffModal.classList.add('open');
+  }
+  function closeStaff() { staffModal.classList.remove('open'); }
+  document.getElementById('open-add').addEventListener('click', openAdd);
+  document.getElementById('staff-modal-close').addEventListener('click', closeStaff);
+  document.getElementById('staff-cancel').addEventListener('click', closeStaff);
+  staffModal.addEventListener('click', e => { if (e.target === staffModal) closeStaff(); });
+  staffSave.addEventListener('click', closeStaff);
+
+  document.querySelectorAll('[data-act="edit"]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); openEdit(); }));
+
+  // Role radio in modal
+  document.querySelectorAll('#role-radio-row .role-radio').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#role-radio-row .role-radio').forEach(o => o.classList.toggle('active', o === b));
+      // Hide specialty if Receptionist
+      document.getElementById('specialty-field').style.display = b.dataset.r === 'practitioner' ? '' : 'none';
+    });
+  });
+
+  // Status toggle
+  const tog = document.getElementById('status-toggle');
+  const togLbl = document.getElementById('status-label');
+  tog.addEventListener('click', () => {
+    tog.classList.toggle('off');
+    togLbl.textContent = tog.classList.contains('off') ? 'Inactive' : 'Active';
+  });
+
+  // Action menu
+  document.querySelectorAll('[data-act="menu"]').forEach(b => b.addEventListener('click', e => {
+    e.stopPropagation();
+    document.querySelectorAll('.menu.open').forEach(m => { if (m !== b.nextElementSibling) m.classList.remove('open'); });
+    b.nextElementSibling.classList.toggle('open');
+  }));
+  document.addEventListener('click', () => document.querySelectorAll('.menu.open').forEach(m => m.classList.remove('open')));
+
+  // Confirm modal
+  const confirmModal = document.getElementById('confirm-modal');
+  const confirmIcon = document.getElementById('confirm-icon');
+  const confirmTitle = document.getElementById('confirm-title');
+  const confirmText = document.getElementById('confirm-text');
+  const confirmDo = document.getElementById('confirm-do');
+  function showArchive() {
+    confirmIcon.className = 'confirm-icon arc';
+    confirmTitle.textContent = 'Archive Staff Member?';
+    confirmText.textContent = 'This staff member will be moved to the archive. You can restore them later.';
+    confirmDo.className = 'btn-confirm arc';
+    confirmDo.textContent = 'Archive';
+    confirmModal.classList.add('open');
+  }
+  function showDelete() {
+    confirmIcon.className = 'confirm-icon del';
+    confirmTitle.textContent = 'Delete Staff Member?';
+    confirmText.textContent = 'This action cannot be undone. The staff member will be permanently deleted.';
+    confirmDo.className = 'btn-confirm del';
+    confirmDo.textContent = 'Delete';
+    confirmModal.classList.add('open');
+  }
+  function closeConfirm() { confirmModal.classList.remove('open'); }
+  document.querySelectorAll('[data-act="archive"]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); document.querySelectorAll('.menu.open').forEach(m => m.classList.remove('open')); showArchive(); }));
+  document.querySelectorAll('[data-act="delete"]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); document.querySelectorAll('.menu.open').forEach(m => m.classList.remove('open')); showDelete(); }));
+  document.getElementById('confirm-cancel').addEventListener('click', closeConfirm);
+  confirmDo.addEventListener('click', closeConfirm);
+  confirmModal.addEventListener('click', e => { if (e.target === confirmModal) closeConfirm(); });
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeStaff(); closeConfirm(); } });
+
+  lucide.createIcons();
+</script>
+<script>
+/* __MW_TOGGLE__ */
+(function(){
+  // Find every parent .nav-item that is followed by a [data-submenu-for] block and wire up click toggle
+  document.querySelectorAll('aside.sidebar .nav-item').forEach(function(item){
+    var next = item.nextElementSibling;
+    if (!next || !next.hasAttribute || !next.hasAttribute('data-submenu-for')) return;
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', function(e){
+      // Don't navigate if it's a link
+      if (item.tagName === 'A') e.preventDefault();
+      var isOpen = next.style.display !== 'none';
+      next.style.display = isOpen ? 'none' : 'block';
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+})();
+</script>
+<script src="_sidebar.js"></script>
+<script src="_staff-table.js"></script>
+<script>
+(function(){
+  // Inject menu HTML after the eye link in every actions cell that doesn't already have one.
+  document.querySelectorAll("tr td .actions, tr td > div.actions, tr td:last-child > div, tr td:last-child").forEach(function(cell){
+    if (cell.querySelector(".staff-menu-trigger")) return;
+    // Look for first eye link or actions wrapper
+    var actionsWrap = cell.classList.contains("actions") ? cell : cell.querySelector(".actions");
+    if (!actionsWrap) {
+      // create a wrapper if the cell directly holds icons
+      var hasIcons = cell.querySelector("a, button");
+      if (!hasIcons) return;
+      actionsWrap = cell;
+    }
+    actionsWrap.classList.add("staff-actions-cell");
+    actionsWrap.insertAdjacentHTML("beforeend", "<button class=\"staff-menu-trigger\" style=\"width:28px;height:28px;background:#F0F6FC;border:none;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#5A7A96;margin-left:4px;\"><i data-lucide=\"more-vertical\" style=\"width:13px;height:13px;\"></i></button><div class=\"staff-menu\"><button data-staff-act=\"toggle\">Toggle Status</button><button data-staff-act=\"archive\" style=\"color:#F97316;\">Archive</button><button data-staff-act=\"delete\" style=\"color:#EF4444;\">Delete</button></div>");
+  });
+  if (window.lucide) window.lucide.createIcons();
+
+  document.querySelectorAll(".staff-menu-trigger").forEach(function(b){
+    b.addEventListener("click", function(e){
+      e.stopPropagation();
+      document.querySelectorAll(".staff-menu.open").forEach(function(m){ if (m !== b.nextElementSibling) m.classList.remove("open"); });
+      b.nextElementSibling.classList.toggle("open");
+    });
+  });
+  document.addEventListener("click", function(){ document.querySelectorAll(".staff-menu.open").forEach(function(m){ m.classList.remove("open"); }); });
+
+  document.querySelectorAll("[data-staff-act]").forEach(function(b){
+    b.addEventListener("click", function(e){
+      e.stopPropagation();
+      var row = b.closest("tr");
+      var act = b.getAttribute("data-staff-act");
+      var statusCell = row && row.querySelector(".status-badge");
+      var name = row && (row.querySelector(".sname, .name-text, .client-name") || {}).textContent || "this staff";
+      if (act === "toggle") {
+        if (statusCell) {
+          var s = (statusCell.textContent || "").trim().toLowerCase();
+          if (s === "active") { statusCell.textContent = "Inactive"; statusCell.style.background = "#FEF3C7"; statusCell.style.color = "#B45309"; }
+          else if (s === "inactive") { statusCell.textContent = "Active"; statusCell.style.background = "#DCFCE7"; statusCell.style.color = "#15803D"; }
+        }
+      } else if (act === "archive") {
+        if (confirm("Move " + (name || "this staff") + " to the archive?")) { row.style.display = "none"; }
+      } else if (act === "delete") {
+        if (confirm("Delete " + (name || "this staff") + " permanently? This cannot be undone.")) { row.remove(); }
+      }
+      var menu = b.closest(".staff-menu"); if (menu) menu.classList.remove("open");
+    });
+  });
+})();
+</script>
+</body>
+</html>

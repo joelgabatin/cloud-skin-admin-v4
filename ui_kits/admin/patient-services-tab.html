@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Patient Services Tab — Interactions</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: #1A2E40; padding: 40px 24px; }
+  .stack { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+  .scene-label { font-family: var(--font-display); font-weight: 700; font-size: 17px; color: #1A2E40; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+  .scene-label .num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #2D6A9F; color: #fff; font-size: 13px; }
+  .scene-label .sub { font-family: var(--font-body); font-weight: 400; font-size: 13px; color: #5A7A96; }
+  .scene { position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(15,30,48,0.10); background: #fff; }
+  .scene.with-overlay .bg { filter: blur(1px); opacity: 0.5; }
+
+  /* Background: patient profile preview */
+  .bg { padding: 22px 26px; min-height: 520px; }
+  .bg .crumb { font-size: 12px; color: #5A7A96; margin-bottom: 14px; }
+  .bg .profile-card { background: #F0F6FC; border-bottom: 1px solid #D0E8F5; border-radius: 8px 8px 0 0; padding: 16px 18px; display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+  .bg .av { width: 56px; height: 56px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 18px; }
+  .bg .nm { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: #1A2E40; }
+  .bg .meta { font-size: 12.5px; color: #5A7A96; margin-top: 3px; }
+  .bg .tabs { display: flex; gap: 2px; border-bottom: 1px solid #E5EFF7; margin-bottom: 14px; }
+  .bg .tabs span { padding: 10px 14px; font-family: var(--font-display); font-weight: 500; font-size: 12.5px; color: #5A7A96; border-bottom: 3px solid transparent; }
+  .bg .tabs span.on { color: #2D6A9F; border-bottom-color: #2D6A9F; font-weight: 700; }
+
+  /* Services tab content */
+  .svc-summary { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; padding: 12px 16px; display: flex; gap: 24px; flex-wrap: wrap; font-size: 13px; color: #5A7A96; }
+  .svc-summary b { font-family: var(--font-display); font-weight: 700; color: #1A2E40; }
+  .svc-row-top { display: flex; justify-content: space-between; align-items: center; margin: 16px 0 12px; }
+  .svc-row-top h3 { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; }
+  .btn { padding: 9px 16px; border-radius: 7px; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; cursor: pointer; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn.ghost { background: #fff; color: #5A7A96; border-color: #D0E8F5; }
+  .btn.ghost:hover { background: #F0F6FC; }
+  .btn.primary { background: #2D6A9F; color: #fff; }
+  .btn.primary:hover { background: #1A5685; }
+  .btn.danger { background: #DC2626; color: #fff; }
+  .btn.danger:hover { background: #B91C1C; }
+  .btn.danger-outline { background: #fff; color: #DC2626; border-color: #FCA5A5; }
+  .btn.danger-outline:hover { background: #FEF2F2; }
+
+  table.svc-table { width: 100%; border-collapse: collapse; }
+  .svc-table th { padding: 11px 12px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 700; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #E5EFF7; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+  .svc-table td { padding: 13px 12px; border-bottom: 1px solid #F0F6FC; font-size: 12.5px; color: #1A2E40; vertical-align: middle; }
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .badge.paid { background: #DCFCE7; color: #15803D; }
+  .badge.pending { background: #FEF3C7; color: #B45309; }
+  .badge.refunded { background: #FEE2E2; color: #DC2626; }
+  .row-actions { position: relative; display: inline-flex; gap: 6px; align-items: center; }
+  .icon-btn { width: 28px; height: 28px; border: 1px solid #D0E8F5; background: #fff; border-radius: 6px; cursor: pointer; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+  .icon-btn:hover { background: #F0F6FC; }
+  .icon-btn .lucide { width: 13px; height: 13px; }
+  .kebab-menu { position: absolute; right: 0; top: calc(100% + 4px); background: #fff; border: 1px solid #D0E8F5; border-radius: 7px; box-shadow: 0 8px 22px rgba(15,30,48,0.15); padding: 5px; z-index: 20; min-width: 170px; }
+  .kebab-menu button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; background: none; border: none; border-radius: 5px; cursor: pointer; font-family: var(--font-display); font-weight: 500; font-size: 12.5px; color: #1A2E40; text-align: left; }
+  .kebab-menu button:hover { background: #F0F6FC; }
+  .kebab-menu button.danger { color: #DC2626; }
+  .kebab-menu button .lucide { width: 13px; height: 13px; }
+  .pagination { padding: 12px 4px 0; font-size: 12px; color: #9BBAD4; }
+
+  /* Modal overlay */
+  .overlay { position: absolute; inset: 0; background: rgba(15,30,48,0.55); display: flex; align-items: flex-start; justify-content: center; padding: 30px 24px; overflow-y: auto; }
+  .modal { background: #fff; border-radius: 12px; width: 100%; max-width: 620px; box-shadow: 0 20px 60px rgba(15,30,48,0.35); display: flex; flex-direction: column; max-height: calc(100vh - 60px); }
+  .modal.small { max-width: 460px; }
+  .modal-head { padding: 18px 22px; border-bottom: 1px solid #E5EFF7; position: relative; }
+  .modal-head h2 { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: #1A2E40; margin: 0 0 3px; }
+  .modal-head .sub { font-size: 12px; color: #5A7A96; }
+  .modal-head .sub.warn { color: #B45309; }
+  .modal-head .close { position: absolute; top: 14px; right: 14px; width: 28px; height: 28px; background: none; border: none; cursor: pointer; border-radius: 6px; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; }
+  .modal-head .close:hover { background: #F0F6FC; color: #1A2E40; }
+  .modal-body { padding: 20px 22px; overflow-y: auto; }
+  .modal-foot { padding: 14px 20px; border-top: 1px solid #E5EFF7; background: #F8FBFD; display: flex; justify-content: flex-end; gap: 10px; align-items: center; }
+  .modal-foot.split { justify-content: space-between; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field + .field, .grid-2 + .field, .field + .grid-2 { margin-top: 14px; }
+  label { font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; }
+  label .opt { color: #9BBAD4; font-weight: 400; font-size: 11px; }
+  label .req { color: #DC2626; font-weight: 700; }
+  input[type="text"], input[type="number"], input[type="email"], select, textarea { width: 100%; height: 38px; padding: 0 11px; border: 1px solid #D1E3F3; border-radius: 7px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  input[readonly], input.locked { background: #F0F6FC; color: #5A7A96; cursor: not-allowed; }
+  textarea { height: auto; padding: 9px 11px; resize: vertical; line-height: 1.5; }
+  input:focus, select:focus, textarea:focus { border-color: #2D6A9F; }
+  .helper { font-size: 11.5px; color: #9BBAD4; margin-top: 3px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* Searchable dropdown */
+  .search-dd { position: relative; }
+  .search-dd input.field-search { padding-left: 32px; }
+  .search-dd .lucide { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .dd-menu { margin-top: 5px; border: 1px solid #D1E3F3; border-radius: 7px; background: #fff; max-height: 240px; overflow-y: auto; box-shadow: 0 6px 16px rgba(15,30,48,0.12); }
+  .dd-menu .dd-cat { padding: 8px 12px 5px; font-family: var(--font-display); font-weight: 700; font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; color: #2D6A9F; background: #F0F6FC; }
+  .dd-menu .dd-item { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; cursor: pointer; }
+  .dd-menu .dd-item:hover { background: #F8FBFD; }
+  .dd-menu .dd-item .price { font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #2D6A9F; }
+
+  /* Pill selectors */
+  .pill-group { display: inline-flex; gap: 7px; flex-wrap: wrap; }
+  .pill-opt { padding: 7px 14px; border-radius: 9999px; border: 1.5px solid #D1E3F3; background: #fff; color: #5A7A96; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+  .pill-opt.on.paid { background: #15803D; color: #fff; border-color: #15803D; }
+  .pill-opt.on.pending { background: #F59E0B; color: #fff; border-color: #F59E0B; }
+  .pill-opt.on.primary { background: #2D6A9F; color: #fff; border-color: #2D6A9F; }
+  .pill-opt.on.danger { background: #DC2626; color: #fff; border-color: #DC2626; }
+  .pill-opt .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+  /* Service summary card inside modal */
+  .summary-box { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; padding: 14px 16px; }
+  .summary-box .ln { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12.5px; }
+  .summary-box .ln .k { color: #5A7A96; }
+  .summary-box .ln .v { color: #1A2E40; font-weight: 600; font-family: var(--font-display); }
+  .warn-box { background: #FFFBEB; border: 1px solid #FCD34D; color: #92400E; border-radius: 7px; padding: 11px 14px; font-size: 12.5px; line-height: 1.5; margin-top: 14px; display: flex; gap: 8px; }
+  .warn-box .lucide { width: 16px; height: 16px; color: #B45309; flex-shrink: 0; margin-top: 1px; }
+  .info-red { background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; border-radius: 7px; padding: 10px 12px; font-size: 12px; margin-top: 14px; }
+
+  /* Confirm modal icon */
+  .confirm-icon { width: 56px; height: 56px; border-radius: 50%; background: #FEE2E2; color: #DC2626; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+  .confirm-icon .lucide { width: 26px; height: 26px; }
+  .confirm-modal .modal-body { text-align: center; }
+  .confirm-modal .title { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: #1A2E40; margin: 0 0 6px; }
+  .confirm-modal .body { font-size: 13px; color: #5A7A96; line-height: 1.5; }
+
+  .read-only-note { font-size: 11px; color: #9BBAD4; margin-top: 4px; font-style: italic; }
+
+  /* Service Detail page styling */
+  .detail-page { padding: 22px 26px; }
+  .detail-page .crumb { font-size: 12px; color: #5A7A96; margin-bottom: 8px; }
+  .detail-page .crumb a { color: #2D6A9F; text-decoration: none; }
+  .detail-page .back { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #2D6A9F; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 14px; }
+  .detail-page .back .lucide { width: 14px; height: 14px; }
+  .detail-page h1 { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; margin: 0 0 18px; }
+  .detail-card { background: #fff; border: 1px solid #E5EFF7; border-radius: 10px; padding: 20px 22px; margin-bottom: 16px; }
+  .detail-card h3 { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1A2E40; margin: 0 0 4px; }
+  .detail-card .ts { font-size: 12px; color: #9BBAD4; margin-bottom: 14px; }
+  .detail-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 700px) { .detail-summary-grid { grid-template-columns: 1fr; } }
+  .kv { display: flex; gap: 8px; padding: 6px 0; font-size: 13px; }
+  .kv .k { color: #5A7A96; min-width: 140px; }
+  .kv .v { color: #1A2E40; font-weight: 600; font-family: var(--font-display); }
+  .kv .v.mono { font-family: var(--font-mono); }
+  .vital-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  @media (max-width: 700px) { .vital-grid { grid-template-columns: repeat(2, 1fr); } }
+  .vital { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 7px; padding: 10px 12px; text-align: center; }
+  .vital .v { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #1A2E40; }
+  .vital .k { font-size: 10.5px; color: #9BBAD4; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .note-block { background: #F8FBFD; border-left: 3px solid #2D6A9F; padding: 14px 16px; border-radius: 0 8px 8px 0; font-size: 13px; color: #1A2E40; line-height: 1.6; }
+  .note-foot { font-size: 11.5px; color: #9BBAD4; margin-top: 10px; }
+  .checklist { display: flex; flex-direction: column; gap: 8px; }
+  .checklist li { list-style: none; display: flex; gap: 8px; align-items: center; font-size: 13px; color: #1A2E40; }
+  .checklist li .lucide { width: 15px; height: 15px; color: #15803D; flex-shrink: 0; }
+  .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .photo-slot { border: 2px dashed #D1E3F3; border-radius: 8px; padding: 30px 20px; text-align: center; background: #F8FBFD; }
+  .photo-slot .ttl { font-family: var(--font-display); font-weight: 700; font-size: 12px; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .photo-slot .ic { width: 36px; height: 36px; border-radius: 50%; background: #F0F6FC; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+  .photo-slot .ic .lucide { width: 18px; height: 18px; }
+  .photo-slot .empty { font-size: 12px; color: #9BBAD4; margin-bottom: 10px; }
+  .protocol-list { display: flex; flex-direction: column; gap: 8px; }
+  .protocol-list .kv { padding: 4px 0; }
+</style>
+</head>
+<body>
+<div class="stack">
+
+  <!-- SCENE 1 — Services tab base state -->
+  <section>
+    <div class="scene-label"><span class="num">1</span>Services Tab — Base State <span class="sub">with action buttons</span></div>
+    <div class="scene">
+      <div class="bg">
+        <div class="crumb">Admin / Patients / Sarah Johnson</div>
+        <div class="profile-card">
+          <div class="av">SJ</div>
+          <div><div class="nm">Sarah Johnson</div><div class="meta">Age 36 · Apr 5, 1990 · 0917-123-4567</div></div>
+        </div>
+        <div class="tabs"><span>Overview</span><span class="on">Services</span><span>Packages</span><span>Appointments</span><span>Skin</span></div>
+
+        <div class="svc-summary"><span>Total services availed: <b>3</b></span><span>Total spent: <b>₱7,500</b></span></div>
+        <div class="svc-row-top">
+          <h3>Service history</h3>
+          <button class="btn primary"><i data-lucide="plus"></i> Add Service</button>
+        </div>
+
+        <div style="border:1px solid #E5EFF7;border-radius:8px;overflow:visible;">
+          <table class="svc-table">
+            <thead><tr><th>Service</th><th>Date</th><th>Practitioner</th><th>Charged</th><th>Discount</th><th>Paid</th><th>Method</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Hydra Facial</td><td>Apr 15, 2026</td><td>Dr. Reyes</td>
+                <td>₱2,800</td><td>₱300</td><td>₱2,500</td><td>GCash</td>
+                <td><span class="badge paid">Paid</span></td>
+                <td style="text-align:right;"><div class="row-actions"><a class="icon-btn" href="#"><i data-lucide="eye"></i></a><button class="icon-btn"><i data-lucide="more-vertical"></i></button></div></td>
+              </tr>
+              <tr>
+                <td>LED Therapy</td><td>Mar 20, 2026</td><td>Dr. Santos</td>
+                <td>₱1,800</td><td>—</td><td>₱1,800</td><td>Cash</td>
+                <td><span class="badge paid">Paid</span></td>
+                <td style="text-align:right;"><div class="row-actions"><a class="icon-btn" href="#"><i data-lucide="eye"></i></a><button class="icon-btn"><i data-lucide="more-vertical"></i></button>
+                  <div class="kebab-menu"><button class="danger"><i data-lucide="ban"></i> Cancel &amp; Refund</button></div>
+                </div></td>
+              </tr>
+              <tr>
+                <td>Glass Skin Microneedling</td><td>May 25, 2026</td><td>Dr. Reyes</td>
+                <td>₱4,999</td><td>—</td><td>—</td><td>—</td>
+                <td><span class="badge pending">Pending Payment</span></td>
+                <td style="text-align:right;"><div class="row-actions"><a class="icon-btn" href="#"><i data-lucide="eye"></i></a><button class="icon-btn"><i data-lucide="more-vertical"></i></button>
+                  <div class="kebab-menu"><button><i data-lucide="pencil"></i> Edit</button><button class="danger"><i data-lucide="trash-2"></i> Delete</button></div>
+                </div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">Showing 1–3 of 3</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 2 — Add Service modal -->
+  <section>
+    <div class="scene-label"><span class="num">2</span>Add Service Modal</div>
+    <div class="scene with-overlay">
+      <div class="bg">
+        <div class="profile-card"><div class="av">SJ</div><div><div class="nm">Sarah Johnson</div><div class="meta">Services tab</div></div></div>
+        <div class="tabs"><span>Overview</span><span class="on">Services</span><span>Packages</span><span>Appointments</span><span>Skin</span></div>
+      </div>
+      <div class="overlay">
+        <div class="modal">
+          <div class="modal-head">
+            <button class="close"><i data-lucide="x"></i></button>
+            <h2>Add Service for Sarah Johnson</h2>
+            <div class="sub">Record a new service and payment for this patient.</div>
+          </div>
+          <div class="modal-body">
+            <div class="field">
+              <label>Service <span class="req">*</span></label>
+              <div class="search-dd">
+                <i data-lucide="search"></i>
+                <input type="text" class="field-search" placeholder="Search and select a service...">
+                <div class="dd-menu">
+                  <div class="dd-cat">Facials</div>
+                  <div class="dd-item"><span>Korea Hydra Facial + Exosomes</span><span class="price">₱4,999</span></div>
+                  <div class="dd-item"><span>Deep Cleanse Facial</span><span class="price">₱999</span></div>
+                  <div class="dd-cat">Treatments</div>
+                  <div class="dd-item"><span>Glass Skin Microneedling</span><span class="price">₱4,999</span></div>
+                  <div class="dd-item"><span>PRP Face Rejuvenation</span><span class="price">₱4,999</span></div>
+                  <div class="dd-cat">IV Therapy</div>
+                  <div class="dd-item"><span>Maintenance Glutathione Drip</span><span class="price">₱1,999</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="field"><label>Date of Service <span class="req">*</span></label><input type="text" placeholder="Select date"></div>
+              <div class="field"><label>Practitioner <span class="req">*</span></label><select><option>Select practitioner...</option><option>Dr. Reyes</option><option>Dr. Santos</option><option>Dr. Angela Lim</option><option>Dr. Olivia Bautista (Visiting)</option></select></div>
+            </div>
+            <div class="grid-2">
+              <div class="field"><label>Amount Charged <span class="req">*</span></label><input type="text" value="₱4,999"><div class="helper">Auto-filled from selected service. Editable.</div></div>
+              <div class="field"><label>Discount Applied</label><input type="text" placeholder="0"><div class="helper">Enter voucher discount amount if applicable.</div></div>
+            </div>
+            <div class="grid-2">
+              <div class="field"><label>Amount Paid</label><input type="text" value="₱4,999" readonly class="locked"><div class="helper">Auto-calculated (Charged − Discount).</div></div>
+              <div class="field"><label>Payment Method</label><select><option>Cash</option><option>GCash</option><option>Card</option><option>Online Bank Transfer</option><option selected>Pending</option></select></div>
+            </div>
+            <div class="field">
+              <label>Payment Status</label>
+              <div class="pill-group">
+                <span class="pill-opt"><span class="dot"></span>Paid</span>
+                <span class="pill-opt on pending"><span class="dot"></span>Pending Payment</span>
+                <span class="pill-opt"><span class="dot"></span>Cancelled</span>
+              </div>
+            </div>
+            <div class="field"><label>Clinical Notes <span class="opt">(optional)</span></label><textarea rows="3" placeholder="Add doctor's notes or procedure notes for this service..."></textarea></div>
+          </div>
+          <div class="modal-foot"><button class="btn ghost">Cancel</button><button class="btn primary"><i data-lucide="save"></i> Save Service</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 3 — Edit Service modal -->
+  <section>
+    <div class="scene-label"><span class="num">3</span>Edit Service Modal <span class="sub">unpaid only</span></div>
+    <div class="scene with-overlay">
+      <div class="bg">
+        <div class="profile-card"><div class="av">SJ</div><div><div class="nm">Sarah Johnson</div><div class="meta">Editing a pending service</div></div></div>
+        <div class="tabs"><span>Overview</span><span class="on">Services</span><span>Packages</span><span>Appointments</span><span>Skin</span></div>
+      </div>
+      <div class="overlay">
+        <div class="modal">
+          <div class="modal-head">
+            <button class="close"><i data-lucide="x"></i></button>
+            <h2>Edit Service — Glass Skin Microneedling</h2>
+            <div class="sub warn">⚠ This service has not been paid yet. You can edit or delete it.</div>
+          </div>
+          <div class="modal-body">
+            <div class="field"><label>Service</label><input type="text" value="Glass Skin Microneedling" readonly class="locked"><div class="read-only-note">Service type cannot be changed after creation.</div></div>
+            <div class="grid-2">
+              <div class="field"><label>Date of Service <span class="req">*</span></label><input type="text" value="May 25, 2026"></div>
+              <div class="field"><label>Practitioner <span class="req">*</span></label><select><option selected>Dr. Reyes</option><option>Dr. Santos</option><option>Dr. Angela Lim</option></select></div>
+            </div>
+            <div class="grid-2">
+              <div class="field"><label>Amount Charged</label><input type="text" value="₱4,999"></div>
+              <div class="field"><label>Discount Applied</label><input type="text" value="₱0"></div>
+            </div>
+            <div class="grid-2">
+              <div class="field"><label>Amount Paid</label><input type="text" value="₱4,999" readonly class="locked"></div>
+              <div class="field"><label>Payment Method</label><select><option selected>Pending</option><option>Cash</option><option>GCash</option><option>Card</option></select></div>
+            </div>
+            <div class="field"><label>Payment Status</label>
+              <div class="pill-group"><span class="pill-opt"><span class="dot"></span>Paid</span><span class="pill-opt on pending"><span class="dot"></span>Pending Payment</span><span class="pill-opt"><span class="dot"></span>Cancelled</span></div>
+            </div>
+            <div class="field"><label>Clinical Notes</label><textarea rows="3">Pre-procedure assessment done. Topical anesthesia applied 30 mins before. Patient has no known allergies.</textarea></div>
+          </div>
+          <div class="modal-foot split">
+            <button class="btn danger-outline"><i data-lucide="trash-2"></i> Delete Service</button>
+            <div style="display:flex;gap:10px;"><button class="btn ghost">Cancel</button><button class="btn primary"><i data-lucide="save"></i> Save Changes</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 4 — Delete confirm modal -->
+  <section>
+    <div class="scene-label"><span class="num">4</span>Delete Confirmation <span class="sub">unpaid only</span></div>
+    <div class="scene with-overlay">
+      <div class="bg">
+        <div class="profile-card"><div class="av">SJ</div><div><div class="nm">Sarah Johnson</div><div class="meta">Confirming delete of an unpaid service</div></div></div>
+        <div class="tabs"><span>Overview</span><span class="on">Services</span><span>Packages</span><span>Appointments</span><span>Skin</span></div>
+      </div>
+      <div class="overlay" style="align-items:center;">
+        <div class="modal small confirm-modal">
+          <div class="modal-body" style="padding-top:28px;padding-bottom:6px;">
+            <div class="confirm-icon"><i data-lucide="alert-circle"></i></div>
+            <h2 class="title">Delete this service record?</h2>
+            <p class="body">You are about to delete <b>Glass Skin Microneedling</b> (May 25, 2026) from Sarah Johnson's service history. This action cannot be undone.</p>
+            <div class="info-red">This service has not been paid. No refund is needed.</div>
+          </div>
+          <div class="modal-foot"><button class="btn ghost">Cancel</button><button class="btn danger"><i data-lucide="trash-2"></i> Yes, Delete Service</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 5 — Cancel & Refund modal -->
+  <section>
+    <div class="scene-label"><span class="num">5</span>Cancel &amp; Refund <span class="sub">paid services</span></div>
+    <div class="scene with-overlay">
+      <div class="bg">
+        <div class="profile-card"><div class="av">SJ</div><div><div class="nm">Sarah Johnson</div><div class="meta">Cancelling a paid service</div></div></div>
+        <div class="tabs"><span>Overview</span><span class="on">Services</span><span>Packages</span><span>Appointments</span><span>Skin</span></div>
+      </div>
+      <div class="overlay">
+        <div class="modal">
+          <div class="modal-head">
+            <button class="close"><i data-lucide="x"></i></button>
+            <h2>Cancel Service &amp; Process Refund</h2>
+            <div class="sub">Hydra Facial — Apr 15, 2026</div>
+          </div>
+          <div class="modal-body">
+            <div class="summary-box">
+              <div class="ln"><span class="k">Service</span><span class="v">Hydra Facial</span></div>
+              <div class="ln"><span class="k">Date</span><span class="v">Apr 15, 2026</span></div>
+              <div class="ln"><span class="k">Practitioner</span><span class="v">Dr. Reyes</span></div>
+              <div class="ln"><span class="k">Amount Paid</span><span class="v">₱2,500</span></div>
+              <div class="ln"><span class="k">Payment Method</span><span class="v">GCash</span></div>
+              <div class="ln"><span class="k">Status</span><span class="v"><span class="badge paid">Paid</span></span></div>
+            </div>
+            <div class="field" style="margin-top:16px;"><label>Cancellation Reason <span class="req">*</span></label><select><option>Select reason...</option><option>Patient Request</option><option>Adverse Reaction</option><option>Procedure Error</option><option>Duplicate Record</option><option>Other</option></select></div>
+            <div class="field"><label>Refund Amount</label><input type="text" value="₱2,500"><div class="helper">You can adjust the refund amount if partial refund applies.</div></div>
+            <div class="field"><label>Refund Method</label>
+              <div class="pill-group">
+                <span class="pill-opt on primary"><i data-lucide="check" style="width:11px;height:11px;"></i> GCash</span>
+                <span class="pill-opt">Cash</span>
+                <span class="pill-opt">Store Credit</span>
+              </div>
+              <div class="helper">Default matches the original payment method.</div>
+            </div>
+            <div class="field"><label>Internal Notes <span class="req">*</span></label><textarea rows="3" placeholder="Reason for cancellation and refund details..."></textarea></div>
+            <div class="warn-box"><i data-lucide="alert-triangle"></i><div>Cancelling a paid service will update the patient's total spend and service history. This action is logged and cannot be undone.</div></div>
+          </div>
+          <div class="modal-foot"><button class="btn ghost">Cancel</button><button class="btn danger"><i data-lucide="ban"></i> Confirm Cancellation &amp; Refund</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 6 — Service Detail page -->
+  <section>
+    <div class="scene-label"><span class="num">6</span>Service Detail Page <span class="sub">full page when eye icon is clicked</span></div>
+    <div class="scene" style="background:#F8FBFD;">
+      <div class="detail-page">
+        <div class="crumb">Admin / Patients / <a href="#">Sarah Johnson</a> / Services / Hydra Facial — Apr 15, 2026</div>
+        <a class="back" href="#"><i data-lucide="arrow-left"></i> Back to Services</a>
+        <h1>Hydra Facial — Apr 15, 2026</h1>
+
+        <div class="detail-card">
+          <div class="detail-summary-grid">
+            <div>
+              <div class="kv"><span class="k">Service</span><span class="v">Hydra Facial</span></div>
+              <div class="kv"><span class="k">Category</span><span class="v">Facials</span></div>
+              <div class="kv"><span class="k">Date</span><span class="v">April 15, 2026</span></div>
+              <div class="kv"><span class="k">Time</span><span class="v">10:00 AM</span></div>
+              <div class="kv"><span class="k">Practitioner</span><span class="v">Dr. Reyes</span></div>
+              <div class="kv"><span class="k">Status</span><span class="v"><span class="badge paid">Paid</span></span></div>
+            </div>
+            <div>
+              <div class="kv"><span class="k">Amount Charged</span><span class="v">₱2,800</span></div>
+              <div class="kv"><span class="k">Discount Applied</span><span class="v" style="color:#15803D;">₱300 (voucher)</span></div>
+              <div class="kv"><span class="k">Amount Paid</span><span class="v">₱2,500</span></div>
+              <div class="kv"><span class="k">Payment Method</span><span class="v">GCash</span></div>
+              <div class="kv"><span class="k">Receipt No.</span><span class="v mono">CSC-2026-00041</span></div>
+              <div class="kv"><span class="k">Transaction Date</span><span class="v">April 15, 2026</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <h3>Clinical Record</h3>
+          <div class="ts">Recorded by Dr. Reyes • Apr 15, 2026 at 11:45 AM</div>
+
+          <div style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#5A7A96;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">Vital Signs</div>
+          <div class="vital-grid">
+            <div class="vital"><div class="v">120/80</div><div class="k">BP (mmHg)</div></div>
+            <div class="vital"><div class="v">78</div><div class="k">HR (bpm)</div></div>
+            <div class="vital"><div class="v">98%</div><div class="k">SpO2</div></div>
+            <div class="vital"><div class="v">58 kg</div><div class="k">Weight</div></div>
+            <div class="vital"><div class="v">162 cm</div><div class="k">Height</div></div>
+          </div>
+
+          <div style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#5A7A96;text-transform:uppercase;letter-spacing:0.05em;margin:20px 0 10px;">Procedure Protocol <span style="font-weight:400;text-transform:none;color:#9BBAD4;font-size:11px;">(Doctor's Order)</span></div>
+          <div class="protocol-list">
+            <div class="kv"><span class="k">Procedure</span><span class="v">Hydra Facial</span></div>
+            <div class="kv"><span class="k">Topical Anesthesia</span><span class="v">None required</span></div>
+            <div class="kv"><span class="k">Equipment</span><span class="v">Korea Hydra Facial Machine — Standard setting</span></div>
+            <div class="kv"><span class="k">Pre-procedure prep</span><span class="v">Double cleanse, toner</span></div>
+            <div class="kv"><span class="k">Products used</span><span class="v">Hyaluronic serum, Exosome booster</span></div>
+          </div>
+
+          <div style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#5A7A96;text-transform:uppercase;letter-spacing:0.05em;margin:20px 0 10px;">Doctor's / Clinical Notes</div>
+          <div class="note-block">Patient presented with mild hyperpigmentation on cheeks and forehead. Hydra facial performed with exosome booster concentrate. Skin responded well — improved hydration and brightness immediately post-procedure. Mild redness resolved within 20 minutes. Recommended monthly sessions for optimal results. Patient advised to avoid direct sun exposure for 48 hours and apply SPF 50.</div>
+          <div class="note-foot">Recorded by Dr. Reyes — April 15, 2026 · 11:45 AM</div>
+
+          <div style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#5A7A96;text-transform:uppercase;letter-spacing:0.05em;margin:20px 0 10px;">Post-procedure Instructions Given</div>
+          <ul class="checklist">
+            <li><i data-lucide="check-circle"></i> Avoid sun exposure for 48 hours</li>
+            <li><i data-lucide="check-circle"></i> Apply SPF 50 daily</li>
+            <li><i data-lucide="check-circle"></i> No heavy makeup for 24 hours</li>
+            <li><i data-lucide="check-circle"></i> Use gentle cleanser only for 3 days</li>
+            <li><i data-lucide="check-circle"></i> Follow-up in 4 weeks recommended</li>
+          </ul>
+
+          <div style="font-family:var(--font-display);font-weight:700;font-size:12px;color:#5A7A96;text-transform:uppercase;letter-spacing:0.05em;margin:20px 0 10px;">Before / After Photos</div>
+          <div class="photo-grid">
+            <div class="photo-slot">
+              <div class="ttl">Before</div>
+              <div class="ic"><i data-lucide="image"></i></div>
+              <div class="empty">No photo uploaded</div>
+              <button class="btn ghost" style="font-size:11.5px;padding:6px 12px;"><i data-lucide="upload"></i> Upload Photo</button>
+            </div>
+            <div class="photo-slot">
+              <div class="ttl">After</div>
+              <div class="ic"><i data-lucide="image"></i></div>
+              <div class="empty">No photo uploaded</div>
+              <button class="btn ghost" style="font-size:11.5px;padding:6px 12px;"><i data-lucide="upload"></i> Upload Photo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

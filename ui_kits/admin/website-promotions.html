@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Manage Promotions Page</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .view-live-btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px; border: 1px solid #2D6A9F; border-radius: 8px; background: #fff; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; text-decoration: none; transition: background 120ms; }
+  .view-live-btn:hover { background: #F0F6FC; }
+  .view-live-btn .lucide { width: 13px; height: 13px; }
+
+  .page { padding: 24px 32px 96px; display: flex; flex-direction: column; gap: 18px; }
+  .page-hero h1 { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .page-hero .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 4px; }
+
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid #D1E3F3; overflow-x: auto; }
+  .tabs button { background: none; border: none; padding: 12px 18px; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #5A7A96; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; }
+  .tabs button .lucide { width: 14px; height: 14px; opacity: 0.7; }
+  .tabs button:hover { color: #1A2E40; }
+  .tabs button.active { color: #2D6A9F; border-bottom-color: #2D6A9F; }
+  .tabs button.active .lucide { opacity: 1; }
+
+  .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .pane { display: none; }
+  .pane.active { display: block; }
+
+  .pane-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 18px; }
+  .pane-head h2 { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .pane-head .desc { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-top: 4px; line-height: 1.5; }
+  .pane-section + .pane-section { margin-top: 22px; padding-top: 22px; border-top: 1px solid #E5EFF7; }
+  .pane-section .sec-ttl { font-family: var(--font-display); font-size: 12px; font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field + .field { margin-top: 18px; }
+  .field-label { font-family: var(--font-display); font-weight: 600; font-size: 12.5px; color: #1A2E40; }
+  .field-input, .field-textarea, .field-select { width: 100%; height: 40px; border: 1px solid #D1E3F3; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .field-textarea { height: auto; padding: 10px 12px; resize: vertical; min-height: 80px; line-height: 1.5; }
+  .field-input:focus, .field-textarea:focus, .field-select:focus { border-color: #2D6A9F; }
+
+  .upload-zone { border: 1.5px dashed #D1E3F3; border-radius: 12px; background: #F0F6FC; padding: 28px 16px; text-align: center; cursor: pointer; transition: border-color 120ms, background 120ms; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .upload-zone:hover { border-color: #2D6A9F; background: #EBF6FD; }
+  .upload-zone .ic { width: 48px; height: 48px; border-radius: 50%; background: #fff; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(45,106,159,0.10); }
+  .upload-zone .ic .lucide { width: 22px; height: 22px; }
+  .upload-zone .ttl { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #1A2E40; }
+  .upload-zone .ttl b { color: #2D6A9F; }
+  .upload-zone .helper { font-family: var(--font-body); font-size: 12px; color: #9BBAD4; }
+
+  .info-box { background: #F0F6FC; border: 1px solid #D1E3F3; border-radius: 8px; padding: 14px 16px; display: flex; gap: 10px; align-items: flex-start; font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; line-height: 1.5; }
+  .info-box .lucide { width: 15px; height: 15px; color: #2D6A9F; flex-shrink: 0; margin-top: 2px; }
+  .info-box b { color: #1A2E40; font-family: var(--font-display); font-weight: 600; }
+
+  /* Active promotions list */
+  .promo-list { display: flex; flex-direction: column; gap: 8px; }
+  .promo-row { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .promo-row .nm { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; color: #1A2E40; }
+  .promo-row .cat-pill { display: inline-block; padding: 3px 10px; border-radius: 9999px; background: #EBF6FD; color: #2D6A9F; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .promo-row .valid { font-family: var(--font-body); font-size: 12px; color: #9BBAD4; margin-left: auto; }
+  .promo-row .active-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 9999px; background: #DCFCE7; color: #15803D; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .promo-row .active-badge .lucide { width: 11px; height: 11px; }
+  .promo-empty { padding: 28px 12px; text-align: center; font-family: var(--font-body); font-size: 12.5px; color: #9BBAD4; }
+
+  /* Step cards */
+  .step-list { display: flex; flex-direction: column; gap: 12px; }
+  .step-card { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 10px; padding: 14px 16px; display: grid; grid-template-columns: 18px 48px 1fr 32px; gap: 12px; align-items: flex-start; }
+  .step-card .drag-handle { color: #BFD8EB; cursor: grab; display: inline-flex; align-items: center; justify-content: center; height: 28px; }
+  .step-card .drag-handle:hover { color: #2D6A9F; }
+  .step-card .drag-handle .lucide { width: 16px; height: 16px; }
+  .step-card .step-num { width: 40px; height: 40px; border-radius: 10px; background: #2D6A9F; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step-card .body { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .step-card .body-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 800px) { .step-card .body-row { grid-template-columns: 1fr; } }
+  .step-card .delete-btn { width: 28px; height: 28px; border-radius: 7px; background: #fff; border: 1px solid #FCA5A5; color: #DC2626; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+  .step-card .delete-btn:hover { background: #FEE2E2; }
+  .step-card .delete-btn .lucide { width: 14px; height: 14px; }
+  .icon-picker { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #D1E3F3; border-radius: 8px; background: #fff; }
+  .icon-picker .plate { width: 34px; height: 34px; border-radius: 8px; background: #EBF6FD; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; }
+  .icon-picker .nm { font-family: var(--font-mono); font-size: 12px; color: #5A7A96; }
+  .icon-picker .change { margin-left: auto; background: none; border: none; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; }
+
+  .add-btn { width: 100%; padding: 10px 16px; border: 1.5px dashed #BFD8EB; background: #F8FBFD; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; }
+  .add-btn:hover { background: #EBF6FD; border-color: #2D6A9F; }
+  .add-btn .lucide { width: 14px; height: 14px; }
+
+  .btn { height: 38px; padding: 0 18px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; text-decoration: none; white-space: nowrap; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-ghost { background: none; color: #5A7A96; }
+  .btn-ghost:hover { background: #F0F6FC; color: #1A2E40; }
+  .btn-primary { background: #2D6A9F; color: #fff; }
+  .btn-primary:hover { background: #1A5685; }
+
+  /* Stepper navigator */
+  .stepper { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; padding: 24px 0 18px; }
+  .stepper .pill { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px; border-radius: 20px; font-family: var(--font-display); font-size: 12.5px; font-weight: 600; cursor: pointer; background: #fff; color: #5A7A96; border: 1px solid #D1E3F3; white-space: nowrap; transition: background 120ms, color 120ms; }
+  .stepper .pill:hover { color: #1A2E40; }
+  .stepper .pill .ix { width: 22px; height: 22px; border-radius: 50%; background: #F0F6FC; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11.5px; }
+  .stepper .pill .ix .lucide { width: 12px; height: 12px; }
+  .stepper .pill.active { background: #2D6A9F; color: #fff; border-color: #2D6A9F; }
+  .stepper .pill.active .ix { background: rgba(255,255,255,0.20); color: #fff; }
+  .stepper .pill.done { background: #F0F6FC; color: #2D6A9F; border-color: #BFD8EB; }
+  .stepper .pill.done .ix { background: #2D6A9F; color: #fff; }
+  .stepper .connector { flex: 0 0 28px; height: 1px; background: #D1E3F3; min-width: 16px; }
+  @media (max-width: 720px) { .stepper .connector { flex: 0 0 16px; } }
+
+  /* Step edit card */
+  .step-edit { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); border: 1px solid #EAF2FB; margin-top: 4px; }
+  .step-edit .top-row { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+  .step-edit .num-badge { background: #2D6A9F; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 16px; padding: 6px 14px; border-radius: 9px; letter-spacing: 0.04em; }
+  .step-edit .icon-line { display: inline-flex; align-items: center; gap: 10px; padding: 6px 12px 6px 6px; border: 1px solid #D1E3F3; border-radius: 8px; background: #F8FBFD; }
+  .step-edit .icon-line .plate { width: 30px; height: 30px; border-radius: 7px; background: #EBF6FD; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; }
+  .step-edit .icon-line .nm { font-family: var(--font-mono); font-size: 12px; color: #5A7A96; }
+  .step-edit .icon-line .change { background: #fff; border: 1px solid #D1E3F3; border-radius: 7px; padding: 5px 10px; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; cursor: pointer; }
+  .step-edit .icon-line .change:hover { background: #F0F6FC; border-color: #2D6A9F; }
+  .step-edit .remove-link { background: none; border: none; color: #DC2626; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; padding: 0; margin-top: 14px; display: inline-flex; align-items: center; gap: 4px; position: relative; }
+  .step-edit .remove-link:hover { text-decoration: underline; }
+  .step-edit .remove-link:disabled { color: #BFD8EB; cursor: not-allowed; text-decoration: none; }
+  .step-edit .remove-link .tip { position: absolute; left: 0; bottom: calc(100% + 6px); background: #1A2E40; color: #fff; padding: 6px 10px; border-radius: 6px; font-family: var(--font-body); font-size: 11.5px; font-weight: 500; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 120ms; }
+  .step-edit .remove-link:disabled:hover .tip { opacity: 1; }
+
+  /* Step nav */
+  .step-nav { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+  .btn[disabled], .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* Add step link */
+  .add-step-link { background: none; border: none; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; cursor: pointer; padding: 4px 0; display: inline-flex; align-items: center; gap: 4px; }
+  .add-step-link:hover { text-decoration: underline; }
+  .add-step-link .lucide { width: 14px; height: 14px; }
+
+  .save-footer { position: fixed; bottom: 0; left: 260px; right: 0; background: #fff; border-top: 1px solid #D1E3F3; padding: 14px 32px; display: flex; justify-content: space-between; align-items: center; gap: 12px; z-index: 50; }
+  @media (max-width: 980px) { .save-footer { left: 0; } }
+  .save-footer .note { font-family: var(--font-body); font-size: 12px; color: #9BBAD4; }
+  .save-footer .actions { display: flex; gap: 10px; margin-left: auto; }
+
+  /* Compact info banner replacing the duplicate page hero */
+  .page-info-banner { background: #F0F6FC; border: 1px solid #D1E3F3; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 12.5px; color: #5A7A96; }
+  .page-info-banner .lucide { width: 15px; height: 15px; color: #5A7A96; flex-shrink: 0; }
+  .page-info-banner b { color: #1A2E40; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Manage Promotions Page</div>
+        <div class="topbar-crumb">Admin / Manage Website / Promotions Page</div>
+      </div>
+      <div class="topbar-actions">
+        <a class="view-live-btn" href="https://cloudskin.com/promotions" target="_blank" rel="noopener">View Live Page <i data-lucide="external-link"></i></a>
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Manage Promotions Page">
+      <div class="page-info-banner"><i data-lucide="info"></i><span>Changes go live after you click <b>Save Changes</b>.</span></div>
+
+      <div class="tabs" id="tabs">
+        <button class="active" data-tab="hero"><i data-lucide="layout"></i> Page Hero</button>
+        <button data-tab="current"><i data-lucide="tag"></i> Current Promotions</button>
+        <button data-tab="howto"><i data-lucide="list-ordered"></i> How to Avail a Promo</button>
+      </div>
+
+      <!-- Tab 1: Page Hero -->
+      <div class="pane active" data-pane="hero">
+        <div class="card">
+          <div class="pane-head"><div><h2>Page Hero</h2><div class="desc">The top-of-page banner shown when visitors land on the Promotions page.</div></div></div>
+          <div class="field"><label class="field-label">Hero Title</label><input class="field-input" value="Promos &amp; Special Offers"></div>
+          <div class="field"><label class="field-label">Hero Subtitle</label><input class="field-input" value="Exclusive deals and packages to make your skin journey more rewarding."></div>
+          <div class="pane-section">
+            <div class="sec-ttl">Hero background image</div>
+            <div class="upload-zone">
+              <div class="ic"><i data-lucide="image-up"></i></div>
+              <div class="ttl"><b>Click to upload</b> or drag &amp; drop</div>
+              <div class="helper">PNG, JPG up to 5MB · Recommended 1920 × 720</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Current Promotions -->
+      <div class="pane" data-pane="current">
+        <div class="card">
+          <div class="pane-head"><div><h2>Current Promotions</h2><div class="desc">Auto-populated from your active packages.</div></div></div>
+          <div class="info-box">
+            <i data-lucide="info"></i>
+            <div>Promotion cards displayed on this page are automatically pulled from your active packages. To add, edit, or deactivate promotions, go to the <b>Packages</b> module. Only packages marked as <b>Active</b> and within their valid date range will appear on this page.</div>
+          </div>
+          <a class="btn btn-primary" href="packages-view-all.html" style="margin-top:18px;"><i data-lucide="arrow-right"></i> Go to Packages</a>
+
+          <div class="pane-section">
+            <div class="sec-ttl">Currently Active Packages</div>
+            <div class="promo-list" id="promo-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: How to Avail a Promo -->
+      <div class="pane" data-pane="howto">
+        <div class="card">
+          <div class="pane-head"><div><h2>How to Avail a Promo</h2><div class="desc">Step-by-step explainer shown on the Promotions page.</div></div></div>
+          <div class="field"><label class="field-label">Section Title</label><input class="field-input" value="How to Avail a Promo"></div>
+
+          <div class="pane-section">
+            <div class="stepper" id="stepper"></div>
+
+            <div class="step-edit" id="step-edit"></div>
+
+            <div class="step-nav">
+              <button class="btn btn-ghost" type="button" id="step-prev"><i data-lucide="arrow-left"></i> Previous</button>
+              <button class="btn btn-primary" type="button" id="step-next">Next <i data-lucide="arrow-right"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <div class="save-footer">
+      <span class="note">Unsaved changes apply only after clicking <b style="color:#1A2E40;font-family:var(--font-display);font-weight:600;">Save Changes</b>.</span>
+      <div class="actions">
+        <button class="btn btn-ghost" type="button">Cancel</button>
+        <button class="btn btn-primary" type="button"><i data-lucide="save"></i> Save Changes</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+
+<script>
+(function () {
+  // Tab switching
+  var tabs = document.querySelectorAll('#tabs button');
+  var panes = document.querySelectorAll('.pane');
+  function activate(name) {
+    tabs.forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tab') === name); });
+    panes.forEach(function (p) { p.classList.toggle('active', p.getAttribute('data-pane') === name); });
+    var url = new URL(location.href);
+    if (name === 'hero') url.searchParams.delete('tab'); else url.searchParams.set('tab', name);
+    history.replaceState({}, '', url);
+  }
+  tabs.forEach(function (b) { b.addEventListener('click', function () { activate(b.getAttribute('data-tab')); }); });
+  activate((new URLSearchParams(location.search)).get('tab') || 'hero');
+
+  // ---------- Current Promotions list ----------
+  var PROMOS = [
+    { name: 'May Glow Special — 20% off Facial Treatments', cat: 'Facial Treatments', valid: 'Valid until May 31, 2026' },
+    { name: 'Laser Hair Removal Bundle (3 sessions)',         cat: 'Laser',              valid: 'Valid until Jun 15, 2026' },
+    { name: 'Wellness IV Drip Pack — Buy 2 Get 1',            cat: 'Wellness',           valid: 'Valid until May 31, 2026' }
+  ];
+  function renderPromos() {
+    var host = document.getElementById('promo-list');
+    if (!PROMOS.length) {
+      host.innerHTML = '<div class="promo-empty">No active packages at the moment.</div>';
+      return;
+    }
+    host.innerHTML = PROMOS.map(function (p) {
+      return '<div class="promo-row">'
+        + '<span class="nm">' + p.name + '</span>'
+        + '<span class="cat-pill">' + p.cat + '</span>'
+        + '<span class="valid">' + p.valid + '</span>'
+        + '<span class="active-badge"><i data-lucide="check-circle"></i> Active</span>'
+        + '</div>';
+    }).join('');
+    if (window.lucide) window.lucide.createIcons();
+  }
+  renderPromos();
+
+  // ---------- Steps (stepper UI) ----------
+  var STEPS = [
+    { ico: 'tag',         title: 'Choose a Promo',        desc: 'Browse our active promotions and pick the package that\u2019s right for you.' },
+    { ico: 'calendar',    title: 'Book Your Slot',        desc: 'Select your preferred date and time, and add a note that you\u2019re availing a promo.' },
+    { ico: 'sparkles',    title: 'Enjoy Savings!',        desc: 'Visit the clinic on your scheduled date. Our team will apply the promo automatically at checkout.' }
+  ];
+  var activeStep = 0; // index
+
+  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function renderStepper() {
+    var host = document.getElementById('stepper');
+    var html = '';
+    STEPS.forEach(function (s, i) {
+      var cls = 'pill';
+      if (i < activeStep) cls += ' done';
+      else if (i === activeStep) cls += ' active';
+      var inner = (i < activeStep) ? '<i data-lucide="check"></i>' : (i + 1);
+      html += '<button type="button" class="' + cls + '" data-i="' + i + '"><span class="ix">' + inner + '</span>' + s.title + '</button>';
+      if (i < STEPS.length - 1) html += '<span class="connector"></span>';
+    });
+    host.innerHTML = html;
+    host.querySelectorAll('.pill').forEach(function (b) {
+      b.addEventListener('click', function () { activeStep = parseInt(b.getAttribute('data-i'), 10); render(); });
+    });
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  function renderEdit() {
+    var s = STEPS[activeStep];
+    var hostEdit = document.getElementById('step-edit');
+    hostEdit.innerHTML =
+      '<div class="top-row">'
+        + '<span class="num-badge">' + pad2(activeStep + 1) + '</span>'
+        + '<div class="icon-line"><span class="plate"><i data-lucide="' + s.ico + '"></i></span><span class="nm">' + s.ico + '</span><button class="change" type="button">Change Icon</button></div>'
+      + '</div>'
+      + '<div class="field"><label class="field-label">Step Title</label><input class="field-input" id="se-title" value="' + s.title.replace(/"/g, '&quot;') + '"></div>'
+      + '<div class="field"><label class="field-label">Step Description</label><textarea class="field-textarea" id="se-desc" rows="3">' + s.desc + '</textarea></div>';
+    document.getElementById('se-title').addEventListener('input', function (e) {
+      STEPS[activeStep].title = e.target.value;
+      renderStepper();
+    });
+    document.getElementById('se-desc').addEventListener('input', function (e) { STEPS[activeStep].desc = e.target.value; });
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  function renderNav() {
+    var prev = document.getElementById('step-prev');
+    var next = document.getElementById('step-next');
+    prev.disabled = activeStep === 0;
+    var isLast = activeStep === STEPS.length - 1;
+    next.innerHTML = isLast
+      ? '<i data-lucide="check"></i> Done'
+      : 'Next <i data-lucide="arrow-right"></i>';
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  function render() { renderStepper(); renderEdit(); renderNav(); }
+
+  document.getElementById('step-prev').addEventListener('click', function () {
+    if (activeStep > 0) { activeStep--; render(); }
+  });
+  document.getElementById('step-next').addEventListener('click', function () {
+    if (activeStep < STEPS.length - 1) { activeStep++; render(); }
+  });
+
+  render();
+
+  if (window.lucide) window.lucide.createIcons();
+})();
+</script>
+</body>
+</html>

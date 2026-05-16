@@ -1,0 +1,1130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Patient Profile</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F8FAFC; font-family: var(--font-body); color: #1A2E40; }
+  .app { display: flex; min-height: 100vh; }
+
+  aside.sidebar { width: 260px; background: #0F1E2E; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 18px; }
+  .back-link { color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; text-decoration: none; width: fit-content; }
+  .back-link .lucide { width: 14px; height: 14px; }
+
+  .grid-main { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: flex-start; }
+  @media (max-width: 900px) { .grid-main { grid-template-columns: 1fr; } }
+
+  .card { background: #fff; border-radius: 10px; border: 1px solid #E5EFF7; box-shadow: 0 1px 3px rgba(26,58,92,0.05); }
+
+  /* Profile header */
+  .ph { padding: 22px; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid #E5EFF7; background: #F0F6FC; border-radius: 10px 10px 0 0; }
+  .ph .who { display: flex; align-items: center; gap: 16px; }
+  .ph .av { width: 72px; height: 72px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 24px; flex-shrink: 0; }
+  .ph .nm { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; }
+  .ph .row1 { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 4px; }
+  .ph .row2 { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap; }
+  .ph .row2 span { display: inline-flex; align-items: center; gap: 5px; }
+  .ph .row2 .lucide { width: 13px; height: 13px; }
+  .edit-btn { background: #2D6A9F; color: #fff; border: none; border-radius: 8px; padding: 10px 16px; font-family: var(--font-display); font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .edit-btn:hover { background: #1A5685; }
+  .edit-btn .lucide { width: 14px; height: 14px; }
+
+  .stats { padding: 18px 22px 22px; display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+  @media (max-width: 720px) { .stats { grid-template-columns: repeat(2,1fr); } }
+  .stat { background: #fff; border: 1px solid #E5EFF7; border-radius: 10px; padding: 14px 16px; text-align: center; }
+  .stat .ic { color: #2D6A9F; display: flex; justify-content: center; margin-bottom: 6px; }
+  .stat .ic .lucide { width: 18px; height: 18px; }
+  .stat .val { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: #1A2E40; }
+  .stat .lbl { font-family: var(--font-body); font-size: 11px; color: #9BBAD4; margin-top: 3px; }
+
+  /* Tabs */
+  .tabs { display: flex; border-bottom: 1px solid #E5EFF7; overflow-x: auto; }
+  .tabs button { flex: 1; background: none; border: none; border-bottom: 3px solid transparent; padding: 14px 18px; font-family: var(--font-display); font-weight: 500; font-size: 13px; color: #5A7A96; cursor: pointer; white-space: nowrap; text-transform: capitalize; }
+  .tabs button:hover { color: #1A2E40; }
+  .tabs button.active { color: #2D6A9F; border-bottom-color: #2D6A9F; font-weight: 600; }
+  .pane { padding: 24px; display: none; }
+  .pane.active { display: block; }
+
+  /* Field grids */
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 720px) { .field-grid { grid-template-columns: 1fr; } }
+  .fld .k { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .fld .v { font-family: var(--font-body); font-size: 13px; color: #1A2E40; }
+  .sec-ttl { font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+  .sec + .sec { border-top: 1px solid #E5EFF7; padding-top: 22px; margin-top: 22px; }
+
+  /* Status badges */
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 11px; }
+  .badge.active   { background: #DCFCE7; color: #15803D; }
+  .badge.paid     { background: #DCFCE7; color: #15803D; }
+  .badge.confirmed{ background: #DBEAFE; color: #1D4ED8; }
+  .badge.completed{ background: #DCFCE7; color: #15803D; }
+  .badge.cancelled{ background: #FEE2E2; color: #DC2626; }
+  .badge.expired  { background: #F1F5F9; color: #6B7280; }
+  .badge.pending  { background: #FEF3C7; color: #B45309; }
+
+  /* Services table */
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 11px 14px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #E5EFF7; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+  td { padding: 14px; border-bottom: 1px solid #F0F6FC; font-size: 13px; color: #1A2E40; vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  .summary-bar { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: flex; gap: 24px; font-family: var(--font-body); font-size: 13px; color: #5A7A96; flex-wrap: wrap; }
+  .summary-bar b { font-family: var(--font-display); font-weight: 700; color: #1A2E40; }
+  /* Services card grid */
+  .svc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .svc-grid { grid-template-columns: 1fr; } }
+  .svc-card { display: block; background: #fff; border: 1px solid #E5EFF7; border-radius: 10px; padding: 18px; text-decoration: none; color: inherit; transition: border-color 120ms, box-shadow 120ms; cursor: pointer; }
+  .svc-card:hover { border-color: #2D6A9F; box-shadow: 0 2px 6px rgba(45,106,159,0.10); }
+  .svc-card.cancelled-card { background: #FEF7F7; border-color: #FCA5A5; }
+  .svc-card .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .svc-card .nm { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1A2E40; }
+  .svc-card .cat { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; margin-top: 2px; font-weight: 400; }
+  .svc-card .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .svc-card .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 12.5px; }
+  .svc-card .row .k { color: #5A7A96; }
+  .svc-card .row .v { color: #1A2E40; font-family: var(--font-display); font-weight: 600; }
+  .svc-card .div { border: none; border-top: 1px solid #F0F6FC; margin: 8px 0; }
+  .svc-card .card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 10px; flex-wrap: wrap; }
+  .svc-card .card-bottom .meta { font-family: var(--font-body); font-size: 11.5px; color: #5A7A96; flex: 1; min-width: 0; }
+  .badge.sb-scheduled { background: #DBEAFE; color: #1D4ED8; }
+  .badge.sb-completed { background: #DCFCE7; color: #15803D; }
+  .badge.sb-cancelled { background: #FEE2E2; color: #B91C1C; }
+  .badge.sb-progress  { background: #FEF3C7; color: #B45309; }
+  .badge.pp-paid     { background: #DCFCE7; color: #15803D; }
+  .badge.pp-pending  { background: #FED7AA; color: #C2410C; }
+  .badge.pp-refunded { background: #F1F5F9; color: #5A7A96; }
+  .badge.pp-waived   { background: #EDE9FE; color: #6D28D9; }
+  .rec-row { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; }
+  .rec-row .lucide { width: 13px; height: 13px; }
+  .rec-row.green { background: #DCFCE7; color: #15803D; }
+  .rec-row.gray  { background: #F1F5F9; color: #6B7280; }
+  .alert-row { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 6px; font-family: var(--font-body); font-size: 11.5px; margin-top: 8px; line-height: 1.4; }
+  .alert-row .lucide { width: 13px; height: 13px; flex-shrink: 0; }
+  .alert-row.orange { background: #FFFBEB; color: #92400E; border: 1px solid #FCD34D; }
+  .alert-row.blue   { background: #EBF6FD; color: #1E40AF; border: 1px solid #BFE0F5; }
+  .alert-row.red    { background: #FEF2F2; color: #991B1B; border: 1px solid #FCA5A5; }
+  .card-action { width: 100%; margin-top: 10px; padding: 8px 12px; border-radius: 7px; background: #fff; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; border: 1.5px solid; transition: background 120ms; }
+  .card-action .lucide { width: 13px; height: 13px; }
+  .card-action.blue { color: #2D6A9F; border-color: #2D6A9F; }
+  .card-action.blue:hover { background: #F0F6FC; }
+  .card-action.orange { color: #B45309; border-color: #FCD34D; }
+  .card-action.orange:hover { background: #FFFBEB; }
+  .card-actions-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .card-actions-row .card-action { margin-top: 0; }
+  .svc-top-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .btn-add-svc { padding: 9px 16px; border-radius: 8px; background: #2D6A9F; color: #fff; border: none; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-add-svc:hover { background: #1A5685; }
+  .btn-add-svc .lucide { width: 14px; height: 14px; }
+  .row-actions { position: relative; display: inline-flex; gap: 6px; align-items: center; }
+  .icon-btn { width: 28px; height: 28px; border: 1px solid #D0E8F5; background: #fff; border-radius: 6px; cursor: pointer; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+  .icon-btn:hover { background: #F0F6FC; }
+  .icon-btn .lucide { width: 13px; height: 13px; }
+  .kebab-menu { position: absolute; right: 0; top: calc(100% + 4px); background: #fff; border: 1px solid #D0E8F5; border-radius: 7px; box-shadow: 0 8px 22px rgba(15,30,48,0.15); padding: 5px; z-index: 20; min-width: 170px; }
+  .kebab-menu[hidden] { display: none !important; }
+  .kebab-menu button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; background: none; border: none; border-radius: 5px; cursor: pointer; font-family: var(--font-display); font-weight: 500; font-size: 12.5px; color: #1A2E40; text-align: left; }
+  .kebab-menu button:hover { background: #F0F6FC; }
+  .kebab-menu button.danger { color: #DC2626; }
+  .kebab-menu button .lucide { width: 13px; height: 13px; }
+  .badge.pending { background: #FEF3C7; color: #B45309; }
+
+  /* Service modals */
+  .modal-svc { position: fixed; inset: 0; background: rgba(15,30,48,0.55); display: flex; align-items: flex-start; justify-content: center; padding: 40px 24px; z-index: 200; overflow-y: auto; }
+  .modal-svc[hidden] { display: none !important; }
+  .modal-svc .card { background: #fff; border-radius: 12px; width: 100%; max-width: 620px; box-shadow: 0 20px 60px rgba(15,30,48,0.35); display: flex; flex-direction: column; }
+  .modal-svc .card.small { max-width: 460px; }
+  .modal-svc .mh { padding: 18px 22px; border-bottom: 1px solid #E5EFF7; position: relative; }
+  .modal-svc .mh h2 { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: #1A2E40; margin: 0 0 3px; }
+  .modal-svc .mh .sub { font-size: 12px; color: #5A7A96; }
+  .modal-svc .mh .sub.warn { color: #B45309; }
+  .modal-svc .mh .close { position: absolute; top: 14px; right: 14px; width: 28px; height: 28px; background: none; border: none; cursor: pointer; border-radius: 6px; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; }
+  .modal-svc .mh .close:hover { background: #F0F6FC; color: #1A2E40; }
+  .modal-svc .mb { padding: 20px 22px; }
+  .modal-svc .mf { padding: 14px 20px; border-top: 1px solid #E5EFF7; background: #F8FBFD; display: flex; justify-content: flex-end; gap: 10px; }
+  .modal-svc .mf.split { justify-content: space-between; }
+  .modal-svc label { display: block; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 5px; }
+  .modal-svc label .req { color: #DC2626; }
+  .modal-svc label .opt { color: #9BBAD4; font-weight: 400; font-size: 11px; }
+  .modal-svc input, .modal-svc select, .modal-svc textarea { width: 100%; height: 38px; padding: 0 11px; border: 1px solid #D1E3F3; border-radius: 7px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .modal-svc textarea { height: auto; padding: 9px 11px; resize: vertical; min-height: 70px; line-height: 1.5; }
+  .modal-svc input[readonly] { background: #F0F6FC; color: #5A7A96; cursor: not-allowed; }
+  .modal-svc input:focus, .modal-svc select:focus, .modal-svc textarea:focus { border-color: #2D6A9F; }
+  .modal-svc .helper { font-size: 11.5px; color: #9BBAD4; margin-top: 3px; }
+  .modal-svc .field + .field, .modal-svc .grid-2 + .field, .modal-svc .field + .grid-2 { margin-top: 14px; }
+  .modal-svc .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 600px) { .modal-svc .grid-2 { grid-template-columns: 1fr; } }
+  .pill-group { display: inline-flex; gap: 7px; flex-wrap: wrap; }
+  .pill-opt { padding: 7px 14px; border-radius: 9999px; border: 1.5px solid #D1E3F3; background: #fff; color: #5A7A96; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; user-select: none; }
+  .pill-opt.on.paid { background: #15803D; color: #fff; border-color: #15803D; }
+  .pill-opt.on.pending { background: #F59E0B; color: #fff; border-color: #F59E0B; }
+  .pill-opt.on.danger { background: #DC2626; color: #fff; border-color: #DC2626; }
+  .pill-opt.on.primary { background: #2D6A9F; color: #fff; border-color: #2D6A9F; }
+  .pill-opt .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .summary-box { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; padding: 14px 16px; }
+  .summary-box .ln { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12.5px; }
+  .summary-box .ln .k { color: #5A7A96; }
+  .summary-box .ln .v { color: #1A2E40; font-weight: 600; font-family: var(--font-display); }
+  .warn-box { background: #FFFBEB; border: 1px solid #FCD34D; color: #92400E; border-radius: 7px; padding: 11px 14px; font-size: 12.5px; line-height: 1.5; margin-top: 14px; display: flex; gap: 8px; align-items: flex-start; }
+  .warn-box .lucide { width: 16px; height: 16px; color: #B45309; flex-shrink: 0; margin-top: 1px; }
+  .info-red { background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; border-radius: 7px; padding: 10px 12px; font-size: 12px; margin-top: 14px; }
+  .confirm-icon { width: 56px; height: 56px; border-radius: 50%; background: #FEE2E2; color: #DC2626; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+  .confirm-icon .lucide { width: 26px; height: 26px; }
+  .read-only-note { font-size: 11px; color: #9BBAD4; margin-top: 4px; font-style: italic; }
+  .btn-svc { padding: 9px 16px; border-radius: 7px; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; cursor: pointer; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-svc .lucide { width: 14px; height: 14px; }
+  .btn-svc.ghost { background: #fff; color: #5A7A96; border-color: #D0E8F5; }
+  .btn-svc.ghost:hover { background: #F0F6FC; }
+  .btn-svc.primary { background: #2D6A9F; color: #fff; }
+  .btn-svc.primary:hover { background: #1A5685; }
+  .btn-svc.danger { background: #DC2626; color: #fff; }
+  .btn-svc.danger:hover { background: #B91C1C; }
+  .btn-svc.danger-outline { background: #fff; color: #DC2626; border-color: #FCA5A5; }
+  .btn-svc.danger-outline:hover { background: #FEF2F2; }
+  .btn-svc.outline-blue { background: #fff; color: #2D6A9F; border-color: #2D6A9F; }
+  .btn-svc.outline-blue:hover { background: #F0F6FC; }
+
+  /* Appointment modal extras */
+  .appt-card { max-width: 720px !important; }
+  .appt-stepper { display: flex; align-items: center; padding: 12px 22px; background: #F8FBFD; border-bottom: 1px solid #E5EFF7; gap: 6px; flex-wrap: nowrap; overflow-x: auto; }
+  .appt-stepper .ast { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .appt-stepper .ast .ix { width: 22px; height: 22px; border-radius: 50%; background: #E5EFF7; color: #5A7A96; font-family: var(--font-display); font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; }
+  .appt-stepper .ast .lb { font-family: var(--font-display); font-weight: 600; font-size: 11.5px; color: #5A7A96; white-space: nowrap; }
+  .appt-stepper .ast.done .ix { background: #15803D; color: #fff; }
+  .appt-stepper .ast.done .ix .lucide { width: 12px; height: 12px; }
+  .appt-stepper .ast.done .lb { color: #15803D; }
+  .appt-stepper .ast.on .ix { background: #2D6A9F; color: #fff; }
+  .appt-stepper .ast.on .lb { color: #2D6A9F; }
+  .appt-stepper .arr { color: #BFD8EB; font-size: 14px; flex-shrink: 0; }
+  .appt-body { min-height: 320px; }
+  .appt-step { display: none; }
+  .appt-step[data-active] { display: block; }
+  .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 600px) { .type-grid { grid-template-columns: 1fr; } }
+  .type-card { border: 2px solid #E5EFF7; border-radius: 10px; padding: 18px; cursor: pointer; transition: border-color 120ms, background 120ms; }
+  .type-card.on { border-color: #2D6A9F; background: #F8FBFF; }
+  .type-card .ic { width: 44px; height: 44px; border-radius: 10px; background: #EBF6FD; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .type-card.on .ic { background: #2D6A9F; color: #fff; }
+  .type-card .ic .lucide { width: 20px; height: 20px; }
+  .type-card .ttl { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #1A2E40; margin-bottom: 6px; }
+  .type-card .desc { font-size: 12.5px; color: #5A7A96; line-height: 1.5; }
+  .svc-search-row { position: relative; margin-bottom: 14px; }
+  .svc-search-row input { width: 100%; height: 38px; padding: 0 11px 0 32px; border: 1px solid #D1E3F3; border-radius: 7px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .svc-search-row .lucide { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .svc-cat { font-family: var(--font-display); font-weight: 700; font-size: 10.5px; color: #2D6A9F; letter-spacing: 0.07em; text-transform: uppercase; margin: 14px 0 8px; padding-top: 12px; border-top: 1px solid #F0F6FC; }
+  .svc-cat:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+  .svc-item { display: flex; align-items: center; gap: 10px; padding: 9px 4px; cursor: pointer; }
+  .svc-item .radio { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #D1E3F3; background: #fff; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+  .svc-item.on .radio { border-color: #2D6A9F; }
+  .svc-item.on .radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #2D6A9F; }
+  .svc-item .nm { flex: 1; font-family: var(--font-body); font-size: 13px; color: #1A2E40; }
+  .svc-item .price { font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #2D6A9F; }
+  .info-blue-mini { background: #EBF6FD; border: 1px solid #BFE0F5; border-radius: 7px; padding: 11px 14px; font-size: 12.5px; color: #1E40AF; line-height: 1.5; margin-top: 14px; display: flex; flex-direction: column; gap: 4px; }
+  .info-blue-mini div { display: flex; gap: 6px; align-items: flex-start; }
+  .info-blue-mini .lucide { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; color: #2D6A9F; }
+  .appt-grid-3 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 700px) { .appt-grid-3 { grid-template-columns: 1fr; } }
+  .appt-label { font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; display: block; }
+  .appt-cal { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; padding: 14px; }
+  .appt-cal .mc-head { display: flex; justify-content: space-between; align-items: center; font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; margin-bottom: 10px; }
+  .appt-cal .cal-nav { background: none; border: 1px solid #D1E3F3; width: 24px; height: 24px; border-radius: 6px; cursor: pointer; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; }
+  .appt-cal .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+  .appt-cal .dow { font-family: var(--font-display); font-weight: 700; font-size: 9.5px; color: #9BBAD4; text-align: center; padding: 4px 0; text-transform: uppercase; }
+  .appt-cal .day { padding: 6px 0; text-align: center; font-family: var(--font-body); font-size: 12px; color: #1A2E40; border-radius: 5px; cursor: pointer; position: relative; }
+  .appt-cal .day.muted { color: #C7D7E5; }
+  .appt-cal .day.booked { color: #BFD8EB; cursor: not-allowed; text-decoration: line-through; }
+  .appt-cal .day.sel { background: #2D6A9F; color: #fff; font-weight: 700; }
+  .appt-cal .day.today::after { content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: #F59E0B; }
+  .time-pills { display: flex; gap: 7px; flex-wrap: wrap; }
+  .time-pills .tpill { padding: 8px 14px; border-radius: 9999px; border: 1.5px solid #D1E3F3; background: #fff; color: #5A7A96; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; }
+  .time-pills .tpill.on { background: #2D6A9F; color: #fff; border-color: #2D6A9F; }
+  .time-pills .tpill.booked { color: #BFD8EB; text-decoration: line-through; cursor: not-allowed; }
+  .appt-select { width: 100%; height: 38px; padding: 0 11px; border: 1px solid #D1E3F3; border-radius: 7px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; background: #fff; }
+  .preview-box-mini { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; padding: 12px 14px; margin-top: 14px; font-size: 12.5px; color: #1A2E40; line-height: 1.6; }
+  .preview-box-mini b { font-family: var(--font-display); font-weight: 700; }
+  .appt-sec-label { font-family: var(--font-display); font-weight: 700; font-size: 12px; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px; }
+  .consent-row { display: flex; gap: 14px; align-items: flex-start; padding: 12px 14px; border: 1px solid #E5EFF7; border-radius: 8px; margin-bottom: 10px; }
+  .consent-row .status { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .consent-row .status.ok { background: #DCFCE7; color: #15803D; }
+  .consent-row .status.bad { background: #FEE2E2; color: #DC2626; }
+  .consent-row .status .lucide { width: 16px; height: 16px; }
+  .consent-row .body { flex: 1; }
+  .consent-row .ttl { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; color: #1A2E40; }
+  .consent-row .meta { font-size: 12px; color: #5A7A96; margin-top: 3px; }
+  .consent-row.bad .ttl { color: #B91C1C; }
+  .warn-red { background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; border-radius: 7px; padding: 10px 12px; font-size: 12px; margin: 8px 0; }
+  .consent-actions { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+  .note-blue { background: #F0F6FC; border: 1px solid #D1E3F3; border-radius: 7px; padding: 10px 14px; font-size: 12px; color: #5A7A96; line-height: 1.5; margin-top: 12px; }
+  .summary-card-appt { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 10px; padding: 18px 20px; }
+  .summary-card-appt .sln { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+  .summary-card-appt .sln .k { color: #5A7A96; }
+  .summary-card-appt .sln .v { color: #1A2E40; font-weight: 700; font-family: var(--font-display); }
+  .warn-orange-mini { background: #FFFBEB; border: 1px solid #FCD34D; color: #92400E; border-radius: 7px; padding: 11px 14px; font-size: 12.5px; line-height: 1.5; margin-top: 14px; display: flex; gap: 8px; align-items: flex-start; }
+  .warn-orange-mini .lucide { width: 16px; height: 16px; color: #B45309; flex-shrink: 0; margin-top: 1px; }
+  .appt-toggle { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #fff; border: 1px solid #E5EFF7; border-radius: 8px; margin-top: 12px; }
+  .appt-toggle .body { flex: 1; }
+  .appt-toggle .body .t { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .appt-toggle .body .d { font-size: 11.5px; color: #5A7A96; margin-top: 3px; }
+  .appt-switch { width: 38px; height: 22px; border-radius: 9999px; background: #2D6A9F; padding: 2px; position: relative; cursor: pointer; border: none; flex-shrink: 0; }
+  .appt-switch::after { content: ''; width: 18px; height: 18px; border-radius: 50%; background: #fff; position: absolute; top: 2px; right: 2px; transition: right 150ms; }
+  .appt-switch.off { background: #D0E8F5; }
+  .appt-switch.off::after { right: 20px; }
+  .modal-svc .mf.split { justify-content: space-between; }
+  .pagination { padding: 12px 0 0; font-family: var(--font-body); font-size: 12px; color: #9BBAD4; }
+
+  /* Package cards */
+  .pkg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .pkg-grid { grid-template-columns: 1fr; } }
+  .pkg-card { border: 1px solid #E5EFF7; border-radius: 10px; padding: 18px; background: #fff; transition: border-color 120ms, box-shadow 120ms; display: block; }
+  .pkg-card:hover { border-color: #2D6A9F; box-shadow: 0 2px 6px rgba(45,106,159,0.10); }
+  .badge.ongoing { background: #DBEAFE; color: #1D4ED8; }
+  .badge.completed { background: #DCFCE7; color: #15803D; }
+  .badge.cancelled { background: #FEE2E2; color: #B91C1C; }
+  .badge.gold { background: #C4A882; color: #3D2E14; font-family: var(--font-display); font-weight: 700; font-size: 10px; letter-spacing: 0.04em; padding: 3px 8px; border-radius: 6px; }
+  .card-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .card-bottom .meta { margin: 0; flex: 1; min-width: 0; }
+  .free-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding: 8px 10px; border-radius: 7px; font-family: var(--font-display); font-size: 12px; font-weight: 600; }
+  .free-row span { display: inline-flex; align-items: center; gap: 5px; }
+  .free-row .lucide { width: 13px; height: 13px; }
+  .free-row.locked { background: #FBF9F4; color: #C4A882; }
+  .free-row.locked .state { color: #8B6F3F; opacity: 0.75; }
+  .free-row.unlocked { background: #F5EFE3; color: #8B6F3F; }
+  .free-row.unlocked .state { color: #15803D; }
+  .btn-gold { width: 100%; margin-top: 10px; padding: 8px 12px; border-radius: 7px; background: #fff; border: 1.5px solid #C4A882; color: #8B6F3F; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; transition: background 120ms, border-color 120ms; }
+  .btn-gold:hover { background: #FBF9F4; border-color: #A88963; }
+  .btn-gold .lucide { width: 13px; height: 13px; }
+  .pkg-card .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .pkg-card .nm { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1A2E40; }
+  .pkg-card .row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; }
+  .pkg-card .row .k { color: #5A7A96; }
+  .pkg-card .row .v { color: #1A2E40; font-weight: 600; }
+  .progress { height: 8px; background: #F0F6FC; border-radius: 4px; overflow: hidden; margin: 10px 0; }
+  .progress > div { height: 100%; background: #2D6A9F; border-radius: 4px; }
+  .progress > div.full { background: #15803D; }
+  .pkg-card .meta { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; margin-top: 6px; }
+
+  /* Appointments filter chips */
+  .chips { display: inline-flex; gap: 6px; margin-bottom: 16px; padding: 4px; background: #F0F6FC; border-radius: 9px; }
+  .chips button { background: none; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-family: var(--font-display); font-weight: 500; font-size: 12px; color: #5A7A96; }
+  .chips button.active { background: #fff; color: #2D6A9F; font-weight: 700; box-shadow: 0 1px 3px rgba(26,58,92,0.08); }
+  .view-link { color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12px; text-decoration: none; }
+  .view-link:hover { text-decoration: underline; }
+
+  /* Skin tab */
+  .pill { display: inline-block; background: #EBF6FD; color: #2D6A9F; padding: 4px 12px; border-radius: 9999px; font-family: var(--font-display); font-weight: 500; font-size: 12px; margin-right: 6px; margin-bottom: 6px; }
+  .timeline { position: relative; padding-left: 24px; }
+  .timeline::before { content: ''; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: #E5EFF7; }
+  .tl-entry { position: relative; padding: 0 0 18px; }
+  .tl-entry:last-child { padding-bottom: 0; }
+  .tl-entry::before { content: ''; position: absolute; left: -24px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #2D6A9F; border: 3px solid #fff; box-shadow: 0 0 0 2px #2D6A9F; }
+  .tl-date { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; margin-bottom: 2px; }
+  .tl-author { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-bottom: 6px; }
+  .tl-note { font-family: var(--font-body); font-size: 13px; color: #1A2E40; line-height: 1.55; background: #F8FBFD; border-left: 3px solid #2D6A9F; padding: 10px 14px; border-radius: 0 8px 8px 0; }
+
+  /* Right sidebar */
+  .side-card { background: #fff; border-radius: 10px; border: 1px solid #E5EFF7; overflow: hidden; }
+  .side-card + .side-card { margin-top: 18px; }
+  .sc-head { padding: 14px 16px; background: #F0F6FC; border-bottom: 1px solid #E5EFF7; }
+  .sc-head h3 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; }
+  .sc-body { padding: 16px; }
+  .pkg-mini .nm { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; }
+  .pkg-mini .row { font-family: var(--font-body); font-size: 12px; color: #5A7A96; display: flex; justify-content: space-between; padding: 4px 0; }
+  .pkg-mini .row b { color: #1A2E40; font-family: var(--font-display); font-weight: 600; }
+  .quick-btn { width: 100%; padding: 10px 14px; background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 12.5px; font-weight: 600; color: #2D6A9F; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .quick-btn + .quick-btn { margin-top: 8px; }
+  .quick-btn:hover { background: #EBF6FD; border-color: #2D6A9F; }
+  .quick-btn .lucide { width: 14px; height: 14px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Sarah Johnson</div>
+        <div class="topbar-crumb">Admin / Patients / Sarah Johnson</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i></button>
+        <div class="user-pill">
+          <div class="avatar" style="width:36px;height:36px;border-radius:50%;background:#2D6A9F;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Patient Profile">
+      <a class="back-link" href="patients-view-all.html"><i data-lucide="arrow-left"></i> Back to Patients</a>
+
+      <div class="grid-main">
+        <div>
+          <!-- Profile header -->
+          <div class="card">
+            <div class="ph">
+              <div class="who">
+                <div class="av">SJ</div>
+                <div>
+                  <div class="nm">Sarah Johnson</div>
+                  <div class="row1">Age 36 • April 5, 1990</div>
+                  <div class="row2">
+                    <span><i data-lucide="phone"></i> 0917-123-4567</span>
+                    <span><i data-lucide="mail"></i> sarah.j@email.com</span>
+                  </div>
+                </div>
+              </div>
+              <button class="edit-btn"><i data-lucide="pencil"></i> Edit Profile</button>
+            </div>
+            <div class="stats">
+              <div class="stat"><div class="ic"><i data-lucide="calendar"></i></div><div class="val">8</div><div class="lbl">Total Visits</div></div>
+              <div class="stat"><div class="ic"><i data-lucide="activity"></i></div><div class="val">Apr 15, 2026</div><div class="lbl">Last Visit</div></div>
+              <div class="stat"><div class="ic"><i data-lucide="package"></i></div><div class="val">1</div><div class="lbl">Packages</div></div>
+              <div class="stat"><div class="ic"><i data-lucide="credit-card"></i></div><div class="val">2</div><div class="lbl">Vouchers</div></div>
+            </div>
+          </div>
+
+          <!-- Tabs -->
+          <div class="card" style="margin-top:18px;">
+            <div class="tabs" id="tabs">
+              <button class="active" data-tab="overview">Overview</button>
+              <button data-tab="services">Services</button>
+              <button data-tab="packages">Packages</button>
+              <button data-tab="appointments">Appointments</button>
+              <button data-tab="skin">Skin</button>
+            </div>
+
+            <!-- Overview -->
+            <div class="pane active" data-pane="overview">
+              <div class="sec">
+                <div class="sec-ttl">Personal Information</div>
+                <div class="field-grid">
+                  <div class="fld"><div class="k">Full Name</div><div class="v">Sarah Johnson</div></div>
+                  <div class="fld"><div class="k">Date of Birth</div><div class="v">April 5, 1990</div></div>
+                  <div class="fld"><div class="k">Phone</div><div class="v">0917-123-4567</div></div>
+                  <div class="fld"><div class="k">Email</div><div class="v">sarah.j@email.com</div></div>
+                  <div class="fld"><div class="k">Address</div><div class="v">12 Mango Street, BGC, Taguig City</div></div>
+                  <div class="fld"><div class="k">Status</div><div class="v"><span class="badge active">Active</span></div></div>
+                </div>
+              </div>
+              <div class="sec">
+                <div class="sec-ttl">Skin Profile</div>
+                <div class="field-grid">
+                  <div class="fld"><div class="k">Skin Type</div><div class="v">Combination</div></div>
+                  <div class="fld"><div class="k">Concerns</div><div class="v">Hyperpigmentation, Enlarged pores, Mild acne</div></div>
+                  <div class="fld"><div class="k">Conditions</div><div class="v">None</div></div>
+                  <div class="fld"><div class="k">Allergies</div><div class="v">None known</div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Services -->
+            <div class="pane" data-pane="services">
+              <div class="svc-top-row">
+                <div class="summary-bar" style="margin-bottom:0;flex:1;"><span>Total services availed: <b>5</b></span><span>Total spent: <b>₱22,500</b></span></div>
+                <button class="btn-add-svc" type="button" id="open-add-svc"><i data-lucide="plus"></i> Add Service</button>
+              </div>
+              <div class="chips" id="svc-filter" style="margin: 14px 0;">
+                <button class="active" data-sf="all">All <span style="margin-left:4px;opacity:0.7;">5</span></button>
+                <button data-sf="scheduled">Scheduled <span style="margin-left:4px;opacity:0.7;">1</span></button>
+                <button data-sf="completed">Completed <span style="margin-left:4px;opacity:0.7;">3</span></button>
+                <button data-sf="cancelled">Cancelled <span style="margin-left:4px;opacity:0.7;">1</span></button>
+              </div>
+              <div class="svc-grid" id="svc-grid">
+
+                <a class="svc-card" data-svc-status="completed" href="service-detail.html?id=SV001">
+                  <div class="top"><div class="nm">Hydra Facial<div class="cat">Facials</div></div><div class="badges"><span class="badge sb-completed">Completed</span><span class="badge pp-paid">Paid</span></div></div>
+                  <div class="row"><span class="k">Date</span><span class="v">April 15, 2026</span></div>
+                  <div class="row"><span class="k">Practitioner</span><span class="v">Dr. Reyes</span></div>
+                  <hr class="div">
+                  <div class="row"><span class="k">Amount Charged</span><span class="v">₱2,800</span></div>
+                  <div class="row"><span class="k">Discount</span><span class="v">₱300</span></div>
+                  <div class="row"><span class="k">Amount Paid</span><span class="v" style="color:#1A2E40;font-weight:700;">₱2,500</span></div>
+                  <div class="row"><span class="k">Payment Method</span><span class="v">GCash</span></div>
+                  <hr class="div">
+                  <div class="rec-row green"><i data-lucide="check-circle"></i> Clinical records complete</div>
+                  <div class="card-bottom"><div class="meta">Assigned by: Admin • Apr 15, 2026 — <span style="color:#2D6A9F;font-weight:600;">View record →</span></div></div>
+                </a>
+
+                <a class="svc-card" data-svc-status="completed" href="service-step3-consent.html?service=led-therapy">
+                  <div class="top"><div class="nm">LED Therapy<div class="cat">Machines &amp; Lasers</div></div><div class="badges"><span class="badge sb-completed">Completed</span><span class="badge pp-paid">Paid</span></div></div>
+                  <div class="row"><span class="k">Date</span><span class="v">March 20, 2026</span></div>
+                  <div class="row"><span class="k">Practitioner</span><span class="v">Dr. Santos</span></div>
+                  <hr class="div">
+                  <div class="row"><span class="k">Amount Charged</span><span class="v">₱1,800</span></div>
+                  <div class="row"><span class="k">Discount</span><span class="v">—</span></div>
+                  <div class="row"><span class="k">Amount Paid</span><span class="v" style="color:#1A2E40;font-weight:700;">₱1,800</span></div>
+                  <div class="row"><span class="k">Payment Method</span><span class="v">Cash</span></div>
+                  <hr class="div">
+                  <div class="rec-row green"><i data-lucide="check-circle"></i> Clinical records complete</div>
+                  <div class="card-bottom"><div class="meta">Assigned by: Admin • Mar 20, 2026 — <span style="color:#2D6A9F;font-weight:600;">View record →</span></div></div>
+                </a>
+
+                <a class="svc-card" data-svc-status="completed" href="service-stepper-glass-skin.html?service=glass-skin-microneedling&amp;patient=P001">
+                  <div class="top"><div class="nm">Glass Skin Microneedling<div class="cat">Treatments</div></div><div class="badges"><span class="badge sb-completed">Completed</span><span class="badge pp-pending">Pending Payment</span></div></div>
+                  <div class="row"><span class="k">Date</span><span class="v">May 25, 2026</span></div>
+                  <div class="row"><span class="k">Practitioner</span><span class="v">Dr. Reyes</span></div>
+                  <hr class="div">
+                  <div class="row"><span class="k">Amount Charged</span><span class="v">₱4,999</span></div>
+                  <div class="row"><span class="k">Discount</span><span class="v">—</span></div>
+                  <div class="row"><span class="k">Amount Paid</span><span class="v">—</span></div>
+                  <div class="row"><span class="k">Payment Method</span><span class="v">—</span></div>
+                  <div class="alert-row orange"><i data-lucide="alert-triangle"></i> Payment has not been collected yet</div>
+                  <hr class="div">
+                  <div class="rec-row green"><i data-lucide="check-circle"></i> Clinical records complete</div>
+                  <button class="card-action blue" type="button" onclick="event.preventDefault();event.stopPropagation();"><i data-lucide="credit-card"></i> Record Payment</button>
+                  <div class="card-bottom"><div class="meta">Assigned by: Admin • May 25, 2026 — <span style="color:#2D6A9F;font-weight:600;">View record →</span></div></div>
+                </a>
+
+                <a class="svc-card" data-svc-status="scheduled" href="service-detail.html?id=SV004">
+                  <div class="top"><div class="nm">eC02 + Subcision + PRP<div class="cat">Machines &amp; Lasers</div></div><div class="badges"><span class="badge sb-scheduled">Scheduled</span><span class="badge pp-pending">Pending Payment</span></div></div>
+                  <div class="row"><span class="k">Date</span><span class="v">May 27, 2026</span></div>
+                  <div class="row"><span class="k">Practitioner</span><span class="v">Dr. Reyes</span></div>
+                  <hr class="div">
+                  <div class="row"><span class="k">Amount Charged</span><span class="v">₱14,999</span></div>
+                  <div class="row"><span class="k">Discount</span><span class="v">—</span></div>
+                  <div class="row"><span class="k">Amount Paid</span><span class="v">—</span></div>
+                  <div class="row"><span class="k">Payment Method</span><span class="v">—</span></div>
+                  <div class="alert-row blue"><i data-lucide="calendar"></i> Upcoming procedure — May 27, 2026 at 10:00 AM</div>
+                  <div class="alert-row orange"><i data-lucide="alert-triangle"></i> eC02 Laser Consent form not yet signed</div>
+                  <hr class="div">
+                  <div class="rec-row gray"><i data-lucide="circle"></i> Clinical records not yet filled</div>
+                  <div class="card-actions-row">
+                    <button class="card-action orange" type="button" onclick="event.preventDefault();event.stopPropagation();"><i data-lucide="clipboard-list"></i> Fill Clinical Records</button>
+                    <button class="card-action blue" type="button" onclick="event.preventDefault();event.stopPropagation();"><i data-lucide="mail"></i> Send Consent Form</button>
+                  </div>
+                  <div class="card-bottom"><div class="meta">Assigned by: Admin • May 15, 2026 — <span style="color:#2D6A9F;font-weight:600;">View record →</span></div></div>
+                </a>
+
+                <a class="svc-card cancelled-card" data-svc-status="cancelled" href="service-detail.html?id=SV005">
+                  <div class="top"><div class="nm">Chemical Peel<div class="cat">Cloud Skin Exclusives</div></div><div class="badges"><span class="badge sb-cancelled">Cancelled</span><span class="badge pp-refunded">Refunded</span></div></div>
+                  <div class="row"><span class="k">Date</span><span class="v">February 10, 2026</span></div>
+                  <div class="row"><span class="k">Practitioner</span><span class="v">Dr. Reyes</span></div>
+                  <hr class="div">
+                  <div class="row"><span class="k">Amount Charged</span><span class="v">₱5,000</span></div>
+                  <div class="row"><span class="k">Discount</span><span class="v">—</span></div>
+                  <div class="row"><span class="k">Amount Refunded</span><span class="v" style="color:#DC2626;font-weight:700;">₱5,000</span></div>
+                  <div class="row"><span class="k">Payment Method</span><span class="v">GCash (refunded)</span></div>
+                  <div class="alert-row red"><i data-lucide="x-circle"></i> Cancelled on Feb 12, 2026 — Reason: Patient request</div>
+                  <hr class="div">
+                  <div class="rec-row gray"><i data-lucide="circle"></i> No clinical records</div>
+                  <div class="card-bottom"><div class="meta">Assigned by: Admin • Feb 10, 2026 — <span style="color:#2D6A9F;font-weight:600;">View record →</span></div></div>
+                </a>
+
+              </div>
+            </div>
+
+            <!-- Packages -->
+            <div class="pane" data-pane="packages">
+              <div class="chips" id="pkg-filter" style="margin-bottom:16px;">
+                <button class="active" data-pf="all">All <span style="margin-left:4px;opacity:0.7;">4</span></button>
+                <button data-pf="ongoing">Ongoing <span style="margin-left:4px;opacity:0.7;">2</span></button>
+                <button data-pf="completed">Completed <span style="margin-left:4px;opacity:0.7;">1</span></button>
+                <button data-pf="cancelled">Cancelled <span style="margin-left:4px;opacity:0.7;">1</span></button>
+              </div>
+              <div class="pkg-grid" id="pkg-grid">
+                <a class="pkg-card" data-pkg-status="ongoing" href="package-details.html?id=PKG001" style="text-decoration:none;color:inherit;cursor:pointer;">
+                  <div class="top">
+                    <div class="nm">Premium Facial Package</div>
+                    <span class="badge ongoing">Ongoing</span>
+                  </div>
+                  <div class="row"><span class="k">Value</span><span class="v">₱15,000</span></div>
+                  <div class="row"><span class="k">Sessions used</span><span class="v">3 of 5</span></div>
+                  <div class="progress"><div style="width:60%;"></div></div>
+                  <div class="free-row locked"><span><i data-lucide="gift"></i> Free session</span><span class="state"><i data-lucide="lock"></i> Not yet unlocked</span></div>
+                  <div class="row"><span class="k">Expiry</span><span class="v">Dec 31, 2026</span></div>
+                  <div class="card-bottom">
+                    <div class="meta">Assigned by: Admin • Apr 1, 2026 — <span style="color:#2D6A9F;font-weight:600;">View sessions →</span></div>
+                    <span class="badge gold">5 + 1 FREE</span>
+                  </div>
+                </a>
+                <a class="pkg-card" data-pkg-status="completed" href="package-details.html?id=PKG002" style="text-decoration:none;color:inherit;cursor:pointer;">
+                  <div class="top">
+                    <div class="nm">Brightening Package</div>
+                    <span class="badge completed">Completed</span>
+                  </div>
+                  <div class="row"><span class="k">Value</span><span class="v">₱8,000</span></div>
+                  <div class="row"><span class="k">Sessions used</span><span class="v">2 of 2</span></div>
+                  <div class="progress"><div class="full" style="width:100%;background:#15803D;"></div></div>
+                  <div class="row"><span class="k">Expiry</span><span class="v">Jan 15, 2026</span></div>
+                  <div class="card-bottom">
+                    <div class="meta">Assigned by: Admin • Jan 1, 2026 — <span style="color:#2D6A9F;font-weight:600;">View sessions →</span></div>
+                  </div>
+                </a>
+                <a class="pkg-card" data-pkg-status="ongoing" href="package-details.html?id=PKG003" style="text-decoration:none;color:inherit;cursor:pointer;">
+                  <div class="top">
+                    <div class="nm">Glow Package</div>
+                    <span class="badge ongoing">Ongoing</span>
+                  </div>
+                  <div class="row"><span class="k">Value</span><span class="v">₱12,000</span></div>
+                  <div class="row"><span class="k">Sessions used</span><span class="v">5 of 5 paid</span></div>
+                  <div class="progress"><div style="width:100%;"></div></div>
+                  <div class="free-row unlocked"><span><i data-lucide="gift"></i> Free session</span><span class="state"><i data-lucide="check-circle"></i> Unlocked — ready to schedule</span></div>
+                  <button class="btn-gold" type="button" onclick="event.preventDefault(); event.stopPropagation(); location.href='package-details.html?id=PKG003';"><i data-lucide="plus"></i> Schedule Free Session</button>
+                  <div class="row"><span class="k">Expiry</span><span class="v">Dec 31, 2026</span></div>
+                  <div class="card-bottom">
+                    <div class="meta">Assigned by: Admin • Mar 1, 2026 — <span style="color:#2D6A9F;font-weight:600;">View sessions →</span></div>
+                    <span class="badge gold">5 + 1 FREE</span>
+                  </div>
+                </a>
+                <a class="pkg-card" data-pkg-status="cancelled" href="package-details.html?id=PKG004" style="text-decoration:none;color:inherit;cursor:pointer;">
+                  <div class="top">
+                    <div class="nm">Anti-Aging Package</div>
+                    <span class="badge cancelled">Cancelled</span>
+                  </div>
+                  <div class="row"><span class="k">Value</span><span class="v">₱10,000</span></div>
+                  <div class="row"><span class="k">Sessions used</span><span class="v">1 of 4</span></div>
+                  <div class="progress"><div style="width:25%;background:#DC2626;"></div></div>
+                  <div class="row"><span class="k">Cancelled on</span><span class="v">Feb 18, 2026</span></div>
+                  <div class="row"><span class="k">Reason</span><span class="v" style="color:#5A7A96;font-weight:400;">Patient request</span></div>
+                  <div class="card-bottom">
+                    <div class="meta">Assigned by: Admin • Feb 1, 2026 — <span style="color:#2D6A9F;font-weight:600;">View sessions →</span></div>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            <!-- Appointments -->
+            <div class="pane" data-pane="appointments">
+              <div class="chips">
+                <button class="active">All</button>
+                <button>Upcoming</button>
+                <button>Completed</button>
+                <button>Cancelled</button>
+              </div>
+              <div style="border:1px solid #E5EFF7;border-radius:8px;overflow:hidden;">
+                <table>
+                  <thead><tr><th>Date</th><th>Time</th><th>Service</th><th>Practitioner</th><th>Status</th><th>Actions</th></tr></thead>
+                  <tbody>
+                    <tr><td>May 20, 2026</td><td>10:00 AM</td><td>Hydra Facial</td><td>Dr. Reyes</td><td><span class="badge confirmed">Confirmed</span></td><td><a class="view-link" href="#">View</a></td></tr>
+                    <tr><td>Apr 15, 2026</td><td>10:00 AM</td><td>Hydra Facial</td><td>Dr. Reyes</td><td><span class="badge completed">Completed</span></td><td><a class="view-link" href="#">View</a></td></tr>
+                    <tr><td>Mar 20, 2026</td><td>12:00 PM</td><td>LED Therapy</td><td>Dr. Santos</td><td><span class="badge completed">Completed</span></td><td><a class="view-link" href="#">View</a></td></tr>
+                    <tr><td>Feb 28, 2026</td><td>10:00 AM</td><td>Consultation</td><td>Dr. Reyes</td><td><span class="badge cancelled">Cancelled</span></td><td><a class="view-link" href="#">View</a></td></tr>
+                    <tr><td>Feb 10, 2026</td><td>12:00 PM</td><td>Chemical Peel</td><td>Dr. Reyes</td><td><span class="badge completed">Completed</span></td><td><a class="view-link" href="#">View</a></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="pagination">Showing 1–5 of 12</div>
+            </div>
+
+            <!-- Skin -->
+            <div class="pane" data-pane="skin">
+              <div class="sec">
+                <div class="sec-ttl">Skin Assessment Summary</div>
+                <div style="font-family:var(--font-body);font-size:12px;color:#9BBAD4;margin-bottom:14px;">Last updated: Apr 15, 2026 by Dr. Reyes</div>
+                <div class="field-grid">
+                  <div class="fld"><div class="k">Skin Type</div><div class="v">Combination</div></div>
+                  <div class="fld"><div class="k">Concerns</div><div class="v" style="margin-top:4px;"><span class="pill">Hyperpigmentation</span><span class="pill">Enlarged pores</span><span class="pill">Mild acne</span></div></div>
+                  <div class="fld"><div class="k">Conditions</div><div class="v">None</div></div>
+                  <div class="fld"><div class="k">Allergies</div><div class="v">None known</div></div>
+                </div>
+              </div>
+              <div class="sec">
+                <div class="sec-ttl">Treatment Notes</div>
+                <div class="timeline">
+                  <div class="tl-entry"><div class="tl-date">Apr 15, 2026</div><div class="tl-author">Dr. Reyes</div><div class="tl-note">"Patient responded well to Hydra Facial. Hyperpigmentation showing improvement. Recommend monthly sessions."</div></div>
+                  <div class="tl-entry"><div class="tl-date">Mar 20, 2026</div><div class="tl-author">Dr. Santos</div><div class="tl-note">"LED Therapy session completed. Mild redness post-treatment, expected to subside within 24 hours."</div></div>
+                  <div class="tl-entry"><div class="tl-date">Feb 10, 2026</div><div class="tl-author">Dr. Reyes</div><div class="tl-note">"First Chemical Peel session. Skin reacted normally. Follow-up in 6 weeks recommended."</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right sidebar -->
+        <div>
+          <div class="side-card">
+            <div class="sc-head"><h3>Active Packages</h3></div>
+            <div class="sc-body">
+              <div class="pkg-mini">
+                <div class="nm">Premium Facial Package</div>
+                <div class="row"><span class="k">Value</span><b>₱15,000</b></div>
+                <div class="row"><span class="k">Sessions</span><b>3 of 5</b></div>
+                <div class="progress"><div style="width:60%;"></div></div>
+                <div class="row"><span class="k">Expires</span><b>Dec 31, 2026</b></div>
+              </div>
+            </div>
+          </div>
+          <div class="side-card">
+            <div class="sc-head"><h3>Quick Actions</h3></div>
+            <div class="sc-body">
+              <button class="quick-btn" id="qa-new-appt"><i data-lucide="plus"></i> New Appointment</button>
+              <button class="quick-btn"><i data-lucide="package"></i> Assign Package</button>
+              <button class="quick-btn"><i data-lucide="gift"></i> Add Voucher</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ========== New Appointment multi-step modal ========== -->
+<div class="modal-svc" id="appt-modal" hidden>
+  <div class="card appt-card">
+    <div class="mh">
+      <button class="close" data-svc-close><i data-lucide="x"></i></button>
+      <h2>New Appointment — Sarah Johnson</h2>
+      <div class="sub" id="appt-substep">Schedule a new consultation or procedure.</div>
+    </div>
+    <div class="appt-stepper">
+      <span class="ast on" data-st="1"><span class="ix">1</span><span class="lb">Type</span></span><span class="arr">›</span>
+      <span class="ast" data-st="2"><span class="ix">2</span><span class="lb">Service</span></span><span class="arr">›</span>
+      <span class="ast" data-st="3"><span class="ix">3</span><span class="lb">Date</span></span><span class="arr">›</span>
+      <span class="ast" data-st="4"><span class="ix">4</span><span class="lb">Consent</span></span><span class="arr">›</span>
+      <span class="ast" data-st="5"><span class="ix">5</span><span class="lb">Confirm</span></span>
+    </div>
+
+    <div class="mb appt-body">
+      <!-- Step 1 -->
+      <div class="appt-step" data-step="1" data-active>
+        <div class="type-grid">
+          <div class="type-card on" data-type="consult">
+            <div class="ic"><i data-lucide="message-square"></i></div>
+            <div class="ttl">Consultation</div>
+            <div class="desc">First visit or follow-up discussion. Doctor discusses treatment plan with patient. No procedure performed.</div>
+          </div>
+          <div class="type-card" data-type="procedure">
+            <div class="ic"><i data-lucide="stethoscope"></i></div>
+            <div class="ttl">Procedure</div>
+            <div class="desc">Patient is coming in for an actual treatment or service. Requires service selection and clinical documentation.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="appt-step" data-step="2">
+        <div class="svc-search-row"><i data-lucide="search"></i><input type="text" placeholder="Search services..."></div>
+        <div class="svc-cat">Facials</div>
+        <div class="svc-item" data-svc="Deep Cleanse Facial"><span class="radio"></span><span class="nm">Deep Cleanse Facial</span><span class="price">₱999/session</span></div>
+        <div class="svc-item" data-svc="Korea Hydra Facial + Exosomes"><span class="radio"></span><span class="nm">Korea Hydra Facial + Exosomes</span><span class="price">₱4,999/session</span></div>
+        <div class="svc-item" data-svc="Vampire Facial"><span class="radio"></span><span class="nm">Vampire Facial</span><span class="price">₱5,499/session</span></div>
+        <div class="svc-cat">IV Therapy</div>
+        <div class="svc-item" data-svc="Maintenance Glutathione Drip"><span class="radio"></span><span class="nm">Maintenance Glutathione Drip</span><span class="price">₱1,999/session</span></div>
+        <div class="svc-item" data-svc="Bio-NAD+ Drip"><span class="radio"></span><span class="nm">Bio-NAD+ Drip</span><span class="price">₱10,000/session</span></div>
+        <div class="svc-cat">Machines &amp; Lasers</div>
+        <div class="svc-item on" data-svc="eCO2 + Subcision + PRP"><span class="radio"></span><span class="nm">eCO2 + Subcision + PRP</span><span class="price">₱14,999/session</span></div>
+        <div class="svc-item" data-svc="Pico Laser Face"><span class="radio"></span><span class="nm">Pico Laser Face</span><span class="price">₱3,499/session</span></div>
+        <div class="info-blue-mini">
+          <div><i data-lucide="file-text"></i>Requires a specific consent form (you'll be reminded in step 4)</div>
+          <div><i data-lucide="clock"></i>Estimated duration: <b>90 minutes</b></div>
+          <div><i data-lucide="user-check"></i>Can be performed by: <b>Dr. Reyes, Dr. Santos</b></div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="appt-step" data-step="3">
+        <div class="appt-grid-3">
+          <div>
+            <label class="appt-label">Date</label>
+            <div class="appt-cal">
+              <div class="mc-head"><button class="cal-nav"><i data-lucide="chevron-left" style="width:13px;height:13px;"></i></button><span>May 2026</span><button class="cal-nav"><i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button></div>
+              <div class="cal-grid">
+                <div class="dow">Su</div><div class="dow">Mo</div><div class="dow">Tu</div><div class="dow">We</div><div class="dow">Th</div><div class="dow">Fr</div><div class="dow">Sa</div>
+                <div class="day muted">26</div><div class="day muted">27</div><div class="day muted">28</div><div class="day muted">29</div><div class="day muted">30</div><div class="day">1</div><div class="day">2</div>
+                <div class="day">3</div><div class="day">4</div><div class="day">5</div><div class="day">6</div><div class="day">7</div><div class="day">8</div><div class="day">9</div>
+                <div class="day">10</div><div class="day">11</div><div class="day">12</div><div class="day">13</div><div class="day">14</div><div class="day today">15</div><div class="day">16</div>
+                <div class="day">17</div><div class="day">18</div><div class="day">19</div><div class="day">20</div><div class="day">21</div><div class="day">22</div><div class="day">23</div>
+                <div class="day">24</div><div class="day">25</div><div class="day booked">26</div><div class="day sel">27</div><div class="day">28</div><div class="day">29</div><div class="day">30</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label class="appt-label">Available Time Slots</label>
+            <div class="time-pills">
+              <span class="tpill on">10:00 AM</span><span class="tpill">11:00 AM</span><span class="tpill booked">12:00 PM</span><span class="tpill">2:00 PM</span>
+            </div>
+            <label class="appt-label" style="margin-top:14px;">Practitioner</label>
+            <select class="appt-select"><option selected>Dr. Reyes — Available</option><option disabled>Dr. Santos — On leave</option><option>Dr. Angela Lim — Available</option></select>
+            <div class="preview-box-mini"><b>eCO2 + Subcision + PRP</b> on <b>May 27, 2026</b> at <b>10:00 AM</b> · 90 mins · <b>Dr. Reyes</b><br><span style="color:#5A7A96;">Estimated end time: 11:30 AM</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="appt-step" data-step="4">
+        <div class="appt-sec-label">Required before this procedure can proceed</div>
+        <div class="consent-row"><span class="status ok"><i data-lucide="check"></i></span><div class="body"><div class="ttl">General Consent Form</div><div class="meta">Signed on March 1, 2026</div></div></div>
+        <div class="consent-row"><span class="status ok"><i data-lucide="check"></i></span><div class="body"><div class="ttl">Medical History Questionnaire</div><div class="meta">Completed on March 1, 2026</div></div></div>
+        <div class="consent-row bad"><span class="status bad"><i data-lucide="x"></i></span><div class="body">
+          <div class="ttl">eCO2 Laser Procedure Consent</div><div class="meta">Not yet signed</div>
+          <div class="warn-red">This consent form must be signed before the procedure date.</div>
+          <div class="consent-actions"><button class="btn-svc outline-blue"><i data-lucide="mail"></i> Send to Patient via Email</button><button class="btn-svc ghost"><i data-lucide="clock"></i> Mark as Will Sign on Arrival</button></div>
+        </div></div>
+        <div class="consent-row"><span class="status ok"><i data-lucide="check"></i></span><div class="body"><div class="ttl">PRP Procedure Consent</div><div class="meta">Signed on April 1, 2026</div></div></div>
+        <div class="note-blue">You can still schedule this appointment. The missing consent form must be completed before the procedure begins on <b>May 27, 2026</b>.</div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="appt-step" data-step="5">
+        <div class="summary-card-appt">
+          <div class="sln"><span class="k">Patient</span><span class="v">Sarah Johnson</span></div>
+          <div class="sln"><span class="k">Appointment Type</span><span class="v">Procedure</span></div>
+          <div class="sln"><span class="k">Service</span><span class="v">eCO2 + Subcision + PRP</span></div>
+          <div class="sln"><span class="k">Date</span><span class="v">May 27, 2026</span></div>
+          <div class="sln"><span class="k">Time</span><span class="v">10:00 AM – 11:30 AM</span></div>
+          <div class="sln"><span class="k">Practitioner</span><span class="v">Dr. Reyes</span></div>
+          <div class="sln"><span class="k">Price</span><span class="v">₱14,999</span></div>
+          <div class="sln"><span class="k">Payment</span><span class="v" style="color:#B45309;">Pending (to be collected on the day)</span></div>
+        </div>
+        <div class="warn-orange-mini"><i data-lucide="alert-triangle"></i><div><b>eCO2 Laser Procedure Consent</b> is pending. Patient will be notified via email.</div></div>
+        <div class="appt-toggle">
+          <div class="body"><div class="t">Send appointment reminder</div><div class="d">Patient receives email and SMS reminder 24 hours before.</div></div>
+          <button class="appt-switch"></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mf split">
+      <button class="btn-svc ghost" id="appt-back" disabled><i data-lucide="arrow-left"></i> Back</button>
+      <button class="btn-svc primary" id="appt-next">Next <i data-lucide="arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+<div class="modal-svc" id="svc-add" hidden>
+  <div class="card">
+    <div class="mh">
+      <button class="close" data-svc-close><i data-lucide="x"></i></button>
+      <h2>Add Service for Sarah Johnson</h2>
+      <div class="sub">Record a new service and payment for this patient.</div>
+    </div>
+    <div class="mb">
+      <div class="field"><label>Service <span class="req">*</span></label><input type="text" placeholder="Search and select a service..."></div>
+      <div class="grid-2">
+        <div class="field"><label>Date of Service <span class="req">*</span></label><input type="text" placeholder="Select date"></div>
+        <div class="field"><label>Practitioner <span class="req">*</span></label><select><option>Select practitioner...</option><option>Dr. Reyes</option><option>Dr. Santos</option><option>Dr. Angela Lim</option><option>Dr. Olivia Bautista (Visiting)</option></select></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Amount Charged <span class="req">*</span></label><input type="text" value="₱4,999"></div>
+        <div class="field"><label>Discount Applied</label><input type="text" placeholder="0"><div class="helper">Enter voucher discount amount if applicable.</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Amount Paid</label><input type="text" value="₱4,999" readonly><div class="helper">Auto-calculated (Charged − Discount).</div></div>
+        <div class="field"><label>Payment Method</label><select><option>Cash</option><option>GCash</option><option>Card</option><option>Online Bank Transfer</option><option selected>Pending</option></select></div>
+      </div>
+      <div class="field"><label>Payment Status</label>
+        <div class="pill-group">
+          <span class="pill-opt"><span class="dot"></span>Paid</span>
+          <span class="pill-opt on pending"><span class="dot"></span>Pending Payment</span>
+          <span class="pill-opt"><span class="dot"></span>Cancelled</span>
+        </div>
+      </div>
+      <div class="field"><label>Clinical Notes <span class="opt">(optional)</span></label><textarea rows="3" placeholder="Add doctor's notes or procedure notes for this service..."></textarea></div>
+    </div>
+    <div class="mf"><button class="btn-svc ghost" data-svc-close>Cancel</button><button class="btn-svc primary"><i data-lucide="save"></i> Save Service</button></div>
+  </div>
+</div>
+
+<div class="modal-svc" id="svc-edit" hidden>
+  <div class="card">
+    <div class="mh">
+      <button class="close" data-svc-close><i data-lucide="x"></i></button>
+      <h2>Edit Service — Glass Skin Microneedling</h2>
+      <div class="sub warn">⚠ This service has not been paid yet. You can edit or delete it.</div>
+    </div>
+    <div class="mb">
+      <div class="field"><label>Service</label><input type="text" value="Glass Skin Microneedling" readonly><div class="read-only-note">Service type cannot be changed after creation.</div></div>
+      <div class="grid-2">
+        <div class="field"><label>Date of Service <span class="req">*</span></label><input type="text" value="May 25, 2026"></div>
+        <div class="field"><label>Practitioner <span class="req">*</span></label><select><option selected>Dr. Reyes</option><option>Dr. Santos</option><option>Dr. Angela Lim</option></select></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Amount Charged</label><input type="text" value="₱4,999"></div>
+        <div class="field"><label>Discount Applied</label><input type="text" value="₱0"></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Amount Paid</label><input type="text" value="₱4,999" readonly></div>
+        <div class="field"><label>Payment Method</label><select><option selected>Pending</option><option>Cash</option><option>GCash</option><option>Card</option></select></div>
+      </div>
+      <div class="field"><label>Payment Status</label>
+        <div class="pill-group"><span class="pill-opt"><span class="dot"></span>Paid</span><span class="pill-opt on pending"><span class="dot"></span>Pending Payment</span><span class="pill-opt"><span class="dot"></span>Cancelled</span></div>
+      </div>
+      <div class="field"><label>Clinical Notes</label><textarea rows="3">Pre-procedure assessment done. Topical anesthesia applied 30 mins before. Patient has no known allergies.</textarea></div>
+    </div>
+    <div class="mf split">
+      <button class="btn-svc danger-outline" data-svc-open="delete"><i data-lucide="trash-2"></i> Delete Service</button>
+      <div style="display:flex;gap:10px;"><button class="btn-svc ghost" data-svc-close>Cancel</button><button class="btn-svc primary"><i data-lucide="save"></i> Save Changes</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-svc" id="svc-delete" hidden>
+  <div class="card small">
+    <div class="mb" style="text-align:center;padding-top:28px;padding-bottom:6px;">
+      <div class="confirm-icon"><i data-lucide="alert-circle"></i></div>
+      <h2 style="font-family:var(--font-display);font-weight:700;font-size:16px;color:#1A2E40;margin:0 0 6px;">Delete this service record?</h2>
+      <p style="font-size:13px;color:#5A7A96;line-height:1.5;margin:0;">You are about to delete <b>Glass Skin Microneedling</b> (May 25, 2026) from Sarah Johnson's service history. This action cannot be undone.</p>
+      <div class="info-red">This service has not been paid. No refund is needed.</div>
+    </div>
+    <div class="mf"><button class="btn-svc ghost" data-svc-close>Cancel</button><button class="btn-svc danger"><i data-lucide="trash-2"></i> Yes, Delete Service</button></div>
+  </div>
+</div>
+
+<div class="modal-svc" id="svc-refund" hidden>
+  <div class="card">
+    <div class="mh">
+      <button class="close" data-svc-close><i data-lucide="x"></i></button>
+      <h2>Cancel Service &amp; Process Refund</h2>
+      <div class="sub">Hydra Facial — Apr 15, 2026</div>
+    </div>
+    <div class="mb">
+      <div class="summary-box">
+        <div class="ln"><span class="k">Service</span><span class="v">Hydra Facial</span></div>
+        <div class="ln"><span class="k">Date</span><span class="v">Apr 15, 2026</span></div>
+        <div class="ln"><span class="k">Practitioner</span><span class="v">Dr. Reyes</span></div>
+        <div class="ln"><span class="k">Amount Paid</span><span class="v">₱2,500</span></div>
+        <div class="ln"><span class="k">Payment Method</span><span class="v">GCash</span></div>
+        <div class="ln"><span class="k">Status</span><span class="v"><span class="badge paid">Paid</span></span></div>
+      </div>
+      <div class="field" style="margin-top:16px;"><label>Cancellation Reason <span class="req">*</span></label><select><option>Select reason...</option><option>Patient Request</option><option>Adverse Reaction</option><option>Procedure Error</option><option>Duplicate Record</option><option>Other</option></select></div>
+      <div class="field"><label>Refund Amount</label><input type="text" value="₱2,500"><div class="helper">You can adjust the refund amount if partial refund applies.</div></div>
+      <div class="field"><label>Refund Method</label>
+        <div class="pill-group">
+          <span class="pill-opt on primary"><i data-lucide="check" style="width:11px;height:11px;"></i> GCash</span>
+          <span class="pill-opt">Cash</span>
+          <span class="pill-opt">Store Credit</span>
+        </div>
+        <div class="helper">Default matches the original payment method.</div>
+      </div>
+      <div class="field"><label>Internal Notes <span class="req">*</span></label><textarea rows="3" placeholder="Reason for cancellation and refund details..."></textarea></div>
+      <div class="warn-box"><i data-lucide="alert-triangle"></i><div>Cancelling a paid service will update the patient's total spend and service history. This action is logged and cannot be undone.</div></div>
+    </div>
+    <div class="mf"><button class="btn-svc ghost" data-svc-close>Cancel</button><button class="btn-svc danger"><i data-lucide="ban"></i> Confirm Cancellation &amp; Refund</button></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+(function () {
+  var tabs = document.querySelectorAll('#tabs button');
+  var panes = document.querySelectorAll('.pane');
+  tabs.forEach(function (b) {
+    b.addEventListener('click', function () {
+      tabs.forEach(function (x) { x.classList.toggle('active', x === b); });
+      var key = b.getAttribute('data-tab');
+      panes.forEach(function (p) { p.classList.toggle('active', p.getAttribute('data-pane') === key); });
+    });
+  });
+  document.querySelectorAll('.chips button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      b.parentElement.querySelectorAll('button').forEach(function (x) { x.classList.toggle('active', x === b); });
+    });
+  });
+
+  // ---------- Service-tab kebab menus + modal wiring ----------
+  function closeAllKebabs() { document.querySelectorAll('.kebab-menu').forEach(function (m) { m.hidden = true; }); }
+  document.querySelectorAll('[data-kebab]').forEach(function (b) {
+    b.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var id = b.getAttribute('data-kebab');
+      var menu = document.getElementById(id);
+      var wasOpen = !menu.hidden;
+      closeAllKebabs();
+      menu.hidden = wasOpen;
+    });
+  });
+  document.addEventListener('click', closeAllKebabs);
+
+  function openSvcModal(name) {
+    var el = document.getElementById('svc-' + name);
+    if (!el) return;
+    closeAllKebabs();
+    document.querySelectorAll('.modal-svc').forEach(function (m) { m.hidden = true; });
+    el.hidden = false;
+    document.body.style.overflow = 'hidden';
+    if (window.lucide) window.lucide.createIcons();
+  }
+  function closeAllSvcModals() {
+    document.querySelectorAll('.modal-svc').forEach(function (m) { m.hidden = true; });
+    document.body.style.overflow = '';
+  }
+  var addBtn = document.getElementById('open-add-svc');
+  if (addBtn) addBtn.addEventListener('click', function () { openSvcModal('add'); });
+  document.querySelectorAll('[data-modal]').forEach(function (b) {
+    b.addEventListener('click', function (e) {
+      e.stopPropagation();
+      openSvcModal(b.getAttribute('data-modal'));
+    });
+  });
+  document.querySelectorAll('[data-svc-close]').forEach(function (b) {
+    b.addEventListener('click', function (e) { e.stopPropagation(); closeAllSvcModals(); });
+  });
+  document.querySelectorAll('[data-svc-open]').forEach(function (b) {
+    b.addEventListener('click', function (e) { e.stopPropagation(); openSvcModal(b.getAttribute('data-svc-open')); });
+  });
+  document.querySelectorAll('.modal-svc').forEach(function (m) {
+    m.addEventListener('click', function (e) { if (e.target === m) closeAllSvcModals(); });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeAllSvcModals();
+  });
+
+  // Pill-group toggle (single-select)
+  document.querySelectorAll('.modal-svc .pill-group').forEach(function (g) {
+    g.querySelectorAll('.pill-opt').forEach(function (p) {
+      p.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var on = p.classList.contains('on');
+        g.querySelectorAll('.pill-opt').forEach(function (x) { x.classList.remove('on', 'paid', 'pending', 'danger', 'primary'); });
+        if (!on) {
+          p.classList.add('on');
+          var txt = p.textContent.trim().toLowerCase();
+          if (txt.indexOf('paid') !== -1) p.classList.add('paid');
+          else if (txt.indexOf('pending') !== -1) p.classList.add('pending');
+          else if (txt.indexOf('cancel') !== -1) p.classList.add('danger');
+          else p.classList.add('primary');
+        }
+      });
+    });
+  });
+
+  // ---------- New Appointment wizard ----------
+  var apptModal = document.getElementById('appt-modal');
+  var apptStep = 1;
+  var apptTotal = 5;
+
+  function renderApptStep() {
+    document.querySelectorAll('.appt-step').forEach(function (s) {
+      var n = parseInt(s.getAttribute('data-step'), 10);
+      if (n === apptStep) s.setAttribute('data-active', ''); else s.removeAttribute('data-active');
+    });
+    document.querySelectorAll('.appt-stepper .ast').forEach(function (st) {
+      var n = parseInt(st.getAttribute('data-st'), 10);
+      st.classList.remove('on', 'done');
+      if (n < apptStep) {
+        st.classList.add('done');
+        st.querySelector('.ix').innerHTML = '<i data-lucide="check" style="width:12px;height:12px;"></i>';
+      } else {
+        st.querySelector('.ix').textContent = n;
+        if (n === apptStep) st.classList.add('on');
+      }
+    });
+    var back = document.getElementById('appt-back');
+    var next = document.getElementById('appt-next');
+    back.disabled = (apptStep === 1);
+    if (apptStep === apptTotal) {
+      next.innerHTML = '<i data-lucide="check"></i> Confirm & Schedule';
+    } else {
+      next.innerHTML = 'Next <i data-lucide="arrow-right"></i>';
+    }
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  var qaBtn = document.getElementById('qa-new-appt');
+  if (qaBtn) {
+    qaBtn.addEventListener('click', function () {
+      apptStep = 1;
+      apptModal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      renderApptStep();
+    });
+  }
+  document.getElementById('appt-back').addEventListener('click', function () {
+    if (apptStep > 1) { apptStep--; renderApptStep(); }
+  });
+  document.getElementById('appt-next').addEventListener('click', function () {
+    if (apptStep < apptTotal) { apptStep++; renderApptStep(); }
+    else { apptModal.hidden = true; document.body.style.overflow = ''; }
+  });
+
+  // Single-select for type cards / svc items / time pills inside the wizard
+  document.querySelectorAll('.appt-step .type-card').forEach(function (c) {
+    c.addEventListener('click', function () {
+      document.querySelectorAll('.type-card').forEach(function (x) { x.classList.remove('on'); });
+      c.classList.add('on');
+    });
+  });
+  document.querySelectorAll('.appt-step .svc-item').forEach(function (it) {
+    it.addEventListener('click', function () {
+      document.querySelectorAll('.svc-item').forEach(function (x) { x.classList.remove('on'); });
+      it.classList.add('on');
+    });
+  });
+  document.querySelectorAll('.time-pills .tpill').forEach(function (p) {
+    p.addEventListener('click', function () {
+      if (p.classList.contains('booked')) return;
+      document.querySelectorAll('.time-pills .tpill').forEach(function (x) { x.classList.remove('on'); });
+      p.classList.add('on');
+    });
+  });
+  document.querySelectorAll('.appt-cal .day').forEach(function (d) {
+    d.addEventListener('click', function () {
+      if (d.classList.contains('muted') || d.classList.contains('booked')) return;
+      document.querySelectorAll('.appt-cal .day').forEach(function (x) { x.classList.remove('sel'); });
+      d.classList.add('sel');
+    });
+  });
+  document.querySelectorAll('.appt-switch').forEach(function (s) {
+    s.addEventListener('click', function () { s.classList.toggle('off'); });
+  });
+
+  // Service filter chips
+  var svcFilter = document.getElementById('svc-filter');
+  if (svcFilter) {
+    svcFilter.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        svcFilter.querySelectorAll('button').forEach(function (x) { x.classList.toggle('active', x === b); });
+        var k = b.getAttribute('data-sf');
+        document.querySelectorAll('#svc-grid .svc-card').forEach(function (c) {
+          var s = c.getAttribute('data-svc-status');
+          c.style.display = (k === 'all' || s === k) ? '' : 'none';
+        });
+      });
+    });
+  }
+
+  // Package filter chips
+  var pkgFilter = document.getElementById('pkg-filter');
+  if (pkgFilter) {
+    pkgFilter.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var k = b.getAttribute('data-pf');
+        document.querySelectorAll('#pkg-grid .pkg-card').forEach(function (c) {
+          var s = c.getAttribute('data-pkg-status');
+          c.style.display = (k === 'all' || s === k) ? '' : 'none';
+        });
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>

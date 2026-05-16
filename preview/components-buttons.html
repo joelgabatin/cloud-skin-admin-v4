@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 32px; background: #fff; display:flex; flex-direction:column; gap: 18px; align-items:flex-start; }
+  .btn { font-family: var(--font-display); font-weight: 600; font-size: 14px; padding: 10px 22px; border-radius: 9999px; border: none; cursor: pointer; text-decoration: none; display: inline-flex; align-items:center; gap: 6px; }
+  .btn-primary-teal { background: #069494; color: #fff; }
+  .btn-primary-teal:hover { background: #047A7A; }
+  .btn-primary-blue { background: #2D6A9F; color: #fff; }
+  .btn-outline-blue { background: transparent; color: #2D6A9F; border: 2px solid #2D6A9F; padding: 8px 20px; }
+  .btn-outline-blue:hover { background: #E8F4FD; }
+  .btn-text-blue { background: transparent; color: #2D6A9F; padding: 6px 10px; }
+  .btn-sm { font-size: 13px; padding: 8px 18px; }
+  .btn-lg { font-size: 15px; padding: 14px 32px; }
+  .row { display:flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .meta { font-family: var(--font-mono); font-size: 11px; color: var(--slate-500); }
+</style>
+</head>
+<body>
+<div class="row">
+  <button class="btn btn-primary-teal btn-lg">Book an Appointment</button>
+  <span class="meta">Primary (marketing) · teal · pill · 14–32px pad</span>
+</div>
+<div class="row">
+  <button class="btn btn-primary-blue">Sign In</button>
+  <button class="btn btn-outline-blue">Contact Us</button>
+  <span class="meta">Primary / Outline (admin) · blue</span>
+</div>
+<div class="row">
+  <button class="btn btn-primary-teal btn-sm">Book Now</button>
+  <button class="btn btn-outline-blue btn-sm">View All Services →</button>
+  <span class="meta">Compact pair · used in cards &amp; rows</span>
+</div>
+<div class="row">
+  <a class="btn btn-text-blue" href="#">View All →</a>
+  <span class="meta">Tertiary text link · "View All" pattern</span>
+</div>
+</body>
+</html>

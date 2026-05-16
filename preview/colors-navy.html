@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 28px 32px; background: #fff; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  .swatch-row { display: flex; align-items: center; gap: 18px; }
+  .swatch { width: 56px; height: 56px; border-radius: 12px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(26,58,92,0.06); }
+  .swatch.border { border: 1px solid var(--tint-200); }
+  .meta { display: flex; flex-direction: column; gap: 2px; }
+  .name { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: var(--navy-800); }
+  .hex { font-family: var(--font-mono); font-size: 12px; color: var(--slate-500); }
+  .use { font-family: var(--font-body); font-size: 12px; color: var(--slate-500); }
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="swatch-row">
+    <div class="swatch" style="background:#152F4A"></div>
+    <div class="meta"><span class="name">Navy 900</span><span class="hex">#152F4A</span><span class="use">Sidebar fill (admin)</span></div>
+  </div>
+  <div class="swatch-row">
+    <div class="swatch" style="background:#1A2E40"></div>
+    <div class="meta"><span class="name">Navy 800</span><span class="hex">#1A2E40</span><span class="use">Primary text on white</span></div>
+  </div>
+  <div class="swatch-row">
+    <div class="swatch" style="background:#1A3A5C"></div>
+    <div class="meta"><span class="name">Navy 700</span><span class="hex">#1A3A5C</span><span class="use">Hero panels, footer, login splash</span></div>
+  </div>
+  <div class="swatch-row">
+    <div class="swatch" style="background:#2D6A9F"></div>
+    <div class="meta"><span class="name">Navy 500 / Primary Blue</span><span class="hex">#2D6A9F</span><span class="use">Admin primary action, link color</span></div>
+  </div>
+  <div class="swatch-row">
+    <div class="swatch" style="background:#5BC0EB"></div>
+    <div class="meta"><span class="name">Navy 400 / Sky</span><span class="hex">#5BC0EB</span><span class="use">Active border, sparkle accent, highlight</span></div>
+  </div>
+</div>
+</body>
+</html>

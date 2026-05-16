@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Manage About Page</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px 96px; display: flex; flex-direction: column; gap: 18px; }
+  .page-hero h1 { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .page-hero .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 4px; }
+
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid #D1E3F3; overflow-x: auto; }
+  .tabs button { background: none; border: none; padding: 12px 18px; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #5A7A96; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; }
+  .tabs button .lucide { width: 14px; height: 14px; opacity: 0.7; }
+  .tabs button:hover { color: #1A2E40; }
+  .tabs button.active { color: #2D6A9F; border-bottom-color: #2D6A9F; }
+  .tabs button.active .lucide { opacity: 1; }
+
+  .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .card + .card { margin-top: 18px; }
+  .pane { display: none; }
+  .pane.active { display: block; }
+
+  .pane-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 18px; }
+  .pane-head h2 { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .pane-head .desc { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-top: 4px; line-height: 1.5; }
+  .pane-section + .pane-section { margin-top: 22px; padding-top: 22px; border-top: 1px solid #E5EFF7; }
+  .pane-section .sec-ttl { font-family: var(--font-display); font-size: 12px; font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+
+  .field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 800px) { .field-grid-2 { grid-template-columns: 1fr; } }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field + .field { margin-top: 18px; }
+  .field-grid-2 .field + .field { margin-top: 0; }
+  .field-label { font-family: var(--font-display); font-weight: 600; font-size: 12.5px; color: #1A2E40; }
+  .field-input, .field-textarea, .field-select { width: 100%; height: 40px; border: 1px solid #D1E3F3; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .field-textarea { height: auto; padding: 10px 12px; resize: vertical; min-height: 120px; line-height: 1.5; }
+  .field-input:focus, .field-textarea:focus, .field-select:focus { border-color: #2D6A9F; }
+
+  .upload-zone { border: 1.5px dashed #BFD8EB; border-radius: 10px; background: #F8FBFD; padding: 22px 16px; text-align: center; cursor: pointer; transition: border-color 120ms, background 120ms; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .upload-zone:hover { border-color: #2D6A9F; background: #EBF6FD; }
+  .upload-zone .ic { width: 44px; height: 44px; border-radius: 50%; background: #EBF6FD; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; }
+  .upload-zone .ic .lucide { width: 20px; height: 20px; }
+  .upload-zone .ttl { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .upload-zone .ttl b { color: #2D6A9F; }
+  .upload-zone .helper { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; }
+  .upload-zone.compact { padding: 14px 12px; }
+  .upload-zone.compact .ic { width: 32px; height: 32px; }
+  .upload-zone.compact .ic .lucide { width: 16px; height: 16px; }
+
+  /* Two-up MV cards */
+  .mv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .mv-grid { grid-template-columns: 1fr; } }
+  .mv-card { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+  .mv-card .label-tag { font-family: var(--font-display); font-weight: 700; font-size: 10.5px; color: #2D6A9F; text-transform: uppercase; letter-spacing: 0.06em; display: inline-block; padding: 3px 8px; background: #EBF6FD; border-radius: 9999px; width: fit-content; }
+  .mv-card.vision .label-tag { color: #7C3AED; background: #EDE9FE; }
+
+  /* Repeatable cards (values, team) */
+  .repeat-list { display: flex; flex-direction: column; gap: 12px; }
+  .repeat-card { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 10px; padding: 14px 16px; display: grid; grid-template-columns: 18px 1fr 32px; gap: 12px; align-items: flex-start; position: relative; }
+  .repeat-card .drag-handle { color: #BFD8EB; cursor: grab; display: inline-flex; align-items: center; justify-content: center; height: 28px; }
+  .repeat-card .drag-handle:hover { color: #2D6A9F; }
+  .repeat-card .drag-handle .lucide { width: 16px; height: 16px; }
+  .repeat-card .body { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .repeat-card .body-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .repeat-card .delete-btn { width: 28px; height: 28px; border-radius: 7px; background: #fff; border: 1px solid #FCA5A5; color: #DC2626; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+  .repeat-card .delete-btn:hover { background: #FEE2E2; }
+  .repeat-card .delete-btn .lucide { width: 14px; height: 14px; }
+
+  .icon-picker { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #D1E3F3; border-radius: 8px; background: #fff; }
+  .icon-picker .plate { width: 34px; height: 34px; border-radius: 8px; background: #EBF6FD; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; }
+  .icon-picker .nm { font-family: var(--font-mono); font-size: 12px; color: #5A7A96; }
+  .icon-picker .change { margin-left: auto; background: none; border: none; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; }
+
+  /* Add button */
+  .add-btn { width: 100%; padding: 10px 16px; border: 1.5px dashed #BFD8EB; background: #F8FBFD; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; }
+  .add-btn:hover { background: #EBF6FD; border-color: #2D6A9F; }
+  .add-btn .lucide { width: 14px; height: 14px; }
+
+  /* Info box */
+  .info-box { background: #F0F6FC; border: 1px solid #BFD8EB; border-radius: 8px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; line-height: 1.5; }
+  .info-box .lucide { width: 15px; height: 15px; color: #2D6A9F; flex-shrink: 0; margin-top: 2px; }
+  .info-box b { color: #1A2E40; font-family: var(--font-display); font-weight: 600; }
+
+  /* Color picker */
+  .color-field { display: flex; align-items: center; gap: 8px; }
+  .color-field input[type="color"] { width: 44px; height: 40px; border: 1px solid #D1E3F3; border-radius: 8px; padding: 4px; background: #fff; cursor: pointer; }
+  .color-field .hex { font-family: var(--font-mono); font-size: 12.5px; color: #5A7A96; }
+
+  /* Toggle switch */
+  .toggle-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid #E5EFF7; border-radius: 10px; background: #fff; }
+  .toggle-row .body { flex: 1; min-width: 0; }
+  .toggle-row .body .nm { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; color: #1A2E40; }
+  .toggle-row .body .d { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 3px; line-height: 1.45; }
+  .switch { width: 40px; height: 22px; border-radius: 9999px; background: #2D6A9F; cursor: pointer; padding: 2px; position: relative; flex-shrink: 0; border: none; transition: background 150ms; }
+  .switch::after { content: ''; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); position: absolute; top: 2px; right: 2px; transition: right 150ms; }
+  .switch.off { background: #D0E8F5; }
+  .switch.off::after { right: 20px; }
+  .when-disabled { transition: opacity 150ms; }
+  .when-disabled.disabled { opacity: 0.45; pointer-events: none; }
+
+  /* Save footer */
+  .save-footer { position: fixed; bottom: 0; left: 260px; right: 0; background: #fff; border-top: 1px solid #D1E3F3; padding: 14px 32px; display: flex; justify-content: space-between; align-items: center; gap: 12px; z-index: 50; }
+  @media (max-width: 980px) { .save-footer { left: 0; } }
+  .save-footer .note { font-family: var(--font-body); font-size: 12px; color: #9BBAD4; }
+  .save-footer .actions { display: flex; gap: 10px; margin-left: auto; }
+  .btn { height: 38px; padding: 0 18px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; text-decoration: none; white-space: nowrap; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-ghost { background: none; color: #5A7A96; }
+  .btn-ghost:hover { background: #F0F6FC; color: #1A2E40; }
+  .btn-primary { background: #2D6A9F; color: #fff; }
+  .btn-primary:hover { background: #1A5685; }
+
+  /* View Live Page button (Manage Website pages) */
+  .view-live-btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px; border: 1px solid #2D6A9F; border-radius: 8px; background: #fff; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; text-decoration: none; transition: background 120ms; }
+  .view-live-btn:hover { background: #F0F6FC; }
+  .view-live-btn .lucide { width: 13px; height: 13px; }
+
+  /* Compact info banner replacing the duplicate page hero */
+  .page-info-banner { background: #F0F6FC; border: 1px solid #D1E3F3; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 12.5px; color: #5A7A96; }
+  .page-info-banner .lucide { width: 15px; height: 15px; color: #5A7A96; flex-shrink: 0; }
+  .page-info-banner b { color: #1A2E40; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Manage About Page</div>
+        <div class="topbar-crumb">Admin / Manage Website / About Page</div>
+      </div>
+      <div class="topbar-actions">
+        <a class="view-live-btn" href="https://cloudskin.com/about" target="_blank" rel="noopener">View Live Page <i data-lucide="external-link"></i></a>
+        
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Manage About Page">
+      <div class="page-info-banner"><i data-lucide="info"></i><span>Changes go live after you click <b>Save Changes</b>.</span></div>
+
+      <div class="tabs" id="tabs">
+        <button class="active" data-tab="hero"><i data-lucide="layout"></i> Page Hero</button>
+        <button data-tab="story"><i data-lucide="book-open"></i> Our Story</button>
+        <button data-tab="mv"><i data-lucide="target"></i> Mission &amp; Vision</button>
+        <button data-tab="values"><i data-lucide="heart"></i> Core Values</button>
+        <button data-tab="team"><i data-lucide="users"></i> Meet the Team</button>
+        <button data-tab="cta"><i data-lucide="zap"></i> CTA Section</button>
+      </div>
+
+      <!-- Tab 1: Page Hero -->
+      <div class="pane active" data-pane="hero">
+        <div class="card">
+          <div class="pane-head"><div><h2>Page Hero</h2><div class="desc">The top-of-page banner shown when visitors land on the About page.</div></div></div>
+          <div class="field"><label class="field-label">Hero Title</label><input class="field-input" value="About Us"></div>
+          <div class="field"><label class="field-label">Hero Subtitle</label><input class="field-input" value="Bringing premium aesthetic care to the heart of Baguio City."></div>
+          <div class="pane-section">
+            <div class="sec-ttl">Hero background image</div>
+            <div class="upload-zone">
+              <div class="ic"><i data-lucide="image-up"></i></div>
+              <div class="ttl"><b>Click to upload</b> or drag &amp; drop</div>
+              <div class="helper">PNG, JPG up to 5MB · Recommended 1920 × 720</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Our Story -->
+      <div class="pane" data-pane="story">
+        <div class="card">
+          <div class="pane-head"><div><h2>Our Story</h2><div class="desc">The clinic's origin story, shown alongside an image on the public page.</div></div></div>
+          <div class="field"><label class="field-label">Section Title</label><input class="field-input" value="Our Story: Born in the Cloud City, Built for Your Skin"></div>
+          <div class="field"><label class="field-label">Story Content</label><textarea class="field-textarea" rows="8">Cloud Skin Clinic + Wellness opened in 2024 with a simple belief: aesthetic medicine should feel as good as it works. Founded by a small team of Baguio-trained dermatologists and wellness practitioners, our clinic blends evidence-based skincare with the calm rhythm of mountain living.
+
+From a single treatment room overlooking Session Road, we have grown into a full-service clinic — but our philosophy has stayed the same. Every client sees a board-certified practitioner, every protocol is grounded in research, and every visit ends with a personalized plan you can actually keep up with.
+
+We are proud to call the Cloud City home, and even prouder to help our community feel confident in the skin they live in.</textarea></div>
+          <div class="pane-section">
+            <div class="sec-ttl">Story image</div>
+            <div class="upload-zone">
+              <div class="ic"><i data-lucide="image-up"></i></div>
+              <div class="ttl"><b>Click to upload</b> or drag &amp; drop</div>
+              <div class="helper">PNG, JPG up to 5MB · Shown alongside the story on the public site</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Mission & Vision -->
+      <div class="pane" data-pane="mv">
+        <div class="card">
+          <div class="pane-head"><div><h2>Mission &amp; Vision</h2><div class="desc">Two side-by-side cards that anchor the page emotionally.</div></div></div>
+          <div class="field"><label class="field-label">Section Title</label><input class="field-input" value="Our Mission &amp; Vision"></div>
+
+          <div class="mv-grid" style="margin-top:18px;">
+            <div class="mv-card mission">
+              <span class="label-tag" id="mission-label">MISSION</span>
+              <div class="field"><label class="field-label">Card Label</label><input class="field-input" value="MISSION" id="mission-label-input"></div>
+              <div class="field"><label class="field-label">Icon</label>
+                <div class="icon-picker"><span class="plate"><i data-lucide="target"></i></span><span class="nm">target</span><button class="change" type="button">Change</button></div>
+              </div>
+              <div class="field"><label class="field-label">Title</label><input class="field-input" value="Empowering Confidence Through Skincare"></div>
+              <div class="field"><label class="field-label">Description</label><textarea class="field-textarea" rows="3">To deliver clinical-grade aesthetic treatments in a warm, transparent environment — so every client leaves more confident than they came in.</textarea></div>
+            </div>
+            <div class="mv-card vision">
+              <span class="label-tag" id="vision-label">VISION</span>
+              <div class="field"><label class="field-label">Card Label</label><input class="field-input" value="VISION" id="vision-label-input"></div>
+              <div class="field"><label class="field-label">Icon</label>
+                <div class="icon-picker"><span class="plate" style="background:#EDE9FE;color:#7C3AED;"><i data-lucide="eye"></i></span><span class="nm">eye</span><button class="change" type="button">Change</button></div>
+              </div>
+              <div class="field"><label class="field-label">Title</label><input class="field-input" value="The Most Trusted Clinic in the Cordillera"></div>
+              <div class="field"><label class="field-label">Description</label><textarea class="field-textarea" rows="3">To be recognized across the Cordillera region as the standard for safe, effective, and deeply personalized aesthetic care.</textarea></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Core Values -->
+      <div class="pane" data-pane="values">
+        <div class="card">
+          <div class="pane-head"><div><h2>Core Values</h2><div class="desc">The principles that guide everything you do — displayed as a grid on the public page.</div></div></div>
+          <div class="field"><label class="field-label">Section Title</label><input class="field-input" value="Our Core Values"></div>
+          <div class="field"><label class="field-label">Section Subtitle</label><input class="field-input" value="The principles that guide everything we do."></div>
+
+          <div class="pane-section">
+            <div class="sec-ttl">Values (drag to reorder)</div>
+            <div class="repeat-list" id="values-list"></div>
+            <button class="add-btn" type="button" data-add="values"><i data-lucide="plus"></i> Add Value</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 5: Meet the Team -->
+      <div class="pane" data-pane="team">
+        <div class="card">
+          <div class="pane-head"><div><h2>Meet the Team</h2><div class="desc">Practitioner cards shown on the public page.</div></div></div>
+
+          <div class="toggle-row" style="margin-bottom:18px;">
+            <div class="body">
+              <div class="nm">Show Meet the Team section</div>
+              <div class="d">When off, this section is hidden from your public About page. Staff records stay safe — you can turn the section back on anytime.</div>
+            </div>
+            <button class="switch" id="team-switch" type="button" aria-label="Toggle team section"></button>
+          </div>
+
+          <div class="when-disabled" id="team-fields">
+            <div class="field"><label class="field-label">Section Title</label><input class="field-input" value="Meet the Team"></div>
+            <div class="field"><label class="field-label">Section Subtitle</label><input class="field-input" value="Our licensed practitioners are here to guide your skin journey."></div>
+
+            <div class="info-box" style="margin-top:14px;">
+              <i data-lucide="info"></i>
+              <div>Photos shown here are pulled from your media library. To manage staff records, schedules, or specialties, go to <b>Staff</b> in the sidebar.</div>
+            </div>
+
+            <div class="pane-section">
+              <div class="sec-ttl">Team members (drag to reorder)</div>
+              <div class="repeat-list" id="team-list"></div>
+              <button class="add-btn" type="button" data-add="team"><i data-lucide="plus"></i> Add Team Member</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 6: CTA Section -->
+      <div class="pane" data-pane="cta">
+        <div class="card">
+          <div class="pane-head"><div><h2>CTA Section</h2><div class="desc">The closing call-to-action block at the bottom of the About page.</div></div></div>
+
+          <div class="toggle-row" style="margin-bottom:18px;">
+            <div class="body">
+              <div class="nm">Show CTA Section</div>
+              <div class="d">When off, this section will be hidden from your About page.</div>
+            </div>
+            <button class="switch" id="cta-switch" type="button" aria-label="Toggle CTA section"></button>
+          </div>
+
+          <div class="when-disabled" id="cta-fields">
+            <div class="field"><label class="field-label">Section Title</label><input class="field-input" value="Ready to Start Your Skin Journey?"></div>
+            <div class="field"><label class="field-label">Section Description</label><textarea class="field-textarea" rows="3">Book a consultation with one of our practitioners and let us craft a treatment plan made for your skin.</textarea></div>
+
+            <div class="field-grid-2" style="margin-top:6px;">
+              <div class="field"><label class="field-label">Primary Button Label</label><input class="field-input" value="Book an Appointment"></div>
+              <div class="field"><label class="field-label">Secondary Button Label</label><input class="field-input" value="Visit Our Clinic"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <div class="save-footer">
+      <span class="note">Unsaved changes apply only after clicking <b style="color:#1A2E40;font-family:var(--font-display);font-weight:600;">Save Changes</b>.</span>
+      <div class="actions">
+        <button class="btn btn-ghost" type="button">Cancel</button>
+        <button class="btn btn-primary" type="button"><i data-lucide="save"></i> Save Changes</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+
+<script>
+(function () {
+  // Tab switching
+  var tabs = document.querySelectorAll('#tabs button');
+  var panes = document.querySelectorAll('.pane');
+  function activate(name) {
+    tabs.forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tab') === name); });
+    panes.forEach(function (p) { p.classList.toggle('active', p.getAttribute('data-pane') === name); });
+    var url = new URL(location.href);
+    if (name === 'hero') url.searchParams.delete('tab'); else url.searchParams.set('tab', name);
+    history.replaceState({}, '', url);
+  }
+  tabs.forEach(function (b) { b.addEventListener('click', function () { activate(b.getAttribute('data-tab')); }); });
+  activate((new URLSearchParams(location.search)).get('tab') || 'hero');
+
+  // Repeatable card factory
+  function makeCard(bodyHtml) {
+    var card = document.createElement('div');
+    card.className = 'repeat-card';
+    card.innerHTML =
+      '<div class="drag-handle" title="Drag to reorder"><i data-lucide="grip-vertical"></i></div>'
+      + '<div class="body">' + bodyHtml + '</div>'
+      + '<button class="delete-btn" type="button" title="Remove"><i data-lucide="x"></i></button>';
+    card.querySelector('.delete-btn').addEventListener('click', function () { card.remove(); });
+    return card;
+  }
+  function iconPicker(ico) {
+    return '<div class="icon-picker"><span class="plate"><i data-lucide="' + ico + '"></i></span><span class="nm">' + ico + '</span><button class="change" type="button">Change</button></div>';
+  }
+  function uploadZone(label) {
+    return '<div class="upload-zone compact">'
+      + '<div class="ic"><i data-lucide="image-up"></i></div>'
+      + '<div class="ttl"><b>Click to upload</b> ' + (label || 'photo') + '</div>'
+      + '<div class="helper">PNG, JPG up to 5MB · Recommended 600 × 600</div>'
+      + '</div>';
+  }
+
+  // Core values
+  var VALUES = [
+    { ico:'user-check',   label:'Client-First' },
+    { ico:'shield-check', label:'Safety' },
+    { ico:'sparkles',     label:'Excellence' },
+    { ico:'heart',        label:'Compassion' },
+    { ico:'eye',          label:'Transparency' },
+    { ico:'leaf',         label:'Holistic Wellness' }
+  ];
+  function renderValue(v) {
+    var body = ''
+      + '<div class="body-row">'
+        + '<div class="field"><label class="field-label">Icon</label>' + iconPicker(v.ico) + '</div>'
+        + '<div class="field"><label class="field-label">Value Label</label><input class="field-input" value="' + v.label + '"></div>'
+      + '</div>';
+    return makeCard(body);
+  }
+
+  // Team
+  var TEAM = [
+    { name:'Dr. Dakota Ross Albon', role:'Medical Director & Lead Dermatologist' },
+    { name:'Dr. Maria Santos',      role:'Aesthetic Practitioner' },
+    { name:'Dr. Joel Reyes',        role:'Wellness Practitioner & Nutrition Lead' }
+  ];
+  function renderTeam(t) {
+    var body = ''
+      + '<div class="body-row">'
+        + '<div class="field"><label class="field-label">Photo</label>' + uploadZone() + '</div>'
+        + '<div style="display:flex;flex-direction:column;gap:12px;">'
+          + '<div class="field"><label class="field-label">Full Name</label><input class="field-input" value="' + t.name + '"></div>'
+          + '<div class="field"><label class="field-label">Designation / Role</label><input class="field-input" value="' + t.role + '"></div>'
+        + '</div>'
+      + '</div>';
+    return makeCard(body);
+  }
+
+  // Populate
+  VALUES.forEach(function (v) { document.getElementById('values-list').appendChild(renderValue(v)); });
+  TEAM.forEach(function (t) { document.getElementById('team-list').appendChild(renderTeam(t)); });
+
+  // Add buttons
+  document.querySelectorAll('[data-add]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-add');
+      var list = document.getElementById(key + '-list');
+      var card;
+      if (key === 'values') card = renderValue({ ico:'star', label:'New Value' });
+      else if (key === 'team') card = renderTeam({ name:'New Member', role:'Role / Designation' });
+      if (card) {
+        list.appendChild(card);
+        if (window.lucide) window.lucide.createIcons();
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
+  });
+
+  // Live preview of MV card label tags as user types
+  function wireLabel(inputId, displayId) {
+    var inp = document.getElementById(inputId), out = document.getElementById(displayId);
+    if (!inp || !out) return;
+    inp.addEventListener('input', function () { out.textContent = inp.value || ''; });
+  }
+  wireLabel('mission-label-input', 'mission-label');
+  wireLabel('vision-label-input', 'vision-label');
+
+  // Color picker hex preview
+  var ci = document.getElementById('cta-color-input'), ch = document.getElementById('cta-color-hex');
+  if (ci && ch) ci.addEventListener('input', function () { ch.textContent = ci.value.toUpperCase(); });
+
+  // Show/hide toggles (Meet the Team + CTA Section)
+  function wireToggle(switchEl, fieldsEl, defaultOn) {
+    if (!switchEl || !fieldsEl) return;
+    var on = defaultOn;
+    function paint() {
+      switchEl.classList.toggle('off', !on);
+      fieldsEl.classList.toggle('disabled', !on);
+    }
+    switchEl.addEventListener('click', function () { on = !on; paint(); });
+    paint();
+  }
+  wireToggle(document.getElementById('team-switch'), document.getElementById('team-fields'), true);
+  wireToggle(document.getElementById('cta-switch'), document.getElementById('cta-fields'), true);
+
+  if (window.lucide) window.lucide.createIcons();
+})();
+</script>
+</body>
+</html>

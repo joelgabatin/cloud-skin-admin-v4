@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Visiting Specialists</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* ============ STATS ============ */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media (max-width: 980px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat { background: #fff; border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; flex-direction: column; gap: 4px; }
+  .stat.blue { background: #2D6A9F; color: #fff; }
+  .stat.navy { background: #152F4A; color: #fff; }
+  .stat .lbl { font-family: var(--font-display); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #5A7A96; }
+  .stat.blue .lbl, .stat.navy .lbl { color: rgba(255,255,255,0.75); }
+  .stat .val { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; }
+  .stat.blue .val, .stat.navy .val { color: #fff; }
+  .stat .ico { color: #2D6A9F; }
+  .stat.blue .ico, .stat.navy .ico { color: #B8D4EC; }
+  .stat .row { display: flex; align-items: center; justify-content: space-between; }
+
+  /* ============ TOOLBAR ============ */
+  .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; position: relative; }
+  .search-input { position: relative; width: 320px; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; pointer-events: none; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .filter-btn { height: 38px; padding: 0 14px; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; display: inline-flex; align-items: center; gap: 6px; }
+  .filter-btn .lucide { width: 14px; height: 14px; color: #5A7A96; }
+  .filter-menu { position: absolute; top: 44px; background: #fff; border: 1px solid #D0E8F5; border-radius: 8px; box-shadow: 0 4px 12px rgba(26,58,92,0.15); min-width: 220px; padding: 6px 0; display: none; z-index: 60; }
+  .filter-menu.open { display: block; }
+  .filter-menu button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 14px; background: none; border: none; cursor: pointer; font-family: var(--font-body); font-size: 13px; color: #1A2E40; text-align: left; }
+  .filter-menu button:hover { background: #F0F6FC; }
+  .filter-menu button.checked { color: #2D6A9F; font-weight: 600; }
+  .filter-menu button.checked::before { content: '✓'; }
+  .filter-menu button:not(.checked)::before { content: ''; width: 8px; }
+  .btn-primary { height: 40px; padding: 0 18px; background: #2D6A9F; border: none; border-radius: 8px; color: #fff; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; margin-left: auto; text-decoration: none; }
+  .btn-primary .lucide { width: 14px; height: 14px; }
+
+  /* ============ TABLE ============ */
+  .section-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .table-wrap { overflow: visible; }
+  table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+  th { padding: 10px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 12px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr.row:hover td { background: #F8FBFF; }
+  tr.row:last-child td { border-bottom: none; }
+  .name-cell { display: flex; align-items: center; gap: 10px; }
+  .avatar-sm { width: 36px; height: 36px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 12px; flex-shrink: 0; letter-spacing: 0.02em; }
+  .sname { font-size: 13px; font-weight: 600; color: #1A2E40; font-family: var(--font-display); }
+  .ssub { font-size: 11.5px; color: #9BBAD4; }
+  .spec { font-size: 13px; color: #1A2E40; font-weight: 500; }
+  .mono { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 12.5px; color: #1A2E40; letter-spacing: 0.02em; }
+  .status-badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .st-active { background: #DCFCE7; color: #15803D; }
+  .st-inactive { background: #F1F5F9; color: #6B7280; }
+  .actions { display: inline-flex; align-items: center; gap: 6px; }
+  .action-btn { width: 28px; height: 28px; background: #EFF6FF; border: 1px solid #BAD4EC; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #2D6A9F; text-decoration: none; }
+  .action-btn:hover { background: #DBEAFE; }
+  .action-btn .lucide { width: 13px; height: 13px; }
+.vs-actions-cell { position: relative; display: inline-flex; gap: 4px; align-items: center; }
+.vs-eye, .vs-menu-trigger { width: 28px; height: 28px; background: #F0F6FC; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #5A7A96; border-radius: 6px; text-decoration: none; }
+.vs-eye:hover, .vs-menu-trigger:hover { background: #E3EEF8; color: #2D6A9F; }
+.vs-eye .lucide, .vs-menu-trigger .lucide { width: 13px; height: 13px; }
+.vs-menu { position: absolute; top: calc(100% + 4px); right: 0; min-width: 160px; background: #fff; border-radius: 8px; box-shadow: 0 6px 18px rgba(26,58,92,0.18); padding: 8px 0; z-index: 50; display: none; }
+.vs-menu.open { display: block; }
+.vs-menu button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 0 12px; height: 32px; background: none; border: none; cursor: pointer; font-family: var(--font-display); font-weight: 500; font-size: 14px; text-align: left; color: #1A2E40; }
+.vs-menu button:hover { background: #F8F9FA; }
+.vs-menu button .lucide { width: 14px; height: 14px; }
+.vs-menu .divider { height: 1px; background: #F0F6FC; margin: 4px 0; }
+.vs-menu .delete-btn { color: #DC2626; }
+.vs-menu .delete-btn .lucide { color: #DC2626; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Visiting Specialists</div>
+        <div class="topbar-crumb">Admin / Staff / Visiting Specialists</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Visiting Specialists">
+
+      <div class="stats">
+        <div class="stat blue">
+          <div class="row"><span class="lbl">Active Specialists</span><span class="ico"><i data-lucide="user-check"></i></span></div>
+          <div class="val">2</div>
+        </div>
+        <div class="stat">
+          <div class="row"><span class="lbl">Inactive Specialists</span><span class="ico"><i data-lucide="user-x"></i></span></div>
+          <div class="val">1</div>
+        </div>
+        <div class="stat navy">
+          <div class="row"><span class="lbl">Total Specialists</span><span class="ico"><i data-lucide="users"></i></span></div>
+          <div class="val">3</div>
+        </div>
+        <div class="stat">
+          <div class="row"><span class="lbl">Next Visit Scheduled</span><span class="ico"><i data-lucide="calendar-check"></i></span></div>
+          <div class="val" style="font-size:20px;">May 20, 2026</div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-input"><i data-lucide="search"></i><input id="search" type="text" placeholder="Search by name or specialty..."></div>
+        <a class="btn-primary" href="staff-visiting-new.html"><i data-lucide="plus"></i> Add Visiting Specialist</a>
+      </div>
+
+      <div class="section-card">
+        <div class="table-wrap">
+          <table>
+            <style>
+              th.vs-sortable { cursor: pointer; user-select: none; }
+              th.vs-sortable:hover { color: #2D6A9F; }
+              th.vs-sortable .arrow { display: inline-block; margin-left: 4px; color: #CBD5E1; font-size: 11px; }
+              th.vs-sortable.sorted { color: #2D6A9F; }
+              th.vs-sortable.sorted .arrow { color: #2D6A9F; }
+            </style>
+            <thead>
+              <tr>
+                <th class="vs-sortable sorted" data-vs="name"><span>Specialist Name</span><span class="arrow">↑</span></th>
+                <th class="vs-sortable" data-vs="specialty"><span>Specialty</span><span class="arrow">↕</span></th>
+                <th class="vs-sortable" data-vs="prc"><span>PRC License No.</span><span class="arrow">↕</span></th>
+                <th class="vs-sortable" data-vs="contact"><span>Contact</span><span class="arrow">↕</span></th>
+                <th class="vs-sortable" data-vs="visit"><span>Scheduled Visits</span><span class="arrow">↕</span></th>
+                <th class="vs-sortable" data-vs="status"><span>Status</span><span class="arrow">↕</span></th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rows">
+              <tr class="row" data-spec="OB-Gyne" data-name="Olivia Bautista">
+                <td><div class="name-cell"><div class="avatar-sm" style="background:#0F766E">OB</div><div><div class="sname">Dr. Olivia Bautista</div><div class="ssub">olivia.bautista@gmail.com</div></div></div></td>
+                <td><span class="spec">OB-Gyne / Aesthetic Gynecologist</span></td>
+                <td><span class="mono">0123456</span></td>
+                <td>0917-456-7890</td>
+                <td>May 20, 2026</td>
+                <td><span class="status-badge st-active">Active</span></td>
+                <td><div class="vs-actions-cell"><a class="vs-eye" href="staff-visiting-profile.html?id=VS001"><i data-lucide="eye"></i></a><button class="vs-menu-trigger"><i data-lucide="more-vertical"></i></button><div class="vs-menu"><button data-vs-act="toggle"><i data-lucide="toggle-right"></i> Toggle Status</button><div class="divider"></div><button class="delete-btn" data-vs-act="delete"><i data-lucide="trash-2"></i> Delete</button></div></div></td>
+              </tr>
+              <tr class="row" data-spec="Surgeon" data-name="Ramon Mercado">
+                <td><div class="name-cell"><div class="avatar-sm" style="background:#2563EB">RM</div><div><div class="sname">Dr. Ramon Mercado</div><div class="ssub">ramon.mercado@gmail.com</div></div></div></td>
+                <td><span class="spec">Aesthetic Surgeon</span></td>
+                <td><span class="mono">0987654</span></td>
+                <td>0918-234-5678</td>
+                <td>Jun 5, 2026</td>
+                <td><span class="status-badge st-active">Active</span></td>
+                <td><div class="vs-actions-cell"><a class="vs-eye" href="staff-visiting-profile.html?id=VS002"><i data-lucide="eye"></i></a><button class="vs-menu-trigger"><i data-lucide="more-vertical"></i></button><div class="vs-menu"><button data-vs-act="toggle"><i data-lucide="toggle-right"></i> Toggle Status</button><div class="divider"></div><button class="delete-btn" data-vs-act="delete"><i data-lucide="trash-2"></i> Delete</button></div></div></td>
+              </tr>
+              <tr class="row" data-spec="Dermatologist" data-name="Lara Cruz">
+                <td><div class="name-cell"><div class="avatar-sm" style="background:#7C3AED">LC</div><div><div class="sname">Dr. Lara Cruz</div><div class="ssub">lara.cruz@gmail.com</div></div></div></td>
+                <td><span class="spec">Dermatologist</span></td>
+                <td><span class="mono">0456789</span></td>
+                <td>0919-876-5432</td>
+                <td style="color:#9BBAD4;">—</td>
+                <td><span class="status-badge st-inactive">Inactive</span></td>
+                <td><div class="vs-actions-cell"><a class="vs-eye" href="staff-visiting-profile.html?id=VS003"><i data-lucide="eye"></i></a><button class="vs-menu-trigger"><i data-lucide="more-vertical"></i></button><div class="vs-menu"><button data-vs-act="toggle"><i data-lucide="toggle-right"></i> Toggle Status</button><div class="divider"></div><button class="delete-btn" data-vs-act="delete"><i data-lucide="trash-2"></i> Delete</button></div></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="_sidebar.js"></script>
+<script>
+  // Search
+  var search = document.getElementById('search');
+  var rows = document.querySelectorAll('#rows tr.row');
+  var specFilter = '';
+  function applyFilters() {
+    var q = (search.value || '').toLowerCase();
+    rows.forEach(function (r) {
+      var name = (r.dataset.name || '').toLowerCase();
+      var spec = r.querySelector('.spec').textContent.toLowerCase();
+      var sp = r.dataset.spec || '';
+      var matchesQ = !q || name.indexOf(q) !== -1 || spec.indexOf(q) !== -1;
+      var matchesS = !specFilter || sp === specFilter;
+      r.style.display = (matchesQ && matchesS) ? '' : 'none';
+    });
+  }
+  search.addEventListener('input', applyFilters);
+
+  // Filter dropdown
+  var fb = document.getElementById('filter-btn');
+  var fm = document.getElementById('filter-menu');
+  var fv = document.getElementById('filter-val');
+  fb.addEventListener('click', function (e) { e.stopPropagation(); fm.classList.toggle('open'); });
+  document.addEventListener('click', function () { fm.classList.remove('open'); });
+  fm.addEventListener('click', function (e) { e.stopPropagation(); });
+  fm.querySelectorAll('button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      fm.querySelectorAll('button').forEach(function (x) { x.classList.toggle('checked', x === b); });
+      specFilter = b.getAttribute('data-v');
+      fv.textContent = specFilter || 'All';
+      fm.classList.remove('open');
+      applyFilters();
+    });
+  });
+
+  lucide.createIcons();
+</script>
+<script id="vs-inline-sort">
+(function(){
+  var s={col:"name",dir:"asc"};
+  function cell(r,c){var i={name:0,specialty:1,prc:2,contact:3,visit:4,status:5}[c];return r.children[i]?r.children[i].textContent.trim():"";}
+  function apply(){var tb=document.getElementById("rows");if(!tb)return;var rs=Array.from(tb.querySelectorAll("tr"));rs.sort(function(a,b){var av=cell(a,s.col),bv=cell(b,s.col);return s.dir==="asc"?av.localeCompare(bv):bv.localeCompare(av);});rs.forEach(function(r){tb.appendChild(r);});}
+  document.querySelectorAll("th.vs-sortable").forEach(function(th){th.addEventListener("click",function(){var c=th.getAttribute("data-vs");if(s.col===c)s.dir=s.dir==="asc"?"desc":"asc";else{s.col=c;s.dir="asc";}document.querySelectorAll("th.vs-sortable").forEach(function(h){var hc=h.getAttribute("data-vs"),is=hc===s.col;h.classList.toggle("sorted",is);var a=h.querySelector(".arrow");if(a)a.textContent=is?(s.dir==="asc"?"\u2191":"\u2193"):"\u2195";});apply();});});
+})();
+</script>
+<script>
+(function(){
+  document.querySelectorAll(".vs-menu-trigger").forEach(function(b){ b.addEventListener("click", function(e){ e.stopPropagation(); document.querySelectorAll(".vs-menu.open").forEach(function(m){ if (m!==b.nextElementSibling) m.classList.remove("open"); }); b.nextElementSibling.classList.toggle("open"); }); });
+  document.addEventListener("click", function(){ document.querySelectorAll(".vs-menu.open").forEach(function(m){ m.classList.remove("open"); }); });
+  document.querySelectorAll("[data-vs-act]").forEach(function(b){ b.addEventListener("click", function(e){ e.stopPropagation(); var row=b.closest("tr"); var act=b.getAttribute("data-vs-act"); var statusCell=row && row.querySelector(".status-badge, .st-active, .st-inactive"); var name=(row.querySelector(".sname")||{}).textContent||"this specialist"; if (act==="toggle") { if (statusCell) { var s=(statusCell.textContent||"").trim().toLowerCase(); if (s==="active") { statusCell.textContent="Inactive"; statusCell.className="status-badge st-inactive"; statusCell.style.background="#FEF3C7"; statusCell.style.color="#B45309"; } else if (s==="inactive") { statusCell.textContent="Active"; statusCell.className="status-badge st-active"; statusCell.style.background="#DCFCE7"; statusCell.style.color="#15803D"; } } } else if (act==="delete") { if (confirm("Delete "+name+" permanently?")) row.remove(); } b.closest(".vs-menu").classList.remove("open"); }); });
+  if (window.lucide) window.lucide.createIcons();
+})();
+</script>
+</body>
+</html>

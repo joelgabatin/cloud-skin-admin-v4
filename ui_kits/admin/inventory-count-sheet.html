@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Count Sheet CNT-0012</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+* { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .page-hero h1 { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .page-hero .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 4px; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .stat-card { background: #fff; border-radius: 10px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; flex-direction: column; gap: 8px; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-card .label { font-size: 12px; color: #5A7A96; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #2D6A9F; display: flex; align-items: center; justify-content: center; }
+  .stat-card .iplate.success { background: #DCFCE7; color: #15803D; }
+  .stat-card .iplate.warning { background: #FEF3C7; color: #B45309; }
+  .stat-card .iplate.danger { background: #FEE2E2; color: #DC2626; }
+  .stat-card .iplate.info { background: #DBEAFE; color: #1D4ED8; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 26px; line-height: 1.1; color: #1A2E40; }
+  .stat-card .sub { font-size: 12px; color: #5A7A96; }
+  .btn { height: 40px; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; text-decoration: none; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-outline { background: #F0F6FC; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-outline.danger { color: #DC2626; border-color: #FCA5A5; background: #FFF; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 18px; }
+  .btn-primary:hover { background: #1A5685; }
+  .btn-primary:disabled { background: #9BBAD4; cursor: not-allowed; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .badge.success { background: #DCFCE7; color: #15803D; }
+  .badge.warning { background: #FEF3C7; color: #B45309; }
+  .badge.danger  { background: #FEE2E2; color: #DC2626; }
+  .badge.info    { background: #DBEAFE; color: #1D4ED8; }
+  .badge.slate   { background: #F1F5F9; color: #475569; }
+  .badge.violet  { background: #F3E8FF; color: #6D28D9; }
+  .section-card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 12px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .nm { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .sku { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; font-weight: 600; }
+  .mono { font-family: var(--font-mono); font-size: 12px; color: #9BBAD4; }
+  .price { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .action-btn { width: 32px; height: 32px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #2D6A9F; margin-right: 4px; }
+  .action-btn.success { background: #DCFCE7; color: #15803D; }
+  .action-btn .lucide { width: 14px; height: 14px; }
+  .search-input { position: relative; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; box-sizing: border-box; }
+  .field-input, .field-select { width: 100%; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; box-sizing: border-box; height: 40px; }
+  .field-textarea { width: 100%; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 10px 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; resize: vertical; min-height: 64px; background: #fff; box-sizing: border-box; }
+  .field-label { display: block; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; }
+  .back-link { background: none; border: none; cursor: pointer; color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; padding: 0; text-decoration: none; }
+  .pagebar-progress { background: #fff; border-radius: 10px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+  .pagebar-progress .meta { display: flex; gap: 18px; font-family: var(--font-body); font-size: 13px; color: #5A7A96; flex-wrap: wrap; }
+  .pagebar-progress .meta strong { font-family: var(--font-display); color: #1A2E40; font-weight: 700; margin-right: 4px; }
+  .pagebar-progress .bar { grid-column: 1 / -1; height: 6px; background: #F0F6FC; border-radius: 9999px; overflow: hidden; }
+  .pagebar-progress .bar > div { height: 100%; background: linear-gradient(90deg, #2D6A9F, #5BC0EB); border-radius: 9999px; }
+  .topbar-actions .user-pill .meta { display: flex; flex-direction: column; }
+
+  .sticky-actions { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #D0E8F5; box-shadow: 0 -2px 8px rgba(26,58,92,0.06); padding: 14px 24px; display: flex; justify-content: flex-end; gap: 10px; z-index: 5; }
+  .count-meta { display: flex; gap: 18px; flex-wrap: wrap; }
+  .count-meta .item { display: flex; flex-direction: column; }
+  .count-meta .k { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.04em; }
+  .count-meta .v { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #1A2E40; margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Count Sheet — CNT-0012</div>
+        <div class="topbar-crumb">Admin / Inventory / Physical Count / CNT-0012</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+    <section class="page" data-screen-label="01 Count Sheet">
+      <a class="back-link" href="inventory-physical-count.html"><i data-lucide="arrow-left" style="width:14px;height:14px"></i> Back to Sessions</a>
+
+      <div class="pagebar-progress">
+        <div class="count-meta">
+          <div class="item"><span class="k">Session</span><span class="v">Full Inventory Count — May 13, 2026</span></div>
+          <div class="item"><span class="k">Assigned To</span><span class="v">A. Cruz</span></div>
+          <div class="item"><span class="k">Started</span><span class="v">May 13, 2026 · 09:14</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:18px;">
+          <div style="text-align:right;">
+            <div style="font-family:var(--font-display);font-size:11px;color:#5A7A96;text-transform:uppercase;letter-spacing:0.04em;">Progress</div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:22px;color:#1A2E40;">34 / 60 items counted</div>
+          </div>
+        </div>
+        <div class="bar"><div style="width:57%;"></div></div>
+      </div>
+
+      <div class="section-card">
+        <div style="padding:16px 20px;border-bottom:1px solid #D0E8F5;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div class="search-input" style="flex:1;max-width:340px;"><i data-lucide="search"></i><input placeholder="Quickly jump to a product or SKU..."></div>
+          <select class="field-select" style="max-width:170px;"><option>All categories</option><option>Serum</option><option>Cream</option><option>Sunscreen</option><option>Injectable</option><option>Treatment</option><option>Supplies</option></select>
+          <select class="field-select" style="max-width:160px;"><option>All items</option><option>Counted</option><option>Pending</option><option>Variance only</option></select>
+          <span style="margin-left:auto;font-family:var(--font-body);font-size:12px;color:#9BBAD4;">Tip: Tab between rows to count quickly</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="min-width:1000px;">
+            <thead><tr><th>#</th><th>Product Name</th><th>SKU</th><th>Category</th><th>System Qty</th><th>Physical Qty</th><th>Variance</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="mono" style="color:#5A7A96;">1</span></td>
+                <td><span class="nm">Hyaluronic Acid Serum</span></td>
+                <td><span class="sku">SKIN-001</span></td>
+                <td><span class="badge slate">Serum</span></td>
+                <td><span class="mono" style="color:#5A7A96;font-size:13px;">450</span></td>
+                <td><input type="number" value="450" placeholder="—" style="width:90px;height:36px;border:1.5px solid #D0E8F5;border-radius:6px;padding:0 10px;font-family:var(--font-mono);font-size:13px;color:#1A2E40;outline:none;background:#fff;text-align:center;font-weight:600;"></td>
+                <td><span style="color:#9BBAD4;font-family:var(--font-mono);">0</span></td>
+                <td><span style="color:#15803D;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="check-circle" style="width:14px;height:14px;"></i>Counted</span></td>
+              </tr>
+              <tr>
+                <td><span class="mono" style="color:#5A7A96;">2</span></td>
+                <td><span class="nm">Retinol Cream</span></td>
+                <td><span class="sku">SKIN-002</span></td>
+                <td><span class="badge slate">Cream</span></td>
+                <td><span class="mono" style="color:#5A7A96;font-size:13px;">85</span></td>
+                <td><input type="number" value="83" placeholder="—" style="width:90px;height:36px;border:1.5px solid #D0E8F5;border-radius:6px;padding:0 10px;font-family:var(--font-mono);font-size:13px;color:#1A2E40;outline:none;background:#fff;text-align:center;font-weight:600;"></td>
+                <td><span style="color:#DC2626;font-family:var(--font-display);font-weight:700;display:inline-flex;align-items:center;gap:2px;"><i data-lucide="arrow-down" style="width:12px;height:12px;"></i>-2</span></td>
+                <td><span style="color:#15803D;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="check-circle" style="width:14px;height:14px;"></i>Counted</span></td>
+              </tr>
+              <tr>
+                <td><span class="mono" style="color:#5A7A96;">3</span></td>
+                <td><span class="nm">Vitamin C Serum</span></td>
+                <td><span class="sku">SKIN-003</span></td>
+                <td><span class="badge slate">Serum</span></td>
+                <td><span class="mono" style="color:#5A7A96;font-size:13px;">320</span></td>
+                <td><input type="number" value="320" placeholder="—" style="width:90px;height:36px;border:1.5px solid #D0E8F5;border-radius:6px;padding:0 10px;font-family:var(--font-mono);font-size:13px;color:#1A2E40;outline:none;background:#fff;text-align:center;font-weight:600;"></td>
+                <td><span style="color:#9BBAD4;font-family:var(--font-mono);">0</span></td>
+                <td><span style="color:#15803D;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="check-circle" style="width:14px;height:14px;"></i>Counted</span></td>
+              </tr>
+              <tr>
+                <td><span class="mono" style="color:#5A7A96;">4</span></td>
+                <td><span class="nm">SPF 50 Sunscreen</span></td>
+                <td><span class="sku">SKIN-004</span></td>
+                <td><span class="badge slate">Sunscreen</span></td>
+                <td><span class="mono" style="color:#5A7A96;font-size:13px;">62</span></td>
+                <td><input type="number" value="65" placeholder="—" style="width:90px;height:36px;border:1.5px solid #D0E8F5;border-radius:6px;padding:0 10px;font-family:var(--font-mono);font-size:13px;color:#1A2E40;outline:none;background:#fff;text-align:center;font-weight:600;"></td>
+                <td><span style="color:#15803D;font-family:var(--font-display);font-weight:700;display:inline-flex;align-items:center;gap:2px;"><i data-lucide="arrow-up" style="width:12px;height:12px;"></i>+3</span></td>
+                <td><span style="color:#15803D;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="check-circle" style="width:14px;height:14px;"></i>Counted</span></td>
+              </tr>
+              <tr>
+                <td><span class="mono" style="color:#5A7A96;">5</span></td>
+                <td><span class="nm">Botox (50u)</span></td>
+                <td><span class="sku">INJ-001</span></td>
+                <td><span class="badge slate">Injectable</span></td>
+                <td><span class="mono" style="color:#5A7A96;font-size:13px;">8</span></td>
+                <td><input type="number" value="null" placeholder="—" style="width:90px;height:36px;border:2px solid #2D6A9F;border-radius:6px;padding:0 10px;font-family:var(--font-mono);font-size:13px;color:#1A2E40;outline:none;background:#EBF6FD;text-align:center;font-weight:700;"></td>
+                <td><span style="color:#9BBAD4;font-family:var(--font-mono);">—</span></td>
+                <td><span style="color:#2D6A9F;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="edit-3" style="width:14px;height:14px;"></i>Counting</span></td>
+              </tr>
+              <tr>
+                <td><span class="mono" style="color:#5A7A96;">6</span></td>
+                <td><span class="nm">Filler (1mL)</span></td>
+                <td><span class="sku">INJ-002</span></td>
+                <td><span class="badge slate">Injectable</span></td>
+                <td><span class="mono" style="color:#5A7A96;font-size:13px;">15</span></td>
+                <td><input type="number"  placeholder="—" style="width:90px;height:36px;border:1.5px solid #D0E8F5;border-radius:6px;padding:0 10px;font-family:var(--font-mono);font-size:13px;color:#9BBAD4;outline:none;background:#F8FBFF;text-align:center;"></td>
+                <td><span style="color:#9BBAD4;font-family:var(--font-mono);">—</span></td>
+                <td><span style="color:#9BBAD4;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="minus" style="width:14px;height:14px;"></i>Pending</span></td>
+              </tr>
+              <tr>
+                <td><span class="mono" style="color:#5A7A96;">7</span></td>
+                <td><span class="nm">Chemical Peel Solution</span></td>
+                <td><span class="sku">TREAT-001</span></td>
+                <td><span class="badge slate">Treatment</span></td>
+                <td><span class="mono" style="color:#5A7A96;font-size:13px;">30</span></td>
+                <td><input type="number"  placeholder="—" style="width:90px;height:36px;border:1.5px solid #D0E8F5;border-radius:6px;padding:0 10px;font-family:var(--font-mono);font-size:13px;color:#9BBAD4;outline:none;background:#F8FBFF;text-align:center;"></td>
+                <td><span style="color:#9BBAD4;font-family:var(--font-mono);">—</span></td>
+                <td><span style="color:#9BBAD4;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="minus" style="width:14px;height:14px;"></i>Pending</span></td>
+              </tr>
+              <tr>
+                <td><span class="mono" style="color:#5A7A96;">8</span></td>
+                <td><span class="nm">Needles (Box 100)</span></td>
+                <td><span class="sku">NEEDLE-001</span></td>
+                <td><span class="badge slate">Supplies</span></td>
+                <td><span class="mono" style="color:#5A7A96;font-size:13px;">3</span></td>
+                <td><input type="number"  placeholder="—" style="width:90px;height:36px;border:1.5px solid #D0E8F5;border-radius:6px;padding:0 10px;font-family:var(--font-mono);font-size:13px;color:#9BBAD4;outline:none;background:#F8FBFF;text-align:center;"></td>
+                <td><span style="color:#9BBAD4;font-family:var(--font-mono);">—</span></td>
+                <td><span style="color:#9BBAD4;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="minus" style="width:14px;height:14px;"></i>Pending</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sticky-actions">
+        <button class="btn btn-outline" type="button"><i data-lucide="save"></i> Save Progress</button>
+        <button class="btn btn-primary" disabled title="All items must be counted before submitting"><i data-lucide="send"></i> Submit for Review</button>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

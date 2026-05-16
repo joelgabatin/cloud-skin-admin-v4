@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Purchase Order — PO-2026-0045</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+* { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .page-hero h1 { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .page-hero .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 4px; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .stat-card { background: #fff; border-radius: 10px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; flex-direction: column; gap: 8px; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-card .label { font-size: 12px; color: #5A7A96; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #2D6A9F; display: flex; align-items: center; justify-content: center; }
+  .stat-card .iplate.success { background: #DCFCE7; color: #15803D; }
+  .stat-card .iplate.warning { background: #FEF3C7; color: #B45309; }
+  .stat-card .iplate.violet  { background: #EDE9FE; color: #7C3AED; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: #1A2E40; }
+  .stat-card .value.warning { color: #B45309; }
+  .stat-card .sub { font-size: 12px; color: #5A7A96; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .badge.draft   { background: #F1F5F9; color: #475569; }
+  .badge.pending { background: #FEF3C7; color: #B45309; }
+  .badge.approved { background: #DBEAFE; color: #1D4ED8; }
+  .badge.sent    { background: #EDE9FE; color: #7C3AED; }
+  .badge.partial { background: #FEF3C7; color: #B45309; }
+  .badge.completed { background: #DCFCE7; color: #15803D; }
+  .badge.cancelled { background: #FEE2E2; color: #DC2626; }
+  .badge.slate   { background: #F1F5F9; color: #475569; }
+  .badge.closed-short { background: #475569; color: #fff; }
+  .badge.success { background: #DCFCE7; color: #15803D; }
+  .badge.warning { background: #FEF3C7; color: #B45309; }
+  .badge.danger  { background: #FEE2E2; color: #DC2626; }
+  .badge.info    { background: #DBEAFE; color: #1D4ED8; }
+  .section-card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 12px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .nm { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .sku { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; font-weight: 600; }
+  .po-num { font-family: var(--font-mono); font-size: 13px; color: #2D6A9F; font-weight: 700; }
+  .mono { font-family: var(--font-mono); font-size: 13px; color: #5A7A96; }
+  .price { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .btn { height: 38px; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; text-decoration: none; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-outline { background: #fff; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-outline.danger { color: #DC2626; border-color: #FCA5A5; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 18px; }
+  .btn-primary:hover { background: #1A5685; }
+  .btn-success { background: #15803D; color: #fff; padding: 0 18px; }
+  .btn-success:hover { background: #166534; }
+  .btn-danger  { background: #DC2626; color: #fff; padding: 0 18px; }
+  .field-input, .field-select { width: 100%; height: 40px; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .field-input.qty { width: 90px; height: 36px; border: 2px solid #2D6A9F; background: #EBF6FD; text-align: center; font-family: var(--font-mono); font-weight: 700; }
+  .field-textarea { width: 100%; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 10px 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; resize: vertical; min-height: 64px; background: #fff; }
+  .field-label { display: block; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; }
+  .back-link { background: none; border: none; cursor: pointer; color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; padding: 0; text-decoration: none; }
+  .search-input { position: relative; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .info-banner { background: #EBF6FD; border: 1px solid #93C5FD; border-radius: 10px; padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start; }
+  .info-banner .lucide { width: 18px; height: 18px; color: #2D6A9F; flex-shrink: 0; margin-top: 1px; }
+  .info-banner .title { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1E40AF; }
+  .info-banner .desc  { font-family: var(--font-body); font-size: 13px; color: #1E40AF; margin-top: 2px; }
+  .warn-banner { background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 10px; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start; color: #92400E; }
+  .warn-banner .lucide { width: 16px; height: 16px; color: #B45309; flex-shrink: 0; margin-top: 1px; }
+
+  .grid-3 { display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: flex-start; }
+  @media (max-width: 1180px) { .grid-3 { grid-template-columns: 1fr; } }
+  .po-header { background: #fff; border-radius: 10px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+  .po-header .po-id { font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: #1A2E40; display: inline-flex; align-items: center; gap: 12px; }
+  .po-header .sub { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 6px; }
+  .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; background: #fff; border-radius: 10px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .info-grid .k { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .info-grid .v { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #1A2E40; }
+  .timeline { background: #fff; border-radius: 10px; padding: 20px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); position: sticky; top: 96px; }
+  .timeline h3 { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #1A2E40; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 16px; }
+  .tl-row { display: flex; gap: 14px; padding: 10px 0; position: relative; }
+  .tl-row:not(:last-child)::after { content: ''; position: absolute; left: 11px; top: 36px; bottom: -6px; width: 2px; background: #D0E8F5; }
+  .tl-dot { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; z-index: 1; }
+  .tl-dot.done { background: #DCFCE7; color: #15803D; }
+  .tl-dot.current { background: #DBEAFE; color: #2D6A9F; animation: pulse 1.6s ease-in-out infinite; }
+  .tl-dot.pending { background: #F1F5F9; color: #9BBAD4; }
+  .tl-dot .lucide { width: 14px; height: 14px; }
+  .tl-content { flex: 1; }
+  .tl-title { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #1A2E40; }
+  .tl-title.pending { color: #9BBAD4; }
+  .tl-meta  { font-family: var(--font-body); font-size: 11px; color: #5A7A96; margin-top: 2px; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(45,106,159,0.45); } 50% { box-shadow: 0 0 0 8px rgba(45,106,159,0); } }
+  .reject-panel { background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 10px; padding: 18px 22px; display: flex; flex-direction: column; gap: 12px; }
+  .reject-panel .ttl { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #991B1B; }
+  .reject-panel textarea { width: 100%; border: 1.5px solid #FCA5A5; border-radius: 8px; padding: 10px 12px; font-family: var(--font-body); font-size: 13px; min-height: 80px; }
+  .totals-row td { font-family: var(--font-display); font-weight: 700; color: #1A2E40; }
+  /* Receipt status pills inside the line items table */
+  .receipt-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .receipt-pill.full { background: #DCFCE7; color: #15803D; }
+  .receipt-pill.pending { background: #FEF3C7; color: #B45309; }
+  .receipt-pill.writeoff { background: #FEE2E2; color: #DC2626; }
+  .receipt-pill .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  /* Write-off row — muted, with subtle gray wash and strikethrough on outstanding qty */
+  tr.writeoff td { color: #94A3B8; background: #F8FAFC; }
+  tr.writeoff td .nm, tr.writeoff td .sku, tr.writeoff td .price, tr.writeoff td .mono { color: #94A3B8; }
+  tr.writeoff td .strike { text-decoration: line-through; text-decoration-color: #CBD5E1; }
+  td .qty-out { font-family: var(--font-mono); font-weight: 700; color: #B45309; }
+  td .qty-zero { font-family: var(--font-mono); color: #9BBAD4; }
+  /* Close PO Short modal */
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(15,30,48,0.55); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 100; }
+  .modal-backdrop[hidden] { display: none !important; }
+  .modal-card { background: #fff; border-radius: 12px; width: 100%; max-width: 760px; max-height: calc(100vh - 48px); overflow: auto; box-shadow: 0 20px 60px rgba(15,30,48,0.35); display: flex; flex-direction: column; }
+  .modal-head { display: flex; align-items: center; gap: 14px; padding: 22px 26px 14px; border-bottom: 1px solid #E5EFF7; }
+  .modal-head .icon-plate { width: 44px; height: 44px; border-radius: 10px; background: #F1F5F9; color: #475569; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .modal-head h2 { margin: 0; font-family: var(--font-display); font-size: 18px; font-weight: 700; color: #1A2E40; }
+  .modal-head .sub { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 3px; }
+  .modal-body { padding: 20px 26px; display: flex; flex-direction: column; gap: 16px; }
+  .modal-body label.req::after { content: ' *'; color: #DC2626; }
+  .modal-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 26px; border-top: 1px solid #E5EFF7; background: #F8FBFD; border-radius: 0 0 12px 12px; }
+  .modal-foot .footnote { font-family: var(--font-body); font-size: 11px; color: #9BBAD4; }
+  .checkbox-row { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; user-select: none; }
+  .checkbox-row.checked { border-color: #2D6A9F; background: #EBF6FD; }
+  .checkbox-row input { width: 18px; height: 18px; margin-top: 1px; accent-color: #2D6A9F; cursor: pointer; }
+  .checkbox-row span { font-family: var(--font-body); font-size: 13px; color: #1A2E40; line-height: 1.45; }
+  .btn-slate { background: #475569; color: #fff; padding: 0 18px; }
+  .btn-slate:hover { background: #334155; }
+  .btn-slate:disabled { background: #CBD5E1; color: #94A3B8; cursor: not-allowed; }
+  .closure-summary-banner { background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 10px; padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start; }
+  .closure-summary-banner .lucide { width: 18px; height: 18px; color: #B45309; flex-shrink: 0; margin-top: 1px; }
+  .closure-summary-banner .title { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #92400E; }
+  .closure-summary-banner .desc  { font-family: var(--font-body); font-size: 13px; color: #92400E; margin-top: 4px; line-height: 1.5; }
+  .closure-summary-banner .desc b { color: #78350F; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Purchase Order — PO-2026-0045</div>
+        <div class="topbar-crumb">Admin / Inventory / Purchase Orders / PO-2026-0045</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+    <section class="page" data-screen-label="01 PO Detail" id="po-page">
+      <a class="back-link" href="inventory-po-list.html"><i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Back to Purchase Orders</a>
+      <div class="po-header">
+        <div>
+          <div class="po-id"><span id="po-num">PO-2026-0045</span> <span id="po-badge" class="badge pending">Pending Approval</span></div>
+          <div class="sub" id="po-sub">Created May 13, 2026 · 9:00 AM · Submitted by Admin User</div>
+        </div>
+        <div id="po-actions-col" style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+          <div id="po-actions" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+            <button class="btn btn-outline danger" type="button" id="reject-btn"><i data-lucide="rotate-ccw"></i> Reject</button>
+            <button class="btn btn-primary"><i data-lucide="check"></i> Approve Purchase Order</button>
+          </div>
+          <div id="po-actions-footnote" style="font-family:var(--font-body);font-size:11px;color:#9BBAD4;" hidden></div>
+        </div>
+      </div>
+
+      <div id="status-banner" hidden></div>
+
+      <div class="grid-3">
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="info-grid" id="info-grid">
+            <div><div class="k">Supplier</div><div class="v">MedSupply PH</div></div>
+            <div><div class="k">Contact Person</div><div class="v">John Smith</div></div>
+            <div><div class="k">Phone</div><div class="v">+63 917 555 0142</div></div>
+            <div><div class="k">Email</div><div class="v">john@medsupply.ph</div></div>
+            <div><div class="k">Payment Terms</div><div class="v">Net 30</div></div>
+            <div><div class="k">Expected Delivery</div><div class="v">May 18, 2026</div></div>
+            <div><div class="k">Delivery Address</div><div class="v">Cloud Skin Clinic, Baguio</div></div>
+            <div><div class="k">Internal Notes</div><div class="v" style="font-weight:500;color:#5A7A96;">Monthly replenishment Q2</div></div>
+          </div>
+
+          <div class="section-card" id="line-items-card">
+            <div style="padding:16px 22px;border-bottom:1px solid #D0E8F5;display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-family:var(--font-display);font-size:14px;font-weight:700;color:#1A2E40;text-transform:uppercase;letter-spacing:0.05em;">Line Items</div>
+              <div id="line-items-summary" style="font-family:var(--font-body);font-size:12px;color:#5A7A96;" hidden></div>
+            </div>
+            <div style="overflow-x:auto;" id="line-items-wrap"><table id="line-items-table">
+              <thead><tr><th>Product Name</th><th>SKU</th><th>Current Stock</th><th>Qty Ordered</th><th>Unit Cost</th><th style="text-align:right;">Line Total</th></tr></thead>
+              <tbody>
+              <tr>
+                <td><span class="nm">Hyaluronic Acid Serum</span></td>
+                <td><span class="sku">SKIN-001</span></td>
+                <td><span class="mono" style="color:#1A2E40;font-weight:600;">12</span> <span class="badge success" style="margin-left:4px;font-size:10px;">OK</span></td>
+                <td><span class="mono" style="color:#1A2E40;font-weight:700;">20</span></td>
+                <td><span class="price">₱110</span></td>
+                <td style="text-align:right;"><span class="price">₱2,200</span></td>
+              </tr>
+              <tr>
+                <td><span class="nm">Retinol Cream</span></td>
+                <td><span class="sku">SKIN-002</span></td>
+                <td><span class="mono" style="color:#1A2E40;font-weight:600;">8</span> <span class="badge warning" style="margin-left:4px;font-size:10px;">Low</span></td>
+                <td><span class="mono" style="color:#1A2E40;font-weight:700;">50</span></td>
+                <td><span class="price">₱180</span></td>
+                <td style="text-align:right;"><span class="price">₱9,000</span></td>
+              </tr>
+              <tr>
+                <td><span class="nm">Filler 1mL</span></td>
+                <td><span class="sku">INJ-002</span></td>
+                <td><span class="mono" style="color:#1A2E40;font-weight:600;">3</span> <span class="badge warning" style="margin-left:4px;font-size:10px;">Low</span></td>
+                <td><span class="mono" style="color:#1A2E40;font-weight:700;">20</span></td>
+                <td><span class="price">₱1600</span></td>
+                <td style="text-align:right;"><span class="price">₱32,000</span></td>
+              </tr>
+              <tr>
+                <td><span class="nm">Vitamin C Serum</span></td>
+                <td><span class="sku">SKIN-003</span></td>
+                <td><span class="mono" style="color:#1A2E40;font-weight:600;">22</span> <span class="badge success" style="margin-left:4px;font-size:10px;">OK</span></td>
+                <td><span class="mono" style="color:#1A2E40;font-weight:700;">30</span></td>
+                <td><span class="price">₱95</span></td>
+                <td style="text-align:right;"><span class="price">₱2,850</span></td>
+              </tr>
+              <tr>
+                <td><span class="nm">SPF 50 Sunscreen</span></td>
+                <td><span class="sku">SKIN-004</span></td>
+                <td><span class="mono" style="color:#1A2E40;font-weight:600;">9</span> <span class="badge warning" style="margin-left:4px;font-size:10px;">Low</span></td>
+                <td><span class="mono" style="color:#1A2E40;font-weight:700;">25</span></td>
+                <td><span class="price">₱140</span></td>
+                <td style="text-align:right;"><span class="price">₱3,500</span></td>
+              </tr>
+                <tr class="totals-row" style="background:#F0F6FC;"><td colspan="5" style="text-align:right;">Subtotal</td><td style="text-align:right;">₱49,550.00</td></tr>
+                <tr class="totals-row" style="background:#F0F6FC;"><td colspan="5" style="text-align:right;">VAT (12%)</td><td style="text-align:right;">₱5,946.00</td></tr>
+                <tr class="totals-row" style="background:#F0F6FC;"><td colspan="5" style="text-align:right;font-size:14px;">Grand Total</td><td style="text-align:right;font-size:18px;color:#2D6A9F;">₱55,496.00</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+
+          <div id="reject-panel" class="reject-panel" hidden>
+            <div class="ttl">Reject Purchase Order</div>
+            <div>
+              <label style="display:block;font-family:var(--font-display);font-weight:600;font-size:12px;color:#991B1B;margin-bottom:6px;">Reason for rejection <span style="color:#DC2626;">*</span></label>
+              <select class="field-select" style="border-color:#FCA5A5;background:#FFF;">
+                <option>Select a reason…</option>
+                <option>Wrong Items</option>
+                <option>Wrong Quantities</option>
+                <option>Wrong Supplier</option>
+                <option>Budget Issue</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <textarea placeholder="Additional notes for the requester — what should be corrected before resubmitting?"></textarea>
+            <div style="display:flex;justify-content:flex-end;gap:8px;">
+              <button class="btn btn-outline" id="reject-cancel">Cancel</button>
+              <button class="btn btn-danger"><i data-lucide="x-circle"></i> Confirm Rejection</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline" id="timeline">
+          <h3>Activity Timeline</h3>
+          <div class="tl-row" data-step="draft"><div class="tl-dot done"><i data-lucide="file-text"></i></div><div class="tl-content"><div class="tl-title">Draft Created</div><div class="tl-meta">Admin User · May 13, 2026 9:00 AM</div></div></div>
+          <div class="tl-row" data-step="submitted"><div class="tl-dot done"><i data-lucide="send"></i></div><div class="tl-content"><div class="tl-title">Submitted for Approval</div><div class="tl-meta">Admin User · May 13, 2026 9:15 AM</div></div></div>
+          <div class="tl-row" data-step="pending"><div class="tl-dot current"><i data-lucide="clock"></i></div><div class="tl-content"><div class="tl-title">Pending Approval</div><div class="tl-meta">Current step</div></div></div>
+          <div class="tl-row" data-step="approved"><div class="tl-dot pending"><i data-lucide="check"></i></div><div class="tl-content"><div class="tl-title pending">Approved</div><div class="tl-meta">Awaiting admin action</div></div></div>
+          <div class="tl-row" data-step="sent"><div class="tl-dot pending"><i data-lucide="truck"></i></div><div class="tl-content"><div class="tl-title pending">Sent to Supplier</div></div></div>
+          <div class="tl-row" data-step="received"><div class="tl-dot pending"><i data-lucide="package-check"></i></div><div class="tl-content"><div class="tl-title pending">Goods Received</div></div></div>
+          <div class="tl-row" data-step="completed"><div class="tl-dot pending"><i data-lucide="check-circle"></i></div><div class="tl-content"><div class="tl-title pending">Completed</div></div></div>
+          <div class="tl-row" data-step="closed-short" id="tl-closed-short" hidden><div class="tl-dot pending" style="background:#475569;color:#fff;"><i data-lucide="archive"></i></div><div class="tl-content"><div class="tl-title">Closed Short</div><div class="tl-meta">Closed by Admin User · May 13, 2026 2:45 PM<br><span style="color:#9BBAD4;font-size:11px;">Reason: Quantity Renegotiated with Supplier</span></div></div></div>
+        </div>
+      </div>
+      <script>
+        (function () {
+          var panel = document.getElementById('reject-panel');
+          document.getElementById('reject-btn').addEventListener('click', function () { panel.hidden = false; panel.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+          document.getElementById('reject-cancel').addEventListener('click', function () { panel.hidden = true; });
+        })();
+      </script>
+
+      <script>
+      // Render the PO detail view according to ?status=… so each non-completed
+      // status surfaces the appropriate actions, timeline state, and contextual info.
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var status = (params.get('status') || 'pending').toLowerCase();
+        var poParam = params.get('po');
+
+        // ---------- helpers for partial / closed-short rendering ----------
+        function renderPharmaCoInfoGrid() {
+          var grid = document.getElementById('info-grid');
+          grid.innerHTML =
+            '<div><div class="k">Supplier</div><div class="v">PharmaCo Manila</div></div>' +
+            '<div><div class="k">Contact Person</div><div class="v">Maria Reyes</div></div>' +
+            '<div><div class="k">Phone</div><div class="v">+63 917 555 0218</div></div>' +
+            '<div><div class="k">Email</div><div class="v">maria@pharmaco.ph</div></div>' +
+            '<div><div class="k">Payment Terms</div><div class="v">Net 30</div></div>' +
+            '<div><div class="k">Order Date</div><div class="v">May 10, 2026</div></div>' +
+            '<div><div class="k">Expected Delivery</div><div class="v">May 15, 2026</div></div>' +
+            '<div><div class="k">Delivery Address</div><div class="v">Cloud Skin Clinic, Baguio</div></div>' +
+            '<div style="grid-column: 1 / -1;"><div class="k">Internal Notes</div><div class="v" style="font-weight:500;color:#5A7A96;">Q2 injectables + treatment replenishment. Supplier flagged possible delays on injectables.</div></div>';
+        }
+
+        function renderPharmaCoLineItems(isClosed) {
+          var rows = [
+            { name:'Retinol Cream',           sku:'SKIN-002',  ord:50, rec:50, out:0,  cost:180,  total:9000,   status:'full' },
+            { name:'SPF 50 Sunscreen',        sku:'SKIN-021',  ord:30, rec:30, out:0,  cost:150,  total:4500,   status:'full' },
+            { name:'Vitamin C Serum',         sku:'SKIN-015',  ord:20, rec:20, out:0,  cost:220,  total:4400,   status:'full' },
+            { name:'Chemical Peel Solution',  sku:'TREAT-001', ord:30, rec:0,  out:30, cost:280,  total:8400,   status:'pending' },
+            { name:'Filler 1mL',              sku:'INJ-002',   ord:20, rec:0,  out:20, cost:1600, total:32000,  status:'pending' },
+            { name:'Botox 50u',               sku:'INJ-001',   ord:10, rec:0,  out:10, cost:2500, total:25000,  status:'pending' }
+          ];
+          var fmt = function (n) { return '₱' + n.toLocaleString('en-US'); };
+          var thead = '<thead><tr>' +
+            '<th>Product Name</th>' +
+            '<th>SKU</th>' +
+            '<th style="text-align:right;">Qty Ordered</th>' +
+            '<th style="text-align:right;">Qty Received</th>' +
+            '<th style="text-align:right;">Qty Outstanding</th>' +
+            '<th style="text-align:right;">Unit Cost</th>' +
+            '<th style="text-align:right;">Line Total</th>' +
+            '<th>Receipt Status</th>' +
+            '</tr></thead>';
+          var body = '<tbody>';
+          rows.forEach(function (r) {
+            // After closure, outstanding items become "Written Off"
+            var rowClass = (isClosed && r.status === 'pending') ? 'writeoff' : '';
+            var pillClass, pillLabel;
+            if (r.status === 'full') { pillClass = 'full'; pillLabel = 'Fully Received'; }
+            else if (isClosed)       { pillClass = 'writeoff'; pillLabel = 'Written Off'; }
+            else                     { pillClass = 'pending'; pillLabel = 'Pending'; }
+            var outCell = r.out === 0
+              ? '<span class="qty-zero">0</span>'
+              : (isClosed && r.status === 'pending'
+                  ? '<span class="strike qty-out" style="color:#94A3B8;">' + r.out + '</span>'
+                  : '<span class="qty-out">' + r.out + '</span>');
+            body += '<tr' + (rowClass ? ' class="'+rowClass+'"' : '') + '>' +
+              '<td><span class="nm">' + r.name + '</span></td>' +
+              '<td><span class="sku">' + r.sku + '</span></td>' +
+              '<td style="text-align:right;"><span class="mono" style="color:#1A2E40;font-weight:700;">' + r.ord + '</span></td>' +
+              '<td style="text-align:right;"><span class="mono" style="color:'+(r.rec===0?'#9BBAD4':'#15803D')+';font-weight:700;">' + r.rec + '</span></td>' +
+              '<td style="text-align:right;">' + outCell + '</td>' +
+              '<td style="text-align:right;"><span class="price">' + fmt(r.cost) + '</span></td>' +
+              '<td style="text-align:right;"><span class="price">' + fmt(r.total) + '</span></td>' +
+              '<td><span class="receipt-pill ' + pillClass + '"><span class="dot"></span>' + pillLabel + '</span></td>' +
+              '</tr>';
+          });
+          var received = 17900, outstanding = 65400, totalVal = received + outstanding;
+          body += '<tr class="totals-row" style="background:#F0F6FC;"><td colspan="6" style="text-align:right;">Subtotal received</td><td style="text-align:right;color:#15803D;">' + fmt(received) + '</td><td></td></tr>';
+          body += '<tr class="totals-row" style="background:#F0F6FC;"><td colspan="6" style="text-align:right;">' + (isClosed ? 'Written off' : 'Outstanding') + '</td><td style="text-align:right;color:'+(isClosed?'#DC2626':'#B45309')+';">' + fmt(outstanding) + '</td><td></td></tr>';
+          body += '<tr class="totals-row" style="background:#F0F6FC;"><td colspan="6" style="text-align:right;font-size:14px;">Grand Total</td><td style="text-align:right;font-size:18px;color:#2D6A9F;">' + fmt(totalVal) + '</td><td></td></tr>';
+          body += '</tbody>';
+          document.getElementById('line-items-table').innerHTML = thead + body;
+          var sum = document.getElementById('line-items-summary');
+          sum.hidden = false;
+          if (isClosed) {
+            sum.innerHTML = '<b style="color:#1A2E40;">3 of 6 items received</b> · <span style="color:#15803D;">' + fmt(received) + ' received into inventory</span> · <span style="color:#DC2626;">' + fmt(outstanding) + ' written off</span>';
+          } else {
+            sum.innerHTML = '<b style="color:#1A2E40;">3 of 6 items received</b> · <span style="color:#15803D;">' + fmt(received) + ' received</span> of <b>' + fmt(totalVal) + '</b> · <span style="color:#B45309;">' + fmt(outstanding) + ' still outstanding</span>';
+          }
+        }
+        var byPo = {
+          'po-2026-0045': { status: 'pending',      supplier: 'MedSupply PH',           total: '₱55,328' },
+          'po-2026-0044': { status: 'approved',     supplier: 'DermaCare Distributors', total: '₱38,200' },
+          'po-2026-0043': { status: 'sent',         supplier: 'Wellness Depot',         total: '₱72,450' },
+          'po-2026-0042': { status: 'partial',      supplier: 'PharmaCo Manila',        total: '₱83,300' },
+          'po-2026-0041': { status: 'sent',         supplier: 'DermaCare Distributors', total: '₱61,750' },
+          'po-2026-0040': { status: 'completed',    supplier: 'MedSupply PH',           total: '₱18,200' },
+          'po-2026-0039': { status: 'closed-short', supplier: 'MedSupply PH',           total: '₱28,500' }
+        };
+        var po = poParam ? poParam.toUpperCase() : 'PO-2026-0045';
+        document.getElementById('po-num').textContent = po;
+        document.title = 'Cloud Skin Admin — Purchase Order — ' + po;
+        var crumb = document.querySelector('.topbar-crumb');
+        if (crumb) crumb.textContent = 'Admin / Inventory / Purchase Orders / ' + po;
+        var topTitle = document.querySelector('.topbar-title');
+        if (topTitle) topTitle.textContent = 'Purchase Order — ' + po;
+
+        var presets = {
+          pending: {
+            badgeClass: 'pending', badgeText: 'Pending Approval',
+            sub: 'Created May 13, 2026 · 9:00 AM · Submitted by Admin User · Awaiting your review',
+            actions: '<a class="btn btn-outline" href="inventory-po-create.html?edit=PO-2026-0045"><i data-lucide="pencil"></i> Edit</a>' +
+                     '<button class="btn btn-outline danger" type="button" id="reject-btn"><i data-lucide="rotate-ccw"></i> Reject</button>' +
+                     '<button class="btn btn-primary"><i data-lucide="check"></i> Approve Purchase Order</button>',
+            timelineCurrent: 'pending',
+            timelineDone: ['draft','submitted'],
+            banner: { tone:'warning', icon:'alert-triangle', title:'Awaiting your approval', desc:'Review line items and totals carefully. Once approved, the PO cannot be edited and will move to the Approved queue, ready to send to the supplier.' }
+          },
+          approved: {
+            badgeClass: 'approved', badgeText: 'Approved',
+            sub: 'Approved May 13, 2026 · 11:42 AM by Admin User · Ready to send to supplier',
+            actions: '<a class="btn btn-outline" href="inventory-po-create.html?edit=PO-2026-0044"><i data-lucide="pencil"></i> Edit</a>' +
+                     '<button class="btn btn-outline" type="button"><i data-lucide="printer"></i> Print / Export PDF</button>' +
+                     '<button class="btn btn-outline" type="button"><i data-lucide="copy"></i> Duplicate</button>' +
+                     '<button class="btn btn-primary"><i data-lucide="send"></i> Mark as Sent to Supplier</button>',
+            timelineCurrent: 'approved',
+            timelineDone: ['draft','submitted','pending'],
+            banner: { tone:'info', icon:'send', title:'Ready to send to supplier', desc:'Email or print the PO for the supplier. When you confirm it has been sent, the PO will move to "Sent" and stock will be expected on the delivery date below.' }
+          },
+          sent: {
+            badgeClass: 'sent', badgeText: 'Sent',
+            sub: 'Sent May 13, 2026 · 3:10 PM · Awaiting delivery from supplier',
+            actions: '<button class="btn btn-outline" type="button"><i data-lucide="printer"></i> Print / Export PDF</button>' +
+                     '<a class="btn btn-success" href="inventory-po-receive.html"><i data-lucide="package-check"></i> Receive Goods</a>',
+            timelineCurrent: 'sent',
+            timelineDone: ['draft','submitted','pending','approved'],
+            banner: { tone:'info', icon:'truck', title:'Awaiting delivery', desc:'Expected delivery on May 18, 2026. When goods arrive, record the delivery to update inventory automatically.' }
+          },
+          partial: {
+            badgeClass: 'partial', badgeText: 'Partially Received',
+            sub: 'First delivery May 12, 2026 · 3 of 6 items received · Awaiting remaining goods',
+            actions: '<button class="btn btn-outline" type="button"><i data-lucide="printer"></i> Print / Export PDF</button>' +
+                     '<a class="btn btn-outline" href="?status=partial&po=PO-2026-0042&modal=close" style="color:#475569;border-color:#CBD5E1;"><i data-lucide="check-square"></i> Close / Finalize PO</a>' +
+                     '<a class="btn btn-primary" href="inventory-po-receive.html"><i data-lucide="truck"></i> Receive Remaining Goods</a>',
+            actionsFootnote: 'Close PO if remaining items will not be delivered.',
+            timelineCurrent: 'received',
+            timelineDone: ['draft','submitted','pending','approved','sent'],
+            banner: { tone:'warning', icon:'alert-triangle', title:'This PO has been partially fulfilled', desc:'3 of 6 items are still outstanding. Receive remaining goods or close this PO if the remaining items will not arrive.' }
+          },
+          'closed-short': {
+            badgeClass: 'closed-short', badgeText: 'Closed Short',
+            sub: 'Closed by Admin User — May 13, 2026 · 2:45 PM',
+            actions: '<button class="btn btn-outline" type="button"><i data-lucide="printer"></i> Print / Export PDF</button>' +
+                     '<button class="btn btn-outline" type="button"><i data-lucide="copy"></i> Duplicate PO</button>',
+            timelineCurrent: 'closed-short',
+            timelineDone: ['draft','submitted','pending','approved','sent','received'],
+            banner: { tone:'closure', icon:'archive', title:'This PO was closed short on May 13, 2026', desc:'<b>3 items were not received</b> by agreement with the supplier.<br><b>Reason:</b> Quantity Renegotiated with Supplier<br><b>Note:</b> Spoke with Maria Reyes on May 13. Remaining items unavailable until July.' }
+          },
+          completed: {
+            badgeClass: 'completed', badgeText: 'Completed',
+            sub: 'Closed May 09, 2026 · All items received · Inventory updated',
+            actions: '<button class="btn btn-outline" type="button"><i data-lucide="file-text"></i> View Delivery Receipt</button>' +
+                     '<button class="btn btn-outline" type="button"><i data-lucide="printer"></i> Print / Export PDF</button>' +
+                     '<button class="btn btn-primary" type="button"><i data-lucide="copy"></i> Duplicate &amp; Re-order</button>',
+            timelineCurrent: 'completed',
+            timelineDone: ['draft','submitted','pending','approved','sent','received'],
+            banner: { tone:'success', icon:'check-circle', title:'Order completed', desc:'All 4 line items received in full. Inventory has been updated and finance has been notified. This PO is locked from further edits.' }
+          }
+        };
+        var preset = presets[status] || presets.pending;
+
+        document.getElementById('po-badge').className = 'badge ' + preset.badgeClass;
+        document.getElementById('po-badge').textContent = preset.badgeText;
+        document.getElementById('po-sub').textContent = preset.sub;
+        document.getElementById('po-actions').innerHTML = preset.actions;
+        var footnoteEl = document.getElementById('po-actions-footnote');
+        if (preset.actionsFootnote) {
+          footnoteEl.hidden = false;
+          footnoteEl.textContent = preset.actionsFootnote;
+        } else {
+          footnoteEl.hidden = true;
+        }
+
+        // For partial / closed-short we are looking at PO-2026-0042 (PharmaCo Manila),
+        // which has a different supplier + line items than the default pending example.
+        if (status === 'partial' || status === 'closed-short') {
+          renderPharmaCoInfoGrid();
+          renderPharmaCoLineItems(status === 'closed-short');
+        }
+
+        // Toggle the alternative "Closed Short" terminal step in the timeline.
+        var tlClosed = document.getElementById('tl-closed-short');
+        if (status === 'closed-short') {
+          tlClosed.hidden = false;
+          // Mark the regular "Completed" row as not applicable for this PO.
+          var compRow = document.querySelector('#timeline .tl-row[data-step="completed"]');
+          if (compRow) compRow.hidden = true;
+        }
+
+        // Render timeline state
+        document.querySelectorAll('#timeline .tl-row').forEach(function (row) {
+          var step = row.getAttribute('data-step');
+          var dot = row.querySelector('.tl-dot');
+          var title = row.querySelector('.tl-title');
+          dot.classList.remove('done','current','pending');
+          title.classList.remove('pending');
+          var meta = row.querySelector('.tl-meta');
+          if (preset.timelineDone.indexOf(step) !== -1) {
+            dot.classList.add('done');
+          } else if (step === preset.timelineCurrent) {
+            dot.classList.add('current');
+            if (meta) meta.textContent = 'Current step';
+          } else {
+            dot.classList.add('pending');
+            title.classList.add('pending');
+          }
+        });
+
+        // Status banner
+        var bannerEl = document.getElementById('status-banner');
+        var toneStyles = {
+          info:    { bg:'#EBF6FD', bd:'#93C5FD', fg:'#1E40AF', icon:'#2D6A9F' },
+          warning: { bg:'#FEF3C7', bd:'#FCD34D', fg:'#92400E', icon:'#B45309' },
+          success: { bg:'#DCFCE7', bd:'#86EFAC', fg:'#166534', icon:'#15803D' },
+          closure: { bg:'#FEF3C7', bd:'#FCD34D', fg:'#92400E', icon:'#B45309' }
+        };
+        var t = toneStyles[preset.banner.tone] || toneStyles.info;
+        bannerEl.hidden = false;
+        bannerEl.style.cssText = 'background:'+t.bg+';border:1px solid '+t.bd+';color:'+t.fg+';border-radius:10px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;';
+        bannerEl.innerHTML =
+          '<i data-lucide="'+preset.banner.icon+'" style="width:18px;height:18px;color:'+t.icon+';flex-shrink:0;margin-top:1px;"></i>' +
+          '<div><div style="font-family:var(--font-display);font-weight:700;font-size:14px;color:'+t.icon+';">'+preset.banner.title+'</div>' +
+          '<div style="font-family:var(--font-body);font-size:13px;color:'+t.fg+';margin-top:4px;line-height:1.5;">'+preset.banner.desc+'</div></div>';
+
+        // Re-bind reject panel button (it was re-rendered)
+        var rejBtn = document.getElementById('reject-btn');
+        var rejPanel = document.getElementById('reject-panel');
+        // Reject is not a valid action once goods have been received — strip the
+        // panel entirely for partially-received, completed, and closed-short POs.
+        if (status === 'partial' || status === 'completed' || status === 'closed-short') {
+          if (rejPanel && rejPanel.parentNode) rejPanel.parentNode.removeChild(rejPanel);
+        } else if (rejBtn && rejPanel) {
+          rejBtn.addEventListener('click', function () { rejPanel.hidden = false; });
+        }
+        // Re-create icons
+        if (window.lucide) window.lucide.createIcons();
+
+        // Close PO Short modal (Screen 3) — shown when ?modal=close is in the URL.
+        if (params.get('modal') === 'close') {
+          openCloseModal();
+        }
+      })();
+
+      function openCloseModal() {
+        var modal = document.getElementById('close-po-modal');
+        if (!modal) return;
+        modal.hidden = false;
+        document.body.style.overflow = 'hidden';
+        if (window.lucide) window.lucide.createIcons();
+      }
+      function closeCloseModal() {
+        var modal = document.getElementById('close-po-modal');
+        if (!modal) return;
+        modal.hidden = true;
+        document.body.style.overflow = '';
+        // Strip ?modal=close from the URL so refreshing doesn't re-open.
+        var url = new URL(window.location.href);
+        url.searchParams.delete('modal');
+        window.history.replaceState({}, '', url);
+      }
+      </script>
+    </section>
+
+    <!-- Close PO Short modal (Screen 3) -->
+    <div id="close-po-modal" class="modal-backdrop" hidden role="dialog" aria-modal="true" aria-labelledby="close-modal-title">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div class="icon-plate"><i data-lucide="archive"></i></div>
+          <div>
+            <h2 id="close-modal-title">Close / Finalize Purchase Order</h2>
+            <div class="sub"><span style="font-family:var(--font-mono);color:#1A2E40;font-weight:600;">PO-2026-0042</span> · PharmaCo Manila</div>
+          </div>
+          <button class="icon-btn" type="button" onclick="closeCloseModal()" aria-label="Close dialog" style="margin-left:auto;"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="info-banner">
+            <i data-lucide="info"></i>
+            <div>
+              <div class="title">Items already received will remain in your inventory.</div>
+              <div class="desc">Only the outstanding items below will be written off. This action is logged for audit and cannot be undone.</div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-family:var(--font-display);font-size:12px;font-weight:700;color:#1A2E40;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Outstanding items to be written off</div>
+            <div style="border:1px solid #E5EFF7;border-radius:10px;overflow:hidden;">
+              <table style="font-size:12.5px;">
+                <thead><tr>
+                  <th>Product</th>
+                  <th>SKU</th>
+                  <th style="text-align:right;">Qty Ordered</th>
+                  <th style="text-align:right;">Qty Received</th>
+                  <th style="text-align:right;color:#DC2626;">Qty to Write Off</th>
+                  <th style="text-align:right;">Value</th>
+                </tr></thead>
+                <tbody>
+                  <tr>
+                    <td><span class="nm">Chemical Peel Solution</span></td>
+                    <td><span class="sku">TREAT-001</span></td>
+                    <td style="text-align:right;"><span class="mono" style="color:#1A2E40;font-weight:700;">30</span></td>
+                    <td style="text-align:right;"><span class="mono" style="color:#9BBAD4;">0</span></td>
+                    <td style="text-align:right;"><span style="font-family:var(--font-mono);font-weight:700;color:#DC2626;">30</span></td>
+                    <td style="text-align:right;"><span class="price" style="color:#DC2626;">₱8,400</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="nm">Filler 1mL</span></td>
+                    <td><span class="sku">INJ-002</span></td>
+                    <td style="text-align:right;"><span class="mono" style="color:#1A2E40;font-weight:700;">20</span></td>
+                    <td style="text-align:right;"><span class="mono" style="color:#9BBAD4;">0</span></td>
+                    <td style="text-align:right;"><span style="font-family:var(--font-mono);font-weight:700;color:#DC2626;">20</span></td>
+                    <td style="text-align:right;"><span class="price" style="color:#DC2626;">₱32,000</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="nm">Botox 50u</span></td>
+                    <td><span class="sku">INJ-001</span></td>
+                    <td style="text-align:right;"><span class="mono" style="color:#1A2E40;font-weight:700;">10</span></td>
+                    <td style="text-align:right;"><span class="mono" style="color:#9BBAD4;">0</span></td>
+                    <td style="text-align:right;"><span style="font-family:var(--font-mono);font-weight:700;color:#DC2626;">10</span></td>
+                    <td style="text-align:right;"><span class="price" style="color:#DC2626;">₱25,000</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="text-align:right;font-family:var(--font-body);font-size:12px;color:#5A7A96;margin-top:8px;">Total value being written off: <b style="color:#DC2626;font-family:var(--font-display);font-size:14px;">₱65,400</b></div>
+          </div>
+
+          <div>
+            <label class="field-label req" for="close-reason">Reason for closing short</label>
+            <select class="field-select" id="close-reason">
+              <option value="">Select a reason…</option>
+              <option>Supplier Out of Stock</option>
+              <option selected>Quantity Renegotiated with Supplier</option>
+              <option>Items No Longer Needed</option>
+              <option>Budget Constraint</option>
+              <option>Supplier Cannot Fulfill Remaining</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="field-label" for="close-notes">Notes <span style="font-weight:400;color:#9BBAD4;">(optional)</span></label>
+            <textarea class="field-textarea" id="close-notes" placeholder="e.g. Spoke with Maria Reyes on May 13. Remaining items unavailable until July.">Spoke with Maria Reyes on May 13. Remaining items unavailable until July.</textarea>
+          </div>
+
+          <label class="checkbox-row" id="confirm-row">
+            <input type="checkbox" id="confirm-close">
+            <span>I confirm that the remaining items will not be delivered and this PO can be permanently closed. <b>This cannot be undone.</b></span>
+          </label>
+        </div>
+        <div class="modal-foot">
+          <span class="footnote">Logged for audit · closed by Admin User</span>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-outline" type="button" onclick="closeCloseModal()">Cancel</button>
+            <a class="btn btn-slate" id="confirm-close-btn" aria-disabled="true" style="opacity:0.55;pointer-events:none;" href="inventory-po-detail.html?status=closed-short&po=PO-2026-0042"><i data-lucide="check-square"></i> Confirm &amp; Close PO</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    // Wire up modal interactions — enable Confirm button only when checkbox is ticked,
+    // and close on Esc / backdrop click.
+    (function () {
+      var cb = document.getElementById('confirm-close');
+      var row = document.getElementById('confirm-row');
+      var btn = document.getElementById('confirm-close-btn');
+      if (cb && btn) {
+        cb.addEventListener('change', function () {
+          var on = cb.checked;
+          row.classList.toggle('checked', on);
+          btn.setAttribute('aria-disabled', on ? 'false' : 'true');
+          btn.style.opacity = on ? '1' : '0.55';
+          btn.style.pointerEvents = on ? 'auto' : 'none';
+        });
+      }
+      var modal = document.getElementById('close-po-modal');
+      if (modal) {
+        modal.addEventListener('click', function (e) {
+          if (e.target === modal) closeCloseModal();
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && !modal.hidden) closeCloseModal();
+        });
+      }
+    })();
+    </script>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

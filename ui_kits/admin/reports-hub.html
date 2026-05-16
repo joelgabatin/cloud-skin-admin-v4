@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Reports</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F5F7FA; font-family: var(--font-body); color: #1A2E40; }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #0F1E2E; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg,#2D6A9F,#5BC0EB); display: flex; align-items: center; justify-content: center; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); padding: 18px 32px; }
+  .crumb { font-size: 12px; color: #5A7A96; }
+  .topbar-actions { margin-left: auto; display: flex; gap: 12px; align-items: center; }
+
+  .page { padding: 28px 32px 60px; display: flex; flex-direction: column; gap: 20px; }
+  .head h1 { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; margin: 0; }
+  .head .sub { font-family: var(--font-body); font-size: 14px; color: #5A7A96; margin-top: 4px; }
+
+  .filter-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .date-pick { height: 36px; padding: 0 12px; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 500; color: #1A2E40; display: inline-flex; align-items: center; gap: 8px; }
+  .date-pick .lucide { width: 14px; height: 14px; color: #5A7A96; }
+  .chip { height: 32px; padding: 0 14px; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 6px; cursor: pointer; font-family: var(--font-display); font-size: 12.5px; font-weight: 500; color: #5A7A96; }
+  .chip.active { border-color: #2D6A9F; color: #2D6A9F; background: #F0F6FC; }
+  .right { margin-left: auto; display: flex; gap: 8px; }
+  .btn { height: 36px; padding: 0 14px; border-radius: 8px; font-family: var(--font-display); font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; }
+  .btn-ghost { background: #fff; color: #5A7A96; border-color: #D0E8F5; }
+  .btn-ghost:hover { background: #F0F6FC; }
+  .btn-primary { background: #2D6A9F; color: #fff; }
+  .btn-primary:hover { background: #1A5685; }
+  .btn .lucide { width: 13px; height: 13px; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+
+  .card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(26,58,92,0.06); border-left: 3px solid transparent; transition: all 120ms; cursor: pointer; text-decoration: none; color: inherit; position: relative; display: block; }
+  .card:hover { border-left-color: #2D6A9F; background: #F8FBFD; }
+  .card:hover .arrow { opacity: 1; }
+  .card .arrow { position: absolute; top: 16px; right: 16px; color: #2D6A9F; opacity: 0; transition: opacity 120ms; }
+  .card .arrow .lucide { width: 18px; height: 18px; }
+  .card .alert { position: absolute; top: 16px; right: 16px; padding: 3px 9px; border-radius: 9999px; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; }
+  .card .alert.orange { background: #FFF7ED; color: #C2410C; }
+  .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .icon-sq { width: 40px; height: 40px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; }
+  .icon-sq .lucide { width: 20px; height: 20px; }
+  .icon-sq.blue { background: #EFF6FF; color: #2D6A9F; }
+  .icon-sq.orange { background: #FFF7ED; color: #F59E0B; }
+  .icon-sq.purple { background: #F5F3FF; color: #7C3AED; }
+  .icon-sq.teal { background: #F0FDFA; color: #0D9488; }
+  .icon-sq.green { background: #F0FDF4; color: #15803D; }
+  .icon-sq.pink { background: #FFF1F2; color: #E11D48; }
+  .icon-sq.amber { background: #FFFBEB; color: #D97706; }
+  .card-head .ti { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: #1A2E40; }
+  .card .desc { font-family: var(--font-body); font-size: 13px; color: #5A7A96; line-height: 1.5; }
+  .card .divider { border-top: 1px solid #F0F6FC; margin: 14px 0; }
+  .card .metrics { display: flex; gap: 14px; }
+  .card .metric { flex: 1; }
+  .card .metric .v { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: #1A2E40; }
+  .card .metric .v.green { color: #15803D; }
+  .card .metric .v.orange { color: #F59E0B; }
+  .card .metric .v.red { color: #DC2626; }
+  .card .metric .v.teal { color: #0D9488; }
+  .card .metric .v.bold-small { font-size: 14px; }
+  .card .metric .k { font-family: var(--font-body); font-size: 11px; color: #5A7A96; margin-top: 3px; }
+  .card-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; }
+  .card-foot .updated { font-family: var(--font-body); font-size: 11px; color: #9BBAD4; }
+  .card-foot .view { font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #2D6A9F; }
+
+  .banner { background: #fff; border-radius: 10px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(26,58,92,0.06); display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .banner .ic { width: 36px; height: 36px; border-radius: 8px; background: #EFF6FF; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; }
+  .banner .ic .lucide { width: 18px; height: 18px; }
+  .banner .copy { flex: 1; font-family: var(--font-body); font-size: 13px; color: #5A7A96; min-width: 240px; }
+  .banner-actions { display: flex; gap: 8px; }
+  /* Category section headers */
+  .cat-row { display: flex; align-items: center; gap: 12px; margin-top: 28px; }
+  .cat-row:first-of-type { margin-top: 4px; }
+  .cat-row .lbl { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; flex-shrink: 0; }
+  .cat-row .pill { background: #F0F6FC; color: #2D6A9F; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; flex-shrink: 0; }
+  .cat-row .rule { flex: 1; height: 1px; background: #E2E8F0; }
+  .cat-grid { margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div class="crumb">Admin / Reports</div>
+    </header>
+
+    <section class="page" data-screen-label="Reports Hub">
+      <div class="head"><h1>Reports</h1><div class="sub">Select a report to view detailed data, charts, and export options.</div></div>
+
+      <!-- ============ FINANCIAL ============ -->
+      <div class="cat-row"><span class="lbl">Financial</span><span class="pill">2 reports</span><span class="rule"></span></div>
+      <div class="grid cat-grid">
+        <a class="card" href="reports.html?type=sales">
+          <i data-lucide="arrow-up-right" class="arrow"></i>
+          <div class="card-head"><div class="icon-sq blue"><i data-lucide="dollar-sign"></i></div><div class="ti">Sales Report</div></div>
+          <div class="desc">Total revenue, transaction history, and payment method breakdown.</div>
+          <div class="divider"></div>
+          <div class="metrics"><div class="metric"><div class="v">₱112,500</div><div class="k">This period</div></div><div class="metric"><div class="v green">↑ 12%</div><div class="k">vs last period</div></div></div>
+          <div class="card-foot"><span class="updated">Last updated: Today</span><span class="view">View Report →</span></div>
+        </a>
+        <a class="card" href="reports.html?type=sales">
+          <i data-lucide="arrow-up-right" class="arrow"></i>
+          <div class="card-head"><div class="icon-sq teal"><i data-lucide="shopping-cart"></i></div><div class="ti">POS Report</div></div>
+          <div class="desc">Point of sale retail transactions, product sales, and cash vs non-cash daily summary.</div>
+          <div class="divider"></div>
+          <div class="metrics"><div class="metric"><div class="v">38</div><div class="k">Transactions this period</div></div><div class="metric"><div class="v">₱22,400</div><div class="k">Retail revenue</div></div></div>
+          <div class="card-foot"><span class="updated">Last updated: Today</span><span class="view">View Report →</span></div>
+        </a>
+      </div>
+
+      <!-- ============ APPOINTMENTS & SCHEDULING ============ -->
+      <div class="cat-row"><span class="lbl">Appointments &amp; Scheduling</span><span class="pill">2 reports</span><span class="rule"></span></div>
+      <div class="grid cat-grid">
+        <a class="card" href="reports.html?type=appointments">
+          <i data-lucide="arrow-up-right" class="arrow"></i>
+          <div class="card-head"><div class="icon-sq blue"><i data-lucide="calendar"></i></div><div class="ti">Appointments Report</div></div>
+          <div class="desc">Total appointments, completion rate, cancellations, no-shows, and daily breakdown.</div>
+          <div class="divider"></div>
+          <div class="metrics"><div class="metric"><div class="v">70</div><div class="k">This period</div></div><div class="metric"><div class="v green">74%</div><div class="k">Completion rate</div></div></div>
+          <div class="card-foot"><span class="updated">Last updated: Today</span><span class="view">View Report →</span></div>
+        </a>
+        <a class="card" href="reports.html?type=appointments">
+          <i data-lucide="arrow-up-right" class="arrow"></i>
+          <div class="card-head"><div class="icon-sq purple"><i data-lucide="user-check"></i></div><div class="ti">Staff Performance</div></div>
+          <div class="desc">Sessions handled per staff member, revenue generated, practitioner utilization rate, and no-show impact.</div>
+          <div class="divider"></div>
+          <div class="metrics"><div class="metric"><div class="v bold-small">Dr. Reyes</div><div class="k">Top performer</div></div><div class="metric"><div class="v">94%</div><div class="k">Utilization rate</div></div></div>
+          <div class="card-foot"><span class="updated">Last updated: Today</span><span class="view">View Report →</span></div>
+        </a>
+      </div>
+
+      <!-- ============ PATIENTS ============ -->
+      <div class="cat-row"><span class="lbl">Patients</span><span class="pill">3 reports</span><span class="rule"></span></div>
+      <div class="grid cat-grid">
+        <a class="card" href="reports.html?type=active-patients">
+          <i data-lucide="arrow-up-right" class="arrow"></i>
+          <div class="card-head"><div class="icon-sq green"><i data-lucide="activity"></i></div><div class="ti">Active Patients</div></div>
+          <div class="desc">Patients with ongoing packages, upcoming appointments, or sessions currently in progress.</div>
+          <div class="divider"></div>
+          <div class="metrics"><div class="metric"><div class="v green">38</div><div class="k">Currently active</div></div><div class="metric"><div class="v">6 Sessions</div><div class="k">In progress today</div></div></div>
+          <div class="card-foot"><span class="updated">Last updated: Today</span><span class="view">View Report →</span></div>
+        </a>
+        <a class="card" href="reports.html?type=retention">
+          <i data-lucide="arrow-up-right" class="arrow"></i>
+          <div class="card-head"><div class="icon-sq blue"><i data-lucide="refresh-cw"></i></div><div class="ti">Patient Retention</div></div>
+          <div class="desc">Return rate, average sessions per patient, and inactive patients who haven't visited in 90 or more days.</div>
+          <div class="divider"></div>
+          <div class="metrics"><div class="metric"><div class="v">68%</div><div class="k">Return rate</div></div><div class="metric"><div class="v orange">14 Inactive</div><div class="k">90+ days</div></div></div>
+          <div class="card-foot"><span class="updated">Last updated: Today</span><span class="view">View Report →</span></div>
+        </a>
+        <a class="card" href="reports.html?type=top-clients">
+          <i data-lucide="arrow-up-right" class="arrow"></i>
+          <div class="card-head"><div class="icon-sq amber"><i data-lucide="crown"></i></div><div class="ti">Top Clients</div></div>
+          <div class="desc">Highest-spending clients, most services availed, most packages purchased, and total lifetime value.</div>
+          <div class="divider"></div>
+          <div class="metrics"><div class="metric"><div class="v bold-small">Maria Cruz</div><div class="k">#1 client</div></div><div class="metric"><div class="v">₱89,500</div><div class="k">Top spend</div></div></div>
+          <div class="card-foot"><span class="updated">Last updated: Today</span><span class="view">View Report →</span></div>
+        </a>
+      </div>
+
+      <!-- ============ INVENTORY & VOUCHERS ============ -->
+      <div class="cat-row"><span class="lbl">Inventory &amp; Vouchers</span><span class="pill">2 reports</span><span class="rule"></span></div>
+      <div class="grid cat-grid">
+        <a class="card" href="reports.html?type=inventory">
+          <span class="alert orange">3 Low Stock</span>
+          <div class="card-head"><div class="icon-sq orange"><i data-lucide="package"></i></div><div class="ti">Inventory Report</div></div>
+          <div class="desc">Stock levels, low stock alerts, expiring items, and product usage per service.</div>
+          <div class="divider"></div>
+          <div class="metrics"><div class="metric"><div class="v orange">3 Items</div><div class="k">Low stock</div></div><div class="metric"><div class="v red">2 Items</div><div class="k">Expiring soon</div></div></div>
+          <div class="card-foot"><span class="updated">Last updated: Today</span><span class="view">View Report →</span></div>
+        </a>
+        <a class="card" href="reports.html?type=vouchers">
+          <i data-lucide="arrow-up-right" class="arrow"></i>
+          <div class="card-head"><div class="icon-sq purple"><i data-lucide="ticket"></i></div><div class="ti">Vouchers Report</div></div>
+          <div class="desc">Active vouchers, redemption history, discount totals, and voucher performance over time.</div>
+          <div class="divider"></div>
+          <div class="metrics"><div class="metric"><div class="v">18</div><div class="k">Active vouchers</div></div><div class="metric"><div class="v">₱8,400</div><div class="k">Total discounts given</div></div></div>
+          <div class="card-foot"><span class="updated">Last updated: Today</span><span class="view">View Report →</span></div>
+        </a>
+      </div>
+
+      <!-- ============ SERVICES & PACKAGES ============ -->
+      <div class="cat-row"><span class="lbl">Services &amp; Packages</span><span class="pill">2 reports</span><span class="rule"></span></div>
+      <div class="grid cat-grid">
+        <a class="card" href="reports.html?type=services">
+          <i data-lucide="arrow-up-right" class="arrow"></i>
+          <div class="card-head"><div class="icon-sq pink"><i data-lucide="sparkles"></i></div><div class="ti">Services Report</div></div>
+          <div class="desc">Most availed services, revenue per service, and overall service performance breakdown.</div>
+          <div class="divider"></div>
+          <div class="metrics"><div class="metric"><div class="v bold-small">HydraFacial</div><div class="k">Most availed</div></div><div class="metric"><div class="v">₱45,000</div><div class="k">Top service revenue</div></div></div>
+          <div class="card-foot"><span class="updated">Last updated: Today</span><span class="view">View Report →</span></div>
+        </a>
+        <a class="card" href="reports.html?type=packages">
+          <span class="alert orange">3 Expiring Soon</span>
+          <div class="card-head"><div class="icon-sq amber"><i data-lucide="gift"></i></div><div class="ti">Packages Report</div></div>
+          <div class="desc">Active packages, sessions completed, expiring packages within 30 days, and package revenue.</div>
+          <div class="divider"></div>
+          <div class="metrics"><div class="metric"><div class="v">24</div><div class="k">Active packages</div></div><div class="metric"><div class="v orange">3 Expiring</div><div class="k">Within 30 days</div></div></div>
+          <div class="card-foot"><span class="updated">Last updated: Today</span><span class="view">View Report →</span></div>
+        </a>
+      </div>
+
+      <!-- ============ MARKETING & COMMUNICATION ============ -->
+      <div class="cat-row"><span class="lbl">Marketing &amp; Communication</span><span class="pill">3 reports</span><span class="rule"></span></div>
+      <div class="grid cat-grid">
+        <a class="card" href="reports.html?type=reviews">
+          <i data-lucide="arrow-up-right" class="arrow"></i>
+          <div class="card-head"><div class="icon-sq amber"><i data-lucide="star"></i></div><div class="ti">Reviews &amp; Ratings</div></div>
+          <div class="desc">Star rating trends over time, review volume, response rate, and overall clinic reputation score.</div>
+          <div class="divider"></div>
+          <div class="metrics"><div class="metric"><div class="v">4.8 ★</div><div class="k">Average rating</div></div><div class="metric"><div class="v">92%</div><div class="k">Response rate</div></div></div>
+          <div class="card-foot"><span class="updated">Last updated: Today</span><span class="view">View Report →</span></div>
+        </a>
+        <a class="card" href="reports.html?type=website">
+          <i data-lucide="arrow-up-right" class="arrow"></i>
+          <div class="card-head"><div class="icon-sq blue"><i data-lucide="globe"></i></div><div class="ti">Website &amp; Online Bookings</div></div>
+          <div class="desc">Online booking conversion rate, most viewed services on the public site, and blog performance.</div>
+          <div class="divider"></div>
+          <div class="metrics"><div class="metric"><div class="v">34 Online</div><div class="k">Bookings this period</div></div><div class="metric"><div class="v">62%</div><div class="k">Conversion rate</div></div></div>
+          <div class="card-foot"><span class="updated">Last updated: Today</span><span class="view">View Report →</span></div>
+        </a>
+        <a class="card" href="reports.html?type=messages">
+          <span class="alert orange">5 Unread</span>
+          <div class="card-head"><div class="icon-sq purple"><i data-lucide="message-square"></i></div><div class="ti">Messages Report</div></div>
+          <div class="desc">Inbound messages from email and contact forms, response rate, average reply time, and inquiry topics.</div>
+          <div class="divider"></div>
+          <div class="metrics"><div class="metric"><div class="v">142</div><div class="k">Messages this period</div></div><div class="metric"><div class="v green">88%</div><div class="k">Response rate</div></div></div>
+          <div class="card-foot"><span class="updated">Last updated: Today</span><span class="view">View Report →</span></div>
+        </a>
+      </div>
+  </main>
+</div>
+
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x===c));}));</script>
+</body>
+</html>

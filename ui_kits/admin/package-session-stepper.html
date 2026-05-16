@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin — Package Session Stepper</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: 'DM Sans', var(--font-body); color: #1A2E40; }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #0F1E2E; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg,#2D6A9F,#5BC0EB); }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-size: 11px; }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; }
+  aside.sidebar .side-collapse { height: 44px; padding: 0 16px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-weight: 700; font-size: 22px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+
+  .page { padding: 24px 32px 60px; display: flex; flex-direction: column; gap: 32px; }
+  .scr-label { background: #2D6A9F; color: #fff; padding: 8px 16px; border-radius: 6px; width: fit-content; font-weight: 700; font-size: 13px; }
+  .back { color: #2D6A9F; font-weight: 600; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .back .lucide { width: 14px; height: 14px; }
+
+  .title-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 10px 0 14px; }
+  .title-row h1 { font-weight: 700; font-size: 22px; color: #1A2E40; margin: 0; }
+  .badge { padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 11px; display: inline-block; }
+  .badge.green { background: #DCFCE7; color: #15803D; }
+  .badge.blue { background: #DBEAFE; color: #1D4ED8; }
+  .badge.orange { background: #FED7AA; color: #C2410C; }
+
+  /* Package progress bar */
+  .ppb { background: #fff; border: 1px solid #E5EFF7; border-radius: 10px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(26,58,92,0.04); }
+  .ppb .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+  .ppb .l { font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .ppb .l .sub { font-weight: 400; font-size: 12px; color: #5A7A96; margin-top: 2px; }
+  .ppb .r { font-size: 13px; color: #5A7A96; }
+  .ppb .nodes { display: flex; align-items: flex-start; position: relative; padding: 0 14px; }
+  .ppb .node { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+  .ppb .node .circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; z-index: 2; background: #fff; border: 2px solid #E5EFF7; color: #9BBAD4; }
+  .ppb .node.done .circle { background: #15803D; border-color: #15803D; color: #fff; }
+  .ppb .node.done .circle .lucide { width: 14px; height: 14px; }
+  .ppb .node.active .circle { background: #2D6A9F; border-color: #2D6A9F; color: #fff; box-shadow: 0 0 0 4px rgba(45,106,159,0.18); }
+  .ppb .node.free .circle { border-color: #F59E0B; color: #F59E0B; }
+  .ppb .node.free .circle .lucide { width: 14px; height: 14px; }
+  .ppb .node .lbl { font-size: 11px; color: #5A7A96; margin-top: 6px; font-weight: 600; }
+  .ppb .node.active .lbl { color: #2D6A9F; }
+  .ppb .node.free .lbl { color: #F59E0B; }
+  .ppb .node .sub { font-size: 10px; color: #9BBAD4; margin-top: 1px; }
+  .ppb .node.active .sub { color: #2D6A9F; }
+  .ppb .node .conn { position: absolute; top: 16px; height: 2px; background: #E5EFF7; left: 50%; right: -50%; z-index: 1; }
+  .ppb .node.done .conn, .ppb .node.active.connected .conn { background: #15803D; }
+  .ppb .node:last-child .conn { display: none; }
+  .ppb .view-prev { font-size: 12px; color: #2D6A9F; font-weight: 600; text-decoration: none; margin-top: 10px; display: inline-block; }
+
+  /* Info strips */
+  .info-strip { padding: 10px 14px; border-radius: 6px; display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .info-strip.blue { background: #F0F6FC; color: #5A7A96; }
+  .info-strip.blue .lucide { color: #2D6A9F; }
+  .info-strip.amber { background: #FFF8E7; color: #92400E; }
+  .info-strip.amber .lucide { color: #F59E0B; }
+  .info-strip .lucide { width: 14px; height: 14px; flex-shrink: 0; }
+
+  /* Header info strip - service type */
+  .svc-info { background: #EFF6FF; border-left: 4px solid #2D6A9F; padding: 10px 16px; border-radius: 8px; display: flex; align-items: center; gap: 12px; font-size: 12.5px; color: #5A7A96; }
+  .svc-info b { font-weight: 700; color: #2D6A9F; }
+  .svc-info .counter { margin-left: auto; padding: 4px 10px; background: #F0F6FC; color: #2D6A9F; border-radius: 6px; font-weight: 700; font-size: 11.5px; }
+
+  /* Main stepper */
+  .step-card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(26,58,92,0.06); border: 1px solid #E5EFF7; overflow: hidden; }
+  .nodes-row { display: flex; padding: 22px 22px 14px; gap: 0; overflow-x: auto; }
+  .step-node { flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 76px; position: relative; }
+  .step-node .circle { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; z-index: 2; background: #fff; border: 2px solid #E5EFF7; color: #9BBAD4; }
+  .step-node.done .circle { background: #15803D; border-color: #15803D; color: #fff; }
+  .step-node.active .circle { background: #2D6A9F; border-color: #2D6A9F; color: #fff; box-shadow: 0 0 0 4px rgba(45,106,159,0.18); }
+  .step-node .lbl { font-size: 10.5px; color: #5A7A96; margin-top: 6px; text-align: center; max-width: 86px; }
+  .step-node.active .lbl { color: #2D6A9F; font-weight: 700; }
+  .step-node .conn { position: absolute; top: 15px; height: 2px; background: #E5EFF7; left: 50%; right: -50%; z-index: 1; }
+  .step-node:last-child .conn { display: none; }
+
+  .step-nav { padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; background: #F8FBFD; border-top: 1px solid #F0F6FC; border-bottom: 1px solid #F0F6FC; font-size: 13px; color: #1A2E40; }
+  .step-nav .pfx { color: #5A7A96; }
+  .arr-btn { width: 28px; height: 28px; border: 1px solid #D0E8F5; background: #fff; border-radius: 6px; color: #5A7A96; }
+
+  .content-panel { padding: 22px 24px; }
+  .content-panel h2 { font-weight: 600; font-size: 18px; color: #1A2E40; margin: 0 0 4px; }
+  .content-panel .subtext { font-size: 13px; color: #5A7A96; margin-bottom: 18px; }
+
+  .summary-card { background: #fff; border: 1px solid #E5EFF7; border-radius: 8px; padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 700px) { .summary-card { grid-template-columns: 1fr; } }
+  .summary-card .k { font-weight: 700; font-size: 11px; color: #2D6A9F; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+  .summary-card .v { font-size: 14px; color: #1A2E40; margin-bottom: 12px; }
+  .summary-card .v .badge { font-size: 10px; padding: 2px 7px; margin-left: 4px; }
+  .chip-green { padding: 2px 8px; background: #DCFCE7; color: #15803D; border-radius: 9999px; font-weight: 700; font-size: 10.5px; margin-left: 4px; }
+
+  /* Carried over data card */
+  .carried { background: #fff; border: 1px solid rgba(45,106,159,0.30); border-radius: 8px; padding: 14px 16px; margin-top: 14px; }
+  .carried h3 { font-weight: 600; font-size: 12px; color: #2D6A9F; margin: 0 0 10px; }
+  .carried .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .carried .chip { padding: 5px 10px; background: #F0F6FC; color: #1A2E40; border-radius: 6px; font-size: 11.5px; display: inline-flex; align-items: center; gap: 5px; }
+  .carried .chip .lucide { width: 12px; height: 12px; color: #15803D; }
+  .carried .note { font-size: 11.5px; color: #5A7A96; margin-top: 10px; font-style: italic; }
+
+  .btn-row { padding: 16px 24px; display: flex; justify-content: space-between; gap: 10px; background: #F8FBFD; border-top: 1px solid #F0F6FC; }
+  .btn { height: 38px; padding: 0 18px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-ghost { background: #fff; color: #5A7A96; border-color: #D0E8F5; }
+  .btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: #2D6A9F; color: #fff; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Package Session Stepper</div>
+        <div class="topbar-crumb">Admin / Patients / Sarah Johnson / Packages / Premium Facial Package</div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="Package Session Stepper">
+
+      <!-- ============ SCREEN 1: Session 1 ============ -->
+      <div>
+        <div class="scr-label">Screen 1 — Session 1 (First Session · Full 9-Step Stepper)</div>
+        <a class="back" href="#" style="margin-top:12px;display:inline-flex;"><i data-lucide="arrow-left"></i> Back to Premium Facial Package</a>
+        <div class="title-row">
+          <h1>Hydra Facial — Session 1 of 6</h1>
+          <span class="badge green">Active Package</span>
+          <span class="badge blue">Session 1 — First Visit</span>
+        </div>
+
+        <!-- Package progress bar -->
+        <div class="ppb">
+          <div class="head">
+            <div class="l">Premium Facial Package<div class="sub">Sarah Johnson · 5 + 1 FREE · ₱15,000</div></div>
+            <div class="r">Session 1 of 6</div>
+          </div>
+          <div class="nodes">
+            <div class="node active connected"><div class="circle">1</div><div class="lbl">Session 1</div><div class="sub">Today</div><span class="conn"></span></div>
+            <div class="node"><div class="circle">2</div><div class="lbl">Session 2</div><span class="conn"></span></div>
+            <div class="node"><div class="circle">3</div><div class="lbl">Session 3</div><span class="conn"></span></div>
+            <div class="node"><div class="circle">4</div><div class="lbl">Session 4</div><span class="conn"></span></div>
+            <div class="node"><div class="circle">5</div><div class="lbl">Session 5</div><span class="conn"></span></div>
+            <div class="node free"><div class="circle"><i data-lucide="star"></i></div><div class="lbl">FREE</div></div>
+          </div>
+        </div>
+
+        <div class="svc-info" style="margin-top:14px;">
+          <i data-lucide="info"></i> <b>Clinical Aesthetic</b> · Patient: Sarah Johnson · Practitioner: Dr. Reyes
+          <span class="counter">1 / 9 steps</span>
+        </div>
+
+        <div class="step-card" style="margin-top:14px;">
+          <div class="nodes-row">
+            <div class="step-node active"><div class="circle">1</div><div class="lbl">Service Info</div><span class="conn"></span></div>
+            <div class="step-node"><div class="circle">2</div><div class="lbl">Schedule</div><span class="conn"></span></div>
+            <div class="step-node"><div class="circle">3</div><div class="lbl">Consent &amp; History</div><span class="conn"></span></div>
+            <div class="step-node"><div class="circle">4</div><div class="lbl">Doctor's Order</div><span class="conn"></span></div>
+            <div class="step-node"><div class="circle">5</div><div class="lbl">Vital Signs</div><span class="conn"></span></div>
+            <div class="step-node"><div class="circle">6</div><div class="lbl">Doctor's Notes</div><span class="conn"></span></div>
+            <div class="step-node"><div class="circle">7</div><div class="lbl">Nurse's Notes</div><span class="conn"></span></div>
+            <div class="step-node"><div class="circle">8</div><div class="lbl">Treatment Notes</div><span class="conn"></span></div>
+            <div class="step-node"><div class="circle">9</div><div class="lbl">Finalize</div></div>
+          </div>
+          <div class="step-nav"><span><span class="pfx">Viewing:</span> <b>Step 1 — Service Info</b></span><div style="display:flex;gap:6px;"><button class="arr-btn"><i data-lucide="chevron-left" style="width:13px;height:13px;"></i></button><button class="arr-btn"><i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button></div></div>
+          <div class="content-panel">
+            <h2>Service Info</h2>
+            <div class="subtext">Review the service details for this package session.</div>
+            <div class="summary-card">
+              <div>
+                <div class="k">Package</div><div class="v">Premium Facial Package</div>
+                <div class="k">Service</div><div class="v">Hydra Facial</div>
+                <div class="k">Session</div><div class="v">Session 1 of 6 — First Visit <span class="badge blue">First Visit</span></div>
+                <div class="k">Package Value</div><div class="v">₱15,000 (5 sessions + 1 FREE)</div>
+              </div>
+              <div>
+                <div class="k">Assigned to</div><div class="v">Sarah Johnson</div>
+                <div class="k">Assigned by</div><div class="v">Admin</div>
+                <div class="k">Package Start</div><div class="v">April 1, 2026</div>
+                <div class="k">Package Expiry</div><div class="v">December 31, 2026 <span class="chip-green">230 days left</span></div>
+              </div>
+            </div>
+            <div class="info-strip blue" style="margin-top:14px;"><i data-lucide="info"></i> This is the first session of this package. All steps are required including full consent forms and Doctor's Order.</div>
+          </div>
+          <div class="btn-row"><button class="btn btn-ghost" disabled><i data-lucide="arrow-left" style="width:13px;height:13px;"></i> Previous Step</button><button class="btn btn-primary">Save &amp; Continue <i data-lucide="arrow-right" style="width:13px;height:13px;"></i></button></div>
+        </div>
+      </div>
+
+      <!-- ============ SCREEN 2: Session 4 ============ -->
+      <div>
+        <div class="scr-label">Screen 2 — Session 4 (Returning Session · Simplified 7-Step Stepper)</div>
+        <a class="back" href="#" style="margin-top:12px;display:inline-flex;"><i data-lucide="arrow-left"></i> Back to Premium Facial Package</a>
+        <div class="title-row">
+          <h1>Hydra Facial — Session 4 of 6</h1>
+          <span class="badge green">Active Package</span>
+          <span class="badge orange">Session 4 — Returning Visit</span>
+        </div>
+
+        <div class="ppb">
+          <div class="head">
+            <div class="l">Premium Facial Package · Sarah Johnson · 5 + 1 FREE · ₱15,000</div>
+            <div class="r">Session 4 of 6</div>
+          </div>
+          <div class="nodes">
+            <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Session 1</div><div class="sub">Feb 10</div><span class="conn"></span></div>
+            <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Session 2</div><div class="sub">Mar 15</div><span class="conn"></span></div>
+            <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Session 3</div><div class="sub">Apr 15</div><span class="conn"></span></div>
+            <div class="node active connected"><div class="circle">4</div><div class="lbl">Session 4</div><div class="sub">Today</div><span class="conn"></span></div>
+            <div class="node"><div class="circle">5</div><div class="lbl">Session 5</div><span class="conn"></span></div>
+            <div class="node free"><div class="circle"><i data-lucide="star"></i></div><div class="lbl">FREE</div></div>
+          </div>
+          <a class="view-prev" href="#">View Previous Sessions →</a>
+        </div>
+
+        <div class="info-strip amber" style="margin-top:14px;"><i data-lucide="clock"></i> Returning session — consent and Doctor's Order carried over from Session 1. Review and confirm before proceeding.</div>
+
+        <div class="svc-info" style="margin-top:10px;">
+          <i data-lucide="info"></i> <b>Clinical Aesthetic</b> · Patient: Sarah Johnson · Practitioner: Dr. Reyes
+          <span class="counter">1 / 7 steps</span>
+        </div>
+
+        <div class="step-card" style="margin-top:14px;">
+          <div class="nodes-row">
+            <div class="step-node active"><div class="circle">1</div><div class="lbl">Service Info</div><span class="conn"></span></div>
+            <div class="step-node"><div class="circle">2</div><div class="lbl">Schedule</div><span class="conn"></span></div>
+            <div class="step-node"><div class="circle">3</div><div class="lbl">Quick Review</div><span class="conn"></span></div>
+            <div class="step-node"><div class="circle">4</div><div class="lbl">Vital Signs</div><span class="conn"></span></div>
+            <div class="step-node"><div class="circle">5</div><div class="lbl">Doctor's Notes</div><span class="conn"></span></div>
+            <div class="step-node"><div class="circle">6</div><div class="lbl">Nurse's Notes</div><span class="conn"></span></div>
+            <div class="step-node"><div class="circle">7</div><div class="lbl">Treatment Notes &amp; Finalize</div></div>
+          </div>
+          <div class="step-nav"><span><span class="pfx">Viewing:</span> <b>Step 1 — Service Info</b></span><div style="display:flex;gap:6px;"><button class="arr-btn"><i data-lucide="chevron-left" style="width:13px;height:13px;"></i></button><button class="arr-btn"><i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button></div></div>
+          <div class="content-panel">
+            <h2>Service Info</h2>
+            <div class="subtext">Session 4 details and package status.</div>
+            <div class="summary-card">
+              <div>
+                <div class="k">Package</div><div class="v">Premium Facial Package</div>
+                <div class="k">Service</div><div class="v">Hydra Facial</div>
+                <div class="k">Session</div><div class="v">Session 4 of 6 — Returning Visit <span class="badge orange">Returning</span></div>
+                <div class="k">Sessions Remaining After Today</div><div class="v">2 paid + 1 FREE</div>
+              </div>
+              <div>
+                <div class="k">Assigned to</div><div class="v">Sarah Johnson</div>
+                <div class="k">Package Expiry</div><div class="v">December 31, 2026 <span class="chip-green">230 days left</span></div>
+                <div class="k">Last Session</div><div class="v">Session 3 — April 15, 2026 · <a href="#" style="color:#2D6A9F;font-weight:600;text-decoration:none;font-size:12px;">View Record</a></div>
+                <div class="k">Last Session Notes</div><div class="v" style="font-style:italic;color:#5A7A96;font-size:13px;">"Third session completed. Recommended to continue monthly."</div>
+              </div>
+            </div>
+            <div class="carried">
+              <h3>Carried Over from Session 1</h3>
+              <div class="chips">
+                <span class="chip"><i data-lucide="check"></i> Consent Forms — Signed Apr 1</span>
+                <span class="chip"><i data-lucide="check"></i> Medical History — Completed Apr 1</span>
+                <span class="chip"><i data-lucide="check"></i> Doctor's Order — Protocol on file</span>
+                <span class="chip"><i data-lucide="check"></i> Package Payment — Confirmed</span>
+              </div>
+              <div class="note">These items are valid and carried over. Step 3 will show a quick review — no re-signing required unless flagged.</div>
+            </div>
+          </div>
+          <div class="btn-row"><button class="btn btn-ghost" disabled><i data-lucide="arrow-left" style="width:13px;height:13px;"></i> Previous Step</button><button class="btn btn-primary">Save &amp; Continue <i data-lucide="arrow-right" style="width:13px;height:13px;"></i></button></div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

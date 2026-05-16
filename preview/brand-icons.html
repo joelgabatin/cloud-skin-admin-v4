@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 28px; background: #fff; }
+  .grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 18px 12px; max-width: 640px; }
+  .cell { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .ico { width: 28px; height: 28px; color: #2D6A9F; }
+  .label { font-family: var(--font-display); font-weight: 500; font-size: 11px; color: var(--slate-500); text-align: center; }
+</style>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+<div class="grid">
+  <div class="cell"><i class="ico" data-lucide="layout-dashboard"></i><span class="label">Dashboard</span></div>
+  <div class="cell"><i class="ico" data-lucide="calendar"></i><span class="label">Calendar</span></div>
+  <div class="cell"><i class="ico" data-lucide="users"></i><span class="label">Patients</span></div>
+  <div class="cell"><i class="ico" data-lucide="user-cog"></i><span class="label">Staff</span></div>
+  <div class="cell"><i class="ico" data-lucide="scissors"></i><span class="label">Services</span></div>
+  <div class="cell"><i class="ico" data-lucide="package"></i><span class="label">Packages</span></div>
+  <div class="cell"><i class="ico" data-lucide="boxes"></i><span class="label">Inventory</span></div>
+  <div class="cell"><i class="ico" data-lucide="credit-card"></i><span class="label">Payments</span></div>
+
+  <div class="cell"><i class="ico" data-lucide="bar-chart-2"></i><span class="label">Reports</span></div>
+  <div class="cell"><i class="ico" data-lucide="message-square"></i><span class="label">Messages</span></div>
+  <div class="cell"><i class="ico" data-lucide="star"></i><span class="label">Reviews</span></div>
+  <div class="cell"><i class="ico" data-lucide="file-text"></i><span class="label">Blog</span></div>
+  <div class="cell"><i class="ico" data-lucide="settings"></i><span class="label">Settings</span></div>
+  <div class="cell"><i class="ico" data-lucide="bell"></i><span class="label">Notifs</span></div>
+  <div class="cell"><i class="ico" data-lucide="search"></i><span class="label">Search</span></div>
+  <div class="cell"><i class="ico" data-lucide="log-out"></i><span class="label">Sign out</span></div>
+
+  <div class="cell"><i class="ico" data-lucide="check-circle" style="color:#16A34A"></i><span class="label">Confirmed</span></div>
+  <div class="cell"><i class="ico" data-lucide="clock" style="color:#A16207"></i><span class="label">Pending</span></div>
+  <div class="cell"><i class="ico" data-lucide="loader" style="color:#1D4ED8"></i><span class="label">In progress</span></div>
+  <div class="cell"><i class="ico" data-lucide="x-circle" style="color:#B91C1C"></i><span class="label">Cancelled</span></div>
+  <div class="cell"><i class="ico" data-lucide="alert-triangle" style="color:#F59E0B"></i><span class="label">Low stock</span></div>
+  <div class="cell"><i class="ico" data-lucide="ban" style="color:#DC2626"></i><span class="label">No stock</span></div>
+  <div class="cell"><i class="ico" data-lucide="trending-up" style="color:#16A34A"></i><span class="label">Trend up</span></div>
+  <div class="cell"><i class="ico" data-lucide="trending-down" style="color:#DC2626"></i><span class="label">Trend down</span></div>
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

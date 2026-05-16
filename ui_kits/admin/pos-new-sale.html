@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — New Sale</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .badge.success { background: #DCFCE7; color: #15803D; }
+  .badge.warning { background: #FEF3C7; color: #B45309; }
+  .badge.danger  { background: #FEE2E2; color: #DC2626; }
+  .badge.info    { background: #DBEAFE; color: #1D4ED8; }
+  .section-card { background: #fff; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .field-input { width: 100%; height: 40px; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; box-sizing: border-box; }
+  .field-label { display: block; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; }
+  .btn { height: 40px; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-outline { background: #F0F6FC; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-outline:hover { background: #EBF6FD; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 18px; }
+  .btn-primary:hover { background: #1A5685; }
+  .sku { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; font-weight: 600; white-space: nowrap; }
+  .price { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .search-input { position: relative; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; box-sizing: border-box; }
+
+  /* POS layout */
+  .pos-layout { display: grid; grid-template-columns: minmax(0,3fr) minmax(0,2fr); gap: 20px; align-items: stretch; }
+  @media (max-width: 1100px) { .pos-layout { grid-template-columns: 1fr; } }
+  .pos-products { display: flex; flex-direction: column; gap: 14px; }
+  .cat-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+  .cat-tab { height: 36px; padding: 0 16px; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 9999px; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #5A7A96; cursor: pointer; }
+  .cat-tab.active { background: #2D6A9F; color: #fff; border-color: #2D6A9F; }
+  .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+  .product-card { background: #fff; border: 1.5px solid #D0E8F5; border-radius: 10px; padding: 14px; cursor: pointer; text-align: left; transition: all 150ms; display: flex; flex-direction: column; gap: 10px; font-family: var(--font-body); }
+  .product-card:hover { border-color: #2D6A9F; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,58,92,0.08); }
+  .product-card.hidden { display: none; }
+  .product-thumb { width: 100%; height: 90px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .product-thumb .lucide { width: 32px; height: 32px; }
+  .product-name { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #1A2E40; line-height: 1.3; }
+  .product-sku { margin-top: 4px; }
+  .product-stock { display: flex; align-items: center; gap: 6px; font-family: var(--font-body); font-size: 11px; color: #5A7A96; flex-wrap: wrap; }
+  .product-stock strong { color: #1A2E40; font-family: var(--font-display); font-weight: 700; }
+  .product-stock .stock-loc-line { display: flex; align-items: center; gap: 4px; line-height: 1.35; }
+  .product-stock .stock-loc-line .lucide { width: 11px; height: 11px; flex-shrink: 0; color: #9BBAD4; }
+  .product-card[data-status="low"] .product-stock strong { color: #B45309; }
+  .product-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+  .product-price { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: #2D6A9F; }
+  .product-empty { grid-column: 1 / -1; padding: 40px 20px; text-align: center; background: #fff; border: 1.5px dashed #D0E8F5; border-radius: 10px; color: #9BBAD4; font-family: var(--font-display); font-size: 14px; font-weight: 600; }
+  .product-empty .lucide { width: 28px; height: 28px; margin-bottom: 8px; display: block; margin-left: auto; margin-right: auto; }
+
+  /* Cart panel */
+  .cart-panel { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; flex-direction: column; min-height: 600px; }
+  .cart-head { padding: 18px 22px; border-bottom: 1px solid #D0E8F5; display: flex; align-items: center; justify-content: space-between; }
+  .cart-head h3 { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .cart-items { flex: 1; overflow-y: auto; padding: 8px 0; max-height: 280px; }
+  .cart-empty { padding: 36px 20px; text-align: center; color: #9BBAD4; font-family: var(--font-body); font-size: 13px; }
+  .cart-empty .lucide { width: 28px; height: 28px; margin-bottom: 8px; color: #D0E8F5; }
+  .cart-item { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; padding: 12px 22px; border-bottom: 1px solid #F0F6FC; }
+  .cart-item-name { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .cart-item-sku { font-family: var(--font-mono); font-size: 11px; color: #9BBAD4; margin-top: 2px; }
+  .qty-stepper { display: inline-flex; align-items: center; gap: 6px; }
+  .qty-btn { width: 26px; height: 26px; border-radius: 6px; background: #F0F6FC; border: none; color: #2D6A9F; font-family: var(--font-display); font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .qty-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .qty-num { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; min-width: 22px; text-align: center; }
+  .line-total { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1A2E40; min-width: 70px; text-align: right; }
+  .remove-btn { background: none; border: none; cursor: pointer; color: #DC2626; padding: 4px; display: inline-flex; }
+  .remove-btn .lucide { width: 14px; height: 14px; }
+  .totals { padding: 16px 22px; border-top: 1px solid #D0E8F5; display: flex; flex-direction: column; gap: 10px; }
+  .totals-row { display: flex; justify-content: space-between; font-family: var(--font-body); font-size: 13px; color: #5A7A96; }
+  .totals-row.grand { padding-top: 10px; border-top: 1px solid #D0E8F5; }
+  .totals-row.grand .lbl { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: #1A2E40; }
+  .totals-row.grand .val { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #2D6A9F; }
+  .pay-tabs { display: flex; gap: 6px; padding: 0 22px; }
+  .pay-tab { flex: 1; height: 44px; border-radius: 8px; background: #F0F6FC; border: 1.5px solid #D0E8F5; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .pay-tab.active { background: #EBF6FD; border-color: #2D6A9F; color: #2D6A9F; }
+  .pay-tab .lucide { width: 14px; height: 14px; }
+  .cash-panel { padding: 16px 22px 4px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cart-footer { padding: 16px 22px 22px; }
+  .complete-btn { width: 100%; height: 52px; background: #2D6A9F; color: #fff; border: none; border-radius: 10px; font-family: var(--font-display); font-size: 15px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.02em; }
+  .complete-btn:hover { background: #1A5685; }
+  .complete-btn:disabled { background: #9BBAD4; cursor: not-allowed; }
+  .tender-err { grid-column: 1 / -1; margin-top: 4px; padding: 8px 12px; background: #FEE2E2; border: 1px solid #FCA5A5; border-radius: 8px; color: #991B1B; font-family: var(--font-body); font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .tender-err .lucide { width: 14px; height: 14px; flex-shrink: 0; }
+  .tender-err[hidden] { display: none; }
+  .field-input.invalid { border-color: #DC2626; background: #FEF2F2; }
+
+  /* Product detail modal */
+  .modal-mask { position: fixed; inset: 0; background: rgba(26,58,92,0.5); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .modal-mask[hidden] { display: none; }
+  .modal-card { background: #fff; border-radius: 14px; width: 100%; max-width: 480px; box-shadow: 0 16px 48px rgba(26,58,92,0.20); overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; }
+  .modal-head { padding: 18px 22px; border-bottom: 1px solid #D0E8F5; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .modal-head h3 { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .modal-head .sub { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; margin-top: 4px; font-weight: 600; }
+  .modal-close { background: none; border: none; cursor: pointer; color: #5A7A96; padding: 4px; display: flex; }
+  .modal-body { padding: 18px 22px; display: grid; gap: 14px; overflow-y: auto; }
+  .pd-grid { display: grid; grid-template-columns: 80px 1fr; gap: 16px; align-items: center; }
+  .pd-thumb { width: 80px; height: 80px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .pd-thumb .lucide { width: 36px; height: 36px; }
+  .pd-meta { display: grid; gap: 4px; }
+  .pd-meta .row { display: flex; justify-content: space-between; align-items: center; font-family: var(--font-body); font-size: 13px; }
+  .pd-meta .row .k { color: #5A7A96; }
+  .pd-meta .row .v { color: #1A2E40; font-weight: 600; font-family: var(--font-display); }
+  .pd-meta .row .v.price { color: #2D6A9F; font-size: 16px; }
+  .loc-list { background: #F0F6FC; border: 1px solid #D0E8F5; border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .loc-list .lbl { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.04em; }
+  .loc-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-top: 1px dashed #D0E8F5; }
+  .loc-row:first-of-type { border-top: none; padding-top: 2px; }
+  .loc-row .name { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .loc-row .name .lucide { width: 14px; height: 14px; color: #2D6A9F; }
+  .loc-row .qty { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #1A2E40; }
+  .qty-picker { background: #F8FBFF; border: 1px solid #D0E8F5; border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+  .qty-picker .lbl { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: #1A2E40; }
+  .qty-picker .max { font-family: var(--font-body); font-size: 11px; color: #5A7A96; }
+  .qty-picker-controls { display: inline-flex; align-items: center; gap: 8px; }
+  .qty-picker-controls .qty-btn { width: 32px; height: 32px; font-size: 16px; }
+  .qty-picker-controls .qty-num { font-size: 18px; min-width: 32px; }
+  .modal-foot { padding: 14px 22px; border-top: 1px solid #D0E8F5; display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* Receipt modal */
+  .receipt-card { background: #fff; border-radius: 14px; width: 100%; max-width: 420px; box-shadow: 0 16px 48px rgba(26,58,92,0.20); overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; font-family: var(--font-body); }
+  .receipt-body { padding: 24px 24px 20px; overflow-y: auto; }
+  .receipt-head { text-align: center; padding-bottom: 16px; border-bottom: 1px dashed #D0E8F5; }
+  .receipt-head .logo { width: 48px; height: 48px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px; overflow: hidden; }
+  .receipt-head .logo img { width: 36px; height: 36px; object-fit: contain; }
+  .receipt-head .name { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: #1A2E40; letter-spacing: 0.04em; text-transform: uppercase; }
+  .receipt-head .sub { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 4px; }
+  .receipt-head .addr { font-family: var(--font-body); font-size: 11px; color: #9BBAD4; margin-top: 6px; line-height: 1.5; }
+  .receipt-meta { padding: 16px 0; border-bottom: 1px dashed #D0E8F5; display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: 12px; }
+  .receipt-meta .k { color: #5A7A96; font-family: var(--font-display); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 11px; }
+  .receipt-meta .v { color: #1A2E40; font-family: var(--font-mono); font-weight: 600; text-align: right; }
+  .receipt-items { padding: 14px 0; border-bottom: 1px dashed #D0E8F5; }
+  .receipt-item { display: grid; grid-template-columns: 1fr auto; gap: 4px; padding: 6px 0; font-size: 13px; }
+  .receipt-item .nm { color: #1A2E40; font-family: var(--font-body); font-weight: 500; }
+  .receipt-item .qty { color: #5A7A96; font-family: var(--font-mono); font-size: 11px; margin-top: 2px; }
+  .receipt-item .total { color: #1A2E40; font-family: var(--font-display); font-weight: 700; align-self: center; }
+  .receipt-totals { padding: 12px 0 16px; }
+  .receipt-totals .row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; color: #5A7A96; font-family: var(--font-body); }
+  .receipt-totals .row .v { font-family: var(--font-display); color: #1A2E40; font-weight: 600; }
+  .receipt-totals .row.grand { padding: 10px 0 4px; border-top: 1px dashed #D0E8F5; margin-top: 6px; }
+  .receipt-totals .row.grand .k { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #1A2E40; text-transform: uppercase; letter-spacing: 0.04em; }
+  .receipt-totals .row.grand .v { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: #2D6A9F; }
+  .receipt-foot { padding-top: 14px; text-align: center; font-size: 11px; color: #5A7A96; line-height: 1.6; }
+  .receipt-foot .ty { font-family: var(--font-display); font-weight: 600; color: #1A2E40; margin-bottom: 4px; }
+  .receipt-actions { padding: 14px 22px; border-top: 1px solid #D0E8F5; display: flex; gap: 8px; justify-content: flex-end; background: #F8FBFF; }
+
+  @media print {
+    @page { margin: 0; }
+    body * { visibility: hidden; }
+    .receipt-card, .receipt-card * { visibility: visible; }
+    .receipt-card { position: absolute; left: 0; top: 0; box-shadow: none; max-width: 100%; max-height: none; border-radius: 0; }
+    .receipt-actions { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">New Sale</div>
+        <div class="topbar-crumb">Admin / POS / New Sale</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+    <section class="page" data-screen-label="01 New Sale">
+      <div class="pos-layout">
+        <div class="pos-products">
+          <div class="section-card" style="padding:16px;">
+            <div class="search-input">
+              <i data-lucide="search"></i>
+              <input id="pos-search" placeholder="Search by product name or SKU...">
+            </div>
+          </div>
+          <div class="cat-tabs">
+            <button class="cat-tab active" type="button" data-cat="">All</button>
+            <button class="cat-tab" type="button" data-cat="Skincare">Skincare</button>
+            <button class="cat-tab" type="button" data-cat="Wellness">Wellness</button>
+            <button class="cat-tab" type="button" data-cat="Supplements">Supplements</button>
+          </div>
+          <div class="product-grid" id="product-grid"><!-- rendered by JS --></div>
+        </div>
+
+        <div class="cart-panel">
+          <div class="cart-head">
+            <h3>Current Sale</h3>
+            <span class="badge info"><i data-lucide="user" style="width:11px;height:11px"></i> Walk-in</span>
+          </div>
+          <div class="cart-items" id="cart-items"><!-- rendered by JS --></div>
+
+          <div style="padding:16px 22px 0;display:grid;grid-template-columns:1fr auto;gap:8px;">
+            <div class="search-input">
+              <i data-lucide="percent"></i>
+              <input id="discount-input" placeholder="Discount code or %" style="padding-left:34px;">
+            </div>
+            <button class="btn btn-outline" style="height:40px;" type="button" id="apply-discount">Apply</button>
+          </div>
+
+          <div class="totals">
+            <div class="totals-row"><span>Subtotal</span><span class="price" id="subtotal-val">₱0.00</span></div>
+            <div class="totals-row" id="discount-row" style="display:none;"><span id="discount-label">Discount</span><span class="price" style="color:#15803D;" id="discount-val">− ₱0.00</span></div>
+            <div class="totals-row"><span>VAT (12%)</span><span class="price" id="vat-val">₱0.00</span></div>
+            <div class="totals-row grand"><span class="lbl">Grand Total</span><span class="val" id="grand-val">₱0.00</span></div>
+          </div>
+
+          <div style="padding:6px 0 14px;">
+            <div class="pay-tabs" id="pay-tabs">
+              <button class="pay-tab active" type="button" data-pay="Cash"><i data-lucide="banknote"></i> Cash</button>
+              <button class="pay-tab" type="button" data-pay="Card"><i data-lucide="credit-card"></i> Card</button>
+              <button class="pay-tab" type="button" data-pay="GCash"><i data-lucide="smartphone"></i> GCash</button>
+            </div>
+            <div class="cash-panel" id="cash-panel">
+              <div>
+                <label class="field-label">Amount Tendered</label>
+                <input class="field-input" type="number" id="tendered" placeholder="0.00">
+              </div>
+              <div>
+                <label class="field-label">Change Due</label>
+                <input class="field-input" id="change-due" readonly value="₱0.00" style="background:#F0F6FC;color:#15803D;font-weight:700;">
+              </div>
+              <div class="tender-err" id="tendered-err" hidden><i data-lucide="alert-triangle"></i><span id="tendered-err-msg">Please enter an amount equal to or greater than the grand total.</span></div>
+            </div>
+          </div>
+
+          <div class="cart-footer">
+            <button class="complete-btn" type="button" id="complete-btn" disabled><i data-lucide="check-circle"></i> Complete Sale</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product detail modal -->
+      <div id="pd-mask" class="modal-mask" hidden>
+        <div class="modal-card">
+          <div class="modal-head">
+            <div>
+              <h3 id="pd-name">Product Name</h3>
+              <div class="sub" id="pd-sku">SKU-000</div>
+            </div>
+            <button class="modal-close" type="button" id="pd-close"><i data-lucide="x"></i></button>
+          </div>
+          <div class="modal-body">
+            <div class="pd-grid">
+              <div class="pd-thumb" id="pd-thumb"><i data-lucide="package"></i></div>
+              <div class="pd-meta">
+                <div class="row"><span class="k">Category</span><span class="v" id="pd-category">—</span></div>
+                <div class="row"><span class="k">In Stock</span><span class="v" id="pd-stock-total">—</span></div>
+                <div class="row"><span class="k">Status</span><span class="v" id="pd-status">—</span></div>
+                <div class="row"><span class="k">Unit Price</span><span class="v price" id="pd-price">₱—</span></div>
+              </div>
+            </div>
+            <div class="loc-list">
+              <span class="lbl">Locations in Clinic</span>
+              <div id="pd-locations"><!-- rendered by JS --></div>
+            </div>
+            <div class="qty-picker">
+              <div>
+                <div class="lbl">Quantity to add</div>
+                <div class="max" id="pd-max">max <span id="pd-max-val">—</span> available</div>
+              </div>
+              <div class="qty-picker-controls">
+                <button class="qty-btn" type="button" id="pd-minus">−</button>
+                <span class="qty-num" id="pd-qty">1</span>
+                <button class="qty-btn" type="button" id="pd-plus">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-foot">
+            <button class="btn btn-outline" type="button" id="pd-cancel">Cancel</button>
+            <button class="btn btn-primary" type="button" id="pd-add"><i data-lucide="plus"></i> Add to Cart</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Receipt modal -->
+      <div id="receipt-mask" class="modal-mask" hidden>
+        <div class="receipt-card">
+          <div class="receipt-body">
+            <div class="receipt-head">
+              <div class="logo"><img src="../../assets/logo-mark.png" alt=""></div>
+              <div class="name">Cloud Skin</div>
+              <div class="sub">Clinic + Wellness</div>
+              <div class="addr">Session Road, Baguio City, Philippines<br>+63 (74) 555-0142 · hello@cloudskin.com</div>
+            </div>
+            <div class="receipt-meta">
+              <div class="k">Order #</div><div class="v" id="r-order">POS-2026-00185</div>
+              <div class="k">Date</div><div class="v" id="r-date">—</div>
+              <div class="k">Cashier</div><div class="v">Anna Reyes</div>
+              <div class="k">Customer</div><div class="v">Walk-in</div>
+            </div>
+            <div class="receipt-items" id="r-items"></div>
+            <div class="receipt-totals" id="r-totals"></div>
+            <div class="receipt-foot">
+              <div class="ty">Thank you for your purchase!</div>
+              <div>Items sold are non-returnable once opened.<br>For inquiries call +63 (74) 555-0142.</div>
+            </div>
+          </div>
+          <div class="receipt-actions">
+            <button class="btn btn-outline" type="button" id="r-close">Close</button>
+            <button class="btn btn-primary" type="button" id="r-print"><i data-lucide="printer"></i> Print Receipt</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+</div>
+<script>
+const PRODUCTS = [{"name":"HydraFacial Serum","sku":"SKIN-001","price":350,"category":"Skincare","icon":"sparkles","c":"#2D6A9F","b":"#EBF6FD","locations":[{"name":"Front Desk Shelf","qty":12},{"name":"Stockroom A-2","qty":33}]},{"name":"Vitamin C Serum","sku":"SKIN-003","price":320,"category":"Skincare","icon":"sparkles","c":"#15803D","b":"#DCFCE7","locations":[{"name":"Front Desk Shelf","qty":20},{"name":"Stockroom A-2","qty":300}]},{"name":"Retinol Cream","sku":"SKIN-002","price":550,"category":"Skincare","icon":"droplet","c":"#B45309","b":"#FEF3C7","locations":[{"name":"Front Desk Shelf","qty":12}]},{"name":"SPF 50 Sunscreen","sku":"SKIN-004","price":450,"category":"Skincare","icon":"sun","c":"#B45309","b":"#FEF3C7","locations":[{"name":"Front Desk Shelf","qty":15},{"name":"Stockroom A-2","qty":47}]},{"name":"Glutathione Capsules","sku":"WLN-001","price":1200,"category":"Wellness","icon":"pill","c":"#0E7490","b":"#CFFAFE","locations":[{"name":"Stockroom B-1","qty":28}]},{"name":"Collagen Peptides","sku":"SUP-001","price":980,"category":"Supplements","icon":"package","c":"#6D28D9","b":"#F3E8FF","locations":[{"name":"Front Desk Shelf","qty":10},{"name":"Stockroom B-1","qty":30}]},{"name":"Multivitamin Daily","sku":"SUP-002","price":480,"category":"Supplements","icon":"package","c":"#15803D","b":"#DCFCE7","locations":[{"name":"Stockroom B-1","qty":96}]},{"name":"IV Drip Wellness Kit","sku":"WLN-002","price":1800,"category":"Wellness","icon":"syringe","c":"#1D4ED8","b":"#DBEAFE","locations":[{"name":"Cold Storage","qty":8}]},{"name":"Niacinamide 10%","sku":"SKIN-005","price":280,"category":"Skincare","icon":"droplet","c":"#2D6A9F","b":"#EBF6FD","locations":[{"name":"Front Desk Shelf","qty":25},{"name":"Stockroom A-2","qty":50}]},{"name":"Probiotics Beauty","sku":"SUP-003","price":720,"category":"Supplements","icon":"leaf","c":"#15803D","b":"#DCFCE7","locations":[{"name":"Stockroom B-2","qty":24}]}];
+
+function totalStock(p) { return p.locations.reduce((a, l) => a + l.qty, 0); }
+function statusOf(p) { var t = totalStock(p); return t === 0 ? 'out' : t <= 15 ? 'low' : 'in'; }
+function statusBadge(p) { var s = statusOf(p); if (s === 'out') return '<span class="badge danger">Out of Stock</span>'; if (s === 'low') return '<span class="badge warning">Low Stock</span>'; return '<span class="badge success">In Stock</span>'; }
+function locInline(p) {
+  return p.locations.map(function (l) {
+    return '<span class="stock-loc-line"><i data-lucide="map-pin"></i><strong>' + l.qty + '</strong> · ' + l.name + '</span>';
+  }).join('');
+}
+
+// Render product grid
+function renderProducts(filterCat, q) {
+  q = (q || '').toLowerCase().trim();
+  var grid = document.getElementById('product-grid');
+  var html = '';
+  var visible = 0;
+  PRODUCTS.forEach(function (p, i) {
+    var matchCat = !filterCat || p.category === filterCat;
+    var matchQ = !q || (p.name + ' ' + p.sku).toLowerCase().indexOf(q) !== -1;
+    var hidden = !(matchCat && matchQ);
+    if (!hidden) visible++;
+    html += '<button type="button" class="product-card' + (hidden ? ' hidden' : '') + '" data-i="' + i + '" data-status="' + statusOf(p) + '">' +
+      '<div class="product-thumb" style="background:' + p.b + ';color:' + p.c + '"><i data-lucide="' + p.icon + '"></i></div>' +
+      '<div class="product-meta">' +
+        '<div class="product-name">' + p.name + '</div>' +
+        '<div class="product-sku"><span class="sku">' + p.sku + '</span></div>' +
+        '<div class="product-stock" style="flex-direction:column;align-items:flex-start;gap:3px;">' + locInline(p) + '</div>' +
+        '<div class="product-foot"><span class="product-price">₱' + p.price.toLocaleString() + '</span>' + statusBadge(p) + '</div>' +
+      '</div>' +
+    '</button>';
+  });
+  if (visible === 0) html += '<div class="product-empty"><i data-lucide="search-x"></i>No products match your search and filters.</div>';
+  grid.innerHTML = html;
+  lucide.createIcons();
+  document.querySelectorAll('.product-card').forEach(function (card) {
+    card.addEventListener('click', function () { openDetail(parseInt(card.getAttribute('data-i'), 10)); });
+  });
+}
+
+// State
+var activeCat = '';
+var searchEl = document.getElementById('pos-search');
+document.querySelectorAll('.cat-tab').forEach(function (t) {
+  t.addEventListener('click', function () {
+    activeCat = t.getAttribute('data-cat') || '';
+    document.querySelectorAll('.cat-tab').forEach(function (o) { o.classList.toggle('active', o === t); });
+    renderProducts(activeCat, searchEl.value);
+  });
+});
+searchEl.addEventListener('input', function () { renderProducts(activeCat, searchEl.value); });
+
+// --- CART STATE ---
+var cart = []; // [{ sku, name, price, qty, max }]
+var discount = { amount: 0, label: '' };
+var payMethod = 'Cash';
+
+function findCart(sku) { return cart.find(function (c) { return c.sku === sku; }); }
+
+function renderCart() {
+  var box = document.getElementById('cart-items');
+  if (cart.length === 0) {
+    box.innerHTML = '<div class="cart-empty"><i data-lucide="shopping-cart"></i><div>Cart is empty.<br>Click a product to add it.</div></div>';
+    lucide.createIcons();
+    document.getElementById('complete-btn').disabled = true;
+  } else {
+    box.innerHTML = cart.map(function (it, idx) {
+      var lineTotal = it.qty * it.price;
+      return '<div class="cart-item">' +
+        '<div><div class="cart-item-name">' + it.name + '</div><div class="cart-item-sku">' + it.sku + ' · ₱' + it.price.toLocaleString() + '</div></div>' +
+        '<div class="qty-stepper">' +
+          '<button class="qty-btn" type="button" data-act="dec" data-i="' + idx + '">−</button>' +
+          '<span class="qty-num">' + it.qty + '</span>' +
+          '<button class="qty-btn" type="button" data-act="inc" data-i="' + idx + '"' + (it.qty >= it.max ? ' disabled' : '') + '>+</button>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<span class="line-total">₱' + lineTotal.toLocaleString() + '</span>' +
+          '<button class="remove-btn" type="button" data-act="rm" data-i="' + idx + '" title="Remove"><i data-lucide="x"></i></button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+    lucide.createIcons();
+    document.querySelectorAll('.qty-btn[data-act], .remove-btn[data-act]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var i = parseInt(b.getAttribute('data-i'), 10);
+        var act = b.getAttribute('data-act');
+        if (act === 'inc' && cart[i].qty < cart[i].max) cart[i].qty++;
+        else if (act === 'dec') { if (cart[i].qty > 1) cart[i].qty--; else cart.splice(i, 1); }
+        else if (act === 'rm') cart.splice(i, 1);
+        renderCart(); renderTotals();
+      });
+    });
+    document.getElementById('complete-btn').disabled = false;
+    updateCompleteState();
+  }
+}
+
+function renderTotals() {
+  var subtotal = cart.reduce(function (s, it) { return s + it.qty * it.price; }, 0);
+  var disc = Math.min(discount.amount || 0, subtotal);
+  var taxBase = subtotal - disc;
+  var vat = Math.round(taxBase * 0.12 * 100) / 100;
+  var grand = Math.round((taxBase + vat) * 100) / 100;
+  document.getElementById('subtotal-val').textContent = '₱' + subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 });
+  var discRow = document.getElementById('discount-row');
+  if (disc > 0) {
+    discRow.style.display = '';
+    document.getElementById('discount-label').textContent = 'Discount' + (discount.label ? ' (' + discount.label + ')' : '');
+    document.getElementById('discount-val').textContent = '− ₱' + disc.toLocaleString(undefined, { minimumFractionDigits: 2 });
+  } else { discRow.style.display = 'none'; }
+  document.getElementById('vat-val').textContent = '₱' + vat.toLocaleString(undefined, { minimumFractionDigits: 2 });
+  document.getElementById('grand-val').textContent = '₱' + grand.toLocaleString(undefined, { minimumFractionDigits: 2 });
+  recomputeChange();
+}
+
+function recomputeChange() {
+  var grand = parseFloat(document.getElementById('grand-val').textContent.replace(/[^0-9.]/g, '')) || 0;
+  var tenderedEl = document.getElementById('tendered');
+  var tendered = parseFloat(tenderedEl.value) || 0;
+  var change = Math.max(0, tendered - grand);
+  document.getElementById('change-due').value = '₱' + change.toLocaleString(undefined, { minimumFractionDigits: 2 });
+  updateCompleteState();
+}
+
+function updateCompleteState() {
+  var btn = document.getElementById('complete-btn');
+  var err = document.getElementById('tendered-err');
+  var errMsg = document.getElementById('tendered-err-msg');
+  var tenderedEl = document.getElementById('tendered');
+  var grand = parseFloat(document.getElementById('grand-val').textContent.replace(/[^0-9.]/g, '')) || 0;
+  var tenderedRaw = tenderedEl.value;
+  var tendered = parseFloat(tenderedRaw) || 0;
+
+  // Empty cart
+  if (cart.length === 0) {
+    btn.disabled = true;
+    err.hidden = true;
+    tenderedEl.classList.remove('invalid');
+    return;
+  }
+
+  // Non-cash payment — no cash validation
+  if (payMethod !== 'Cash') {
+    btn.disabled = false;
+    err.hidden = true;
+    tenderedEl.classList.remove('invalid');
+    return;
+  }
+
+  // Cash: must enter amount ≥ grand total
+  if (tenderedRaw === '' || tendered === 0) {
+    btn.disabled = true;
+    errMsg.textContent = 'Enter the amount tendered to complete the sale.';
+    err.hidden = false;
+    tenderedEl.classList.remove('invalid');
+  } else if (tendered < grand) {
+    btn.disabled = true;
+    var short = (grand - tendered).toLocaleString(undefined, { minimumFractionDigits: 2 });
+    errMsg.textContent = 'Amount is ₱' + short + ' short. Please enter ₱' + grand.toLocaleString(undefined, { minimumFractionDigits: 2 }) + ' or more.';
+    err.hidden = false;
+    tenderedEl.classList.add('invalid');
+  } else {
+    btn.disabled = false;
+    err.hidden = true;
+    tenderedEl.classList.remove('invalid');
+  }
+}
+document.getElementById('tendered').addEventListener('input', recomputeChange);
+
+// Payment tabs
+document.querySelectorAll('.pay-tab').forEach(function (t) {
+  t.addEventListener('click', function () {
+    payMethod = t.getAttribute('data-pay');
+    document.querySelectorAll('.pay-tab').forEach(function (o) { o.classList.toggle('active', o === t); });
+    document.getElementById('cash-panel').style.display = payMethod === 'Cash' ? '' : 'none';
+    updateCompleteState();
+  });
+});
+
+// Discount
+document.getElementById('apply-discount').addEventListener('click', function () {
+  var v = (document.getElementById('discount-input').value || '').trim();
+  if (!v) { discount = { amount: 0, label: '' }; renderTotals(); return; }
+  var subtotal = cart.reduce(function (s, it) { return s + it.qty * it.price; }, 0);
+  if (v.endsWith('%')) {
+    var pct = parseFloat(v); if (!isNaN(pct)) discount = { amount: subtotal * pct / 100, label: v };
+  } else if (/^MAY10$/i.test(v)) discount = { amount: subtotal * 0.10, label: 'MAY10' };
+  else if (/^GLOW20$/i.test(v)) discount = { amount: subtotal * 0.20, label: 'GLOW20' };
+  else {
+    var fixed = parseFloat(v.replace(/[^0-9.]/g, '')); if (!isNaN(fixed)) discount = { amount: fixed, label: v };
+  }
+  renderTotals();
+});
+
+// --- PRODUCT DETAIL MODAL ---
+var currentDetailIdx = -1, currentDetailQty = 1;
+function openDetail(i) {
+  var p = PRODUCTS[i];
+  currentDetailIdx = i;
+  var existing = findCart(p.sku);
+  var totalAvail = totalStock(p) - (existing ? existing.qty : 0);
+  currentDetailQty = totalAvail > 0 ? 1 : 0;
+  document.getElementById('pd-name').textContent = p.name;
+  document.getElementById('pd-sku').textContent = p.sku;
+  var thumb = document.getElementById('pd-thumb');
+  thumb.style.background = p.b; thumb.style.color = p.c;
+  thumb.innerHTML = '<i data-lucide="' + p.icon + '"></i>';
+  document.getElementById('pd-category').textContent = p.category;
+  document.getElementById('pd-stock-total').textContent = totalStock(p) + ' units';
+  document.getElementById('pd-status').innerHTML = statusBadge(p);
+  document.getElementById('pd-price').textContent = '₱' + p.price.toLocaleString();
+  document.getElementById('pd-locations').innerHTML = p.locations.map(function (l) {
+    return '<div class="loc-row"><span class="name"><i data-lucide="map-pin"></i>' + l.name + '</span><span class="qty">' + l.qty + ' units</span></div>';
+  }).join('');
+  document.getElementById('pd-max-val').textContent = totalAvail;
+  document.getElementById('pd-qty').textContent = currentDetailQty;
+  refreshQtyButtons();
+  document.getElementById('pd-mask').hidden = false;
+  lucide.createIcons();
+}
+function refreshQtyButtons() {
+  var p = PRODUCTS[currentDetailIdx];
+  var existing = findCart(p.sku);
+  var totalAvail = totalStock(p) - (existing ? existing.qty : 0);
+  document.getElementById('pd-minus').disabled = currentDetailQty <= 1;
+  document.getElementById('pd-plus').disabled = currentDetailQty >= totalAvail;
+  document.getElementById('pd-add').disabled = totalAvail <= 0;
+}
+document.getElementById('pd-minus').addEventListener('click', function () { if (currentDetailQty > 1) { currentDetailQty--; document.getElementById('pd-qty').textContent = currentDetailQty; refreshQtyButtons(); } });
+document.getElementById('pd-plus').addEventListener('click', function () {
+  var p = PRODUCTS[currentDetailIdx];
+  var existing = findCart(p.sku);
+  var totalAvail = totalStock(p) - (existing ? existing.qty : 0);
+  if (currentDetailQty < totalAvail) { currentDetailQty++; document.getElementById('pd-qty').textContent = currentDetailQty; refreshQtyButtons(); }
+});
+document.getElementById('pd-add').addEventListener('click', function () {
+  if (currentDetailIdx < 0 || currentDetailQty <= 0) return;
+  var p = PRODUCTS[currentDetailIdx];
+  var existing = findCart(p.sku);
+  if (existing) { existing.qty = Math.min(existing.qty + currentDetailQty, totalStock(p)); }
+  else { cart.push({ sku: p.sku, name: p.name, price: p.price, qty: currentDetailQty, max: totalStock(p) }); }
+  document.getElementById('pd-mask').hidden = true;
+  renderCart(); renderTotals();
+});
+document.getElementById('pd-close').addEventListener('click', function () { document.getElementById('pd-mask').hidden = true; });
+document.getElementById('pd-cancel').addEventListener('click', function () { document.getElementById('pd-mask').hidden = true; });
+document.getElementById('pd-mask').addEventListener('click', function (e) { if (e.target.id === 'pd-mask') document.getElementById('pd-mask').hidden = true; });
+
+// --- COMPLETE SALE → RECEIPT ---
+document.getElementById('complete-btn').addEventListener('click', function () {
+  if (cart.length === 0) return;
+  // Hard guard: re-check cash validity in case state drifted
+  var grand = parseFloat(document.getElementById('grand-val').textContent.replace(/[^0-9.]/g, '')) || 0;
+  var tendered = parseFloat(document.getElementById('tendered').value) || 0;
+  if (payMethod === 'Cash' && tendered < grand) {
+    document.getElementById('tendered').focus();
+    updateCompleteState();
+    return;
+  }
+  var orderNum = 'POS-2026-00' + (185 + Math.floor(Math.random() * 50));
+  var now = new Date();
+  var dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+  document.getElementById('r-order').textContent = orderNum;
+  document.getElementById('r-date').textContent = dateStr;
+
+  var subtotal = cart.reduce(function (s, it) { return s + it.qty * it.price; }, 0);
+  var disc = Math.min(discount.amount || 0, subtotal);
+  var taxBase = subtotal - disc;
+  var vat = Math.round(taxBase * 0.12 * 100) / 100;
+  var grand = Math.round((taxBase + vat) * 100) / 100;
+  var tendered = parseFloat(document.getElementById('tendered').value) || (payMethod === 'Cash' ? 0 : grand);
+  var change = Math.max(0, tendered - grand);
+
+  document.getElementById('r-items').innerHTML = cart.map(function (it) {
+    return '<div class="receipt-item"><div><div class="nm">' + it.name + '</div><div class="qty">' + it.qty + ' × ₱' + it.price.toLocaleString() + '</div></div><div class="total">₱' + (it.qty * it.price).toLocaleString() + '</div></div>';
+  }).join('');
+
+  var totalsHtml = '<div class="row"><span>Subtotal</span><span class="v">₱' + subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 }) + '</span></div>';
+  if (disc > 0) totalsHtml += '<div class="row"><span>Discount' + (discount.label ? ' (' + discount.label + ')' : '') + '</span><span class="v" style="color:#15803D;">− ₱' + disc.toLocaleString(undefined, { minimumFractionDigits: 2 }) + '</span></div>';
+  totalsHtml += '<div class="row"><span>VAT (12%)</span><span class="v">₱' + vat.toLocaleString(undefined, { minimumFractionDigits: 2 }) + '</span></div>';
+  totalsHtml += '<div class="row grand"><span class="k">Total</span><span class="v">₱' + grand.toLocaleString(undefined, { minimumFractionDigits: 2 }) + '</span></div>';
+  totalsHtml += '<div class="row" style="margin-top:8px;"><span>Payment</span><span class="v">' + payMethod + '</span></div>';
+  if (payMethod === 'Cash') {
+    totalsHtml += '<div class="row"><span>Tendered</span><span class="v">₱' + tendered.toLocaleString(undefined, { minimumFractionDigits: 2 }) + '</span></div>';
+    totalsHtml += '<div class="row"><span>Change</span><span class="v">₱' + change.toLocaleString(undefined, { minimumFractionDigits: 2 }) + '</span></div>';
+  }
+  document.getElementById('r-totals').innerHTML = totalsHtml;
+
+  document.getElementById('receipt-mask').hidden = false;
+  lucide.createIcons();
+});
+
+document.getElementById('r-close').addEventListener('click', function () {
+  document.getElementById('receipt-mask').hidden = true;
+  // Reset for new sale
+  cart = []; discount = { amount: 0, label: '' };
+  document.getElementById('tendered').value = '';
+  document.getElementById('discount-input').value = '';
+  renderCart(); renderTotals();
+});
+document.getElementById('r-print').addEventListener('click', function () { window.print(); });
+document.getElementById('receipt-mask').addEventListener('click', function (e) { if (e.target.id === 'receipt-mask') document.getElementById('r-close').click(); });
+
+// Init
+renderProducts('', '');
+renderCart();
+renderTotals();
+lucide.createIcons();
+</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 32px; background: #fff; display: flex; flex-direction: column; gap: 16px; max-width: 380px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  label { font-family: var(--font-display); font-weight: 500; font-size: 13px; color: #1A2E40; }
+  .input { height: 40px; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 14px; font-family: var(--font-body); font-size: 14px; color: #1A2E40; background: #fff; outline: none; box-sizing: border-box; }
+  .input.focus { border-color: #2D6A9F; }
+  .input-with-icon { position: relative; }
+  .input-with-icon .icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #9BBAD4; font-size: 14px; }
+  .input.error { border-color: #DC2626; }
+  .helper { font-family: var(--font-body); font-size: 12px; color: #5A7A96; }
+  .error-text { font-family: var(--font-body); font-size: 12px; color: #B91C1C; }
+</style>
+</head>
+<body>
+<div class="field">
+  <label>Email Address</label>
+  <input class="input" placeholder="admin@cloudskin.com">
+  <span class="helper">Use your staff email.</span>
+</div>
+<div class="field">
+  <label>Password</label>
+  <div class="input-with-icon">
+    <input class="input focus" type="password" value="password" style="padding-right: 40px;">
+    <span class="icon">👁</span>
+  </div>
+</div>
+<div class="field">
+  <label>Phone</label>
+  <input class="input error" value="0917">
+  <span class="error-text">Please enter a complete number.</span>
+</div>
+</body>
+</html>

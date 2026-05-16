@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — PO Queue</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+* { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .page-hero h1 { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .page-hero .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 4px; }
+
+  .btn { height: 38px; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; text-decoration: none; white-space: nowrap; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-outline { background: #fff; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-outline.danger { color: #DC2626; border-color: #FCA5A5; }
+  .btn-outline.danger:hover { background: #FEF2F2; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 18px; }
+  .btn-primary:hover { background: #1A5685; }
+  .btn-primary.big { height: 44px; font-size: 14px; padding: 0 22px; }
+  .btn-ghost-amber { background: none; color: #B45309; border: none; padding: 0; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+  .btn-ghost-amber:hover { color: #92400E; text-decoration: underline; }
+
+  /* Top summary bar */
+  .summary-bar { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); padding: 18px 22px; display: grid; grid-template-columns: repeat(4, auto) 1fr auto; gap: 20px; align-items: center; }
+  @media (max-width: 1180px) { .summary-bar { grid-template-columns: repeat(2, 1fr); } }
+  .sb-stat { display: flex; flex-direction: column; gap: 3px; padding-right: 22px; border-right: 1px solid #E5EFF7; }
+  .sb-stat:nth-child(4) { border-right: none; }
+  .sb-stat .lbl { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; }
+  .sb-stat .val { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #1A2E40; line-height: 1.1; display: inline-flex; align-items: center; gap: 8px; }
+  .sb-stat .val .ok { width: 22px; height: 22px; border-radius: 50%; background: #DCFCE7; color: #15803D; display: inline-flex; align-items: center; justify-content: center; }
+  .sb-stat .val .ok .lucide { width: 12px; height: 12px; }
+  .sb-stat .val.warning { color: #B45309; }
+  .sb-stat .val .alert { width: 22px; height: 22px; border-radius: 50%; background: #FEF3C7; color: #B45309; display: inline-flex; align-items: center; justify-content: center; }
+  .sb-stat .val .alert .lucide { width: 12px; height: 12px; }
+  .sb-actions { grid-column: 6; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .sb-actions .row { display: flex; gap: 10px; }
+  .sb-actions .footnote { font-family: var(--font-body); font-size: 11px; color: #9BBAD4; }
+
+  /* Info banner reused */
+  .info-banner { background: #EBF6FD; border: 1px solid #93C5FD; border-radius: 10px; padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start; }
+  .info-banner .lucide { width: 18px; height: 18px; color: #2D6A9F; flex-shrink: 0; margin-top: 1px; }
+  .info-banner .title { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; color: #1E40AF; }
+  .info-banner .desc  { font-family: var(--font-body); font-size: 12.5px; color: #1E40AF; margin-top: 3px; line-height: 1.5; }
+
+  /* Supplier card */
+  .supplier-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  .sc-head { padding: 16px 22px; border-bottom: 1px solid #E5EFF7; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; background: #F8FBFD; }
+  .sc-head .icon-plate { width: 38px; height: 38px; border-radius: 9px; background: #EBF6FD; color: #2D6A9F; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .sc-head .nm-wrap .nm { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: #1A2E40; }
+  .sc-head .nm-wrap .nm a { color: #2D6A9F; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; position: relative; }
+  .sc-head .nm-wrap .nm a:hover { text-decoration: underline; }
+  .sc-head .nm-wrap .nm a .lucide { width: 13px; height: 13px; opacity: 0.7; }
+  .sc-head .nm-wrap .nm a .tip { position: absolute; left: 0; top: calc(100% + 6px); background: #1A2E40; color: #fff; padding: 6px 10px; border-radius: 6px; font-family: var(--font-body); font-size: 11.5px; font-weight: 500; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 120ms; box-shadow: 0 4px 12px rgba(15,30,48,0.25); text-decoration: none; }
+  .sc-head .nm-wrap .nm a:hover .tip { opacity: 1; }
+  .sc-head .nm-wrap .meta { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 2px; }
+  .sc-head .item-count { background: #F1F5F9; color: #475569; font-family: var(--font-display); font-weight: 600; font-size: 11px; padding: 4px 10px; border-radius: 9999px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .sc-head .subtotal { margin-left: auto; font-family: var(--font-display); font-weight: 700; font-size: 18px; color: #1A2E40; }
+  .sc-head .subtotal .lbl { display: block; font-family: var(--font-display); font-size: 10px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 11px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #E5EFF7; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  .nm { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .sku { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; font-weight: 600; }
+  .mono { font-family: var(--font-mono); font-size: 13px; color: #5A7A96; }
+  .price { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #1A2E40; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .badge.no { background: #FEE2E2; color: #DC2626; }
+  .badge.low { background: #FEF3C7; color: #B45309; }
+  .badge.ok { background: #DCFCE7; color: #15803D; }
+  .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .qty-input { width: 70px; height: 34px; border: 2px solid #2D6A9F; border-radius: 7px; background: #EBF6FD; text-align: center; font-family: var(--font-mono); font-weight: 700; font-size: 13px; color: #1A2E40; outline: none; }
+  .qty-input:focus { background: #fff; }
+  .cost-wrap { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
+  .cost-input { width: 96px; height: 32px; border: 1.5px solid #D0E8F5; border-radius: 7px; padding: 0 8px 0 22px; font-family: var(--font-mono); font-weight: 600; font-size: 13px; color: #1A2E40; background: #fff; outline: none; position: relative; }
+  .cost-input:focus { border-color: #2D6A9F; }
+  .cost-field { position: relative; }
+  .cost-field::before { content: '\20B1'; position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-family: var(--font-mono); font-size: 12px; color: #9BBAD4; pointer-events: none; }
+  .price-warn { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-display); font-size: 10.5px; font-weight: 600; color: #B45309; line-height: 1.3; }
+  .price-warn .lucide { width: 11px; height: 11px; }
+
+  .row-price-changed { box-shadow: inset 3px 0 0 #B45309; }
+  .row-flash { animation: flashGreen 600ms ease; }
+  @keyframes flashGreen { 0% { background: #DCFCE7; } 100% { background: #fff; } }
+
+  .remove-btn { width: 30px; height: 30px; border: none; background: transparent; color: #9BBAD4; border-radius: 7px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .remove-btn:hover { background: #FEE2E2; color: #DC2626; }
+  .remove-btn .lucide { width: 14px; height: 14px; }
+
+  .added-on { font-family: var(--font-mono); font-size: 11px; color: #9BBAD4; white-space: nowrap; }
+
+  .sc-foot { padding: 12px 22px; display: flex; justify-content: flex-end; align-items: center; gap: 14px; background: #F8FBFD; border-top: 1px solid #E5EFF7; }
+  .sc-foot .lbl { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; }
+  .sc-foot .val { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: #2D6A9F; }
+
+  /* Unassigned warning card */
+  .unassigned-card { background: #FEF3C7; border: 1.5px solid #FCD34D; border-radius: 12px; overflow: hidden; }
+  .uc-head { padding: 16px 22px; display: flex; align-items: flex-start; gap: 12px; }
+  .uc-head .icon-plate { width: 36px; height: 36px; border-radius: 9px; background: #FCD34D; color: #92400E; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .uc-head .ttl { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: #92400E; }
+  .uc-head .sub { font-family: var(--font-body); font-size: 12.5px; color: #92400E; margin-top: 4px; line-height: 1.5; max-width: 680px; }
+  .unassigned-card table { background: #FFFBEB; }
+  .unassigned-card th { background: #FEF3C7; color: #92400E; border-bottom-color: #FCD34D; }
+  .unassigned-card td { border-bottom-color: #FDE68A; }
+  .unassigned-card .uc-actions { padding: 12px 22px; display: flex; gap: 18px; background: #FEF3C7; border-top: 1px solid #FCD34D; }
+  .link-danger { background: none; border: none; color: #DC2626; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; cursor: pointer; padding: 0; display: inline-flex; align-items: center; gap: 4px; }
+  .link-danger:hover { text-decoration: underline; }
+  .link-blue { background: none; border: none; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; cursor: pointer; padding: 0; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; }
+  .link-blue:hover { text-decoration: underline; }
+
+  /* Grand total bar */
+  .grand-bar { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .grand-bar .summary { font-family: var(--font-body); font-size: 13px; color: #5A7A96; }
+  .grand-bar .summary .grand { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #1A2E40; margin-left: 8px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">PO Queue</div>
+        <div class="topbar-crumb">Admin / Inventory / PO Queue</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 PO Queue">
+      <div class="page-hero">
+        <h1>PO Queue</h1>
+        <div class="sub">Review and manage products staged for purchase orders. Items are grouped by supplier.</div>
+      </div>
+
+      <!-- Summary bar -->
+      <div class="summary-bar">
+        <div class="sb-stat">
+          <span class="lbl">Items in Queue</span>
+          <span class="val" id="stat-items">6</span>
+        </div>
+        <div class="sb-stat">
+          <span class="lbl">Suppliers</span>
+          <span class="val">3</span>
+        </div>
+        <div class="sb-stat">
+          <span class="lbl">Est. Total Value</span>
+          <span class="val" id="stat-total">₱128,900</span>
+        </div>
+        <div class="sb-stat">
+          <span class="lbl">Unassigned</span>
+          <span class="val" id="stat-unassigned"><span class="ok"><i data-lucide="check"></i></span>0</span>
+        </div>
+        <div></div>
+        <div class="sb-actions">
+          <div class="row">
+            <button class="btn btn-outline danger" type="button" id="clear-queue-btn"><i data-lucide="trash-2"></i> Clear Queue</button>
+            <button class="btn btn-primary big" type="button" id="create-all-btn"><i data-lucide="shopping-bag"></i> Create All Purchase Orders</button>
+          </div>
+          <div class="footnote">Creates <b style="color:#2D6A9F;">3 separate Draft POs</b>, one per supplier.</div>
+        </div>
+      </div>
+
+      <!-- Info banner -->
+      <div class="info-banner">
+        <i data-lucide="info"></i>
+        <div>
+          <div class="title">How the queue works</div>
+          <div class="desc">Items added from inventory are grouped here by supplier. Adjust quantities and unit costs before generating purchase orders. Created POs will appear under <b>Purchase Orders</b> as drafts and won't be sent to suppliers until you approve them.</div>
+        </div>
+      </div>
+
+      <!-- ============ Supplier Card 1 — DermaCare Distributors ============ -->
+      <div class="supplier-card">
+        <div class="sc-head">
+          <div class="icon-plate"><i data-lucide="building-2"></i></div>
+          <div class="nm-wrap">
+            <div class="nm"><a href="inventory-supplier-profile.html?supplier=dermacare">DermaCare Distributors <i data-lucide="external-link"></i><span class="tip">View supplier profile →</span></a></div>
+            <div class="meta">Contact: Maria Reyes · +63 917 123 4567 · Payment Terms: Net 30</div>
+          </div>
+          <span class="item-count">3 items</span>
+          <div class="subtotal"><span class="lbl">Subtotal</span>₱49,400</div>
+          <a class="btn btn-outline" href="inventory-po-create.html?supplier=dermacare&from=queue"><i data-lucide="plus"></i> Create PO for This Supplier</a>
+        </div>
+        <table>
+          <thead><tr>
+            <th>Product Name</th>
+            <th>SKU</th>
+            <th>Current Stock</th>
+            <th style="text-align:center;">Order Qty</th>
+            <th>Unit Cost</th>
+            <th style="text-align:right;">Line Total</th>
+            <th>Added</th>
+            <th></th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="nm">Retinol Cream</span></td>
+              <td><span class="sku">SKIN-002</span></td>
+              <td><span class="badge no"><span class="dot"></span>No Stock · 0</span></td>
+              <td style="text-align:center;"><input class="qty-input" type="number" value="50" min="1"></td>
+              <td><div class="cost-field"><input class="cost-input" type="number" value="180" step="0.01"></div></td>
+              <td style="text-align:right;"><span class="price">₱9,000</span></td>
+              <td><span class="added-on">May 13 · 9:02 AM</span></td>
+              <td><button class="remove-btn" title="Remove from queue"><i data-lucide="x"></i></button></td>
+            </tr>
+            <tr>
+              <td><span class="nm">Filler 1mL</span></td>
+              <td><span class="sku">INJ-002</span></td>
+              <td><span class="badge low"><span class="dot"></span>Low · 3</span></td>
+              <td style="text-align:center;"><input class="qty-input" type="number" value="20" min="1"></td>
+              <td><div class="cost-field"><input class="cost-input" type="number" value="1600" step="0.01"></div></td>
+              <td style="text-align:right;"><span class="price">₱32,000</span></td>
+              <td><span class="added-on">May 13 · 9:05 AM</span></td>
+              <td><button class="remove-btn" title="Remove from queue"><i data-lucide="x"></i></button></td>
+            </tr>
+            <tr>
+              <td><span class="nm">Chemical Peel Solution</span></td>
+              <td><span class="sku">TREAT-001</span></td>
+              <td><span class="badge low"><span class="dot"></span>Low · 4</span></td>
+              <td style="text-align:center;"><input class="qty-input" type="number" value="30" min="1"></td>
+              <td><div class="cost-field"><input class="cost-input" type="number" value="280" step="0.01"></div></td>
+              <td style="text-align:right;"><span class="price">₱8,400</span></td>
+              <td><span class="added-on">May 13 · 9:05 AM</span></td>
+              <td><button class="remove-btn" title="Remove from queue"><i data-lucide="x"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="sc-foot"><span class="lbl">Subtotal</span><span class="val">₱49,400</span></div>
+      </div>
+
+      <!-- ============ Supplier Card 2 — MedSupply PH ============ -->
+      <div class="supplier-card">
+        <div class="sc-head">
+          <div class="icon-plate"><i data-lucide="building-2"></i></div>
+          <div class="nm-wrap">
+            <div class="nm"><a href="inventory-supplier-profile.html?supplier=medsupply">MedSupply PH <i data-lucide="external-link"></i><span class="tip">View supplier profile →</span></a></div>
+            <div class="meta">Contact: Juan Santos · +63 917 555 0142 · Payment Terms: Net 15</div>
+          </div>
+          <span class="item-count">2 items</span>
+          <div class="subtotal"><span class="lbl">Subtotal</span>₱29,500</div>
+          <a class="btn btn-outline" href="inventory-po-create.html?supplier=medsupply&from=queue"><i data-lucide="plus"></i> Create PO for This Supplier</a>
+        </div>
+        <table>
+          <thead><tr>
+            <th>Product Name</th>
+            <th>SKU</th>
+            <th>Current Stock</th>
+            <th style="text-align:center;">Order Qty</th>
+            <th>Unit Cost</th>
+            <th style="text-align:right;">Line Total</th>
+            <th>Added</th>
+            <th></th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="nm">Botox 50u</span></td>
+              <td><span class="sku">INJ-001</span></td>
+              <td><span class="badge no"><span class="dot"></span>No Stock · 2</span></td>
+              <td style="text-align:center;"><input class="qty-input" type="number" value="10" min="1"></td>
+              <td><div class="cost-field"><input class="cost-input" type="number" value="2500" step="0.01"></div></td>
+              <td style="text-align:right;"><span class="price">₱25,000</span></td>
+              <td><span class="added-on">May 13 · 9:10 AM</span></td>
+              <td><button class="remove-btn" title="Remove from queue"><i data-lucide="x"></i></button></td>
+            </tr>
+            <tr class="row-price-changed">
+              <td><span class="nm">SPF 50 Sunscreen</span></td>
+              <td><span class="sku">SKIN-021</span></td>
+              <td><span class="badge ok"><span class="dot"></span>OK · 8</span></td>
+              <td style="text-align:center;"><input class="qty-input" type="number" value="30" min="1"></td>
+              <td>
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                  <div class="cost-field"><input class="cost-input" type="number" value="150" step="0.01" style="border-color:#FCD34D;background:#FFFBEB;"></div>
+                  <span class="price-warn"><i data-lucide="trending-up"></i> Last: ₱130 · +15%</span>
+                </div>
+              </td>
+              <td style="text-align:right;"><span class="price">₱4,500</span></td>
+              <td><span class="added-on">May 13 · 9:11 AM</span></td>
+              <td><button class="remove-btn" title="Remove from queue"><i data-lucide="x"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="sc-foot"><span class="lbl">Subtotal</span><span class="val">₱29,500</span></div>
+      </div>
+
+      <!-- ============ Supplier Card 3 — Wellness Depot ============ -->
+      <div class="supplier-card">
+        <div class="sc-head">
+          <div class="icon-plate"><i data-lucide="building-2"></i></div>
+          <div class="nm-wrap">
+            <div class="nm"><a href="inventory-supplier-profile.html?supplier=wellness">Wellness Depot <i data-lucide="external-link"></i><span class="tip">View supplier profile →</span></a></div>
+            <div class="meta">Contact: Ana Reyes · +63 917 222 8810 · Payment Terms: Cash on Delivery</div>
+          </div>
+          <span class="item-count">1 item</span>
+          <div class="subtotal"><span class="lbl">Subtotal</span>₱50,000</div>
+          <a class="btn btn-outline" href="inventory-po-create.html?supplier=wellness&from=queue"><i data-lucide="plus"></i> Create PO for This Supplier</a>
+        </div>
+        <table>
+          <thead><tr>
+            <th>Product Name</th>
+            <th>SKU</th>
+            <th>Current Stock</th>
+            <th style="text-align:center;">Order Qty</th>
+            <th>Unit Cost</th>
+            <th style="text-align:right;">Line Total</th>
+            <th>Added</th>
+            <th></th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="nm">Glutathione IV Drip</span></td>
+              <td><span class="sku">WELL-007</span></td>
+              <td><span class="badge no"><span class="dot"></span>No Stock · 0</span></td>
+              <td style="text-align:center;"><input class="qty-input" type="number" value="10" min="1"></td>
+              <td><div class="cost-field"><input class="cost-input" type="number" value="5000" step="0.01"></div></td>
+              <td style="text-align:right;"><span class="price">₱50,000</span></td>
+              <td><span class="added-on">May 13 · 9:15 AM</span></td>
+              <td><button class="remove-btn" title="Remove from queue"><i data-lucide="x"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="sc-foot"><span class="lbl">Subtotal</span><span class="val">₱50,000</span></div>
+      </div>
+
+      <!-- ============ Unassigned Products (only when ?unassigned=1) ============ -->
+      <div class="unassigned-card" id="unassigned-card" hidden>
+        <div class="uc-head">
+          <div class="icon-plate"><i data-lucide="alert-triangle"></i></div>
+          <div>
+            <div class="ttl">Unassigned Products — Cannot Create PO</div>
+            <div class="sub">The following products have no supplier assigned. Add a supplier to these products before they can be included in a purchase order.</div>
+          </div>
+        </div>
+        <table>
+          <thead><tr>
+            <th>Product Name</th>
+            <th>SKU</th>
+            <th>Current Stock</th>
+            <th style="text-align:center;">Order Qty</th>
+            <th>Added</th>
+            <th></th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="nm">Kojic Acid Soap</span></td>
+              <td><span class="sku">SKIN-030</span></td>
+              <td><span class="badge no"><span class="dot"></span>No Stock · 0</span></td>
+              <td style="text-align:center;"><input class="qty-input" type="number" value="50" min="1" style="border-color:#B45309;background:#FFFBEB;"></td>
+              <td><span class="added-on">May 13 · 9:20 AM</span></td>
+              <td style="text-align:right;"><button class="btn-ghost-amber" type="button">Assign Supplier <i data-lucide="arrow-right"></i></button></td>
+            </tr>
+            <tr>
+              <td><span class="nm">Biotin Capsules</span></td>
+              <td><span class="sku">SUPP-004</span></td>
+              <td><span class="badge low"><span class="dot"></span>Low · 5</span></td>
+              <td style="text-align:center;"><input class="qty-input" type="number" value="30" min="1" style="border-color:#B45309;background:#FFFBEB;"></td>
+              <td><span class="added-on">May 13 · 9:21 AM</span></td>
+              <td style="text-align:right;"><button class="btn-ghost-amber" type="button">Assign Supplier <i data-lucide="arrow-right"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="uc-actions">
+          <button class="link-danger" type="button"><i data-lucide="trash-2" style="width:13px;height:13px;"></i> Remove All Unassigned</button>
+          <a class="link-blue" href="#"><i data-lucide="settings" style="width:13px;height:13px;"></i> Go to Product Settings</a>
+        </div>
+      </div>
+
+      <!-- Grand total bar -->
+      <div class="grand-bar">
+        <div class="summary"><b id="grand-summary">3 suppliers · 6 items</b> · Grand Total: <span class="grand" id="grand-total">₱128,900</span></div>
+        <button class="btn btn-primary big" type="button" id="create-all-btn-2" title=""><i data-lucide="shopping-bag"></i> Create All Purchase Orders</button>
+      </div>
+
+    </section>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+  // ?unassigned=1 → reveal the warning card + flip the Unassigned stat to amber.
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('unassigned') !== '1') return;
+    var card = document.getElementById('unassigned-card');
+    if (card) card.hidden = false;
+    var statU = document.getElementById('stat-unassigned');
+    if (statU) {
+      statU.classList.add('warning');
+      statU.innerHTML = '<span class="alert"><i data-lucide="alert-triangle"></i></span>2';
+    }
+    // Show tooltip on Create All button explaining unassigned items will be excluded.
+    var tip = 'Unassigned items will be excluded from PO creation.';
+    var b1 = document.getElementById('create-all-btn');
+    var b2 = document.getElementById('create-all-btn-2');
+    if (b1) b1.title = tip;
+    if (b2) b2.title = tip;
+    if (window.lucide) window.lucide.createIcons();
+  })();
+
+  // Live line-total + subtotal + grand-total recalculation so the queue feels real.
+  (function () {
+    function fmt(n) { return '₱' + Math.round(n).toLocaleString('en-US'); }
+    function recalc() {
+      var grand = 0, itemCount = 0;
+      document.querySelectorAll('.supplier-card').forEach(function (card) {
+        var sub = 0;
+        card.querySelectorAll('tbody tr').forEach(function (tr) {
+          var q = parseFloat(tr.querySelector('.qty-input').value) || 0;
+          var c = parseFloat(tr.querySelector('.cost-input').value) || 0;
+          var lt = q * c;
+          tr.querySelector('.price').textContent = fmt(lt);
+          sub += lt;
+          itemCount++;
+        });
+        var subEl = card.querySelector('.sc-foot .val');
+        if (subEl) subEl.textContent = fmt(sub);
+        var subEl2 = card.querySelector('.sc-head .subtotal');
+        if (subEl2) {
+          subEl2.innerHTML = '<span class="lbl">Subtotal</span>' + fmt(sub);
+        }
+        grand += sub;
+      });
+      document.getElementById('stat-items').textContent = itemCount;
+      document.getElementById('stat-total').textContent = fmt(grand);
+      document.getElementById('grand-total').textContent = fmt(grand);
+      var supplierCount = document.querySelectorAll('.supplier-card').length;
+      document.getElementById('grand-summary').textContent = supplierCount + ' supplier' + (supplierCount===1?'':'s') + ' · ' + itemCount + ' item' + (itemCount===1?'':'s');
+    }
+    document.querySelectorAll('.qty-input, .cost-input').forEach(function (el) {
+      el.addEventListener('input', recalc);
+    });
+    // Remove row from queue
+    document.querySelectorAll('.remove-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var tr = btn.closest('tr');
+        var card = btn.closest('.supplier-card');
+        tr.remove();
+        if (card && card.querySelectorAll('tbody tr').length === 0) card.remove();
+        recalc();
+      });
+    });
+    // Clear queue
+    var clear = document.getElementById('clear-queue-btn');
+    if (clear) clear.addEventListener('click', function () {
+      if (!confirm('Clear all items from the queue? Created POs will not be affected.')) return;
+      document.querySelectorAll('.supplier-card').forEach(function (c) { c.remove(); });
+      recalc();
+    });
+  })();
+</script>
+</body>
+</html>

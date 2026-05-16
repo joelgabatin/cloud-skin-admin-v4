@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin — Returning Session Stepper</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: 'DM Sans', var(--font-body); color: #1A2E40; }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #0F1E2E; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg,#2D6A9F,#5BC0EB); }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; }
+  aside.sidebar .nav-item .chev { margin-left: auto; }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.2); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; }
+  aside.sidebar .side-collapse { height: 44px; padding: 0 16px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-weight: 700; font-size: 22px; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+
+  .page { padding: 24px 32px 60px; display: flex; flex-direction: column; gap: 14px; }
+  .back { color: #2D6A9F; font-weight: 600; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .back .lucide { width: 14px; height: 14px; }
+  .title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .title-row h1 { font-weight: 700; font-size: 22px; margin: 0; }
+  .badge { padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 11px; display: inline-block; }
+  .badge.green { background: #DCFCE7; color: #15803D; }
+  .badge.orange { background: #FED7AA; color: #C2410C; }
+  .pkg-pill { background: #fff; border: 1px solid #2D6A9F; color: #2D6A9F; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 12px; display: inline-flex; align-items: center; gap: 5px; }
+  .pkg-pill .lucide { width: 13px; height: 13px; }
+
+  .step-card { background: #fff; border-radius: 10px; border: 1px solid #E5EFF7; box-shadow: 0 2px 8px rgba(26,58,92,0.06); overflow: hidden; }
+  .nodes-row { display: flex; padding: 22px 22px 14px; overflow-x: auto; }
+  .step-node { flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 76px; position: relative; }
+  .step-node .circle { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; z-index: 2; background: #fff; border: 2px solid #E5EFF7; color: #9BBAD4; }
+  .step-node .circle .lucide { width: 13px; height: 13px; }
+  .step-node.carried .circle { background: #0D9488; border-color: #0D9488; color: #fff; }
+  .step-node.active .circle { background: #2D6A9F; border-color: #2D6A9F; color: #fff; box-shadow: 0 0 0 4px rgba(45,106,159,0.18); }
+  .step-node .lbl { font-size: 10.5px; color: #5A7A96; margin-top: 6px; text-align: center; max-width: 86px; }
+  .step-node.carried .lbl { color: #0D9488; font-weight: 600; }
+  .step-node.active .lbl { color: #2D6A9F; font-weight: 700; }
+  .step-node .conn { position: absolute; top: 15px; height: 2px; background: #E5EFF7; left: 50%; right: -50%; z-index: 1; }
+  .step-node.carried .conn { background: #0D9488; }
+  .step-node:last-child .conn { display: none; }
+  .edit-hint { font-size: 9.5px; color: #0D9488; margin-top: 2px; display: inline-flex; align-items: center; gap: 3px; }
+  .edit-hint .lucide { width: 9px; height: 9px; }
+
+  .legend { display: flex; justify-content: flex-end; gap: 16px; padding: 0 22px 14px; font-size: 11px; color: #5A7A96; }
+  .legend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+  .legend .dot.done { background: #15803D; }
+  .legend .dot.active { background: #2D6A9F; }
+  .legend .dot.upcoming { background: #9CA3AF; }
+  .legend .dot.carried { background: #0D9488; }
+
+  .info-strip { padding: 10px 14px; border-radius: 6px; display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .info-strip.teal { background: #F0FDFA; border-left: 3px solid #0D9488; color: #115E59; }
+  .info-strip.teal .lucide { width: 14px; height: 14px; color: #0D9488; }
+  .info-strip.green { background: #F0FDF4; border-left: 3px solid #15803D; color: #166534; }
+  .info-strip.green .lucide { width: 14px; height: 14px; color: #15803D; }
+  .info-strip.blue { background: #F0F6FC; border-left: 3px solid #2D6A9F; color: #5A7A96; }
+  .info-strip.blue .lucide { width: 14px; height: 14px; color: #2D6A9F; }
+  .info-strip .link { margin-left: auto; color: #0D9488; font-weight: 600; text-decoration: none; }
+
+  .step-nav { padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; background: #F8FBFD; border-top: 1px solid #F0F6FC; border-bottom: 1px solid #F0F6FC; font-size: 13px; }
+  .pfx { color: #5A7A96; }
+  .arrows { display: flex; gap: 6px; }
+  .arr-btn { width: 28px; height: 28px; border: 1px solid #D0E8F5; background: #fff; border-radius: 6px; color: #5A7A96; }
+
+  .content-panel { padding: 22px 24px; }
+  .content-panel h2 { font-weight: 600; font-size: 18px; margin: 0 0 4px; }
+  .content-panel .subtext { font-size: 13px; color: #5A7A96; margin-bottom: 16px; }
+
+  .ro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .ro-grid { grid-template-columns: 1fr; } }
+  .ro-field { background: #F8F9FA; border-radius: 6px; padding: 10px 12px; }
+  .ro-field .k { font-size: 11px; font-weight: 700; color: #2D6A9F; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+  .ro-field .v { font-size: 14px; color: #1A2E40; }
+
+  .field-lbl { display: block; font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; }
+  input[type="text"], input[type="date"], input[type="time"], select, textarea { width: 100%; height: 40px; padding: 0 12px; border: 1px solid #D1E3F3; border-radius: 8px; font-family: inherit; font-size: 13px; color: #1A2E40; background: #fff; }
+  textarea { padding: 10px 12px; min-height: 70px; resize: vertical; }
+  .ed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 700px) { .ed-grid { grid-template-columns: 1fr; } }
+  .field-block { margin-bottom: 12px; }
+
+  .btn-row { padding: 16px 24px; display: flex; justify-content: space-between; gap: 10px; background: #F8FBFD; border-top: 1px solid #F0F6FC; }
+  .btn { height: 40px; padding: 0 18px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-ghost { background: #fff; color: #5A7A96; border-color: #D0E8F5; }
+  .btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-ghost.teal { color: #0D9488; border-color: #99F6E4; }
+  .btn-primary { background: #2D6A9F; color: #fff; }
+  .btn-teal { background: #0D9488; color: #fff; }
+
+  /* Doctor's Order styles */
+  .sec-h { font-weight: 700; font-size: 11px; color: #2D6A9F; text-transform: uppercase; letter-spacing: 0.05em; margin: 14px 0 8px; }
+  .tpl-card { border: 1.5px solid #2D6A9F; border-radius: 10px; padding: 16px; }
+  .tpl-dd { display: flex; align-items: center; justify-content: space-between; height: 44px; padding: 0 12px; border: 1px solid #D1E3F3; border-radius: 8px; }
+  .pill-green { background: #DCFCE7; color: #15803D; padding: 3px 9px; border-radius: 9999px; font-weight: 700; font-size: 10.5px; }
+  .chips-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chips-row span { padding: 4px 10px; background: #F0F6FC; color: #2D6A9F; border-radius: 6px; font-weight: 600; font-size: 11.5px; }
+  .signoff { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; padding: 14px 16px; }
+  .signoff .row { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 12.5px; }
+  .signoff .lbl-row { font-weight: 600; font-size: 11.5px; color: #5A7A96; min-width: 130px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">HydraFacial — Session 4</div>
+        <div class="topbar-crumb">Admin / Patients / Sarah Johnson / Packages / Premium Facial Package / Session 4</div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="Returning Session Stepper">
+      <a class="back" href="package-details.html?id=PKG001"><i data-lucide="arrow-left"></i> Back to Premium Facial Package</a>
+      <div class="title-row">
+        <h1>HydraFacial — Session 4</h1>
+        <span class="badge green">Active Package</span>
+        <span class="badge orange">Returning Visit</span>
+        <span class="pkg-pill"><i data-lucide="package"></i> Session 4 of 6</span>
+      </div>
+
+      <div class="info-strip blue" style="margin-top:4px;"><i data-lucide="info"></i> <b style="color:#2D6A9F;">Clinical Aesthetic</b> · Patient: Sarah Johnson · Practitioner: Dr. Reyes <span style="margin-left:auto;background:#fff;color:#2D6A9F;padding:4px 10px;border-radius:6px;font-weight:700;font-size:11.5px;border:1px solid #D0E8F5;">4 / 9 steps</span></div>
+
+      <!-- Master stepper card -->
+      <div class="step-card">
+        <div class="nodes-row">
+          <div class="step-node carried"><div class="circle"><i data-lucide="clock"></i></div><div class="lbl">Service Info</div><span class="conn"></span></div>
+          <div class="step-node carried"><div class="circle"><i data-lucide="clock"></i></div><div class="lbl">Schedule</div><span class="edit-hint"><i data-lucide="pencil"></i> editable</span><span class="conn"></span></div>
+          <div class="step-node carried"><div class="circle"><i data-lucide="clock"></i></div><div class="lbl">Consent &amp; History</div><span class="conn"></span></div>
+          <div class="step-node active"><div class="circle">4</div><div class="lbl">Doctor's Order</div><span class="conn"></span></div>
+          <div class="step-node"><div class="circle">5</div><div class="lbl">Vital Signs</div><span class="conn"></span></div>
+          <div class="step-node"><div class="circle">6</div><div class="lbl">Doctor's Notes</div><span class="conn"></span></div>
+          <div class="step-node"><div class="circle">7</div><div class="lbl">Nurse's Notes</div><span class="conn"></span></div>
+          <div class="step-node"><div class="circle">8</div><div class="lbl">Treatment Notes</div><span class="conn"></span></div>
+          <div class="step-node"><div class="circle">9</div><div class="lbl">Finalize</div></div>
+        </div>
+        <div class="legend">
+          <span><span class="dot done"></span>Completed this session</span>
+          <span><span class="dot active"></span>Active</span>
+          <span><span class="dot upcoming"></span>Upcoming</span>
+          <span><span class="dot carried"></span>Carried over from Session 1</span>
+        </div>
+      </div>
+
+      <div class="info-strip teal"><i data-lucide="clock"></i> Steps 1–3 carried over from Session 1 (April 1, 2026). Service Info and Consent &amp; History are read-only. Schedule can be updated by admin if needed. <a class="link" href="#">View Session 1 Records →</a></div>
+
+      <!-- ============ PANEL A — Step 1 Service Info (read-only) ============ -->
+      <div class="step-card pane" data-step="1" hidden>
+        <div class="step-nav"><span><span class="pfx">Viewing:</span> <b>Step 1 — Service Info</b></span><div class="arrows"><button class="arr-btn" disabled><i data-lucide="chevron-left" style="width:13px;height:13px;"></i></button><button class="arr-btn"><i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button></div></div>
+        <div class="content-panel">
+          <div class="info-strip teal" style="margin-bottom:14px;"><i data-lucide="lock"></i> Read-only — carried over from Session 1. Service information cannot be changed for an active package.</div>
+          <h2>Service Info</h2>
+          <div class="subtext">Service and package details from Session 1.</div>
+          <div class="ro-grid">
+            <div class="ro-field"><div class="k">Package</div><div class="v">Premium Facial Package</div></div>
+            <div class="ro-field"><div class="k">Service</div><div class="v">HydraFacial</div></div>
+            <div class="ro-field"><div class="k">Session</div><div class="v">Session 4 of 6 — Returning Visit <span class="badge orange" style="font-size:10px;padding:2px 7px;margin-left:4px;">Returning</span></div></div>
+            <div class="ro-field"><div class="k">Package Value</div><div class="v">₱15,000</div></div>
+            <div class="ro-field"><div class="k">Assigned to</div><div class="v">Sarah Johnson</div></div>
+            <div class="ro-field"><div class="k">Package Expiry</div><div class="v">December 31, 2026</div></div>
+          </div>
+        </div>
+        <div class="btn-row"><button class="btn btn-ghost" disabled><i data-lucide="arrow-left" style="width:13px;height:13px;"></i> Previous Step</button><button class="btn btn-ghost teal">Next Step <i data-lucide="arrow-right" style="width:13px;height:13px;"></i></button></div>
+      </div>
+
+      <!-- ============ PANEL B — Step 2 Schedule (editable) ============ -->
+      <div class="step-card pane" data-step="2" hidden>
+        <div class="step-nav"><span><span class="pfx">Viewing:</span> <b>Step 2 — Schedule</b></span><div class="arrows"><button class="arr-btn"><i data-lucide="chevron-left" style="width:13px;height:13px;"></i></button><button class="arr-btn"><i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button></div></div>
+        <div class="content-panel">
+          <div class="info-strip teal" style="margin-bottom:14px;"><i data-lucide="pencil"></i> Schedule can be updated by admin. Original schedule from Session 1 shown below — edit if this session has been rescheduled.</div>
+          <h2>Schedule</h2>
+          <div class="subtext">Update the appointment for this session.</div>
+          <div class="ed-grid">
+            <div class="field-block"><label class="field-lbl">Appointment Date</label><input type="date" value="2026-05-25"></div>
+            <div class="field-block"><label class="field-lbl">Appointment Time</label><input type="time" value="10:00"></div>
+            <div class="field-block"><label class="field-lbl">Assigned Practitioner</label><select><option selected>Dr. Reyes</option><option>Dr. Santos</option><option>Dr. Angela Lim</option></select></div>
+            <div class="field-block"><label class="field-lbl">Room / Chair</label><input type="text" value="Room 1"></div>
+          </div>
+          <div class="field-block"><label class="field-lbl">Notes</label><textarea>Follow-up session — returning patient.</textarea></div>
+          <div style="font-size:11.5px;color:#9BBAD4;font-style:italic;margin-top:8px;">Changes here update the appointment for this session only. Other sessions in the package are not affected.</div>
+        </div>
+        <div class="btn-row"><button class="btn btn-ghost teal"><i data-lucide="arrow-left" style="width:13px;height:13px;"></i> Previous Step</button><button class="btn btn-teal"><i data-lucide="save" style="width:13px;height:13px;"></i> Save Schedule</button></div>
+      </div>
+
+      <!-- ============ Step 3 Consent (read-only) ============ -->
+      <div class="step-card pane" data-step="3" hidden>
+        <div class="step-nav"><span><span class="pfx">Viewing:</span> <b>Step 3 — Consent &amp; History</b></span></div>
+        <div class="content-panel">
+          <div class="info-strip teal" style="margin-bottom:14px;"><i data-lucide="lock"></i> Read-only — consent forms carried over from Session 1.</div>
+          <h2>Consent &amp; History</h2>
+          <div class="subtext">All consents and questionnaires already on file.</div>
+          <div class="ro-grid">
+            <div class="ro-field"><div class="k">General Consent</div><div class="v">✓ Signed April 1, 2026</div></div>
+            <div class="ro-field"><div class="k">Medical History</div><div class="v">✓ Completed April 1, 2026 — 2 flagged items</div></div>
+          </div>
+        </div>
+        <div class="btn-row"><button class="btn btn-ghost teal"><i data-lucide="arrow-left" style="width:13px;height:13px;"></i> Previous Step</button><button class="btn btn-ghost teal">Next Step <i data-lucide="arrow-right" style="width:13px;height:13px;"></i></button></div>
+      </div>
+
+      <!-- ============ PANEL C — Step 4 Doctor's Order (active default) ============ -->
+      <div class="step-card pane" data-step="4">
+        <div class="step-nav"><span><span class="pfx">Viewing:</span> <b>Step 4 — Doctor's Order</b></span><div class="arrows"><button class="arr-btn"><i data-lucide="chevron-left" style="width:13px;height:13px;"></i></button><button class="arr-btn"><i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button></div></div>
+        <div class="content-panel">
+          <div class="info-strip green"><i data-lucide="check-circle"></i> Consent &amp; History verified from Session 1. Proceeding to Doctor's Order.</div>
+          <div class="info-strip blue" style="margin-top:10px;"><i data-lucide="info"></i> Previous session protocol available — Session 3 (April 15, 2026) used HydraFacial Standard Protocol. <button class="btn btn-ghost" style="margin-left:auto;height:30px;padding:0 12px;font-size:11.5px;">Use Previous Session</button></div>
+          <h2 style="margin-top:14px;">Doctor's Order</h2>
+          <div class="subtext">Select a protocol template and review the treatment plan for this session.</div>
+
+          <div class="sec-h">Protocol Template</div>
+          <div class="tpl-card">
+            <div class="tpl-dd"><span style="display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;">HydraFacial — Standard Protocol <span class="pill-green">Default</span></span><a style="color:#2D6A9F;font-weight:600;font-size:12px;cursor:pointer;">Change</a></div>
+            <div class="chips-row"><span>3 pre-steps</span><span>Hyaluronic + Booster</span><span>Full Face</span><span>4 post-steps</span></div>
+          </div>
+
+          <div class="sec-h">Treatment Plan</div>
+          <div class="ed-grid">
+            <div class="field-block"><label class="field-lbl">Procedure</label><input type="text" value="HydraFacial"></div>
+            <div class="field-block"><label class="field-lbl">Topical Anesthesia</label><input type="text" value="None required"></div>
+            <div class="field-block"><label class="field-lbl">Treatment Areas</label><input type="text" value="Full Face"></div>
+            <div class="field-block"><label class="field-lbl">Special Instructions</label><input type="text" value="Standard protocol — monitor comfort."></div>
+          </div>
+
+          <div class="sec-h">Physician Sign-off</div>
+          <div class="signoff">
+            <div class="row"><span class="lbl-row">Ordering Physician</span><span style="font-weight:700;">Dr. Reyes</span></div>
+            <div class="row"><span class="lbl-row">Order Date</span><span>May 25, 2026</span></div>
+            <div class="row"><span class="lbl-row">Order Status</span><span class="badge orange">Draft</span></div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:10px;"><i data-lucide="lock" style="width:13px;height:13px;"></i> Finalize &amp; Lock Order</button>
+          </div>
+        </div>
+        <div class="btn-row"><button class="btn btn-ghost"><i data-lucide="arrow-left" style="width:13px;height:13px;"></i> Previous Step</button><button class="btn btn-primary">Save &amp; Continue <i data-lucide="arrow-right" style="width:13px;height:13px;"></i></button></div>
+      </div>
+
+    </section>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+(function () {
+  // Add upcoming step panes
+  var contentHost = document.querySelector('.page');
+  var upcomingSteps = [
+    { n: 5, label: "Vital Signs" },
+    { n: 6, label: "Doctor's Notes" },
+    { n: 7, label: "Nurse's Notes" },
+    { n: 8, label: "Treatment Notes" },
+    { n: 9, label: "Finalize" }
+  ];
+  upcomingSteps.forEach(function (s) {
+    var card = document.createElement('div');
+    card.className = 'step-card pane';
+    card.setAttribute('data-step', s.n);
+    card.hidden = true;
+    card.innerHTML = '<div class="step-nav"><span><span class="pfx">Viewing:</span> <b>Step ' + s.n + ' — ' + s.label + '</b></span></div>'
+      + '<div class="content-panel"><h2>' + s.label + '</h2><div class="subtext">This step will be completed during the procedure today.</div>'
+      + '<div class="info-strip blue"><i data-lucide="info"></i> Step ' + s.n + ' content opens when the previous step is saved. Continue through the workflow to complete this session.</div></div>'
+      + '<div class="btn-row"><button class="btn btn-ghost"><i data-lucide="arrow-left" style="width:13px;height:13px;"></i> Previous Step</button><button class="btn btn-primary">Save &amp; Continue <i data-lucide="arrow-right" style="width:13px;height:13px;"></i></button></div>';
+    contentHost.appendChild(card);
+  });
+
+  // Stepper navigation: show only the selected step's pane.
+  var current = 4; // default landing
+  var nodes = document.querySelectorAll('.nodes-row .step-node');
+  var panes = document.querySelectorAll('.pane');
+  function show(step) {
+    current = step;
+    nodes.forEach(function (n, i) {
+      var num = i + 1;
+      n.classList.toggle('active', num === step);
+    });
+    panes.forEach(function (p) {
+      p.hidden = parseInt(p.getAttribute('data-step'), 10) !== step;
+    });
+    if (window.lucide) window.lucide.createIcons();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  nodes.forEach(function (n, i) {
+    n.addEventListener('click', function () { show(i + 1); });
+    n.style.cursor = 'pointer';
+  });
+  // Wire all step-nav arrow buttons
+  document.querySelectorAll('.step-nav .arr-btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var icon = b.querySelector('[data-lucide]');
+      var dir = icon && icon.getAttribute('data-lucide') === 'chevron-left' ? -1 : 1;
+      var next = Math.max(1, Math.min(9, current + dir));
+      show(next);
+    });
+  });
+  // Wire all btn-row Previous/Save & Continue buttons inside panes
+  document.querySelectorAll('.pane .btn-row .btn').forEach(function (b) {
+    b.addEventListener('click', function (e) {
+      var txt = b.textContent.toLowerCase();
+      if (txt.indexOf('previous') !== -1) { if (current > 1) show(current - 1); }
+      else if (txt.indexOf('next step') !== -1 || txt.indexOf('save') !== -1 || txt.indexOf('continue') !== -1) { if (current < 9) show(current + 1); }
+    });
+  });
+  show(4);
+})();
+</script>
+</body>
+</html>

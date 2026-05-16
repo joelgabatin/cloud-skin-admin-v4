@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Inactive Services</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill-side { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 24px; }
+
+  /* ============ TOOLBAR ============ */
+  .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .cat-pills { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+  .cat-pill { height: 36px; padding: 0 14px; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 500; color: #5A7A96; }
+  .cat-pill.active { background: #2D6A9F; border-color: #2D6A9F; color: #fff; }
+  .btn-primary { height: 40px; padding: 0 18px; background: #2D6A9F; border: none; border-radius: 8px; color: #fff; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; flex-shrink: 0; }
+  .btn-primary .lucide { width: 14px; height: 14px; }
+
+  /* ============ CARD GRID ============ */
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); border: 1px solid #D0E8F5; overflow: hidden; display: flex; flex-direction: column; }
+  .card-img { width: 100%; height: 180px; background: #F0F6FC; overflow: hidden; border-bottom: 1px solid #D0E8F5; }
+  .card-img img { width: 100%; height: 100%; object-fit: cover; }
+  .card-img .ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #9BBAD4; }
+  .card-hd { background: linear-gradient(135deg, #EBF6FD 0%, #F0F6FC 100%); padding: 16px 20px; border-bottom: 1px solid #D0E8F5; display: flex; justify-content: space-between; align-items: flex-start; }
+  .card-hd .nm { font-family: var(--font-display); font-weight: 600; font-size: 15px; color: #1A2E40; margin-bottom: 6px; }
+  .chip-cat { background: #EBF6FD; color: #2D6A9F; font-family: var(--font-display); font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 9999px; }
+  .chip-dur { background: #F0F6FC; color: #5A7A96; font-family: var(--font-body); font-size: 11px; padding: 2px 8px; border-radius: 9999px; }
+  .chip-row { display: inline-flex; gap: 6px; align-items: center; }
+  .status-badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .card-bd { padding: 16px 20px; flex: 1; display: flex; flex-direction: column; }
+  .card-desc { font-size: 12px; color: #5A7A96; line-height: 1.6; margin: 0 0 14px; flex: 1; }
+  .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .price { font-family: var(--font-display); font-weight: 700; font-size: 20px; color: #2D6A9F; }
+  .practs { display: inline-flex; }
+  .pavatar { width: 28px; height: 28px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 600; font-size: 10px; border: 2px solid #fff; }
+  .pavatar:not(:first-child) { margin-left: -6px; }
+  .card-ft { display: flex; justify-content: space-between; align-items: center; }
+  .toggle-pair { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #5A7A96; }
+  .toggle { width: 36px; height: 20px; border-radius: 9999px; background: #2D6A9F; cursor: pointer; position: relative; padding: 2px; display: flex; align-items: center; }
+  .toggle .knob { width: 16px; height: 16px; border-radius: 50%; background: #fff; margin-left: auto; transition: margin 150ms; }
+  .toggle.off { background: #D0E8F5; }
+  .toggle.off .knob { margin-left: 0; }
+  .action-btns { display: inline-flex; gap: 6px; }
+  .btn-edit { height: 30px; padding: 0 12px; background: #F0F6FC; border: 1.5px solid #D0E8F5; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-display); font-size: 12px; font-weight: 500; color: #5A7A96; }
+  .btn-edit .lucide { width: 12px; height: 12px; }
+  .btn-trash { height: 30px; width: 30px; background: #FEE2E2; border: 1.5px solid #FCA5A5; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #DC2626; }
+  .btn-trash .lucide { width: 14px; height: 14px; }
+
+  /* ============ MODAL ============ */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(26,58,92,0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 24px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: 16px; max-width: 560px; width: 100%; max-height: 90vh; box-shadow: 0 8px 32px rgba(26,58,92,0.18); overflow: hidden; display: flex; flex-direction: column; }
+  .modal.sm { max-width: 400px; }
+  .modal-head { padding: 20px 24px; border-bottom: 1px solid #D0E8F5; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+  .modal-head h2 { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: #1A2E40; margin: 0; }
+  .modal-head button { background: none; border: none; cursor: pointer; color: #5A7A96; display: flex; }
+  .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+  .upload-area { width: 100%; height: 200px; border: 2px dashed #D0E8F5; border-radius: 12px; background: #F8FBFF; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: #9BBAD4; }
+  .upload-area .lucide { width: 32px; height: 32px; margin-bottom: 8px; }
+  .upload-area .lbl { font-family: var(--font-display); font-size: 13px; font-weight: 500; color: #5A7A96; margin-bottom: 4px; }
+  .upload-area .sub { font-size: 11px; color: #9BBAD4; }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .field { }
+  .field.full { grid-column: 1 / -1; }
+  .field label { display: block; font-family: var(--font-display); font-weight: 500; font-size: 13px; color: #1A2E40; margin-bottom: 6px; }
+  .field input, .field select, .field textarea { width: 100%; height: 40px; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .field textarea { height: auto; padding: 10px 12px; resize: none; }
+  .modal-foot { padding: 16px 24px; border-top: 1px solid #D0E8F5; display: flex; justify-content: flex-end; gap: 10px; flex-shrink: 0; }
+  .btn-cancel { height: 38px; padding: 0 20px; background: none; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 14px; color: #5A7A96; }
+  .btn-solid { height: 38px; padding: 0 20px; background: #2D6A9F; border: none; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #fff; }
+  .btn-confirm-del { height: 38px; padding: 0 20px; background: #EF4444; border: none; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #fff; }
+
+  .confirm-body { padding: 24px; text-align: center; }
+  .confirm-icon { width: 60px; height: 60px; border-radius: 50%; background: #FEE2E2; color: #EF4444; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .confirm-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: #1A2E40; margin-bottom: 8px; }
+  .confirm-text { font-size: 13px; color: #5A7A96; }
+.svc-search { background: #fff; border: 1px solid #D0E8F5; border-radius: 8px; padding: 0 14px; display: flex; align-items: center; gap: 10px; height: 44px; margin-bottom: 16px; }
+.svc-search .lucide { width: 16px; height: 16px; color: #9BBAD4; flex-shrink: 0; }
+.svc-search input { flex: 1; border: none; outline: none; height: 100%; background: none; font-family: var(--font-body); font-size: 14px; color: #1A2E40; }
+.svc-search input::placeholder { color: #9BBAD4; }
+.svc-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.svc-bar-row .svc-search { flex: 1; margin-bottom: 0; }
+.svc-bar-row .icon-square { width: 44px; height: 44px; background: #F0F6FC; color: #2D6A9F; border: 1px solid #D0E8F5; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.svc-bar-row .icon-square .lucide { width: 16px; height: 16px; }
+.svc-bar-row .btn-add-service { height: 44px; padding: 0 18px; background: #2D6A9F; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside id="sidebar-mount" class="sidebar"></aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Inactive Services</div>
+        <div class="topbar-crumb">Admin / Inactive Services</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Inactive Services">
+      <div class="svc-bar-row"><div class="svc-search"><i data-lucide="search"></i><input id="svc-search-input" placeholder="Search by service name or category..."></div><button class="icon-square" title="Export"><i data-lucide="download"></i></button><button class="btn-add-service" id="open-add"><i data-lucide="plus"></i> Add Service</button></div>
+<span class="status-badge" style="background:#F1F5F9;color:#64748B">Inactive</span>
+          </div>
+          <div class="card-bd">
+            <p class="card-desc">Chemical exfoliation treatment for skin renewal and brightening.</p>
+            <div class="price-row">
+              <div class="price">₱3,500</div>
+              <div class="practs"><div class="pavatar" style="background:#16A34A">MS</div><div class="pavatar" style="background:#7C3AED">AR</div></div>
+            </div>
+            <div class="card-ft">
+              <div class="toggle-pair"><span>Inactive</span><div class="toggle off"><div class="knob"></div></div></div>
+              <div class="action-btns"><button class="btn-edit" data-act="edit"><i data-lucide="pencil"></i> Edit</button><button class="btn-trash" data-act="delete" data-name="Chemical Peel"><i data-lucide="trash-2"></i></button></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" data-cat="Skin Treatments">
+          <div class="card-img"><div class="ph">No Image</div></div>
+          <div class="card-hd">
+            <div>
+              <div class="nm">Microneedling</div>
+              <div class="chip-row"><span class="chip-cat">Skin Treatments</span><span class="chip-dur">60 min</span></div>
+            </div>
+            <span class="status-badge" style="background:#F1F5F9;color:#64748B">Inactive</span>
+          </div>
+          <div class="card-bd">
+            <p class="card-desc">Collagen induction therapy using micro-needles for skin rejuvenation.</p>
+            <div class="price-row">
+              <div class="price">₱4,500</div>
+              <div class="practs"><div class="pavatar" style="background:#16A34A">MS</div></div>
+            </div>
+            <div class="card-ft">
+              <div class="toggle-pair"><span>Inactive</span><div class="toggle off"><div class="knob"></div></div></div>
+              <div class="action-btns"><button class="btn-edit" data-act="edit"><i data-lucide="pencil"></i> Edit</button><button class="btn-trash" data-act="delete" data-name="Microneedling"><i data-lucide="trash-2"></i></button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Add/Edit Modal -->
+<div id="svc-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="svc-modal-title">Add Service</h2>
+      <button id="svc-modal-close"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="field full" style="margin-bottom:20px">
+        <label>Service Image</label>
+        <div class="upload-area"><i data-lucide="image"></i><div class="lbl">Click to upload image</div><div class="sub">PNG, JPG up to 5MB</div></div>
+      </div>
+      <div class="field-grid">
+        <div class="field full"><label>Service Name</label><input placeholder="e.g. Hydra Facial"></div>
+        <div class="field"><label>Category</label><select><option>Skin Treatments</option><option>Injectables</option><option>Laser</option><option>Hair</option><option>Wellness</option></select></div>
+        <div class="field"><label>Duration (minutes)</label><input type="number" placeholder="60"></div>
+        <div class="field"><label>Price (PHP)</label><input type="number" placeholder="2500"></div>
+        <div class="field full"><label>Description</label><textarea rows="3" placeholder="Describe the service..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" id="svc-cancel">Cancel</button>
+      <button class="btn-solid" id="svc-save">Save Service</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div id="del-modal" class="modal-overlay">
+  <div class="modal sm">
+    <div class="confirm-body">
+      <div class="confirm-icon"><i data-lucide="trash-2" style="width:28px;height:28px"></i></div>
+      <div class="confirm-title">Delete Service?</div>
+      <p class="confirm-text">Are you sure you want to delete <strong id="del-name">""</strong>? This action cannot be undone.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" id="del-cancel">Cancel</button>
+      <button class="btn-confirm-del" id="del-confirm">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Category pill filter
+  document.querySelectorAll('#cat-pills button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#cat-pills button').forEach(o => o.classList.toggle('active', o === b));
+      const c = b.dataset.c;
+      document.querySelectorAll('#grid .card').forEach(card => {
+        card.style.display = (c === 'All' || card.dataset.cat === c) ? '' : 'none';
+      });
+    });
+  });
+
+  // Toggle inside cards
+  document.querySelectorAll('.toggle').forEach(t => t.addEventListener('click', e => {
+    e.stopPropagation();
+    t.classList.toggle('off');
+    const lbl = t.parentElement.querySelector('span');
+    if (lbl) lbl.textContent = t.classList.contains('off') ? 'Inactive' : 'Active';
+  }));
+
+  // Add/Edit modal
+  const svcModal = document.getElementById('svc-modal');
+  const svcTitle = document.getElementById('svc-modal-title');
+  function openAdd() { svcTitle.textContent = 'Add Service'; svcModal.classList.add('open'); }
+  function openEdit() { svcTitle.textContent = 'Edit Service'; svcModal.classList.add('open'); }
+  function closeSvc() { svcModal.classList.remove('open'); }
+  document.getElementById('open-add').addEventListener('click', openAdd);
+  document.getElementById('svc-modal-close').addEventListener('click', closeSvc);
+  document.getElementById('svc-cancel').addEventListener('click', closeSvc);
+  document.getElementById('svc-save').addEventListener('click', closeSvc);
+  svcModal.addEventListener('click', e => { if (e.target === svcModal) closeSvc(); });
+  document.querySelectorAll('[data-act="edit"]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); openEdit(); }));
+
+  // Delete confirm modal
+  const delModal = document.getElementById('del-modal');
+  const delName = document.getElementById('del-name');
+  function openDel(name) { delName.textContent = `"${name}"`; delModal.classList.add('open'); }
+  function closeDel() { delModal.classList.remove('open'); }
+  document.querySelectorAll('[data-act="delete"]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); openDel(b.dataset.name); }));
+  document.getElementById('del-cancel').addEventListener('click', closeDel);
+  document.getElementById('del-confirm').addEventListener('click', closeDel);
+  delModal.addEventListener('click', e => { if (e.target === delModal) closeDel(); });
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSvc(); closeDel(); } });
+
+  lucide.createIcons();
+</script>
+<script>
+/* __MW_TOGGLE__ */
+(function(){
+  // Find every parent .nav-item that is followed by a [data-submenu-for] block and wire up click toggle
+  document.querySelectorAll('aside.sidebar .nav-item').forEach(function(item){
+    var next = item.nextElementSibling;
+    if (!next || !next.hasAttribute || !next.hasAttribute('data-submenu-for')) return;
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', function(e){
+      // Don't navigate if it's a link
+      if (item.tagName === 'A') e.preventDefault();
+      var isOpen = next.style.display !== 'none';
+      next.style.display = isOpen ? 'none' : 'block';
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+})();
+</script>
+<script src="_sidebar.js"></script>
+<script>
+(function(){
+  var input = document.getElementById("svc-search-input");
+  if (!input) return;
+  input.addEventListener("input", function(){
+    var q = (input.value || "").trim().toLowerCase();
+    document.querySelectorAll("#grid .card").forEach(function(card){
+      var nm = (card.querySelector(".nm") || {}).textContent || "";
+      var cat = (card.querySelector(".chip-cat") || {}).textContent || "";
+      var hay = (nm + " " + cat).toLowerCase();
+      card.style.display = !q || hay.indexOf(q) !== -1 ? "" : "none";
+    });
+  });
+})();
+</script>
+</body>
+</html>

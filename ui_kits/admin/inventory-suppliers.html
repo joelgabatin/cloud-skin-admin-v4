@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Suppliers</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+* { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .stat-card { background: #fff; border-radius: 16px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08), 0 2px 8px rgba(26,58,92,0.04); display: flex; flex-direction: column; gap: 8px; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-card .label { font-size: 13px; color: #5A7A96; }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #5BC0EB; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .stat-card .iplate.success { background: #DCFCE7; color: #15803D; }
+  .stat-card .iplate.info { background: #DBEAFE; color: #1D4ED8; }
+  .stat-card .iplate.warning { background: #FEF3C7; color: #B45309; }
+  .stat-card .iplate.danger { background: #FEE2E2; color: #DC2626; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 30px; line-height: 1.1; color: #1A2E40; }
+  .stat-card .sub { font-size: 12px; color: #5A7A96; }
+  .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .search-input { position: relative; flex: 1; max-width: 320px; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .btn { height: 40px; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-outline { background: #F0F6FC; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 18px; }
+  .btn-primary:hover { background: #1A5685; }
+  .section-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 800px; }
+  th { padding: 12px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr.row { cursor: pointer; transition: background 150ms; }
+  tr.row:hover td { background: #F8FBFF; }
+  tr.row:last-child td { border-bottom: none; }
+  .nm { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .sku { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; font-weight: 600; }
+  .price { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .status-badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .action-btn { width: 32px; height: 32px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #2D6A9F; }
+  .action-btn .lucide { width: 14px; height: 14px; }
+  .link-btn { background: none; border: none; color: #2D6A9F; font-family: var(--font-display); font-size: 13px; font-weight: 600; text-decoration: underline; cursor: pointer; }
+  .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; background: #F0F6FC; border: 1px solid #D0E8F5; border-radius: 12px; padding: 20px; }
+  .info-grid .k { font-family: var(--font-body); font-size: 11px; color: #5A7A96; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; letter-spacing: 0.06em; }
+  .info-grid .v { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #1A2E40; }
+  .back-link { background: none; border: none; cursor: pointer; color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; padding: 0; }
+
+  /* === Filter + sort dropdowns === */
+  .filter-wrap { position: relative; }
+  .filter-wrap .btn strong { font-weight: 700; color: #1A2E40; }
+  .drop-menu { position: absolute; top: calc(100% + 6px); left: 0; min-width: 220px; background: #fff; border: 1px solid #D0E8F5; border-radius: 10px; box-shadow: 0 8px 24px rgba(26,58,92,0.12); padding: 6px; z-index: 50; display: flex; flex-direction: column; gap: 2px; }
+  .drop-menu[hidden] { display: none; }
+  .drop-head { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 10px 6px; }
+  .drop-opt { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: none; border: none; border-radius: 6px; font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; cursor: pointer; text-align: left; width: 100%; }
+  .drop-opt:hover { background: #F8FBFF; }
+  .drop-opt.active { background: #EBF6FD; color: #2D6A9F; font-weight: 600; }
+  .drop-opt .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .drop-opt .lucide { width: 14px; height: 14px; color: #5A7A96; flex-shrink: 0; }
+  .drop-opt.active .lucide { color: #2D6A9F; }
+  tr.row.hidden { display: none; }
+  /* === Add Supplier modal === */
+  .modal-mask { position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important; margin: 0 !important; background: rgba(26,58,92,0.5); backdrop-filter: blur(4px); z-index: 9999; display: flex !important; align-items: center !important; justify-content: center !important; padding: 24px; box-sizing: border-box; }
+  .modal-mask[hidden] { display: none !important; }
+  .modal-card { background: #fff; border-radius: 14px; width: 100%; max-width: 600px; box-shadow: 0 16px 48px rgba(26,58,92,0.20); overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; }
+  .modal-head { padding: 18px 22px; border-bottom: 1px solid #D0E8F5; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .modal-head h3 { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .modal-head .sub { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 4px; }
+  .modal-close { background: none; border: none; cursor: pointer; color: #5A7A96; padding: 4px; display: flex; }
+  .modal-body { padding: 18px 22px; display: grid; gap: 14px; overflow-y: auto; }
+  .modal-body .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .modal-foot { padding: 14px 22px; border-top: 1px solid #D0E8F5; display: flex; gap: 8px; justify-content: flex-end; background: #F8FBFF; }
+  .field-label { display: block; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; }
+  .field-input, .field-select { width: 100%; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; box-sizing: border-box; height: 40px; }
+  .field-input.invalid { border-color: #DC2626; background: #FEF2F2; }
+  .field-textarea { width: 100%; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 10px 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; resize: vertical; min-height: 64px; background: #fff; box-sizing: border-box; }
+  .seg-toggle { display: flex; background: #F0F6FC; border-radius: 8px; padding: 4px; gap: 4px; }
+  .seg-toggle button { flex: 1; height: 36px; background: transparent; border: none; border-radius: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .seg-toggle button.on { background: #fff; color: #1A2E40; box-shadow: 0 1px 3px rgba(26,58,92,0.10); }
+  .seg-toggle button.on[data-val="Active"] { color: #15803D; }
+  .seg-toggle button.on[data-val="Inactive"] { color: #B45309; }
+  .seg-toggle button .lucide { width: 14px; height: 14px; }
+  .err-banner { background: #FEE2E2; border: 1px solid #FCA5A5; color: #991B1B; border-radius: 8px; padding: 10px 12px; font-family: var(--font-body); font-size: 12px; display: flex; align-items: center; gap: 8px; }
+  .err-banner[hidden] { display: none; }
+  .err-banner .lucide { width: 14px; height: 14px; flex-shrink: 0; }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #15803D; color: #fff; padding: 10px 18px; border-radius: 10px; font-family: var(--font-display); font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.18); z-index: 200; display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateY(8px); transition: opacity 200ms, transform 200ms; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast .lucide { width: 16px; height: 16px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Suppliers</div>
+        <div class="topbar-crumb">Admin / Inventory / Suppliers</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+    <section class="page" data-screen-label="01 Suppliers">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <h3 style="font-family:var(--font-display);font-size:14px;font-weight:700;color:#1A2E40;margin:0;text-transform:uppercase;letter-spacing:0.05em;">At a Glance</h3>
+        <a class="btn btn-primary" href="inventory-suppliers-analytics.html"><i data-lucide="bar-chart-3"></i> View Full Analytics</a>
+      </div>
+      <div class="stat-row" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+        <div class="stat-card"><div class="top"><span class="label">Total Suppliers</span><div class="iplate success"><i data-lucide="building-2"></i></div></div><div class="value">5</div><div class="sub">3 new this quarter</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Active Suppliers</span><div class="iplate info"><i data-lucide="building-2"></i></div></div><div class="value">4</div><div class="sub">1 inactive · 0 on hold</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Open Purchase Orders</span><div class="iplate warning"><i data-lucide="clock"></i></div></div><div class="value">7</div><div class="sub">$24,650 expected · 2 overdue</div></div>
+      </div>
+      <div class="toolbar">
+        <div class="search-input" style="flex:1;max-width:300px;"><i data-lucide="search"></i><input id="sup-search" placeholder="Search suppliers..."></div>
+        <div class="filter-wrap">
+          <button id="sup-filter-btn" class="btn btn-outline" type="button"><i data-lucide="filter"></i> <span>Status: <strong id="sup-filter-label">All</strong></span> <i data-lucide="chevron-down" style="width:14px;height:14px;"></i></button>
+          <div id="sup-filter-menu" class="drop-menu" hidden>
+            <div class="drop-head">Filter by status</div>
+            <button type="button" class="drop-opt active" data-val="">All Suppliers</button>
+            <button type="button" class="drop-opt" data-val="Active"><span class="dot" style="background:#15803D"></span>Active</button>
+            <button type="button" class="drop-opt" data-val="Inactive"><span class="dot" style="background:#9CA3AF"></span>Inactive</button>
+          </div>
+        </div>
+        <div class="filter-wrap">
+          <button id="sup-sort-btn" class="btn btn-outline" type="button"><i data-lucide="arrow-up-down"></i> <span>Sort: <strong id="sup-sort-label">Default</strong></span> <i data-lucide="chevron-down" style="width:14px;height:14px;"></i></button>
+          <div id="sup-sort-menu" class="drop-menu" hidden>
+            <div class="drop-head">Sort suppliers by</div>
+            <button type="button" class="drop-opt active" data-sort="default" data-label="Default"><i data-lucide="list"></i>Default order</button>
+            <button type="button" class="drop-opt" data-sort="name-az" data-label="Name A–Z"><i data-lucide="a-arrow-down"></i>Name (A–Z)</button>
+            <button type="button" class="drop-opt" data-sort="name-za" data-label="Name Z–A"><i data-lucide="a-arrow-up"></i>Name (Z–A)</button>
+            <button type="button" class="drop-opt" data-sort="tx-desc" data-label="Most orders"><i data-lucide="trending-up"></i>Most transactions</button>
+            <button type="button" class="drop-opt" data-sort="tx-asc" data-label="Fewest orders"><i data-lucide="trending-down"></i>Fewest transactions</button>
+            <button type="button" class="drop-opt" data-sort="recent" data-label="Recent order"><i data-lucide="calendar"></i>Recently ordered</button>
+            <button type="button" class="drop-opt" data-sort="oldest" data-label="Oldest order"><i data-lucide="calendar-clock"></i>Oldest last order</button>
+          </div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:10px;">
+          <button class="btn btn-outline"><i data-lucide="download"></i> Export</button>
+          <button class="btn btn-primary" id="add-supplier-btn"><i data-lucide="plus"></i> Add Supplier</button>
+        </div>
+      </div>
+      <div class="section-card"><div class="table-wrap"><table>
+        <thead><tr><th>Supplier Name</th><th>Contact Person</th><th>Email</th><th>Phone</th><th>City</th><th>Transactions</th><th>Last Order</th><th>Status</th><th style="text-align:center">Actions</th></tr></thead>
+        <tbody>
+          <tr class="row"><td><span class="nm">MediCare Supplies Ltd</span></td><td>John Smith</td><td>john@medicare.com</td><td>+1 (555) 123-4567</td><td>New York</td><td><span class="price">24</span></td><td>2024-05-10</td><td><span class="status-badge" style="background:#D1FAE5;color:#065F46;">Active</span></td><td style="text-align:center"><a class="link-btn" href="inventory-supplier-detail.html">View</a></td></tr>
+          <tr class="row"><td><span class="nm">Global Health Products</span></td><td>Maria Garcia</td><td>maria@globalhealth.com</td><td>+1 (555) 234-5678</td><td>Los Angeles</td><td><span class="price">18</span></td><td>2024-05-12</td><td><span class="status-badge" style="background:#D1FAE5;color:#065F46;">Active</span></td><td style="text-align:center"><a class="link-btn" href="inventory-supplier-detail.html">View</a></td></tr>
+          <tr class="row"><td><span class="nm">Premier Medical Distributor</span></td><td>Robert Chen</td><td>robert@premier.com</td><td>+1 (555) 345-6789</td><td>Chicago</td><td><span class="price">31</span></td><td>2024-05-08</td><td><span class="status-badge" style="background:#D1FAE5;color:#065F46;">Active</span></td><td style="text-align:center"><a class="link-btn" href="inventory-supplier-detail.html">View</a></td></tr>
+          <tr class="row"><td><span class="nm">Elite Pharmaceutical Inc</span></td><td>Sarah Johnson</td><td>sarah@elite.com</td><td>+1 (555) 456-7890</td><td>Houston</td><td><span class="price">12</span></td><td>2024-04-28</td><td><span class="status-badge" style="background:#F3F4F6;color:#374151;">Inactive</span></td><td style="text-align:center"><a class="link-btn" href="inventory-supplier-detail.html">View</a></td></tr>
+          <tr class="row"><td><span class="nm">Express Medical Solutions</span></td><td>David Martinez</td><td>david@express.com</td><td>+1 (555) 567-8901</td><td>Phoenix</td><td><span class="price">15</span></td><td>2024-05-11</td><td><span class="status-badge" style="background:#D1FAE5;color:#065F46;">Active</span></td><td style="text-align:center"><a class="link-btn" href="inventory-supplier-detail.html">View</a></td></tr>
+        </tbody>
+      </table></div></div>
+      <!-- Add Supplier modal -->
+      <div id="add-mask" class="modal-mask" hidden>
+        <div class="modal-card">
+          <div class="modal-head">
+            <div>
+              <h3>Add New Supplier</h3>
+              <div class="sub">Register a new supplier for purchase orders and inventory.</div>
+            </div>
+            <button class="modal-close" type="button" id="add-close"><i data-lucide="x"></i></button>
+          </div>
+          <div class="modal-body">
+            <div>
+              <label class="field-label">Supplier Status</label>
+              <div class="seg-toggle" id="a-status-toggle">
+                <button type="button" class="on" data-val="Active"><i data-lucide="check-circle"></i> Active</button>
+                <button type="button" data-val="Inactive"><i data-lucide="x-circle"></i> Inactive</button>
+              </div>
+            </div>
+            <div>
+              <label class="field-label">Supplier Name *</label>
+              <input class="field-input" id="a-name" type="text" placeholder="e.g. MediCare Supplies Ltd">
+            </div>
+            <div class="row2">
+              <div>
+                <label class="field-label">Contact Person *</label>
+                <input class="field-input" id="a-contact" type="text" placeholder="Full name">
+              </div>
+              <div>
+                <label class="field-label">Phone</label>
+                <input class="field-input" id="a-phone" type="text" placeholder="+1 (555) 000-0000">
+              </div>
+            </div>
+            <div>
+              <label class="field-label">Email *</label>
+              <input class="field-input" id="a-email" type="email" placeholder="contact@supplier.com">
+            </div>
+            <div class="row2">
+              <div>
+                <label class="field-label">City</label>
+                <input class="field-input" id="a-city" type="text" placeholder="New York">
+              </div>
+              <div>
+                <label class="field-label">Country</label>
+                <input class="field-input" id="a-country" type="text" placeholder="USA">
+              </div>
+            </div>
+            <div class="row2">
+              <div>
+                <label class="field-label">Payment Terms</label>
+                <select class="field-select" id="a-terms">
+                  <option>Net 15</option>
+                  <option selected>Net 30</option>
+                  <option>Net 45</option>
+                  <option>Net 60</option>
+                  <option>Cash on Delivery</option>
+                  <option>Prepaid</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label">Tax / VAT ID</label>
+                <input class="field-input" id="a-tax" type="text" placeholder="Optional" style="font-family:var(--font-mono);">
+              </div>
+            </div>
+            <div>
+              <label class="field-label">Internal Notes (optional)</label>
+              <textarea class="field-textarea" id="a-notes" placeholder="Notes visible only to admins..."></textarea>
+            </div>
+            <div class="err-banner" id="a-err" hidden><i data-lucide="alert-triangle"></i><span>Please fill in all required fields (marked with *).</span></div>
+          </div>
+          <div class="modal-foot">
+            <button class="btn btn-outline" type="button" id="add-cancel">Cancel</button>
+            <button class="btn btn-primary" type="button" id="add-save"><i data-lucide="plus"></i> Create Supplier</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="toast" class="toast"><i data-lucide="check-circle"></i><span id="toast-msg">Done.</span></div>
+    </section>
+  </main>
+</div>
+<script>lucide.createIcons();</script>
+<script>
+/* __MW_TOGGLE__ */
+(function(){
+  document.querySelectorAll('aside.sidebar .nav-item').forEach(function(item){
+    var next = item.nextElementSibling;
+    if (!next || !next.hasAttribute || !next.hasAttribute('data-submenu-for')) return;
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', function(e){
+      if (item.tagName === 'A') e.preventDefault();
+      var isOpen = next.style.display !== 'none';
+      next.style.display = isOpen ? 'none' : 'block';
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+})();
+</script>
+<script>
+// Filter + sort + search wiring
+(function () {
+  var tbody = document.querySelector('.section-card tbody');
+  var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr.row'));
+  rows.forEach(function (r, i) { r.setAttribute('data-orig', i); });
+  var state = { search: '', status: '', sort: 'default' };
+  var search = document.getElementById('sup-search');
+  var filterLbl = document.getElementById('sup-filter-label');
+  var sortLbl = document.getElementById('sup-sort-label');
+
+  function apply() {
+    var q = state.search.toLowerCase().trim();
+    rows.forEach(function (r) {
+      var txt = r.textContent.toLowerCase();
+      var statusBadge = r.querySelector('.status-badge');
+      var statusText = statusBadge ? statusBadge.textContent.trim() : '';
+      var passSearch = !q || txt.indexOf(q) !== -1;
+      var passStatus = !state.status || statusText === state.status;
+      r.classList.toggle('hidden', !(passSearch && passStatus));
+    });
+    var sorted = rows.slice();
+    var cellNum = function (r, idx) { return parseInt((r.children[idx].textContent || '').replace(/[^0-9-]/g, ''), 10) || 0; };
+    var cellText = function (r, idx) { return (r.children[idx].textContent || '').trim().toLowerCase(); };
+    var cellDate = function (r, idx) { return new Date(r.children[idx].textContent.trim()).getTime() || 0; };
+    if (state.sort === 'name-az')   sorted.sort(function (a, b) { return cellText(a, 0).localeCompare(cellText(b, 0)); });
+    else if (state.sort === 'name-za') sorted.sort(function (a, b) { return cellText(b, 0).localeCompare(cellText(a, 0)); });
+    else if (state.sort === 'tx-desc') sorted.sort(function (a, b) { return cellNum(b, 5) - cellNum(a, 5); });
+    else if (state.sort === 'tx-asc')  sorted.sort(function (a, b) { return cellNum(a, 5) - cellNum(b, 5); });
+    else if (state.sort === 'recent')  sorted.sort(function (a, b) { return cellDate(b, 6) - cellDate(a, 6); });
+    else if (state.sort === 'oldest')  sorted.sort(function (a, b) { return cellDate(a, 6) - cellDate(b, 6); });
+    else sorted.sort(function (a, b) { return parseInt(a.getAttribute('data-orig'), 10) - parseInt(b.getAttribute('data-orig'), 10); });
+    sorted.forEach(function (r) { tbody.appendChild(r); });
+  }
+
+  search.addEventListener('input', function () { state.search = search.value; apply(); });
+
+  var fBtn = document.getElementById('sup-filter-btn');
+  var fMenu = document.getElementById('sup-filter-menu');
+  var sBtn = document.getElementById('sup-sort-btn');
+  var sMenu = document.getElementById('sup-sort-menu');
+
+  fBtn.addEventListener('click', function (e) { e.stopPropagation(); fMenu.hidden = !fMenu.hidden; sMenu.hidden = true; });
+  fMenu.querySelectorAll('.drop-opt').forEach(function (o) {
+    o.addEventListener('click', function () {
+      state.status = o.getAttribute('data-val');
+      filterLbl.textContent = state.status || 'All';
+      fMenu.querySelectorAll('.drop-opt').forEach(function (x) { x.classList.toggle('active', x === o); });
+      fMenu.hidden = true;
+      apply();
+    });
+  });
+
+  sBtn.addEventListener('click', function (e) { e.stopPropagation(); sMenu.hidden = !sMenu.hidden; fMenu.hidden = true; });
+  sMenu.querySelectorAll('.drop-opt').forEach(function (o) {
+    o.addEventListener('click', function () {
+      state.sort = o.getAttribute('data-sort');
+      sortLbl.textContent = o.getAttribute('data-label');
+      sMenu.querySelectorAll('.drop-opt').forEach(function (x) { x.classList.toggle('active', x === o); });
+      sMenu.hidden = true;
+      apply();
+    });
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!fMenu.hidden && !fMenu.contains(e.target) && !fBtn.contains(e.target)) fMenu.hidden = true;
+    if (!sMenu.hidden && !sMenu.contains(e.target) && !sBtn.contains(e.target)) sMenu.hidden = true;
+  });
+})();
+
+(function () {
+  lucide.createIcons();
+  var mask = document.getElementById('add-mask');
+  var openBtn = document.getElementById('add-supplier-btn');
+  var closeBtn = document.getElementById('add-close');
+  var cancelBtn = document.getElementById('add-cancel');
+  var saveBtn = document.getElementById('add-save');
+  var toast = document.getElementById('toast');
+
+  function showToast(msg) {
+    document.getElementById('toast-msg').textContent = msg;
+    toast.classList.add('show');
+    setTimeout(function () { toast.classList.remove('show'); }, 2200);
+  }
+  function openModal() {
+    ['a-name','a-contact','a-phone','a-email','a-city','a-country','a-tax','a-notes'].forEach(function (id) {
+      var el = document.getElementById(id); if (el) { el.value = ''; el.classList.remove('invalid'); }
+    });
+    document.getElementById('a-err').hidden = true;
+    mask.hidden = false;
+    lucide.createIcons();
+    setTimeout(function () { document.getElementById('a-name').focus(); }, 50);
+  }
+  function closeModal() { mask.hidden = true; }
+
+  openBtn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  cancelBtn.addEventListener('click', closeModal);
+  mask.addEventListener('click', function (e) { if (e.target === mask) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !mask.hidden) closeModal(); });
+
+  // Status toggle
+  document.querySelectorAll('#a-status-toggle button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('#a-status-toggle button').forEach(function (o) { o.classList.toggle('on', o === b); });
+    });
+  });
+
+  saveBtn.addEventListener('click', function () {
+    var name = document.getElementById('a-name');
+    var contact = document.getElementById('a-contact');
+    var email = document.getElementById('a-email');
+    var fields = [name, contact, email];
+    var ok = true;
+    fields.forEach(function (f) {
+      if (!f.value.trim()) { f.classList.add('invalid'); ok = false; }
+      else f.classList.remove('invalid');
+    });
+    if (!ok) { document.getElementById('a-err').hidden = false; return; }
+    document.getElementById('a-err').hidden = true;
+
+    var status = document.querySelector('#a-status-toggle button.on').getAttribute('data-val');
+    var phone = document.getElementById('a-phone').value || '—';
+    var city = document.getElementById('a-city').value || '—';
+    var today = new Date().toISOString().slice(0, 10);
+    var statusBadge = status === 'Active'
+      ? '<span class="status-badge" style="background:#D1FAE5;color:#065F46;">Active</span>'
+      : '<span class="status-badge" style="background:#F3F4F6;color:#374151;">Inactive</span>';
+
+    // Insert at top of table
+    var tbody = document.querySelector('.section-card tbody');
+    var tr = document.createElement('tr');
+    tr.className = 'row';
+    tr.innerHTML = '<td><span class="nm">' + name.value.trim() + '</span></td>'
+      + '<td>' + contact.value.trim() + '</td>'
+      + '<td>' + email.value.trim() + '</td>'
+      + '<td>' + phone + '</td>'
+      + '<td>' + city + '</td>'
+      + '<td><span class="price">0</span></td>'
+      + '<td>' + today + '</td>'
+      + '<td>' + statusBadge + '</td>'
+      + '<td style="text-align:center"><a class="link-btn" href="inventory-supplier-detail.html">View</a></td>';
+    tbody.insertBefore(tr, tbody.firstChild);
+
+    // Update stat counters
+    var cards = document.querySelectorAll('.stat-card .value');
+    if (cards[0]) cards[0].textContent = String((parseInt(cards[0].textContent, 10) || 0) + 1);
+    if (status === 'Active' && cards[1]) cards[1].textContent = String((parseInt(cards[1].textContent, 10) || 0) + 1);
+
+    closeModal();
+    showToast('Supplier "' + name.value.trim() + '" added.');
+  });
+})();
+</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

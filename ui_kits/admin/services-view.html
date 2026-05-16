@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Service View</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #EFF6FF; font-family: var(--font-body); color: #1A2E40; }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; position: sticky; top: 0; max-height: 100vh; font-family: var(--font-display); }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg,#2D6A9F,#5BC0EB); display: flex; align-items: center; justify-content: center; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; }
+  aside.sidebar .side-collapse { height: 44px; padding: 0 16px; display: flex; justify-content: flex-end; align-items: center; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 16px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar h1 { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: #1A2E40; margin: 0; }
+  .topbar-actions { margin-left: auto; display: inline-flex; align-items: center; gap: 14px; }
+  .icon-btn { width: 36px; height: 36px; border: none; background: none; cursor: pointer; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .badge { position: absolute; top: 4px; right: 4px; min-width: 16px; height: 16px; border-radius: 8px; background: #EF4444; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 9.5px; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
+  .user-pill { display: inline-flex; align-items: center; gap: 10px; }
+  .user-pill .av { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; font-family: var(--font-display); font-weight: 700; font-size: 9.5px; padding: 1px 6px; border-radius: 9999px; text-transform: uppercase; margin-top: 1px; display: inline-block; }
+
+  .page { padding: 22px 32px 60px; }
+  .back-link { color: #5A7A96; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; text-decoration: none; margin-bottom: 14px; }
+  .back-link .lucide { width: 14px; height: 14px; }
+
+  /* Top grid: hero image left + info right */
+  .top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; margin-bottom: 18px; }
+  @media (max-width: 1000px) { .top-grid { grid-template-columns: 1fr; } }
+  .hero { border-radius: 14px; overflow: hidden; aspect-ratio: 16/9; background: #DBEAFE; }
+  .hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .info-col .lbl { font-family: var(--font-display); font-weight: 700; font-size: 11px; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .info-col .v { font-family: var(--font-body); font-size: 14px; color: #1A2E40; margin-bottom: 18px; }
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .summary-card { background: #DBEAFE; border-radius: 10px; padding: 18px 14px; text-align: center; }
+  .summary-card.free { background: #D1FAE5; }
+  .summary-card .n { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #2D6A9F; }
+  .summary-card.free .n { color: #15803D; }
+  .summary-card .l { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-top: 2px; }
+  .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .action-row .btn { height: 40px; border-radius: 10px; font-family: var(--font-display); font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .btn.edit { background: #fff; border: 1px solid #CBD5E1; color: #1A2E40; }
+  .btn.edit:hover { background: #F8FBFD; }
+  .btn.del { background: #FECACA; border: 1px solid #FCA5A5; color: #DC2626; }
+  .btn.del:hover { background: #FEB7B7; }
+  .btn .lucide { width: 14px; height: 14px; }
+
+  /* Stats row below hero */
+  .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 12px; }
+  @media (max-width: 1000px) { .stats-row { grid-template-columns: 1fr; } }
+  .stat-card { background: #fff; border-radius: 12px; padding: 20px 26px; text-align: center; box-shadow: 0 1px 4px rgba(26,58,92,0.06); }
+  .stat-card .v { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #2D6A9F; }
+  .stat-card.dark .v { color: #1A2E40; }
+  .stat-card .l { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-top: 3px; }
+  .active-pill { display: inline-block; background: #D1FAE5; color: #15803D; font-family: var(--font-display); font-weight: 600; font-size: 12px; padding: 4px 12px; border-radius: 8px; margin-bottom: 18px; }
+
+  /* Sessions list */
+  .sessions-ttl { font-family: var(--font-display); font-weight: 700; font-size: 17px; color: #1A2E40; margin: 26px 0 12px; }
+  .sess-list { display: flex; flex-direction: column; gap: 12px; }
+  .sess { background: #fff; border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; box-shadow: 0 1px 3px rgba(26,58,92,0.05); }
+  .sess .num { width: 30px; height: 30px; border-radius: 50%; background: #DBEAFE; color: #2D6A9F; font-family: var(--font-display); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .sess.free .num { background: #D1FAE5; color: #15803D; }
+  .sess .info { flex: 1; min-width: 0; }
+  .sess .nm { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1A2E40; }
+  .sess .ord { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-top: 2px; }
+  .free-pill { background: #FEF3C7; color: #B45309; font-family: var(--font-display); font-weight: 700; font-size: 11px; padding: 3px 10px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 5px; }
+  .free-pill .lucide { width: 12px; height: 12px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <h1 id="pkg-title">Hydra Facial</h1>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="badge">4</span></button>
+        <div class="user-pill"><div class="av">AU</div><div><div class="name">Admin User</div><span class="role-pill-light">Admin</span></div></div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Service View">
+      <a class="back-link" href="javascript:history.back()"><i data-lucide="arrow-left"></i> Back</a>
+
+      <div class="top-grid">
+        <div class="hero"><img src="../../assets/service-hydra-facial.jpg" alt="Package hero" onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#DBEAFE,#BFDBFE)';"></div>
+
+        <div class="info-col">
+          <div class="lbl">Description</div>
+          <div class="v" id="pkg-desc">Deep cleansing and hydration treatment that exfoliates, extracts impurities, and delivers nourishing serums.</div>
+
+          <div class="lbl">Category</div>
+          <div class="v" id="pkg-cat">Facial</div>
+
+          
+            <div class="summary-card free"><div class="n" id="free-n">1</div><div class="l">Free Sessions</div></div>
+          </div>
+
+          <div class="action-row">
+            <button class="btn edit"><i data-lucide="pencil"></i> Edit</button>
+            <button class="btn del"><i data-lucide="trash-2"></i> Delete</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card"><div class="v" id="pkg-value">₱2,500</div><div class="l">Service Price</div></div>
+        <div class="stat-card dark"><div class="v" id="total-sessions">60 min</div><div class="l">Duration</div></div>
+      </div>
+
+      <span class="active-pill" id="pkg-status">Active</span>
+
+      <h2 class="sessions-ttl">Service Details</h2>
+      <div class="sess-list">
+        <div class="sess"><div class="num"><i data-lucide="info"></i></div><div class="info"><div class="nm">What's Included</div><div class="ord">Cleansing, exfoliation, extraction, hydration, LED light therapy</div></div></div>
+        <div class="sess"><div class="num"><i data-lucide="clock"></i></div><div class="info"><div class="nm">Recovery Time</div><div class="ord">No downtime — return to normal activity immediately</div></div></div>
+        <div class="sess"><div class="num"><i data-lucide="award"></i></div><div class="info"><div class="nm">Recommended For</div><div class="ord">Dull, dry, congested skin — all skin types</div></div></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+(function () {
+  // Read ?id= and adapt the package shown if it's one of the demo presets.
+  var id = (new URLSearchParams(location.search).get('id') || '').toLowerCase();
+  var presets = {
+    'premium-facial': { title:'Hydra Facial', desc:'Deep cleansing and hydration treatment that exfoliates, extracts impurities, and delivers nourishing serums.', cat:'Facial', paid:5, free:1, value:'₱15,000', total:6,
+      sessions:[ {nm:'Hydra Facial'}, {nm:'Chemical Peel'}, {nm:'Hydra Facial'}, {nm:'Microneedling'}, {nm:'Hydra Facial'}, {nm:'Chemical Peel', free:true } ] },
+    'anti-aging': { title:'Anti-Aging Package', desc:'4-session anti-aging protocol with Botox and fillers', cat:'Anti-Aging', paid:4, free:0, value:'₱28,000', total:4,
+      sessions:[ {nm:'Botox'}, {nm:'Filler'}, {nm:'PRP Therapy'}, {nm:'Laser Resurfacing'} ] },
+    'hair-restoration': { title:'Hair Restoration Package', desc:'6-session PRP hair restoration protocol', cat:'Hair', paid:6, free:0, value:'₱18,000', total:6,
+      sessions:[ {nm:'PRP Hair'}, {nm:'PRP Hair'}, {nm:'PRP Hair'}, {nm:'PRP Hair'}, {nm:'PRP Hair'}, {nm:'PRP Hair'} ] }
+  };
+  var p = presets[id];
+  if (!p) return; // keep defaults
+  document.getElementById('pkg-title').textContent = p.title;
+  document.getElementById('pkg-desc').textContent = p.desc;
+  document.getElementById('pkg-cat').textContent = p.cat;
+  document.getElementById('paid-n').textContent = p.paid;
+  document.getElementById('free-n').textContent = p.free;
+  document.getElementById('pkg-value').textContent = p.value;
+  document.getElementById('total-sessions').textContent = p.total;
+  var list = document.getElementById('sess-list');
+  list.innerHTML = p.sessions.map(function (s, i) {
+    return '<div class="sess' + (s.free ? ' free' : '') + '"><div class="num">' + (i + 1) + '</div><div class="info"><div class="nm">' + s.nm + '</div><div class="ord">Session ' + (i + 1) + '</div></div>' + (s.free ? '<span class="free-pill"><i data-lucide="gift"></i> Free</span>' : '') + '</div>';
+  }).join('');
+  if (window.lucide) lucide.createIcons();
+})();
+</script>
+</body>
+</html>

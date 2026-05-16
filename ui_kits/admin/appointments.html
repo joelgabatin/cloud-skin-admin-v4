@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Appointments</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+
+  /* ============ LAYOUT (sidebar + topbar shell) ============ */
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { height: 60px; background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 0 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 20px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 12px; color: #5A7A96; line-height: 1.2; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .topbar-divider { width: 1px; height: 24px; background: #D0E8F5; }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 24px; }
+  h1.page-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; margin: 0; line-height: 1.2; }
+  .crumb { font-size: 13px; color: #5A7A96; margin: 4px 0 0; }
+  .section-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+
+  /* ============ STAT CARDS ============ */
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .stat-card { background: #fff; border-radius: 16px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08), 0 2px 8px rgba(26,58,92,0.04); }
+  .stat-card.primary { background: #2D6A9F; color: #fff; }
+  .stat-card.warning { border-left: 4px solid #F59E0B; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .stat-card .label { font-size: 13px; color: #5A7A96; }
+  .stat-card.primary .label { color: rgba(255,255,255,0.8); }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #5BC0EB; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .stat-card.primary .iplate { background: rgba(255,255,255,0.2); color: #fff; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 32px; line-height: 1.1; margin-bottom: 8px; color: #1A2E40; }
+  .stat-card.primary .value { color: #fff; }
+  .stat-card .delta { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #16A34A; }
+  .stat-card.warning .delta { color: #92400E; }
+
+  /* ============ TAB BAR ============ */
+  .tabs { display: flex; background: #F8FBFF; border-bottom: 1px solid #D0E8F5; }
+  .tabs button { flex: 1; padding: 16px 20px; background: transparent; border: none; cursor: pointer; font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .tabs button.active { background: #fff; color: #2D6A9F; border-bottom: 3px solid #2D6A9F; margin-bottom: -1px; }
+  .tabs .lucide { width: 16px; height: 16px; }
+
+  /* ============ FILTER ROW ============ */
+  .filter-row { padding: 16px 24px; border-bottom: 1px solid #D0E8F5; background: #F8FBFF; display: flex; flex-wrap: wrap; gap: 20px; align-items: center; }
+  .filter-group { display: inline-flex; align-items: center; gap: 8px; }
+  .filter-group .head { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: #5A7A96; }
+  .filter-group label { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #5A7A96; cursor: pointer; text-transform: capitalize; }
+  .filter-group input[type="checkbox"] { width: 14px; height: 14px; accent-color: #2D6A9F; cursor: pointer; }
+
+  /* ============ SEARCH ROW ============ */
+  .search-row { padding: 20px 24px; border-bottom: 1px solid #D0E8F5; display: flex; gap: 12px; align-items: center; }
+  .search-input { flex: 1; position: relative; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #9BBAD4; pointer-events: none; }
+  .search-input input { width: 100%; height: 36px; padding: 0 12px 0 36px; border: 1px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; }
+  .icon-square { width: 36px; height: 36px; background: #F0F6FC; color: #2D6A9F; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .icon-square .lucide { width: 16px; height: 16px; }
+
+  /* ============ TABLE ============ */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+  th { padding: 12px 16px; text-align: left; font-family: var(--font-body); font-size: 12px; font-weight: 600; color: #5A7A96; background: #F8FBFF; border-bottom: 1px solid #D0E8F5; white-space: nowrap; }
+  td { padding: 12px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: top; }
+  th.sortable { cursor: pointer; user-select: none; }
+  th.sortable:hover { color: #2D6A9F; }
+  th.sortable .arrow { display: inline-block; margin-left: 4px; color: #CBD5E1; font-size: 11px; }
+  th.sortable.sorted { color: #2D6A9F; }
+  th.sortable.sorted .arrow { color: #2D6A9F; }
+  tr.row { cursor: pointer; }
+  tr.row:hover td { background: #F8FBFF; }
+
+  .id-mono { font-family: var(--font-mono); font-size: 12px; color: #9BBAD4; }
+  .client-cell { display: flex; align-items: center; gap: 10px; }
+  .avatar-sm { width: 32px; height: 32px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 600; font-size: 11px; flex-shrink: 0; }
+  .client-name { font-size: 13px; color: #1A2E40; font-weight: 500; }
+  .client-phone { font-size: 11px; color: #9BBAD4; }
+  .service-name { font-size: 13px; color: #1A2E40; }
+  .duration-chip { display: inline-block; background: #F0F6FC; color: #5A7A96; font-size: 11px; padding: 1px 8px; border-radius: 9999px; margin-top: 2px; }
+  .date-str { font-size: 12px; color: #1A2E40; }
+  .time-mono { font-family: var(--font-mono); font-size: 12px; color: #5A7A96; }
+  .type-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 6px; font-family: var(--font-display); font-weight: 500; font-size: 12px; }
+  .type-f2f { background: #EFF6FF; color: #1E40AF; }
+  .type-online { background: #F0FDF4; color: #16A34A; }
+  .practitioner-text { font-size: 13px; color: #5A7A96; }
+  .amount-bold { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .payment-cell { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+  .payment-cell .row1 { display: inline-flex; align-items: center; gap: 6px; }
+
+  .status { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+
+  .actions { display: inline-flex; align-items: center; gap: 6px; }
+  .action-btn { width: 28px; height: 28px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #5A7A96; }
+  .action-btn.primary { color: #2D6A9F; }
+  .action-btn .lucide { width: 13px; height: 13px; }
+
+  /* ============ PAGINATION ============ */
+  .pagination { padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #D0E8F5; }
+  .pagination .info { font-size: 13px; color: #5A7A96; }
+  .pager { display: inline-flex; align-items: center; gap: 6px; }
+  .pager button { width: 32px; height: 32px; background: none; border: 1.5px solid #D0E8F5; border-radius: 6px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; }
+  .pager button.active { background: #2D6A9F; border-color: #2D6A9F; color: #fff; }
+  .pager .lucide { width: 14px; height: 14px; }
+
+  /* ============ CALENDAR VIEW ============ */
+  .cal-pad { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+  .cal-filters { display: flex; flex-direction: column; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid #D0E8F5; }
+  .cal-filter-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .cal-filter-row .head { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .cal-filter-row label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .cal-filter-row label input { width: 16px; height: 16px; accent-color: #2D6A9F; cursor: pointer; }
+  .cal-filter-row label span { font-size: 13px; color: #5A7A96; text-transform: capitalize; }
+  .view-modes { display: inline-flex; gap: 8px; }
+  .view-modes button { padding: 6px 12px; background: #F0F6FC; color: #5A7A96; border: 1px solid #D0E8F5; border-radius: 6px; cursor: pointer; font-family: var(--font-display); font-size: 12px; font-weight: 500; text-transform: capitalize; }
+  .view-modes button.active { background: #2D6A9F; color: #fff; border-color: #2D6A9F; }
+
+  .cal-head { display: flex; justify-content: space-between; align-items: center; }
+  .cal-head h3 { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: #1A2E40; margin: 0; }
+  .cal-nav { display: inline-flex; gap: 8px; }
+  .cal-nav button { width: 28px; height: 28px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; }
+  .cal-nav .lucide { width: 14px; height: 14px; }
+
+  .weekday-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 8px; }
+  .weekday-row > div { text-align: center; font-family: var(--font-display); font-size: 12px; font-weight: 600; color: #5A7A96; padding: 8px 0; }
+  .month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .day-cell { padding: 8px; border: 1px solid #D0E8F5; border-radius: 8px; background: #fff; min-height: 88px; display: flex; flex-direction: column; gap: 6px; }
+  .day-cell.today { background: #F0F6FC; border-color: #2D6A9F; }
+  .day-cell .num { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .day-cell.empty { border: none; background: transparent; }
+  .day-event { color: #fff; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-family: var(--font-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+  .day-more { font-size: 9px; color: #5A7A96; padding-left: 6px; }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; padding-top: 12px; border-top: 1px solid #D0E8F5; }
+  .legend .item { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #5A7A96; }
+  .legend .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* ============ MODAL (detached preview) ============ */
+  .modal-preview-wrap { background: rgba(26,46,64,0.5); padding: 32px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(26,46,64,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 24px; backdrop-filter: blur(2px); }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: 16px; box-shadow: 0 20px 25px rgba(26,46,64,0.15); max-width: 600px; width: 100%; overflow: hidden; }
+  .modal-head { padding: 24px; border-bottom: 1px solid #D0E8F5; display: flex; justify-content: space-between; align-items: center; }
+  .modal-head h2 { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .modal-head button { background: none; border: none; cursor: pointer; color: #5A7A96; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; }
+  .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .modal-section h3 { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 12px; }
+  .info-box { background: #F0F6FC; border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .info-box .k { font-size: 12px; color: #5A7A96; margin: 0 0 4px; }
+  .info-box .v { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: #1A2E40; margin: 0; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .info-cell { background: #F0F6FC; border-radius: 8px; padding: 12px; }
+  .info-cell .k { font-size: 12px; color: #5A7A96; margin: 0 0 4px; }
+  .info-cell .v { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #1A2E40; margin: 0; }
+  .info-cell .v.amount { font-size: 18px; font-weight: 700; color: #2D6A9F; }
+  .status-pill { display: inline-flex; align-items: center; gap: 6px; color: #fff; padding: 8px 12px; border-radius: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; text-transform: capitalize; }
+  .status-pill .ind { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.6); }
+  .type-pill { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; }
+  .payment-pill { display: inline-flex; align-items: center; gap: 4px; color: #fff; padding: 4px 8px; border-radius: 4px; font-family: var(--font-display); font-size: 12px; font-weight: 600; text-transform: capitalize; }
+  .modal-foot { padding: 16px 24px; border-top: 1px solid #D0E8F5; display: flex; gap: 8px; justify-content: flex-end; }
+  .btn-close { padding: 8px 16px; background: #F0F6FC; color: #2D6A9F; border: 1px solid #D0E8F5; border-radius: 6px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; }
+
+  .lucide { width: 18px; height: 18px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside id="sidebar-mount" class="sidebar"></aside>
+
+  <!-- ============ CONTENT ============ -->
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">All Appointments</div>
+        <div class="topbar-crumb">Admin / Appointments / All Appointments</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">3</span></button>
+        <div class="topbar-divider"></div>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta">
+            <span class="name">Admin User</span>
+            <span class="role-pill-light">Admin</span>
+          </div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+<div class="page">
+
+  <!-- ============ HEADER ============ -->
+  <div data-screen-label="01 Appointments · Page Header">
+    <h1 class="page-title">All Appointments</h1>
+    <p class="crumb">Admin / Appointments / All Appointments</p>
+  </div>
+
+  <!-- ============ STAT CARDS ============ -->
+  <div class="stat-row" data-screen-label="02 Appointments · Stat Cards">
+    <div class="stat-card primary">
+      <div class="top"><span class="label">Confirmed</span><div class="iplate"><i data-lucide="check-circle"></i></div></div>
+      <div class="value">6</div>
+    </div>
+    <div class="stat-card">
+      <div class="top"><span class="label">In Progress</span><div class="iplate"><i data-lucide="clock"></i></div></div>
+      <div class="value">1</div>
+    </div>
+    <div class="stat-card warning">
+      <div class="top"><span class="label">Pending</span><div class="iplate" style="background:#FEF3C7;color:#D97706"><i data-lucide="calendar"></i></div></div>
+      <div class="value">3</div>
+    </div>
+    <div class="stat-card">
+      <div class="top"><span class="label">Cancelled</span><div class="iplate"><i data-lucide="x-circle"></i></div></div>
+      <div class="value">1</div>
+    </div>
+  </div>
+
+  <!-- ============ TABS PANEL ============ -->
+  <div class="section-card" data-screen-label="03 Appointments · Tabs (Calendar + List)">
+    <div class="tabs" id="view-tabs">
+      <button class="active" data-view="calendar"><i data-lucide="calendar"></i> Calendar View</button>
+      <button data-view="list"><i data-lucide="list"></i> List View</button>
+    </div>
+
+    <!-- ===== CALENDAR VIEW (default) ===== -->
+    <div id="view-calendar" class="view-pane">
+      <div class="cal-pad">
+        <div class="cal-filters">
+          <div class="cal-filter-row" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <span class="head">Filter by Status:</span>
+            <label><input type="checkbox" checked><span>confirmed</span></label>
+            <label><input type="checkbox" checked><span>in progress</span></label>
+            <label><input type="checkbox" checked><span>pending</span></label>
+            <label><input type="checkbox" checked><span>cancelled</span></label>
+            <a href="appointment-new.html" style="margin-left:auto;height:36px;padding:0 16px;background:#2D6A9F;color:#fff;border:none;border-radius:8px;font-family:var(--font-display);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;text-decoration:none;flex-shrink:0;"><i data-lucide="plus" style="width:14px;height:14px;"></i> Add Appointment</a>
+          </div>
+          <div class="cal-filter-row">
+            <span class="head">View Mode:</span>
+            <div class="view-modes" id="mode-switch">
+              <button data-mode="day">day</button>
+              <button data-mode="week">week</button>
+              <button class="active" data-mode="month">month</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cal-head">
+          <h3>April 2026</h3>
+          <div class="cal-nav">
+            <button><i data-lucide="chevron-left"></i></button>
+            <button><i data-lucide="chevron-right"></i></button>
+          </div>
+        </div>
+
+        <div>
+          <div class="weekday-row"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
+          <div class="month-grid">
+            <div class="day-cell empty"></div><div class="day-cell empty"></div><div class="day-cell empty"></div>
+            <div class="day-cell"><span class="num">1</span></div>
+            <div class="day-cell"><span class="num">2</span></div>
+            <div class="day-cell"><span class="num">3</span></div>
+            <div class="day-cell"><span class="num">4</span></div>
+            <div class="day-cell"><span class="num">5</span></div>
+            <div class="day-cell"><span class="num">6</span></div>
+            <div class="day-cell"><span class="num">7</span></div>
+            <div class="day-cell"><span class="num">8</span></div>
+            <div class="day-cell"><span class="num">9</span></div>
+            <div class="day-cell"><span class="num">10</span></div>
+            <div class="day-cell"><span class="num">11</span></div>
+            <div class="day-cell"><span class="num">12</span></div>
+            <div class="day-cell"><span class="num">13</span></div>
+            <div class="day-cell"><span class="num">14</span></div>
+            <div class="day-cell"><span class="num">15</span></div>
+            <div class="day-cell"><span class="num">16</span></div>
+            <div class="day-cell"><span class="num">17</span></div>
+            <div class="day-cell"><span class="num">18</span></div>
+            <div class="day-cell"><span class="num">19</span></div>
+            <div class="day-cell"><span class="num">20</span></div>
+            <div class="day-cell"><span class="num">21</span></div>
+            <div class="day-cell"><span class="num">22</span></div>
+            <div class="day-cell"><span class="num">23</span></div>
+            <div class="day-cell"><span class="num">24</span></div>
+            <div class="day-cell today">
+              <span class="num">25</span>
+              <div class="day-event" style="background:#16A34A" data-open-modal>Sarah - 10:00 AM</div>
+              <div class="day-event" style="background:#F59E0B" data-open-modal>Miguel - 11:00 AM</div>
+              <div class="day-more">+3 more</div>
+            </div>
+            <div class="day-cell">
+              <span class="num">26</span>
+              <div class="day-event" style="background:#3B82F6" data-open-modal>Roberto - 9:00 AM</div>
+              <div class="day-event" style="background:#16A34A" data-open-modal>Lisa - 10:30 AM</div>
+              <div class="day-more">+1 more</div>
+            </div>
+            <div class="day-cell">
+              <span class="num">27</span>
+              <div class="day-event" style="background:#DC2626" data-open-modal>Diana - 10:00 AM</div>
+              <div class="day-event" style="background:#8B5CF6" data-open-modal>Marco - 2:00 PM</div>
+            </div>
+            <div class="day-cell">
+              <span class="num">28</span>
+              <div class="day-event" style="background:#16A34A" data-open-modal>Patricia - 9:30 AM</div>
+              <div class="day-event" style="background:#3B82F6" data-open-modal>Antonio - 11:00 AM</div>
+            </div>
+            <div class="day-cell"><span class="num">29</span></div>
+            <div class="day-cell"><span class="num">30</span></div>
+            <div class="day-cell empty"></div><div class="day-cell empty"></div>
+          </div>
+        </div>
+
+        <div class="legend">
+          <div class="item"><span class="dot" style="background:#16A34A"></span>Confirmed</div>
+          <div class="item"><span class="dot" style="background:#F59E0B"></span>In Progress</div>
+          <div class="item"><span class="dot" style="background:#3B82F6"></span>Pending</div>
+          <div class="item"><span class="dot" style="background:#DC2626"></span>Cancelled</div>
+          <div class="item"><span class="dot" style="background:#8B5CF6"></span>Completed</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LIST VIEW ===== -->
+    <div id="view-list" class="view-pane" hidden>
+
+    <!-- Filter row -->
+    <div class="filter-row">
+      <div class="filter-group">
+        <span class="head">Status:</span>
+        <label><input type="checkbox" checked> <span>confirmed</span></label>
+        <label><input type="checkbox" checked> <span>in progress</span></label>
+        <label><input type="checkbox" checked> <span>pending</span></label>
+        <label><input type="checkbox" checked> <span>cancelled</span></label>
+        <label><input type="checkbox" checked> <span>completed</span></label>
+      </div>
+      <div class="filter-group">
+        <span class="head">Type:</span>
+        <label><input type="checkbox" checked> <span>F2F</span></label>
+        <label><input type="checkbox" checked> <span>Online</span></label>
+      </div>
+      <div class="filter-group">
+        <span class="head">Payment:</span>
+        <label><input type="checkbox" checked> <span>paid</span></label>
+        <label><input type="checkbox" checked> <span>unpaid</span></label>
+        <label><input type="checkbox"> <span>pending</span></label>
+      </div>
+    </div>
+
+    <!-- Search row -->
+    <div class="search-row">
+      <div class="search-input">
+        <i data-lucide="search"></i>
+        <input placeholder="Search by client or service..." value="">
+      </div>
+      <button class="icon-square" title="Export"><i data-lucide="download"></i></button>
+          <a href="appointment-new.html" class="btn-add-appt" style="height:40px;padding:0 16px;background:#2D6A9F;color:#fff;border:none;border-radius:8px;font-family:var(--font-display);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;text-decoration:none;flex-shrink:0;"><i data-lucide="plus" style="width:14px;height:14px;"></i> Add Appointment</a>
+        </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th class="sortable" data-sort="id"><span>#ID</span><span class="arrow">↕</span></th>
+          <th class="sortable sorted" data-sort="client"><span>Client</span><span class="arrow">↑</span></th>
+          <th class="sortable" data-sort="service"><span>Service</span><span class="arrow">↕</span></th>
+          <th class="sortable" data-sort="date"><span>Date &amp; Time</span><span class="arrow">↕</span></th>
+          <th class="sortable" data-sort="type"><span>Type</span><span class="arrow">↕</span></th>
+          <th class="sortable" data-sort="status"><span>Status</span><span class="arrow">↕</span></th>
+          <th class="sortable" data-sort="practitioner"><span>Practitioner</span><span class="arrow">↕</span></th>
+          <th class="sortable" data-sort="payment"><span>Payment</span><span class="arrow">↕</span></th>
+          <th>Actions</th>
+        </tr></thead>
+        <tbody>
+          <tr class="row">
+            <td><span class="id-mono">#1001</span></td>
+            <td><div class="client-cell"><div class="avatar-sm" style="background:#2D6A9F">SJ</div><div><div class="client-name">Sarah Johnson</div><div class="client-phone">0917-123-4567</div></div></div></td>
+            <td><div class="service-name">Hydra Facial</div><div class="duration-chip">60 min</div></td>
+            <td><div class="date-str">Apr 25, 2026</div><div class="time-mono">10:00 AM</div></td>
+            <td><span class="type-chip type-f2f">F2F</span></td>
+            <td><span class="status" style="background:#DCFCE7;color:#15803D">Confirmed</span></td>
+            <td><span class="practitioner-text">Dr. Santos</span></td>
+            <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#EFF6FF;color:#1D4ED8">GCash</span><span class="amount-bold">₱2,500</span></div><span class="status" style="background:#DCFCE7;color:#15803D">Paid</span></div></td>
+            <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+          </tr>
+          <tr class="row">
+            <td><span class="id-mono">#1002</span></td>
+            <td><div class="client-cell"><div class="avatar-sm" style="background:#16A34A">MC</div><div><div class="client-name">Miguel Cruz</div><div class="client-phone">0918-234-5678</div></div></div></td>
+            <td><div class="service-name">Botox Treatment</div><div class="duration-chip">45 min</div></td>
+            <td><div class="date-str">Apr 25, 2026</div><div class="time-mono">11:00 AM</div></td>
+            <td><span class="type-chip type-f2f">F2F</span></td>
+            <td><span class="status" style="background:#DBEAFE;color:#1D4ED8">In Progress</span></td>
+            <td><span class="practitioner-text">Dr. Reyes</span></td>
+            <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#F0FDF4;color:#166534">Cash</span><span class="amount-bold">₱8,000</span></div><span class="status" style="background:#DCFCE7;color:#15803D">Paid</span></div></td>
+            <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+          </tr>
+          <tr class="row">
+            <td><span class="id-mono">#1003</span></td>
+            <td><div class="client-cell"><div class="avatar-sm" style="background:#7C3AED">CT</div><div><div class="client-name">Camille Torres</div><div class="client-phone">0919-345-6789</div></div></div></td>
+            <td><div class="service-name">Chemical Peel</div><div class="duration-chip">45 min</div></td>
+            <td><div class="date-str">Apr 25, 2026</div><div class="time-mono">1:00 PM</div></td>
+            <td><span class="type-chip type-online">Online</span></td>
+            <td><span class="status" style="background:#FEF9C3;color:#A16207">Pending</span></td>
+            <td><span class="practitioner-text">Dr. Santos</span></td>
+            <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#EFF6FF;color:#1D4ED8">GCash</span><span class="amount-bold">₱3,500</span></div><span class="status" style="background:#FEF9C3;color:#A16207">Unpaid</span></div></td>
+            <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+          </tr>
+          <tr class="row">
+            <td><span class="id-mono">#1004</span></td>
+            <td><div class="client-cell"><div class="avatar-sm" style="background:#EA580C">JD</div><div><div class="client-name">Jose Dela Cruz</div><div class="client-phone">0920-456-7890</div></div></div></td>
+            <td><div class="service-name">PRP Therapy</div><div class="duration-chip">90 min</div></td>
+            <td><div class="date-str">Apr 25, 2026</div><div class="time-mono">2:30 PM</div></td>
+            <td><span class="type-chip type-f2f">F2F</span></td>
+            <td><span class="status" style="background:#DCFCE7;color:#15803D">Confirmed</span></td>
+            <td><span class="practitioner-text">Dr. Lim</span></td>
+            <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#F5F3FF;color:#6D28D9">Card</span><span class="amount-bold">₱12,000</span></div><span class="status" style="background:#DCFCE7;color:#15803D">Paid</span></div></td>
+            <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+          </tr>
+          <tr class="row">
+            <td><span class="id-mono">#1005</span></td>
+            <td><div class="client-cell"><div class="avatar-sm" style="background:#0891B2">AP</div><div><div class="client-name">Angela Park</div><div class="client-phone">0921-567-8901</div></div></div></td>
+            <td><div class="service-name">LED Therapy</div><div class="duration-chip">30 min</div></td>
+            <td><div class="date-str">Apr 25, 2026</div><div class="time-mono">3:30 PM</div></td>
+            <td><span class="type-chip type-online">Online</span></td>
+            <td><span class="status" style="background:#DCFCE7;color:#15803D">Confirmed</span></td>
+            <td><span class="practitioner-text">Dr. Reyes</span></td>
+            <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#F0FDF4;color:#166534">Cash</span><span class="amount-bold">₱1,800</span></div><span class="status" style="background:#DCFCE7;color:#15803D">Paid</span></div></td>
+            <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+          </tr>
+          <tr class="row">
+            <td><span class="id-mono">#1006</span></td>
+            <td><div class="client-cell"><div class="avatar-sm" style="background:#B45309">RT</div><div><div class="client-name">Roberto Tan</div><div class="client-phone">0922-678-9012</div></div></div></td>
+            <td><div class="service-name">Microneedling</div><div class="duration-chip">60 min</div></td>
+            <td><div class="date-str">Apr 26, 2026</div><div class="time-mono">9:00 AM</div></td>
+            <td><span class="type-chip type-f2f">F2F</span></td>
+            <td><span class="status" style="background:#FEF9C3;color:#A16207">Pending</span></td>
+            <td><span class="practitioner-text">Dr. Santos</span></td>
+            <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#EFF6FF;color:#1D4ED8">GCash</span><span class="amount-bold">₱4,500</span></div><span class="status" style="background:#FEF9C3;color:#A16207">Unpaid</span></div></td>
+            <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+          </tr>
+          <tr class="row">
+            <td><span class="id-mono">#1007</span></td>
+            <td><div class="client-cell"><div class="avatar-sm" style="background:#9D174D">LG</div><div><div class="client-name">Lisa Gomez</div><div class="client-phone">0923-789-0123</div></div></div></td>
+            <td><div class="service-name">Laser Resurfacing</div><div class="duration-chip">90 min</div></td>
+            <td><div class="date-str">Apr 26, 2026</div><div class="time-mono">10:30 AM</div></td>
+            <td><span class="type-chip type-f2f">F2F</span></td>
+            <td><span class="status" style="background:#DCFCE7;color:#15803D">Confirmed</span></td>
+            <td><span class="practitioner-text">Dr. Lim</span></td>
+            <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#F5F3FF;color:#6D28D9">Card</span><span class="amount-bold">₱15,000</span></div><span class="status" style="background:#DCFCE7;color:#15803D">Paid</span></div></td>
+            <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+          </tr>
+          <tr class="row">
+            <td><span class="id-mono">#1009</span></td>
+            <td><div class="client-cell"><div class="avatar-sm" style="background:#6B21A8">DR</div><div><div class="client-name">Diana Reyes</div><div class="client-phone">0925-901-2345</div></div></div></td>
+            <td><div class="service-name">Dermal Fillers</div><div class="duration-chip">60 min</div></td>
+            <td><div class="date-str">Apr 27, 2026</div><div class="time-mono">10:00 AM</div></td>
+            <td><span class="type-chip type-f2f">F2F</span></td>
+            <td><span class="status" style="background:#FEE2E2;color:#B91C1C">Cancelled</span></td>
+            <td><span class="practitioner-text">Dr. Santos</span></td>
+            <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#EFF6FF;color:#1D4ED8">GCash</span><span class="amount-bold">₱18,000</span></div><span class="status" style="background:#FEF9C3;color:#A16207">Unpaid</span></div></td>
+            <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+          </tr>
+          <tr class="row">
+            <td><span class="id-mono">#1010</span></td>
+            <td><div class="client-cell"><div class="avatar-sm" style="background:#0C4A6E">MV</div><div><div class="client-name">Marco Villanueva</div><div class="client-phone">0926-012-3456</div></div></div></td>
+            <td><div class="service-name">IV Drip Wellness</div><div class="duration-chip">60 min</div></td>
+            <td><div class="date-str">Apr 27, 2026</div><div class="time-mono">2:00 PM</div></td>
+            <td><span class="type-chip type-f2f">F2F</span></td>
+            <td><span class="status" style="background:#F0F6FC;color:#475569">Completed</span></td>
+            <td><span class="practitioner-text">Dr. Lim</span></td>
+            <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#FFF7ED;color:#C2410C">Transfer</span><span class="amount-bold">₱3,500</span></div><span class="status" style="background:#DCFCE7;color:#15803D">Paid</span></div></td>
+            <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+          </tr>
+          <tr class="row">
+            <td><span class="id-mono">#1011</span></td>
+            <td><div class="client-cell"><div class="avatar-sm" style="background:#14532D">PS</div><div><div class="client-name">Patricia Santos</div><div class="client-phone">0927-123-4567</div></div></div></td>
+            <td><div class="service-name">Hydra Facial</div><div class="duration-chip">60 min</div></td>
+            <td><div class="date-str">Apr 28, 2026</div><div class="time-mono">9:30 AM</div></td>
+            <td><span class="type-chip type-f2f">F2F</span></td>
+            <td><span class="status" style="background:#DCFCE7;color:#15803D">Confirmed</span></td>
+            <td><span class="practitioner-text">Dr. Santos</span></td>
+            <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#F0FDF4;color:#166534">Cash</span><span class="amount-bold">₱2,500</span></div><span class="status" style="background:#DCFCE7;color:#15803D">Paid</span></div></td>
+            <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <span class="info">Showing 1–10 of 12</span>
+      <div class="pager">
+        <button disabled style="opacity:0.5"><i data-lucide="chevron-left"></i></button>
+        <button class="active">1</button>
+        <button>2</button>
+        <button><i data-lucide="chevron-right"></i></button>
+      </div>
+    </div>
+    </div><!-- /#view-list -->
+  </div><!-- /section-card -->
+
+  <!-- ============ DETAILS MODAL ============ -->
+  <div id="modal-overlay" class="modal-overlay" data-screen-label="04 Appointments · Details Modal">
+      <div class="modal">
+        <div class="modal-head">
+          <h2>Appointment Details</h2>
+          <button><i data-lucide="x" style="width:20px;height:20px"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-section">
+            <h3>Client Information</h3>
+            <div class="info-box">
+              <div><p class="k">Name</p><p class="v">Sarah Johnson</p></div>
+              <div><p class="k">Phone</p><p class="v">0917-123-4567</p></div>
+            </div>
+          </div>
+          <div class="modal-section">
+            <h3>Appointment Details</h3>
+            <div class="info-grid">
+              <div class="info-cell"><p class="k">Service</p><p class="v">Hydra Facial</p></div>
+              <div class="info-cell"><p class="k">Practitioner</p><p class="v">Dr. Santos</p></div>
+              <div class="info-cell"><p class="k">Date &amp; Time</p><p class="v">Apr 25, 2026 at 10:00 AM</p></div>
+              <div class="info-cell"><p class="k">Duration</p><p class="v">60 min</p></div>
+            </div>
+          </div>
+          <div class="info-grid">
+            <div><p class="k" style="text-transform:uppercase;margin:0 0 8px">Status</p>
+              <span class="status-pill" style="background:#16A34A"><span class="ind"></span>Confirmed</span>
+            </div>
+            <div><p class="k" style="text-transform:uppercase;margin:0 0 8px">Type</p>
+              <span class="type-pill" style="background:#DBEAFE;color:#1E40AF">👤 Face to Face</span>
+            </div>
+          </div>
+          <div class="modal-section">
+            <h3>Payment Information</h3>
+            <div class="info-grid">
+              <div class="info-cell"><p class="k">Amount</p><p class="v amount">₱2,500</p></div>
+              <div class="info-cell"><p class="k">Payment Status</p><span class="payment-pill" style="background:#16A34A">Paid</span></div>
+              <div class="info-cell" style="grid-column: 1 / -1"><p class="k">Payment Method</p>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:16px">📱</span><span class="v">GCash</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn-close" id="modal-close">Close</button>
+        </div>
+      </div>
+  </div>
+</div>
+  </main>
+</div>
+<script>
+  // Tab switching: calendar / list
+  const tabs = document.querySelectorAll('#view-tabs button');
+  const panes = { calendar: document.getElementById('view-calendar'), list: document.getElementById('view-list') };
+  tabs.forEach(btn => btn.addEventListener('click', () => {
+    tabs.forEach(b => b.classList.toggle('active', b === btn));
+    const v = btn.dataset.view;
+    panes.calendar.hidden = (v !== 'calendar');
+    panes.list.hidden = (v !== 'list');
+  }));
+
+  // Calendar mode switcher (day / week / month) — visual only
+  document.querySelectorAll('#mode-switch button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#mode-switch button').forEach(o => o.classList.toggle('active', o === b));
+    });
+  });
+
+  // Open details modal — wired to row eye buttons + day-event chips
+  const overlay = document.getElementById('modal-overlay');
+  function openModal() { overlay.classList.add('open'); }
+  function closeModal() { overlay.classList.remove('open'); }
+  document.querySelectorAll('.action-btn.primary').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); openModal(); }));
+  document.querySelectorAll('[data-open-modal]').forEach(el => el.addEventListener('click', e => { e.stopPropagation(); openModal(); }));
+  // Row click anywhere also opens
+  document.querySelectorAll('tr.row').forEach(r => r.addEventListener('click', openModal));
+  // Close handlers
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.querySelector('.modal-head button').addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // Sortable table headers
+  var sortState = { col: 'client', dir: 'asc' };
+  function parseDate(s) { return new Date(s + ' 2026').getTime() || 0; }
+  function sortRows() {
+    var tbody = document.querySelector('table tbody');
+    if (!tbody) return;
+    var rows = Array.from(tbody.querySelectorAll('tr.row'));
+    function val(r, col) {
+      var tds = r.children;
+      if (col === 'client') return (r.querySelector('.client-name') || {}).textContent || '';
+      if (col === 'id') return (r.querySelector('.id-mono') || {}).textContent || '';
+      if (col === 'service') return (r.querySelector('.service-name') || {}).textContent || '';
+      if (col === 'type') return (r.querySelector('.type-chip') || {}).textContent || '';
+      if (col === 'practitioner') return (r.querySelector('.practitioner-text') || {}).textContent || '';
+      if (col === 'status') {
+        var statusCell = tds[5];
+        return (statusCell && statusCell.textContent || '').trim();
+      }
+      if (col === 'payment') return ((r.querySelector('.payment-cell .status') || {}).textContent || '') + ((r.querySelector('.payment-cell .amount-bold') || {}).textContent || '');
+      if (col === 'date') return parseDate(((r.querySelector('.date-str') || {}).textContent || '').replace(',', ''));
+      return '';
+    }
+    rows.sort(function (a, b) {
+      var av = val(a, sortState.col);
+      var bv = val(b, sortState.col);
+      if (typeof av === 'number') return sortState.dir === 'asc' ? av - bv : bv - av;
+      return sortState.dir === 'asc' ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
+    });
+    rows.forEach(function (r) { tbody.appendChild(r); });
+  }
+  function paintSortHeaders() {
+    document.querySelectorAll('th.sortable').forEach(function (th) {
+      var col = th.getAttribute('data-sort');
+      var isActive = col === sortState.col;
+      th.classList.toggle('sorted', isActive);
+      var arrow = th.querySelector('.arrow');
+      if (arrow) arrow.textContent = isActive ? (sortState.dir === 'asc' ? '↑' : '↓') : '↕';
+    });
+  }
+  document.querySelectorAll('th.sortable').forEach(function (th) {
+    th.addEventListener('click', function () {
+      var col = th.getAttribute('data-sort');
+      if (sortState.col === col) sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+      else { sortState.col = col; sortState.dir = col === 'date' ? 'desc' : 'asc'; }
+      paintSortHeaders();
+      sortRows();
+    });
+  });
+
+  lucide.createIcons();
+</script>
+<script>
+/* __MW_TOGGLE__ */
+(function(){
+  // Find every parent .nav-item that is followed by a [data-submenu-for] block and wire up click toggle
+  document.querySelectorAll('aside.sidebar .nav-item').forEach(function(item){
+    var next = item.nextElementSibling;
+    if (!next || !next.hasAttribute || !next.hasAttribute('data-submenu-for')) return;
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', function(e){
+      // Don't navigate if it's a link
+      if (item.tagName === 'A') e.preventDefault();
+      var isOpen = next.style.display !== 'none';
+      next.style.display = isOpen ? 'none' : 'block';
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+})();
+</script>
+<script src="_sidebar.js"></script>
+<script src="_appointment-modal.js"></script>
+</body>
+</html>

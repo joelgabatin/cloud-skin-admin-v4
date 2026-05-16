@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — LED Therapy Service</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F8FAFC; font-family: var(--font-body); color: #1A2E40; }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #0F1E2E; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-crumb a { color: #2D6A9F; text-decoration: none; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px 60px; }
+  .layout { display: grid; grid-template-columns: 250px 1fr; gap: 18px; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+  .stepper { background: #fff; border: 1px solid #E5EFF7; border-radius: 10px; padding: 18px 16px; box-shadow: 0 1px 3px rgba(26,58,92,0.05); position: sticky; top: 92px; }
+  .step { display: flex; gap: 10px; padding: 10px 8px; align-items: center; cursor: pointer; border-left: 3px solid transparent; margin-left: -19px; padding-left: 16px; border-radius: 0 6px 6px 0; transition: background 120ms; }
+  .step:hover { background: #F8FBFD; }
+  .step.active { background: #F0F6FC; border-left-color: #2D6A9F; }
+  .step .ix { width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 11px; flex-shrink: 0; }
+  .step .ix.done { background: #15803D; color: #fff; }
+  .step .ix.active { background: #2D6A9F; color: #fff; }
+  .step .ix.pending { background: #E5EFF7; color: #6B7280; }
+  .step .body .nm { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .step.active .body .nm { color: #2D6A9F; }
+  .step .body .ts { font-family: var(--font-body); font-size: 11px; color: #5A7A96; }
+  .progress-box { margin-top: 14px; padding-top: 14px; border-top: 1px solid #E5EFF7; }
+  .progress-box .lbl { font-family: var(--font-display); font-size: 10.5px; font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .progress-box .bar { height: 6px; background: #F0F6FC; border-radius: 3px; overflow: hidden; }
+  .progress-box .bar > div { height: 100%; background: #2D6A9F; border-radius: 3px; transition: width 200ms; }
+
+  .right { display: flex; flex-direction: column; gap: 14px; }
+  .step-nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #fff; border: 1px solid #E5EFF7; border-radius: 10px; }
+  .viewing { font-family: var(--font-body); font-size: 13px; color: #1A2E40; }
+  .viewing .pfx { color: #5A7A96; }
+  .arrows { display: flex; gap: 6px; }
+  .arr-btn { width: 30px; height: 30px; background: #fff; border: 1px solid #E5EFF7; border-radius: 7px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #5A7A96; }
+  .arr-btn:hover { background: #F0F6FC; }
+
+  .card { background: #fff; border-radius: 10px; border: 1px solid #E5EFF7; padding: 22px 24px; box-shadow: 0 1px 3px rgba(26,58,92,0.05); }
+  .card.active-card { border-color: #2D6A9F; box-shadow: 0 0 0 2px rgba(45,106,159,0.08); }
+  .card h3 { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #1A2E40; margin: 0 0 4px; }
+  .card .sub { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-bottom: 16px; }
+
+  .back { color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-weight: 600; font-size: 13px; text-decoration: none; margin-bottom: 12px; cursor: pointer; }
+  .back .lucide { width: 14px; height: 14px; }
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; letter-spacing: 0.04em; }
+  .badge.orange { background: #FEF3C7; color: #C2410C; }
+  .badge.green { background: #DCFCE7; color: #15803D; }
+  .badge.blue { background: #DBEAFE; color: #1D4ED8; }
+  .badge.gray { background: #E5EFF7; color: #6B7280; }
+
+  .form-row { display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; padding: 14px 16px; background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 10px; align-items: center; }
+  .form-row + .form-row { margin-top: 10px; }
+  .form-row .ic { width: 42px; height: 42px; border-radius: 9px; background: #DBEAFE; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; }
+  .form-row .ic .lucide { width: 20px; height: 20px; }
+  .form-row .ti { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; color: #1A2E40; margin-bottom: 3px; }
+  .form-row .desc { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; line-height: 1.45; margin-bottom: 6px; }
+  .btn-pri { background: #2D6A9F; color: #fff; border: none; padding: 8px 14px; border-radius: 7px; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; }
+  .btn-pri:hover { background: #1A5685; }
+  .btn-out { background: #fff; color: #2D6A9F; border: 1px solid #D0E8F5; padding: 8px 14px; border-radius: 7px; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; }
+  .btn-out:hover { background: #F0F6FC; }
+  .link-out { color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12px; text-decoration: none; }
+
+  .alert { padding: 12px 14px; border-radius: 8px; font-family: var(--font-body); font-size: 12.5px; display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; margin-top: 16px; }
+  .alert .lucide { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+  .alert.warn { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; }
+  .alert.success { background: #DCFCE7; color: #166534; border: 1px solid #86EFAC; }
+  .alert.info { background: #F0F6FC; color: #1A3A5C; border: 1px solid #BFD8EB; }
+
+  .pat-banner { background: #F0F6FC; border: 1px solid #BFD8EB; border-radius: 8px; padding: 12px 14px; margin: 12px 0 18px; }
+  .pat-banner .lbl { font-family: var(--font-display); font-weight: 700; font-size: 10.5px; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .pat-banner .row1 { font-family: var(--font-body); font-size: 12.5px; color: #1A2E40; }
+  .pat-banner b { font-family: var(--font-display); font-weight: 700; }
+
+  .form-content { font-family: var(--font-body); font-size: 13px; line-height: 1.6; max-height: 340px; overflow-y: auto; border: 1px solid #E5EFF7; border-radius: 8px; padding: 16px 18px; background: #fff; }
+  .form-content h4 { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; color: #1A2E40; margin: 16px 0 6px; }
+  .form-content h4:first-child { margin-top: 0; }
+  .form-content h2 { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: #1A2E40; margin: 0 0 4px; text-align: center; }
+  .form-content em { color: #5A7A96; font-size: 12.5px; display: block; text-align: center; margin-bottom: 14px; }
+  .ack-box { background: #F0F6FC; border-left: 3px solid #2D6A9F; padding: 12px 14px; margin-top: 18px; border-radius: 0 6px 6px 0; font-style: italic; color: #1A3A5C; font-size: 12.5px; }
+
+  .sig-section { margin-top: 22px; padding-top: 20px; border-top: 1px solid #E5EFF7; }
+  .sig-pad { width: 100%; max-width: 500px; height: 140px; border: 1.5px dashed #BFD8EB; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; position: relative; }
+  .sig-pad .placeholder { color: #BFD8EB; font-family: var(--font-body); font-size: 12.5px; }
+  .sig-svg { position: absolute; inset: 0; pointer-events: none; }
+  .sig-toolbar { display: flex; justify-content: space-between; max-width: 500px; margin-top: 8px; font-family: var(--font-display); font-size: 12px; }
+  .sig-toolbar .clear { color: #DC2626; cursor: pointer; }
+  .cb { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-body); font-size: 12.5px; cursor: pointer; }
+  .cb .box { width: 16px; height: 16px; background: #2D6A9F; color: #fff; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .cb .box .lucide { width: 11px; height: 11px; }
+  .sig-actions { display: flex; gap: 10px; margin-top: 14px; justify-content: flex-end; }
+
+  .qsec h4.sec-h { font-family: var(--font-display); font-weight: 700; font-size: 12.5px; color: #2D6A9F; text-transform: uppercase; letter-spacing: 0.05em; margin: 18px 0 10px; padding-bottom: 6px; border-bottom: 1px solid #E5EFF7; }
+  .cond-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px 14px; padding: 12px; background: #F8FBFD; border-radius: 8px; }
+  @media (max-width: 720px) { .cond-grid { grid-template-columns: repeat(2,1fr); } }
+  .cond-grid label { display: flex; align-items: center; gap: 7px; font-family: var(--font-body); font-size: 12.5px; cursor: pointer; }
+  .cond-grid .box { width: 14px; height: 14px; border: 1.5px solid #BFD8EB; border-radius: 3px; flex-shrink: 0; background: #fff; display: inline-flex; align-items: center; justify-content: center; }
+  .cond-grid label.checked .box { background: #2D6A9F; border-color: #2D6A9F; color: #fff; }
+  .cond-grid label.checked .box .lucide { width: 10px; height: 10px; }
+  .q-card { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; padding: 12px 14px; margin-top: 10px; }
+  .q-card .q { font-family: var(--font-body); font-size: 13px; margin-bottom: 8px; }
+  .q-card .q b { font-family: var(--font-display); font-weight: 700; color: #2D6A9F; margin-right: 4px; }
+  .yn { display: inline-flex; border: 1px solid #D0E8F5; border-radius: 6px; overflow: hidden; cursor: pointer; }
+  .yn span { padding: 5px 16px; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #5A7A96; background: #fff; }
+  .yn span.sel { background: #2D6A9F; color: #fff; }
+  .followup { margin-top: 10px; padding: 10px 12px; background: #fff; border: 1px solid #E5EFF7; border-radius: 6px; }
+  .followup .lbl { font-family: var(--font-display); font-weight: 600; font-size: 11.5px; color: #5A7A96; margin-bottom: 5px; }
+  .followup input { width: 100%; padding: 7px 10px; border: 1px solid #D0E8F5; border-radius: 6px; font-family: var(--font-body); font-size: 12.5px; }
+  .decl-box { background: #F0F6FC; border-left: 3px solid #2D6A9F; padding: 12px 14px; margin-top: 16px; border-radius: 0 6px 6px 0; font-style: italic; color: #1A3A5C; font-size: 12.5px; }
+
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 720px) { .info-grid { grid-template-columns: 1fr; } }
+  .info-grid .k { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .info-grid .v { font-family: var(--font-body); font-size: 13px; color: #1A2E40; }
+
+  .vital-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; }
+  @media (max-width: 720px) { .vital-grid { grid-template-columns: repeat(3,1fr); } }
+  .vital { background: #F8FBFD; border: 1px solid #E5EFF7; padding: 12px 10px; border-radius: 8px; text-align: center; }
+  .vital .v { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: #2D6A9F; }
+  .vital .k { font-family: var(--font-body); font-size: 11px; color: #5A7A96; margin-top: 4px; }
+
+  .demo-note { background: #FEF3C7; border: 1px solid #FCD34D; color: #92400E; padding: 8px 14px; border-radius: 6px; font-family: var(--font-body); font-size: 12px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+  .demo-note .lucide { width: 14px; height: 14px; color: #B45309; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Service Detail — LED Therapy</div>
+        <div class="topbar-crumb">Admin / Patients / <a href="patient-profile.html?id=P001">Sarah Johnson</a> / LED Therapy</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="LED Therapy Workflow">
+      <div class="demo-note"><i data-lucide="info"></i> <span>Interactive demo — click any step in the left stepper to view that step's panel. No data is saved.</span></div>
+      <div class="layout">
+        <aside class="stepper" id="stepper">
+          <div class="step" data-step="1"><div class="ix done"><i data-lucide="check" style="width:13px;height:13px;"></i></div><div class="body"><div class="nm">Appointment</div><div class="ts">Apr 10, 2026</div></div></div>
+          <div class="step" data-step="2"><div class="ix done"><i data-lucide="check" style="width:13px;height:13px;"></i></div><div class="body"><div class="nm">Consultation</div><div class="ts">Apr 1, 2026</div></div></div>
+          <div class="step active" data-step="3"><div class="ix active">3</div><div class="body"><div class="nm">Consent Forms</div><div class="ts" id="step3-ts">3 forms required</div></div></div>
+          <div class="step" data-step="4"><div class="ix pending">4</div><div class="body"><div class="nm">Doctor's Order</div><div class="ts">Pending</div></div></div>
+          <div class="step" data-step="5"><div class="ix pending">5</div><div class="body"><div class="nm">Vital Signs</div><div class="ts">Pending</div></div></div>
+          <div class="step" data-step="6"><div class="ix pending">6</div><div class="body"><div class="nm">Clinical Notes</div><div class="ts">Pending</div></div></div>
+          <div class="step" data-step="7"><div class="ix pending">7</div><div class="body"><div class="nm">Payment</div><div class="ts">Pending</div></div></div>
+          <div class="progress-box">
+            <div class="lbl">Progress · <span id="prog-label">2 of 7</span></div>
+            <div class="bar"><div id="prog-bar" style="width:28%;"></div></div>
+          </div>
+        </aside>
+
+        <div class="right">
+          <div class="step-nav"><span class="viewing"><span class="pfx">Viewing:</span> <b id="view-label">Step 3 — Consent Forms</b></span><div class="arrows"><button class="arr-btn" id="prev-btn"><i data-lucide="chevron-left"></i></button><button class="arr-btn" id="next-btn"><i data-lucide="chevron-right"></i></button></div></div>
+
+          <!-- STEP 1 -->
+          <div class="card" data-pane="1" hidden>
+            <h3>Step 1 — Appointment</h3>
+            <div class="sub">Booked appointment record for this service.</div>
+            <div class="info-grid">
+              <div><div class="k">Date</div><div class="v">April 10, 2026 — 10:00 AM</div></div>
+              <div><div class="k">Practitioner</div><div class="v">Dr. Santos</div></div>
+              <div><div class="k">Service</div><div class="v">LED Therapy</div></div>
+              <div><div class="k">Status</div><div class="v"><span class="badge green">Confirmed</span></div></div>
+            </div>
+            <div class="alert success" style="margin-top:18px;"><i data-lucide="check-circle"></i><div>Appointment confirmed and patient notified via SMS + email.</div></div>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="card" data-pane="2" hidden>
+            <h3>Step 2 — Consultation</h3>
+            <div class="sub">Pre-treatment consultation notes recorded by Dr. Santos.</div>
+            <div class="info-grid">
+              <div><div class="k">Date</div><div class="v">April 1, 2026</div></div>
+              <div><div class="k">Practitioner</div><div class="v">Dr. Santos</div></div>
+              <div><div class="k">Chief Concern</div><div class="v">Mild hyperpigmentation and dull skin tone</div></div>
+              <div><div class="k">Treatment Plan</div><div class="v">6-session LED Therapy course</div></div>
+            </div>
+            <div class="ack-box" style="margin-top:14px;">"Patient is a good candidate for LED Therapy. No contraindications. Recommend full 6-session course with monthly maintenance after completion."</div>
+          </div>
+
+          <!-- STEP 3 sub-states -->
+          <div class="card active-card" data-pane="3-overview">
+            <h3>Forms Required for This Service</h3>
+            <div class="sub">Please complete all forms before the procedure can proceed.</div>
+
+            <div class="form-row" id="row-general">
+              <div class="ic"><i data-lucide="file-text"></i></div>
+              <div>
+                <div class="ti">General Consent Form</div>
+                <div class="desc">Covers general consent to treatment, data privacy, financial responsibility, and patient rights.</div>
+                <span class="badge orange" id="b-general">Not yet signed</span>
+              </div>
+              <div><button class="btn-pri" data-goto="3-consent">Sign Now <i data-lucide="arrow-right" style="width:13px;height:13px;"></i></button></div>
+            </div>
+
+            <div class="form-row" id="row-history">
+              <div class="ic"><i data-lucide="clipboard-list"></i></div>
+              <div>
+                <div class="ti">Medical History Questionnaire</div>
+                <div class="desc">Patient health history, existing conditions, current medications, and previous treatments.</div>
+                <span class="badge orange" id="b-history">Not yet completed</span>
+              </div>
+              <div><button class="btn-pri" data-goto="3-history">Fill Out <i data-lucide="arrow-right" style="width:13px;height:13px;"></i></button></div>
+            </div>
+
+            <div class="form-row" id="row-treatment">
+              <div class="ic"><i data-lucide="file-text"></i></div>
+              <div>
+                <div class="ti">LED Therapy Treatment Consent</div>
+                <div class="desc">Procedure-specific consent for LED Therapy. Covers pre and post-care obligations.</div>
+                <span class="badge orange" id="b-treatment">Not yet signed</span>
+              </div>
+              <div><button class="btn-pri" data-goto="3-treatment">Sign Now <i data-lucide="arrow-right" style="width:13px;height:13px;"></i></button></div>
+            </div>
+
+            <div class="alert warn" id="alert-incomplete"><i data-lucide="alert-triangle"></i><div>All 3 forms must be completed before this procedure can proceed.</div></div>
+            <div class="alert success" id="alert-complete" hidden><i data-lucide="check-circle"></i><div>All consent forms have been completed and are on file. You may now proceed to <b>Step 4 — Doctor's Order</b>.</div></div>
+            <div style="text-align:right;margin-top:14px;" id="continue-wrap" hidden><button class="btn-pri" data-step-jump="4">Continue to Step 4 <i data-lucide="arrow-right" style="width:13px;height:13px;"></i></button></div>
+          </div>
+
+          <!-- 3-consent General Consent Form -->
+          <div class="card active-card" data-pane="3-consent" hidden>
+            <a class="back" data-goto="3-overview"><i data-lucide="arrow-left"></i> Back to Consent Forms</a>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;">
+              <div>
+                <h3 style="font-size:17px;">General Consent Form</h3>
+                <div class="sub" style="margin-bottom:0;">Read the form below carefully then sign at the bottom.</div>
+              </div>
+              <span class="badge orange">Awaiting Signature</span>
+            </div>
+            <div class="pat-banner">
+              <div class="lbl">Patient information auto-filled</div>
+              <div class="row1"><b>Patient:</b> Sarah Johnson · <b>DOB:</b> April 5, 1990 · <b>Age/Sex:</b> 36 / Female · <b>Contact:</b> 0917-123-4567</div>
+            </div>
+            <div class="form-content">
+              <h2>GENERAL CONSENT AND ACKNOWLEDGMENT FORM</h2>
+              <em>Please read carefully before signing.</em>
+              <h4>1. CONSENT TO TREATMENT</h4>
+              <p>I voluntarily consent to receive aesthetic, wellness, and cosmetic treatments and services offered by Cloud Skin Clinic + Wellness.</p>
+              <h4>2. DISCLOSURE OF MEDICAL INFORMATION</h4>
+              <p>I confirm that all medical information I have provided is accurate and complete.</p>
+              <h4>3. RISKS AND COMPLICATIONS</h4>
+              <p>I acknowledge that all medical and aesthetic procedures carry inherent risks including temporary redness, swelling, bruising, sensitivity, or pigmentation changes.</p>
+              <h4>4. PHOTOGRAPHY AND CLINICAL RECORDS</h4>
+              <p>I consent to before-and-after photographs for clinical documentation.</p>
+              <h4>5. PRIVACY AND DATA PROTECTION</h4>
+              <p>In compliance with the Data Privacy Act of 2012, I authorize Cloud Skin Clinic + Wellness to collect and process my personal and medical information.</p>
+              <h4>6. FINANCIAL RESPONSIBILITY</h4>
+              <p>I accept full financial responsibility for all services rendered.</p>
+              <h4>7. RIGHT TO WITHDRAW CONSENT</h4>
+              <p>I understand that I have the right to withdraw this consent at any time in writing.</p>
+              <div class="ack-box">By signing below, I confirm that I have read and understood this General Consent and Acknowledgment Form.</div>
+            </div>
+            <div class="sig-section">
+              <h4 style="font-family:var(--font-display);font-weight:700;font-size:13px;margin:0 0 6px;">Patient Signature</h4>
+              <div style="font-family:var(--font-body);font-size:12px;color:#5A7A96;margin-bottom:10px;">Date: May 15, 2026</div>
+              <div class="sig-pad" id="sig-general">
+                <span class="placeholder">Sign here using your mouse, trackpad, or touch screen</span>
+              </div>
+              <div class="sig-toolbar"><span class="clear" data-clear="sig-general">Clear Signature</span><span style="color:#6B7280;">Use Typed Signature</span></div>
+              <div style="margin-top:12px;font-family:var(--font-body);font-size:12.5px;">Printed name: <b style="font-family:var(--font-display);">Sarah Johnson</b></div>
+              <label class="cb" style="margin-top:10px;"><span class="box"><i data-lucide="check"></i></span>I confirm I have read and understood this form and am signing voluntarily.</label>
+              <div class="sig-actions">
+                <button class="btn-out" data-clear="sig-general">Clear &amp; Start Over</button>
+                <button class="btn-pri" data-submit="general">Submit Signature &amp; Complete Form</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3-history Medical History Questionnaire -->
+          <div class="card active-card" data-pane="3-history" hidden>
+            <a class="back" data-goto="3-overview"><i data-lucide="arrow-left"></i> Back to Consent Forms</a>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;">
+              <div>
+                <h3 style="font-size:17px;">Medical History Questionnaire</h3>
+                <div class="sub" style="margin-bottom:0;">Answer all questions honestly. This information helps ensure your safety during treatment.</div>
+              </div>
+              <span class="badge orange">Not yet completed</span>
+            </div>
+            <div class="pat-banner"><div class="lbl">Patient auto-filled</div><div class="row1"><b>Patient:</b> Sarah Johnson · <b>Date:</b> May 15, 2026</div></div>
+
+            <div class="qsec">
+              <h4 class="sec-h">Section 1 — Existing Medical Conditions</h4>
+              <div class="cond-grid" id="cond-grid">
+                <label data-cond><span class="box"><i data-lucide="check"></i></span>Blood disorder</label>
+                <label data-cond><span class="box"><i data-lucide="check"></i></span>Diabetes</label>
+                <label data-cond><span class="box"><i data-lucide="check"></i></span>High blood pressure</label>
+                <label data-cond><span class="box"><i data-lucide="check"></i></span>Heart attack history</label>
+                <label data-cond><span class="box"><i data-lucide="check"></i></span>Seizure</label>
+                <label data-cond><span class="box"><i data-lucide="check"></i></span>Stroke</label>
+                <label data-cond><span class="box"><i data-lucide="check"></i></span>Thyroid disease</label>
+                <label data-cond><span class="box"><i data-lucide="check"></i></span>Tinnitus</label>
+                <label data-cond class="checked"><span class="box"><i data-lucide="check"></i></span>None of the above</label>
+              </div>
+
+              <h4 class="sec-h">Section 2 — Medical Questions</h4>
+              <div class="q-card"><div class="q"><b>Q1.</b>Are you presently under a dermatologist or physician's care?</div><div class="yn" data-yn><span>Yes</span><span class="sel">No</span></div></div>
+              <div class="q-card"><div class="q"><b>Q2.</b>Are you currently taking any medication?</div><div class="yn" data-yn><span>Yes</span><span class="sel">No</span></div></div>
+              <div class="q-card"><div class="q"><b>Q3.</b>Have you had any Botox, fillers, or threads in the area to be treated?</div><div class="yn" data-yn><span>Yes</span><span class="sel">No</span></div></div>
+              <div class="q-card"><div class="q"><b>Q4.</b>Have you had intense sun exposure in the past 2–4 weeks?</div><div class="yn" data-yn><span>Yes</span><span class="sel">No</span></div></div>
+              <div class="q-card"><div class="q"><b>Q5.</b>For female patients: Are you currently pregnant?</div><div class="yn" data-yn><span>Yes</span><span class="sel">No</span></div></div>
+
+              <h4 class="sec-h">Section 3 — Patient Declaration</h4>
+              <div class="decl-box">"All of the above information is true and accurate to the best of my knowledge."</div>
+              <div class="sig-section" style="border-top:none;padding-top:0;margin-top:14px;">
+                <div class="sig-pad" id="sig-history"><span class="placeholder">Sign here using your mouse, trackpad, or touch screen</span></div>
+                <div class="sig-toolbar"><span class="clear" data-clear="sig-history">Clear Signature</span><span style="color:#6B7280;">Use Typed Signature</span></div>
+                <label class="cb" style="margin-top:10px;"><span class="box"><i data-lucide="check"></i></span>I confirm all information provided is truthful and accurate.</label>
+                <div class="sig-actions">
+                  <button class="btn-out" data-goto="3-overview">Save &amp; Continue Later</button>
+                  <button class="btn-pri" data-submit="history">Submit Questionnaire</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3-treatment LED Therapy Consent -->
+          <div class="card active-card" data-pane="3-treatment" hidden>
+            <a class="back" data-goto="3-overview"><i data-lucide="arrow-left"></i> Back to Consent Forms</a>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;">
+              <div>
+                <h3 style="font-size:17px;">LED Therapy Treatment Consent</h3>
+                <div class="sub" style="margin-bottom:0;">Procedure-specific consent for LED Therapy.</div>
+              </div>
+              <span class="badge orange">Awaiting Signature</span>
+            </div>
+            <div class="pat-banner"><div class="lbl">Patient auto-filled</div><div class="row1"><b>Patient:</b> Sarah Johnson · <b>Date:</b> May 15, 2026</div></div>
+            <div class="form-content">
+              <h2>LED THERAPY TREATMENT CONSENT</h2>
+              <em>Specific to LED phototherapy treatment.</em>
+              <h4>What is LED Therapy?</h4>
+              <p>LED Therapy uses light wavelengths to stimulate skin regeneration, reduce inflammation, and improve overall skin tone. It is non-invasive and painless.</p>
+              <h4>Pre-Treatment Instructions</h4>
+              <p>Arrive with clean, makeup-free skin. Avoid retinoids, acids, and exfoliants for 48 hours before treatment.</p>
+              <h4>Post-Care Obligations</h4>
+              <p>Avoid direct sun exposure for 24 hours. Apply SPF 50 daily. Do not use harsh skincare products for 48 hours post-treatment.</p>
+              <h4>Risks Acknowledgment</h4>
+              <p>Mild temporary redness, dryness, or sensitivity may occur. Rare reactions include skin irritation or pigmentation changes.</p>
+              <div class="ack-box">I have read and understood the procedure-specific information for LED Therapy and consent to undergo this treatment.</div>
+            </div>
+            <div class="sig-section">
+              <div class="sig-pad" id="sig-treatment"><span class="placeholder">Sign here using your mouse, trackpad, or touch screen</span></div>
+              <div class="sig-toolbar"><span class="clear" data-clear="sig-treatment">Clear Signature</span><span style="color:#6B7280;">Use Typed Signature</span></div>
+              <label class="cb" style="margin-top:10px;"><span class="box"><i data-lucide="check"></i></span>I confirm I have read and understood this treatment consent.</label>
+              <div class="sig-actions">
+                <button class="btn-out" data-clear="sig-treatment">Clear &amp; Start Over</button>
+                <button class="btn-pri" data-submit="treatment">Submit Signature &amp; Complete Form</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 4 -->
+          <div class="card" data-pane="4" hidden>
+            <h3>Step 4 — Doctor's Order</h3>
+            <div class="sub">Doctor's clinical order for the LED Therapy session.</div>
+            <div class="info-grid">
+              <div><div class="k">Ordered by</div><div class="v">Dr. Santos</div></div>
+              <div><div class="k">Treatment</div><div class="v">LED Therapy — Red &amp; Near-Infrared, 20 min</div></div>
+              <div><div class="k">Power Setting</div><div class="v">Standard intensity</div></div>
+              <div><div class="k">Frequency</div><div class="v">Bi-weekly for 6 sessions</div></div>
+            </div>
+            <div class="alert info" style="margin-top:14px;"><i data-lucide="info"></i><div>Complete consent forms before this order can be marked as ready.</div></div>
+          </div>
+
+          <!-- STEP 5 -->
+          <div class="card" data-pane="5" hidden>
+            <h3>Step 5 — Vital Signs</h3>
+            <div class="sub">Pre-procedure vital signs recording.</div>
+            <div class="vital-grid">
+              <div class="vital"><div class="v">—</div><div class="k">BP (mmHg)</div></div>
+              <div class="vital"><div class="v">—</div><div class="k">HR (BPM)</div></div>
+              <div class="vital"><div class="v">—</div><div class="k">SpO₂</div></div>
+              <div class="vital"><div class="v">—</div><div class="k">Weight</div></div>
+              <div class="vital"><div class="v">—</div><div class="k">Height</div></div>
+            </div>
+            <div class="alert info" style="margin-top:14px;"><i data-lucide="info"></i><div>Vital signs will be recorded at check-in on the day of the procedure.</div></div>
+          </div>
+
+          <!-- STEP 6 -->
+          <div class="card" data-pane="6" hidden>
+            <h3>Step 6 — Clinical Notes</h3>
+            <div class="sub">Procedure notes and post-care given.</div>
+            <div class="alert info"><i data-lucide="info"></i><div>Clinical notes will be added by the practitioner during/after the procedure.</div></div>
+          </div>
+
+          <!-- STEP 7 -->
+          <div class="card" data-pane="7" hidden>
+            <h3>Step 7 — Payment</h3>
+            <div class="sub">Service payment record.</div>
+            <div class="info-grid">
+              <div><div class="k">Service</div><div class="v">LED Therapy</div></div>
+              <div><div class="k">Amount</div><div class="v">₱1,800</div></div>
+              <div><div class="k">Status</div><div class="v"><span class="badge gray">Pending</span></div></div>
+              <div><div class="k">Payment Method</div><div class="v">—</div></div>
+            </div>
+            <div class="alert info" style="margin-top:14px;"><i data-lucide="info"></i><div>Payment will be recorded on the day of service.</div></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+(function () {
+  // Demo state (no persistence)
+  var state = {
+    current: '3-overview',
+    forms: { general: false, history: false, treatment: false },
+    stepDone: { 1: true, 2: true, 3: false, 4: false, 5: false, 6: false, 7: false }
+  };
+  var stepNames = {
+    '1': 'Step 1 — Appointment',
+    '2': 'Step 2 — Consultation',
+    '3-overview': 'Step 3 — Consent Forms',
+    '3-consent': 'Step 3 — General Consent Form',
+    '3-history': 'Step 3 — Medical History',
+    '3-treatment': 'Step 3 — LED Therapy Consent',
+    '4': "Step 4 — Doctor's Order",
+    '5': 'Step 5 — Vital Signs',
+    '6': 'Step 6 — Clinical Notes',
+    '7': 'Step 7 — Payment'
+  };
+  var stepOrder = ['1','2','3-overview','4','5','6','7'];
+
+  function goto(key) {
+    state.current = key;
+    document.querySelectorAll('[data-pane]').forEach(function (p) { p.hidden = p.getAttribute('data-pane') !== key; });
+    document.getElementById('view-label').textContent = stepNames[key] || key;
+    var rootStep = key.split('-')[0];
+    document.querySelectorAll('#stepper .step').forEach(function (s) { s.classList.toggle('active', s.getAttribute('data-step') === rootStep); });
+    if (window.lucide) window.lucide.createIcons();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateStep3Status() {
+    var done = state.forms.general && state.forms.history && state.forms.treatment;
+    var alertOk = document.getElementById('alert-complete');
+    var alertWarn = document.getElementById('alert-incomplete');
+    var contWrap = document.getElementById('continue-wrap');
+    var s3 = document.querySelector('#stepper .step[data-step="3"]');
+    var ix3 = s3.querySelector('.ix');
+    var ts3 = document.getElementById('step3-ts');
+
+    function setBadge(id, completed) {
+      var el = document.getElementById(id);
+      el.className = 'badge ' + (completed ? 'green' : 'orange');
+      var labels = { 'b-general': ['Not yet signed','Signed — May 15, 2026'], 'b-history': ['Not yet completed','Completed — May 15, 2026'], 'b-treatment': ['Not yet signed','Signed — May 15, 2026'] };
+      el.textContent = labels[id][completed ? 1 : 0];
+    }
+    setBadge('b-general', state.forms.general);
+    setBadge('b-history', state.forms.history);
+    setBadge('b-treatment', state.forms.treatment);
+
+    if (done) {
+      alertOk.hidden = false;
+      alertWarn.hidden = true;
+      contWrap.hidden = false;
+      ix3.className = 'ix done';
+      ix3.innerHTML = '<i data-lucide="check" style="width:13px;height:13px;"></i>';
+      ts3.textContent = 'All forms signed';
+      state.stepDone[3] = true;
+      // Mark step 4 as active visually
+      var s4 = document.querySelector('#stepper .step[data-step="4"]');
+      var ix4 = s4.querySelector('.ix');
+      if (!state.stepDone[4]) ix4.className = 'ix active';
+    } else {
+      alertOk.hidden = true;
+      alertWarn.hidden = false;
+      contWrap.hidden = true;
+      ix3.className = 'ix active';
+      ix3.innerHTML = '3';
+      var doneCount = (state.forms.general?1:0) + (state.forms.history?1:0) + (state.forms.treatment?1:0);
+      ts3.textContent = doneCount + ' of 3 signed';
+      state.stepDone[3] = false;
+    }
+    // Update progress
+    var totalDone = Object.values(state.stepDone).filter(Boolean).length;
+    document.getElementById('prog-label').textContent = totalDone + ' of 7';
+    document.getElementById('prog-bar').style.width = Math.round((totalDone/7)*100) + '%';
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  // Stepper clicks
+  document.querySelectorAll('#stepper .step').forEach(function (s) {
+    s.addEventListener('click', function () {
+      var k = s.getAttribute('data-step');
+      goto(k === '3' ? '3-overview' : k);
+    });
+  });
+
+  // Internal navigation buttons
+  document.body.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-goto]');
+    if (t) { goto(t.getAttribute('data-goto')); return; }
+    var j = e.target.closest('[data-step-jump]');
+    if (j) { goto(j.getAttribute('data-step-jump')); return; }
+    var sub = e.target.closest('[data-submit]');
+    if (sub) {
+      var key = sub.getAttribute('data-submit');
+      state.forms[key] = true;
+      updateStep3Status();
+      goto('3-overview');
+      return;
+    }
+    var cl = e.target.closest('[data-clear]');
+    if (cl) {
+      var padId = cl.getAttribute('data-clear');
+      var pad = document.getElementById(padId);
+      if (pad) {
+        var svg = pad.querySelector('.sig-svg');
+        if (svg) svg.remove();
+        var ph = pad.querySelector('.placeholder');
+        if (ph) ph.style.opacity = '1';
+      }
+      return;
+    }
+    // Yes/No toggle
+    var ynSpan = e.target.closest('[data-yn] span');
+    if (ynSpan) {
+      var group = ynSpan.parentElement;
+      group.querySelectorAll('span').forEach(function (x) { x.classList.toggle('sel', x === ynSpan); });
+      return;
+    }
+    // Condition toggle
+    var cond = e.target.closest('[data-cond]');
+    if (cond) {
+      cond.classList.toggle('checked');
+      if (window.lucide) window.lucide.createIcons();
+      return;
+    }
+  });
+
+  // Signature pad: draw on mouse/touch
+  function wireSigPad(pad) {
+    var drawing = false, path = null, dStr = '', svg = null;
+    var ph = pad.querySelector('.placeholder');
+    function getPt(e) {
+      var rect = pad.getBoundingClientRect();
+      var pt = (e.touches && e.touches[0]) || e;
+      return { x: pt.clientX - rect.left, y: pt.clientY - rect.top };
+    }
+    function start(e) {
+      e.preventDefault();
+      drawing = true;
+      if (ph) ph.style.opacity = '0';
+      if (!svg) {
+        svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'sig-svg');
+        svg.setAttribute('viewBox', '0 0 ' + pad.offsetWidth + ' ' + pad.offsetHeight);
+        pad.appendChild(svg);
+      }
+      var p = getPt(e);
+      dStr = 'M ' + p.x + ' ' + p.y;
+      path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', '#1A3A5C');
+      path.setAttribute('stroke-width', '2.4');
+      path.setAttribute('stroke-linecap', 'round');
+      path.setAttribute('stroke-linejoin', 'round');
+      svg.appendChild(path);
+    }
+    function move(e) {
+      if (!drawing) return;
+      e.preventDefault();
+      var p = getPt(e);
+      dStr += ' L ' + p.x + ' ' + p.y;
+      path.setAttribute('d', dStr);
+    }
+    function end() { drawing = false; }
+    pad.addEventListener('mousedown', start);
+    pad.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', end);
+    pad.addEventListener('touchstart', start, { passive: false });
+    pad.addEventListener('touchmove', move, { passive: false });
+    pad.addEventListener('touchend', end);
+  }
+  document.querySelectorAll('.sig-pad').forEach(wireSigPad);
+
+  // Init
+  goto('3-overview');
+  updateStep3Status();
+})();
+</script>
+</body>
+</html>

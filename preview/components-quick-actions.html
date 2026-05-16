@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body { margin: 0; padding: 32px; background: #F6FAFD; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .tile { background: #fff; border: 1px solid #D0E8F5; border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 14px; box-shadow: 0 1px 4px rgba(26,58,92,0.06); cursor: pointer; position: relative; }
+  .icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .label { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #1A2E40; }
+  .pill { position: absolute; top: 10px; right: 14px; background: #EF4444; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 11px; padding: 1px 7px; border-radius: 9999px; }
+</style>
+</head>
+<body>
+<div class="tile">
+  <div class="icon" style="background:#EBF6FD;color:#2D6A9F"><i data-lucide="calendar" width="22" height="22"></i></div>
+  <span class="label">+ New Booking</span>
+</div>
+<div class="tile">
+  <div class="icon" style="background:#F0FDF4;color:#16A34A"><i data-lucide="plus" width="22" height="22"></i></div>
+  <span class="label">+ New Patient</span>
+</div>
+<div class="tile">
+  <div class="icon" style="background:#FFFBEB;color:#D97706"><i data-lucide="credit-card" width="22" height="22"></i></div>
+  <span class="label">Review Payments</span>
+  <span class="pill">3</span>
+</div>
+<div class="tile">
+  <div class="icon" style="background:#F5F3FF;color:#7C3AED"><i data-lucide="pen-line" width="22" height="22"></i></div>
+  <span class="label">Write Blog Post</span>
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

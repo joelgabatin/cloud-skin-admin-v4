@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Add New Staff</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: #1A2E40; }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; position: sticky; top: 0; max-height: 100vh; font-family: var(--font-display); }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg,#2D6A9F,#5BC0EB); display: flex; align-items: center; justify-content: center; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-crumb a { color: #2D6A9F; text-decoration: none; }
+
+  .page { padding: 24px 32px 60px; max-width: 960px; margin: 0 auto; width: 100%; }
+  .back-link { color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; text-decoration: none; margin-bottom: 14px; }
+  .back-link .lucide { width: 14px; height: 14px; }
+
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(26,58,92,0.06); border: 1px solid #E5EFF7; }
+
+  .sec { padding: 22px 28px; border-top: 1px solid #F0F6FC; }
+  .sec:first-of-type { border-top: none; }
+  .sec-lbl { font-family: var(--font-display); font-weight: 700; font-size: 11px; color: #2D6A9F; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+
+  .photo-row { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+  .photo-circle { width: 84px; height: 84px; border-radius: 50%; border: 2px dashed #CBD5E1; background: #F8FBFD; display: flex; align-items: center; justify-content: center; color: #5A7A96; cursor: pointer; flex-shrink: 0; }
+  .photo-circle .lucide { width: 30px; height: 30px; }
+  .photo-info .ttl { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #1A2E40; }
+  .photo-info .sub { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 4px; max-width: 320px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+  .field { margin-bottom: 14px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { display: block; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; }
+  .field label .req { color: #DC2626; }
+  .field input, .field select, .field textarea { width: 100%; height: 40px; padding: 0 12px; border: 1px solid #CBD5E1; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .field input::placeholder { color: #9CA3AF; font-size: 12px; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: #2D6A9F; }
+  .field.locked { position: relative; }
+  .field.locked input { background: #F8F9FA; padding-right: 36px; cursor: not-allowed; }
+  .field.locked .lock-icon { position: absolute; right: 12px; top: 33px; color: #9CA3AF; }
+  .field.locked .lock-icon .lucide { width: 14px; height: 14px; }
+  .field.with-toggle { position: relative; }
+  .field.with-toggle input { padding-right: 36px; }
+  .field.with-toggle .eye-btn { position: absolute; right: 8px; top: 28px; background: none; border: none; cursor: pointer; padding: 4px; color: #5A7A96; }
+  .field.with-toggle .eye-btn .lucide { width: 14px; height: 14px; }
+  .helper { font-family: var(--font-body); font-size: 11.5px; color: #5A7A96; font-style: italic; margin-top: 6px; }
+
+  .conditional { border-left: 3px solid #0D9488; padding-left: 12px; }
+  .conditional .cond-tag { font-family: var(--font-display); font-weight: 600; font-size: 10px; color: #0D9488; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; display: block; }
+
+  .info-strip { background: rgba(13,148,136,0.08); border-left: 3px solid #0D9488; padding: 10px 14px; border-radius: 6px; font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; font-style: italic; margin-bottom: 14px; }
+
+  .status-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: end; }
+  @media (max-width: 700px) { .status-row { grid-template-columns: 1fr; } }
+  .toggle-wrap { display: flex; align-items: center; gap: 10px; height: 40px; }
+  .toggle { width: 38px; height: 22px; border-radius: 9999px; background: #15803D; cursor: pointer; position: relative; padding: 2px; transition: background 120ms; }
+  .toggle .knob { width: 18px; height: 18px; border-radius: 50%; background: #fff; margin-left: auto; transition: margin 150ms; }
+  .toggle.off { background: #CBD5E1; }
+  .toggle.off .knob { margin-left: 0; }
+  .toggle-label { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #15803D; }
+
+  .foot-bar { background: #fff; border-top: 1px solid #E5EFF7; padding: 14px 28px; display: flex; justify-content: flex-end; gap: 10px; border-radius: 0 0 12px 12px; }
+  .btn { height: 40px; padding: 0 20px; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn.ghost { background: #fff; color: #5A7A96; border-color: #D0E8F5; text-decoration: none; }
+  .btn.ghost:hover { background: #F0F6FC; }
+  .btn.primary { background: #2D6A9F; color: #fff; }
+  .btn.primary:hover { background: #1A5685; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #15803D; color: #fff; padding: 12px 18px; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 13px; box-shadow: 0 4px 14px rgba(0,0,0,0.18); opacity: 0; transform: translateY(10px); transition: opacity 200ms, transform 200ms; z-index: 1100; pointer-events: none; display: inline-flex; align-items: center; gap: 8px; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast .lucide { width: 16px; height: 16px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Add New Staff</div>
+        <div class="topbar-crumb">Admin / Staff / <a href="staff-view-all.html">View All Staff</a> / Add New Staff</div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Add New Staff">
+      <a class="back-link" href="staff-view-all.html"><i data-lucide="arrow-left"></i> Back to Staff</a>
+
+      <div class="card">
+
+        <div class="sec">
+          <div class="sec-lbl">Personal Information</div>
+          <div class="photo-row">
+            <div class="photo-circle"><i data-lucide="camera"></i></div>
+            <div class="photo-info">
+              <div class="ttl">Profile Photo</div>
+              <div class="sub">Upload a clear, professional headshot. PNG or JPG, max 2MB.</div>
+            </div>
+          </div>
+          <div class="field full"><label>Full Name <span class="req">*</span></label><input id="f-name" placeholder="e.g., Dr. Sarah Mendoza"></div>
+          <div class="field full"><label>Email Address <span class="req">*</span></label><input id="f-email" type="email" placeholder="name@cloudskin.com"></div>
+          <div class="grid-2">
+            <div class="field"><label>Phone Number</label><input id="f-phone" placeholder="+63 917-…"></div>
+            <div class="field"><label>Date of Birth</label><input id="f-dob" type="date"></div>
+            <div class="field"><label>Gender</label><select id="f-gender"><option value="">Select…</option><option>Male</option><option>Female</option><option>Prefer not to say</option></select></div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-lbl">Emergency Contact</div>
+          <div class="field full"><label>Emergency Contact Name</label><input id="f-ec-name" placeholder="Full name"></div>
+          <div class="grid-2">
+            <div class="field"><label>Emergency Contact Number</label><input id="f-ec-phone" placeholder="+63 917-…"></div>
+            <div class="field"><label>Relationship</label><select id="f-ec-rel"><option value="">Select…</option><option>Spouse</option><option>Parent</option><option>Sibling</option><option>Friend</option><option>Other</option></select></div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-lbl">Employment Details</div>
+          <div class="field full"><label>Role <span class="req">*</span></label><select id="f-role"><option value="Admin">Admin</option><option value="Practitioner" selected>Practitioner</option><option value="Receptionist">Receptionist</option></select></div>
+          <div class="field full conditional" id="specialty-wrap"><span class="cond-tag">Practitioner only</span><label>Specialty</label><select id="f-specialty"><option>Dermatology</option><option selected>Aesthetic Medicine</option><option>Laser Specialist</option><option>Cosmetology</option><option>Wellness</option></select></div>
+          <div class="field full"><label>Employment Type</label><select id="f-emp"><option>Full-time</option><option>Part-time</option><option>Visiting Specialist</option></select></div>
+          <div class="status-row">
+            <div class="field"><label>Start Date</label><input id="f-start" type="date"></div>
+            <div class="field"><label>Status</label><div class="toggle-wrap"><div class="toggle" id="status-toggle"><div class="knob"></div></div><span class="toggle-label" id="status-lbl">Active</span></div></div>
+          </div>
+          <div class="helper">Inactive staff cannot log in to the system.</div>
+        </div>
+
+        <div class="sec" id="credentials-sec">
+          <div class="sec-lbl">Professional Credentials</div>
+          <div class="info-strip">This section is required for the Practitioner role only.</div>
+          <div class="grid-2">
+            <div class="field"><label>PRC License Number</label><input id="f-prc" placeholder="e.g., 0123456"></div>
+            <div class="field"><label>License Expiry Date</label><input id="f-prc-exp" type="date"></div>
+          </div>
+          <div class="field full"><label>PTR Number</label><input id="f-ptr" placeholder="e.g., PTR-2026-…"></div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-lbl">Account Access</div>
+          <div class="field full locked"><label>Login Email</label><input id="f-login-email" readonly placeholder="Auto-fills from email above"><span class="lock-icon"><i data-lucide="lock"></i></span></div>
+          <div class="field full with-toggle"><label>Temporary Password</label><input id="f-pwd" type="password" placeholder="Auto-generate or set manually"><button type="button" class="eye-btn" id="eye-btn"><i data-lucide="eye"></i></button></div>
+          <div class="helper">Staff will be prompted to change their password on first login.</div>
+        </div>
+
+        <div class="foot-bar">
+          <a class="btn ghost" href="staff-view-all.html">Cancel</a>
+          <button class="btn primary" id="save-btn"><i data-lucide="check"></i> Add Staff</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"><i data-lucide="check-circle"></i><span id="toast-text">Staff added</span></div>
+
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+(function () {
+  // Role -> show/hide Specialty + Credentials
+  var roleSel = document.getElementById('f-role');
+  function syncRole() {
+    var isPract = roleSel.value === 'Practitioner';
+    document.getElementById('specialty-wrap').style.display = isPract ? '' : 'none';
+    document.getElementById('credentials-sec').style.display = isPract ? '' : 'none';
+  }
+  roleSel.addEventListener('change', syncRole);
+  syncRole();
+
+  // Status toggle
+  var tog = document.getElementById('status-toggle');
+  var togLbl = document.getElementById('status-lbl');
+  tog.addEventListener('click', function () {
+    tog.classList.toggle('off');
+    var off = tog.classList.contains('off');
+    togLbl.textContent = off ? 'Inactive' : 'Active';
+    togLbl.style.color = off ? '#5A7A96' : '#15803D';
+  });
+
+  // Login email autofill
+  var emailIn = document.getElementById('f-email');
+  var loginEmail = document.getElementById('f-login-email');
+  emailIn.addEventListener('input', function () { loginEmail.value = emailIn.value; });
+
+  // Eye toggle
+  var eyeBtn = document.getElementById('eye-btn');
+  var pwd = document.getElementById('f-pwd');
+  eyeBtn.addEventListener('click', function () {
+    pwd.type = pwd.type === 'password' ? 'text' : 'password';
+    eyeBtn.innerHTML = pwd.type === 'password' ? '<i data-lucide="eye"></i>' : '<i data-lucide="eye-off"></i>';
+    if (window.lucide) window.lucide.createIcons();
+  });
+
+  // Save
+  var toast = document.getElementById('toast');
+  var toastText = document.getElementById('toast-text');
+  document.getElementById('save-btn').addEventListener('click', function () {
+    var name = document.getElementById('f-name').value.trim();
+    var em = emailIn.value.trim();
+    if (!name || !em) {
+      toastText.textContent = 'Please fill in required fields';
+      toast.style.background = '#DC2626';
+      toast.classList.add('show');
+      setTimeout(function () { toast.classList.remove('show'); toast.style.background = '#15803D'; }, 2200);
+      return;
+    }
+    try {
+      var list = JSON.parse(localStorage.getItem('cs.newStaff') || '[]');
+      list.push({ id: 'S' + Date.now(), name: name, email: em,
+        phone: document.getElementById('f-phone').value, role: document.getElementById('f-role').value,
+        specialty: document.getElementById('f-specialty').value, empType: document.getElementById('f-emp').value,
+        startDate: document.getElementById('f-start').value,
+        active: !tog.classList.contains('off'), createdAt: new Date().toISOString() });
+      localStorage.setItem('cs.newStaff', JSON.stringify(list));
+    } catch (e) {}
+    toastText.textContent = name + ' added';
+    toast.classList.add('show');
+    setTimeout(function () { toast.classList.remove('show'); location.href = 'staff-view-all.html'; }, 1500);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Confirmed Appointments</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+
+  /* ============ LAYOUT ============ */
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+  /* ============ TALLER TOPBAR (status-page variant) ============ */
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; }
+  .section-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+
+  /* ============ SEARCH ROW ============ */
+  .search-row { padding: 20px 24px; border-bottom: 1px solid #D0E8F5; display: flex; gap: 12px; align-items: center; }
+  .search-input { flex: 1; position: relative; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #9BBAD4; pointer-events: none; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 36px; border: 1px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; }
+  .icon-square { width: 40px; height: 40px; background: #F0F6FC; color: #2D6A9F; border: none; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .icon-square .lucide { width: 16px; height: 16px; }
+
+  /* ============ TABLE ============ */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+  th { padding: 14px 16px; text-align: left; font-family: var(--font-body); font-size: 13px; font-weight: 600; color: #5A7A96; background: #fff; border-bottom: 1px solid #D0E8F5; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr.row { cursor: pointer; }
+  tr.row:hover td { background: #F8FBFF; }
+  tr.row:last-child td { border-bottom: none; }
+
+  .id-mono { font-family: var(--font-mono); font-size: 13px; color: #9BBAD4; }
+  .client-cell { display: flex; align-items: center; gap: 12px; }
+  .avatar-sm { width: 36px; height: 36px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 600; font-size: 12px; flex-shrink: 0; }
+  .client-name { font-size: 14px; color: #1A2E40; font-weight: 500; }
+  .client-phone { font-size: 12px; color: #9BBAD4; }
+  .service-name { font-size: 14px; color: #1A2E40; }
+  .duration-chip { display: inline-block; background: #F0F6FC; color: #5A7A96; font-size: 11px; padding: 2px 10px; border-radius: 9999px; margin-top: 4px; }
+  .date-str { font-size: 13px; color: #1A2E40; }
+  .time-mono { font-family: var(--font-mono); font-size: 12px; color: #5A7A96; margin-top: 2px; }
+  .type-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 6px; font-family: var(--font-display); font-weight: 500; font-size: 12px; }
+  .type-f2f { background: #EFF6FF; color: #1E40AF; }
+  .type-online { background: #F0FDF4; color: #16A34A; }
+  .practitioner-text { font-size: 13px; color: #5A7A96; }
+  .amount-bold { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .payment-cell { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+  .payment-cell .row1 { display: inline-flex; align-items: center; gap: 6px; }
+  .status { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+
+  .actions { display: inline-flex; align-items: center; gap: 6px; }
+  .action-btn { width: 32px; height: 32px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #5A7A96; }
+  .action-btn.primary { color: #2D6A9F; }
+  .action-btn .lucide { width: 14px; height: 14px; }
+
+  /* ============ PAGINATION ============ */
+  .pagination { padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #D0E8F5; }
+  .pagination .info { font-size: 13px; color: #5A7A96; }
+  .pager { display: inline-flex; align-items: center; gap: 6px; }
+  .pager button { width: 32px; height: 32px; background: none; border: 1.5px solid #D0E8F5; border-radius: 6px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; }
+  .pager button.active { background: #2D6A9F; border-color: #2D6A9F; color: #fff; }
+  .pager .lucide { width: 14px; height: 14px; }
+
+  /* ============ MODAL ============ */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(26,46,64,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 24px; backdrop-filter: blur(2px); }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: 16px; box-shadow: 0 20px 25px rgba(26,46,64,0.15); max-width: 600px; width: 100%; overflow: hidden; }
+  .modal-head { padding: 24px; border-bottom: 1px solid #D0E8F5; display: flex; justify-content: space-between; align-items: center; }
+  .modal-head h2 { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .modal-head button { background: none; border: none; cursor: pointer; color: #5A7A96; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; }
+  .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .modal-section h3 { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 12px; }
+  .info-box { background: #F0F6FC; border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .info-box .k, .info-cell .k { font-size: 12px; color: #5A7A96; margin: 0 0 4px; }
+  .info-box .v, .info-cell .v { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #1A2E40; margin: 0; }
+  .info-box .v { font-size: 16px; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .info-cell { background: #F0F6FC; border-radius: 8px; padding: 12px; }
+  .info-cell .v.amount { font-size: 18px; font-weight: 700; color: #2D6A9F; }
+  .status-pill { display: inline-flex; align-items: center; gap: 6px; color: #fff; padding: 8px 12px; border-radius: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; text-transform: capitalize; background: #16A34A; }
+  .status-pill .ind { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.6); }
+  .type-pill { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; background: #DBEAFE; color: #1E40AF; }
+  .payment-pill { display: inline-flex; color: #fff; padding: 4px 8px; border-radius: 4px; font-family: var(--font-display); font-size: 12px; font-weight: 600; text-transform: capitalize; background: #16A34A; }
+  .modal-foot { padding: 16px 24px; border-top: 1px solid #D0E8F5; display: flex; gap: 8px; justify-content: flex-end; }
+  .btn-close { padding: 8px 16px; background: #F0F6FC; color: #2D6A9F; border: 1px solid #D0E8F5; border-radius: 6px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside id="sidebar-mount" class="sidebar"></aside>
+
+  <!-- ============ CONTENT ============ -->
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Confirmed Appointments</div>
+        <div class="topbar-crumb">Admin / Appointments / Confirmed</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta">
+            <span class="name">Admin User</span>
+            <span class="role-pill-light">Admin</span>
+          </div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Confirmed Appointments">
+      <div class="section-card">
+
+        <!-- Search row -->
+        <div class="search-row">
+          <div class="search-input">
+            <i data-lucide="search"></i>
+            <input placeholder="Search by client or service...">
+          </div>
+          <button class="icon-square" title="Export"><i data-lucide="download"></i></button>
+          <a href="appointment-new.html" class="btn-add-appt" style="height:40px;padding:0 16px;background:#2D6A9F;color:#fff;border:none;border-radius:8px;font-family:var(--font-display);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;text-decoration:none;flex-shrink:0;"><i data-lucide="plus" style="width:14px;height:14px;"></i> Add Appointment</a>
+        </div>
+
+        <!-- Filter bar -->
+        <style>
+          .filter-bar { display: flex; align-items: center; gap: 20px; padding: 12px 16px; border-bottom: 1px solid #F0F6FC; flex-wrap: wrap; }
+          .fb-group { display: inline-flex; align-items: center; gap: 8px; }
+          .fb-lbl { font-family: var(--font-display); font-weight: 500; font-size: 12px; color: #5A7A96; }
+          .fb-pill { height: 30px; padding: 0 14px; border-radius: 6px; background: #fff; border: 1px solid #CBD5E1; color: #1A2E40; font-family: var(--font-display); font-weight: 500; font-size: 12px; cursor: pointer; }
+          .fb-pill:hover { background: #F0F6FC; }
+          .fb-pill.active { background: #2D6A9F; color: #fff; border-color: #2D6A9F; }
+          .fb-count { margin-left: auto; font-family: var(--font-body); font-size: 12px; color: #5A7A96; }
+          th.sortable { cursor: pointer; user-select: none; }
+          th.sortable:hover { color: #2D6A9F; }
+          th.sortable .arrow { display: inline-block; margin-left: 4px; color: #CBD5E1; font-size: 11px; }
+          th.sortable.sorted { color: #2D6A9F; }
+          th.sortable.sorted .arrow { color: #2D6A9F; }
+        </style>
+        <div class="filter-bar">
+          <div class="fb-group">
+            <span class="fb-lbl">Type:</span>
+            <button class="fb-pill active" data-fb="type" data-v="all">All</button>
+            <button class="fb-pill" data-fb="type" data-v="f2f">F2F</button>
+            <button class="fb-pill" data-fb="type" data-v="online">Online</button>
+          </div>
+          <div class="fb-group">
+            <span class="fb-lbl">Payment:</span>
+            <button class="fb-pill active" data-fb="pay" data-v="all">All</button>
+            <button class="fb-pill" data-fb="pay" data-v="gcash">GCash</button>
+            <button class="fb-pill" data-fb="pay" data-v="card">Card</button>
+            <button class="fb-pill" data-fb="pay" data-v="cash">Cash</button>
+            <button class="fb-pill" data-fb="pay" data-v="transfer">Transfer</button>
+          </div>
+          <span class="fb-count" id="fb-count">6 results</span>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th class="sortable" data-sort="id"><span>#ID</span><span class="arrow">↕</span></th>
+              <th class="sortable sorted" data-sort="client"><span>Client</span><span class="arrow">↑</span></th>
+              <th class="sortable" data-sort="service"><span>Service</span><span class="arrow">↕</span></th>
+              <th class="sortable" data-sort="date"><span>Date &amp; Time</span><span class="arrow">↕</span></th>
+              <th class="sortable" data-sort="type"><span>Type</span><span class="arrow">↕</span></th>
+              <th class="sortable" data-sort="practitioner"><span>Practitioner</span><span class="arrow">↕</span></th>
+              <th class="sortable" data-sort="payment"><span>Payment</span><span class="arrow">↕</span></th>
+              <th>Actions</th>
+            </tr></thead>
+            <tbody>
+              <tr class="row">
+                <td><span class="id-mono">#1001</span></td>
+                <td><div class="client-cell"><div class="avatar-sm" style="background:#2D6A9F">SJ</div><div><div class="client-name">Sarah Johnson</div><div class="client-phone">0917-123-4567</div></div></div></td>
+                <td><div class="service-name">Hydra Facial</div><div class="duration-chip">60 min</div></td>
+                <td><div class="date-str">Apr 25, 2026</div><div class="time-mono">10:00 AM</div></td>
+                <td><span class="type-chip type-f2f">F2F</span></td>
+                <td><span class="practitioner-text">Dr. Santos</span></td>
+                <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#EFF6FF;color:#1D4ED8">GCash</span><span class="amount-bold">₱2,500</span></div><span class="status" style="background:#DCFCE7;color:#15803D">Paid</span></div></td>
+                <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+              </tr>
+              <tr class="row">
+                <td><span class="id-mono">#1004</span></td>
+                <td><div class="client-cell"><div class="avatar-sm" style="background:#EA580C">JD</div><div><div class="client-name">Jose Dela Cruz</div><div class="client-phone">0920-456-7890</div></div></div></td>
+                <td><div class="service-name">PRP Therapy</div><div class="duration-chip">90 min</div></td>
+                <td><div class="date-str">Apr 25, 2026</div><div class="time-mono">2:30 PM</div></td>
+                <td><span class="type-chip type-f2f">F2F</span></td>
+                <td><span class="practitioner-text">Dr. Lim</span></td>
+                <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#F5F3FF;color:#6D28D9">Card</span><span class="amount-bold">₱12,000</span></div><span class="status" style="background:#DCFCE7;color:#15803D">Paid</span></div></td>
+                <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+              </tr>
+              <tr class="row">
+                <td><span class="id-mono">#1005</span></td>
+                <td><div class="client-cell"><div class="avatar-sm" style="background:#0891B2">AP</div><div><div class="client-name">Angela Park</div><div class="client-phone">0921-567-8901</div></div></div></td>
+                <td><div class="service-name">LED Therapy</div><div class="duration-chip">30 min</div></td>
+                <td><div class="date-str">Apr 25, 2026</div><div class="time-mono">3:30 PM</div></td>
+                <td><span class="type-chip type-online">Online</span></td>
+                <td><span class="practitioner-text">Dr. Reyes</span></td>
+                <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#F0FDF4;color:#166534">Cash</span><span class="amount-bold">₱1,800</span></div><span class="status" style="background:#DCFCE7;color:#15803D">Paid</span></div></td>
+                <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+              </tr>
+              <tr class="row">
+                <td><span class="id-mono">#1007</span></td>
+                <td><div class="client-cell"><div class="avatar-sm" style="background:#9D174D">LG</div><div><div class="client-name">Lisa Gomez</div><div class="client-phone">0923-789-0123</div></div></div></td>
+                <td><div class="service-name">Laser Resurfacing</div><div class="duration-chip">90 min</div></td>
+                <td><div class="date-str">Apr 26, 2026</div><div class="time-mono">10:30 AM</div></td>
+                <td><span class="type-chip type-f2f">F2F</span></td>
+                <td><span class="practitioner-text">Dr. Lim</span></td>
+                <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#F5F3FF;color:#6D28D9">Card</span><span class="amount-bold">₱15,000</span></div><span class="status" style="background:#DCFCE7;color:#15803D">Paid</span></div></td>
+                <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+              </tr>
+              <tr class="row">
+                <td><span class="id-mono">#1008</span></td>
+                <td><div class="client-cell"><div class="avatar-sm" style="background:#065F46">KB</div><div><div class="client-name">Kevin Bautista</div><div class="client-phone">0924-890-1234</div></div></div></td>
+                <td><div class="service-name">Acne Treatment</div><div class="duration-chip">45 min</div></td>
+                <td><div class="date-str">Apr 26, 2026</div><div class="time-mono">11:30 AM</div></td>
+                <td><span class="type-chip type-online">Online</span></td>
+                <td><span class="practitioner-text">Dr. Reyes</span></td>
+                <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#F0FDF4;color:#166534">Cash</span><span class="amount-bold">₱2,800</span></div><span class="status" style="background:#DCFCE7;color:#15803D">Paid</span></div></td>
+                <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+              </tr>
+              <tr class="row">
+                <td><span class="id-mono">#1011</span></td>
+                <td><div class="client-cell"><div class="avatar-sm" style="background:#14532D">PS</div><div><div class="client-name">Patricia Santos</div><div class="client-phone">0927-123-4567</div></div></div></td>
+                <td><div class="service-name">Hydra Facial</div><div class="duration-chip">60 min</div></td>
+                <td><div class="date-str">Apr 28, 2026</div><div class="time-mono">9:30 AM</div></td>
+                <td><span class="type-chip type-f2f">F2F</span></td>
+                <td><span class="practitioner-text">Dr. Santos</span></td>
+                <td><div class="payment-cell"><div class="row1"><span class="status" style="background:#F0FDF4;color:#166534">Cash</span><span class="amount-bold">₱2,500</span></div><span class="status" style="background:#DCFCE7;color:#15803D">Paid</span></div></td>
+                <td><div class="actions"><button class="action-btn primary"><i data-lucide="eye"></i></button><button class="action-btn"><i data-lucide="pencil"></i></button><button class="action-btn"><i data-lucide="more-vertical"></i></button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <span class="info">Showing 1–6 of 6</span>
+          <div class="pager">
+            <button disabled style="opacity:0.5"><i data-lucide="chevron-left"></i></button>
+            <button class="active">1</button>
+            <button disabled style="opacity:0.5"><i data-lucide="chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ DETAILS MODAL ============ -->
+<div id="modal-overlay" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Appointment Details</h2>
+      <button id="modal-close-x"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <h3>Client Information</h3>
+        <div class="info-box">
+          <div><p class="k">Name</p><p class="v">Sarah Johnson</p></div>
+          <div><p class="k">Phone</p><p class="v">0917-123-4567</p></div>
+        </div>
+      </div>
+      <div class="modal-section">
+        <h3>Appointment Details</h3>
+        <div class="info-grid">
+          <div class="info-cell"><p class="k">Service</p><p class="v">Hydra Facial</p></div>
+          <div class="info-cell"><p class="k">Practitioner</p><p class="v">Dr. Santos</p></div>
+          <div class="info-cell"><p class="k">Date &amp; Time</p><p class="v">Apr 25, 2026 at 10:00 AM</p></div>
+          <div class="info-cell"><p class="k">Duration</p><p class="v">60 min</p></div>
+        </div>
+      </div>
+      <div class="info-grid">
+        <div><p class="k" style="text-transform:uppercase;margin:0 0 8px">Status</p><span class="status-pill"><span class="ind"></span>Confirmed</span></div>
+        <div><p class="k" style="text-transform:uppercase;margin:0 0 8px">Type</p><span class="type-pill">👤 Face to Face</span></div>
+      </div>
+      <div class="modal-section">
+        <h3>Payment Information</h3>
+        <div class="info-grid">
+          <div class="info-cell"><p class="k">Amount</p><p class="v amount">₱2,500</p></div>
+          <div class="info-cell"><p class="k">Payment Status</p><span class="payment-pill">Paid</span></div>
+          <div class="info-cell" style="grid-column: 1 / -1"><p class="k">Payment Method</p>
+            <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:16px">📱</span><span class="v">GCash</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn-close" id="modal-close">Close</button></div>
+  </div>
+</div>
+
+<script>
+  const overlay = document.getElementById('modal-overlay');
+  const openModal = () => overlay.classList.add('open');
+  const closeModal = () => overlay.classList.remove('open');
+  document.querySelectorAll('.action-btn.primary').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); openModal(); }));
+  document.querySelectorAll('tr.row').forEach(r => r.addEventListener('click', openModal));
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('modal-close-x').addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // Filter pills (Type + Payment)
+  var fbState = { type: 'all', pay: 'all' };
+  function applyFilter() {
+    var rows = document.querySelectorAll('table tbody tr.row');
+    var shown = 0;
+    rows.forEach(function (r) {
+      var typeText = (r.querySelector('.type-chip') || {}).textContent || '';
+      var typeKey = typeText.trim().toLowerCase().replace(/\s+/g, '');
+      var payText = (r.querySelector('.payment-cell .status') || {}).textContent || '';
+      var payKey = payText.trim().toLowerCase();
+      var okType = fbState.type === 'all' || typeKey === fbState.type;
+      var okPay = fbState.pay === 'all' || payKey === fbState.pay;
+      var show = okType && okPay;
+      r.style.display = show ? '' : 'none';
+      if (show) shown++;
+    });
+    var c = document.getElementById('fb-count');
+    if (c) c.textContent = shown + ' result' + (shown === 1 ? '' : 's');
+  }
+  document.querySelectorAll('.fb-pill').forEach(function (p) {
+    p.addEventListener('click', function () {
+      var group = p.getAttribute('data-fb');
+      document.querySelectorAll('.fb-pill[data-fb="' + group + '"]').forEach(function (o) { o.classList.remove('active'); });
+      p.classList.add('active');
+      fbState[group] = p.getAttribute('data-v');
+      applyFilter();
+    });
+  });
+
+  // Column sort toggle (client/date/payment)
+  var sortState = { col: 'client', dir: 'asc' };
+  function parseDate(s) { return new Date(s + ' 2026').getTime() || 0; }
+  function sortRows() {
+    var tbody = document.querySelector('table tbody');
+    var rows = Array.from(tbody.querySelectorAll('tr.row'));
+    function val(r, col) {
+      if (col === 'client') return (r.querySelector('.client-name') || {}).textContent || '';
+      if (col === 'id') return (r.querySelector('.id-mono') || {}).textContent || '';
+      if (col === 'service') return (r.querySelector('.service-name') || {}).textContent || '';
+      if (col === 'type') return (r.querySelector('.type-chip') || {}).textContent || '';
+      if (col === 'practitioner') return (r.querySelector('.practitioner-text') || {}).textContent || '';
+      if (col === 'payment') return ((r.querySelector('.payment-cell .status') || {}).textContent || '') + ((r.querySelector('.payment-cell .amount-bold') || {}).textContent || '');
+      if (col === 'date') return parseDate(((r.querySelector('.date-str') || {}).textContent || '').replace(',', ''));
+      return '';
+    }
+    rows.sort(function (a, b) {
+      var av = val(a, sortState.col);
+      var bv = val(b, sortState.col);
+      if (typeof av === 'number') return sortState.dir === 'asc' ? av - bv : bv - av;
+      return sortState.dir === 'asc' ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
+    });
+    rows.forEach(function (r) { tbody.appendChild(r); });
+  }
+  function paintSortHeaders() {
+    document.querySelectorAll('th.sortable').forEach(function (th) {
+      var col = th.getAttribute('data-sort');
+      var isActive = col === sortState.col;
+      th.classList.toggle('sorted', isActive);
+      var arrow = th.querySelector('.arrow');
+      if (arrow) arrow.textContent = isActive ? (sortState.dir === 'asc' ? '↑' : '↓') : '↕';
+    });
+  }
+  document.querySelectorAll('th.sortable').forEach(function (th) {
+    th.addEventListener('click', function () {
+      var col = th.getAttribute('data-sort');
+      if (sortState.col === col) {
+        sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortState.col = col;
+        sortState.dir = col === 'date' ? 'desc' : 'asc';
+      }
+      paintSortHeaders();
+      sortRows();
+    });
+  });
+
+  lucide.createIcons();
+</script>
+<script>
+/* __MW_TOGGLE__ */
+(function(){
+  // Find every parent .nav-item that is followed by a [data-submenu-for] block and wire up click toggle
+  document.querySelectorAll('aside.sidebar .nav-item').forEach(function(item){
+    var next = item.nextElementSibling;
+    if (!next || !next.hasAttribute || !next.hasAttribute('data-submenu-for')) return;
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', function(e){
+      // Don't navigate if it's a link
+      if (item.tagName === 'A') e.preventDefault();
+      var isOpen = next.style.display !== 'none';
+      next.style.display = isOpen ? 'none' : 'block';
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+})();
+</script>
+<script src="_sidebar.js"></script>
+<script src="_appointment-modal.js"></script>
+</body>
+</html>

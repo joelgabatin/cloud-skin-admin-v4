@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body { margin: 0; padding: 24px; background: #F0F6FC; font-family: var(--font-body); }
+  .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .h { text-align: center; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; padding: 6px 0; }
+  .day { background: #fff; border: 1px solid #D0E8F5; border-radius: 8px; padding: 6px; min-height: 78px; display: flex; flex-direction: column; gap: 4px; }
+  .day.empty { background: transparent; border: none; }
+  .day.today { background: #F0F6FC; border-color: #2D6A9F; }
+  .num { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: #1A2E40; }
+  .ev { color: #fff; padding: 2px 5px; border-radius: 3px; font-size: 9px; font-family: var(--font-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .more { font-size: 8px; color: #5A7A96; padding-left: 5px; }
+  .hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .hdr h3 { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: #1A2E40; margin: 0; }
+  .nav { display: inline-flex; gap: 6px; }
+  .nav button { width: 26px; height: 26px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; padding-top: 10px; margin-top: 12px; border-top: 1px solid #D0E8F5; }
+  .leg-item { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: #5A7A96; }
+  .leg-dot { width: 7px; height: 7px; border-radius: 50%; }
+</style>
+</head>
+<body>
+<div class="hdr">
+  <h3>April 2026</h3>
+  <div class="nav"><button><i data-lucide="chevron-left" style="width:13px;height:13px"></i></button><button><i data-lucide="chevron-right" style="width:13px;height:13px"></i></button></div>
+</div>
+<div class="grid">
+  <div class="h">Sun</div><div class="h">Mon</div><div class="h">Tue</div><div class="h">Wed</div><div class="h">Thu</div><div class="h">Fri</div><div class="h">Sat</div>
+  <div class="day empty"></div><div class="day empty"></div><div class="day empty"></div>
+  <div class="day"><span class="num">1</span></div><div class="day"><span class="num">2</span></div><div class="day"><span class="num">3</span></div><div class="day"><span class="num">4</span></div>
+  <div class="day"><span class="num">5</span></div><div class="day"><span class="num">6</span></div><div class="day"><span class="num">7</span></div><div class="day"><span class="num">8</span></div><div class="day"><span class="num">9</span></div><div class="day"><span class="num">10</span></div><div class="day"><span class="num">11</span></div>
+  <div class="day"><span class="num">12</span></div><div class="day"><span class="num">13</span></div><div class="day"><span class="num">14</span></div><div class="day"><span class="num">15</span></div><div class="day"><span class="num">16</span></div><div class="day"><span class="num">17</span></div><div class="day"><span class="num">18</span></div>
+  <div class="day"><span class="num">19</span></div><div class="day"><span class="num">20</span></div><div class="day"><span class="num">21</span></div><div class="day"><span class="num">22</span></div><div class="day"><span class="num">23</span></div><div class="day"><span class="num">24</span></div>
+  <div class="day today">
+    <span class="num">25</span>
+    <div class="ev" style="background:#16A34A">Sarah · 10 AM</div>
+    <div class="ev" style="background:#F59E0B">Miguel · 11 AM</div>
+    <div class="more">+3 more</div>
+  </div>
+  <div class="day"><span class="num">26</span>
+    <div class="ev" style="background:#3B82F6">Roberto · 9 AM</div>
+    <div class="ev" style="background:#16A34A">Lisa · 10:30 AM</div>
+  </div>
+  <div class="day"><span class="num">27</span>
+    <div class="ev" style="background:#DC2626">Diana · 10 AM</div>
+    <div class="ev" style="background:#8B5CF6">Marco · 2 PM</div>
+  </div>
+  <div class="day"><span class="num">28</span>
+    <div class="ev" style="background:#16A34A">Patricia · 9:30 AM</div>
+  </div>
+  <div class="day"><span class="num">29</span></div><div class="day"><span class="num">30</span></div>
+  <div class="day empty"></div><div class="day empty"></div>
+</div>
+<div class="legend">
+  <span class="leg-item"><span class="leg-dot" style="background:#16A34A"></span>Confirmed</span>
+  <span class="leg-item"><span class="leg-dot" style="background:#F59E0B"></span>In Progress</span>
+  <span class="leg-item"><span class="leg-dot" style="background:#3B82F6"></span>Pending</span>
+  <span class="leg-item"><span class="leg-dot" style="background:#DC2626"></span>Cancelled</span>
+  <span class="leg-item"><span class="leg-dot" style="background:#8B5CF6"></span>Completed</span>
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>

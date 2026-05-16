@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin — Clinical Service Stepper Versions</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: #1A2E40; }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #0F1E2E; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+
+  .page { padding: 24px 32px 60px; display: flex; flex-direction: column; gap: 22px; }
+  .ver-label { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #fff; background: #2D6A9F; padding: 8px 16px; border-radius: 6px; display: inline-flex; align-items: center; gap: 8px; width: fit-content; }
+  .ver-label .badge-orange { background: #FED7AA; color: #C2410C; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+
+  /* Stepper card */
+  .step-card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(26,58,92,0.06); border: 1px solid #E5EFF7; overflow: hidden; }
+
+  /* Horizontal stepper nodes */
+  .nodes { display: flex; align-items: flex-start; padding: 24px 32px 16px; gap: 0; position: relative; overflow-x: auto; }
+  .node { flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 80px; position: relative; }
+  .node .circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 12.5px; flex-shrink: 0; z-index: 2; background: #fff; border: 2px solid #E5EFF7; color: #9BBAD4; }
+  .node.done .circle { background: #2D6A9F; border-color: #2D6A9F; color: #fff; }
+  .node.done .circle .lucide { width: 16px; height: 16px; }
+  .node.active .circle { background: #2D6A9F; border-color: #2D6A9F; color: #fff; box-shadow: 0 0 0 4px rgba(45,106,159,0.15); }
+  .node .lbl { font-family: var(--font-display); font-size: 11px; color: #5A7A96; margin-top: 8px; text-align: center; line-height: 1.3; max-width: 90px; }
+  .node.active .lbl { color: #2D6A9F; font-weight: 700; }
+  .node.done .lbl { color: #1A2E40; font-weight: 600; }
+  .node .conn { position: absolute; top: 16px; height: 2px; background: #E5EFF7; left: 50%; right: -50%; z-index: 1; }
+  .node.done .conn { background: #2D6A9F; }
+  .node:last-child .conn { display: none; }
+
+  /* Content panel */
+  .content-panel { padding: 24px 32px; border-top: 1px solid #F0F6FC; }
+  .content-panel h2 { font-family: var(--font-display); font-weight: 600; font-size: 18px; color: #1A2E40; margin: 0 0 4px; display: flex; align-items: center; gap: 10px; }
+  .content-panel .subtext { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-bottom: 20px; }
+  .badge-pill { padding: 3px 10px; border-radius: 4px; font-family: var(--font-display); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+  .badge-pill.orange { background: #FED7AA; color: #C2410C; }
+  .badge-pill.green { background: #DCFCE7; color: #15803D; }
+
+  /* 2-column / 3-column */
+  .col-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .col-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .col-2, .col-3 { grid-template-columns: 1fr; } }
+
+  /* Section label */
+  .sec-lbl { font-family: var(--font-display); font-weight: 700; font-size: 11px; color: #2D6A9F; text-transform: uppercase; letter-spacing: 0.06em; margin: 14px 0 10px; padding-top: 12px; border-top: 1px solid #F0F6FC; }
+  .sec-lbl:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+  /* Inputs */
+  label.fld-lbl { display: block; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; }
+  input[type="text"], input[type="number"], input[type="date"], select, textarea { width: 100%; height: 40px; padding: 0 12px; border: 1px solid #D1E3F3; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  textarea { height: auto; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+  input:focus, select:focus, textarea:focus { border-color: #2D6A9F; }
+  .field { margin-bottom: 12px; }
+
+  /* Chip / pill */
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; background: #F0F6FC; color: #2D6A9F; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 12px; }
+  .chip.pill { padding: 5px 12px; border-radius: 9999px; }
+  .chip .x { color: #5A7A96; cursor: pointer; font-size: 13px; line-height: 1; }
+  .tag-input { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border: 1px solid #D1E3F3; border-radius: 8px; background: #fff; min-height: 40px; align-items: center; }
+  .tag-input .add { background: none; border: 1px dashed #BFD8EB; color: #2D6A9F; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 12px; }
+
+  /* Toggle */
+  .toggle-row { display: flex; align-items: center; gap: 12px; }
+  .toggle-row .switch { width: 38px; height: 22px; border-radius: 9999px; background: #D0E8F5; padding: 2px; cursor: pointer; border: none; position: relative; }
+  .toggle-row .switch::after { content: ''; width: 18px; height: 18px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; }
+  .toggle-row .switch.on { background: #2D6A9F; }
+  .toggle-row .switch.on::after { left: 18px; }
+  .toggle-row .note { font-family: var(--font-body); font-size: 12.5px; color: #9BBAD4; font-style: italic; }
+
+  /* Table */
+  table.simple { width: 100%; border-collapse: collapse; border: 1px solid #E5EFF7; border-radius: 8px; overflow: hidden; }
+  table.simple th { padding: 10px 12px; font-family: var(--font-display); font-size: 10.5px; font-weight: 700; color: #5A7A96; background: #F0F6FC; text-transform: uppercase; letter-spacing: 0.04em; text-align: left; border-bottom: 1px solid #E5EFF7; }
+  table.simple td { padding: 10px 12px; font-family: var(--font-body); font-size: 12.5px; color: #1A2E40; border-bottom: 1px solid #F0F6FC; }
+  table.simple tr:nth-child(even) td { background: #FBFCFE; }
+  table.simple tbody tr:last-child td { border-bottom: none; }
+  table.simple td input, table.simple td select { height: 32px; padding: 0 8px; font-size: 12px; }
+  .add-link { color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; }
+  .add-link .lucide { width: 13px; height: 13px; }
+
+  /* Signature box */
+  .sig-box { border: 1px solid #D1E3F3; border-radius: 8px; padding: 14px; }
+  .sig-box .sig-lbl { font-family: var(--font-display); font-weight: 700; font-size: 11px; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .sig-canvas { width: 100%; max-width: 280px; height: 120px; background: #F8FBFD; border: 1.5px dashed #BFD8EB; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: var(--font-body); font-size: 12px; color: #9BBAD4; margin: 0 auto; }
+  .sig-actions { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+  .btn-ghost-sm { background: none; border: 1px solid #D0E8F5; color: #5A7A96; padding: 5px 12px; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; cursor: pointer; }
+
+  /* Buttons */
+  .btn-row { display: flex; justify-content: flex-end; gap: 10px; padding: 18px 32px; background: #F8FBFD; border-top: 1px solid #F0F6FC; }
+  .btn { height: 40px; padding: 0 18px; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 13px; cursor: pointer; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-ghost { background: #fff; color: #5A7A96; border-color: #D0E8F5; }
+  .btn-ghost:hover { background: #F0F6FC; }
+  .btn-primary { background: #2D6A9F; color: #fff; }
+  .btn-primary:hover { background: #1A5685; }
+  .btn-green { background: #15803D; color: #fff; }
+  .btn-green:hover { background: #166534; }
+  .btn-full { width: 100%; justify-content: center; }
+  .warn-orange { font-family: var(--font-body); font-size: 11.5px; color: #C2410C; margin-top: 8px; text-align: center; font-style: italic; }
+
+  /* Vital cards */
+  .vital-card { background: #fff; border: 1px solid #E5EFF7; border-radius: 10px; padding: 16px; }
+  .vital-card .head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .vital-card .head .ic { color: #2D6A9F; }
+  .vital-card .head .ic .lucide { width: 18px; height: 18px; }
+  .vital-card .head .nm { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; }
+  .vital-card .row { display: flex; gap: 8px; align-items: center; }
+  .vital-card .row input { flex: 1; }
+  .vital-card .unit { font-family: var(--font-body); font-size: 12px; color: #9BBAD4; }
+  .radio-row { display: flex; gap: 12px; margin-top: 10px; font-family: var(--font-body); font-size: 12px; }
+  .radio-row label { display: inline-flex; align-items: center; gap: 5px; color: #5A7A96; cursor: pointer; }
+  .radio-row label input { width: 14px; height: 14px; accent-color: #2D6A9F; }
+  .bmi-badge { display: inline-block; padding: 3px 10px; background: #DCFCE7; color: #15803D; border-radius: 6px; font-family: var(--font-display); font-weight: 700; font-size: 11.5px; margin-top: 10px; }
+
+  /* Recorded-by row */
+  .recorded { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding: 12px 14px; background: #F8FBFD; border-radius: 8px; }
+  .recorded .av { width: 32px; height: 32px; border-radius: 50%; background: #2D6A9F; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 11.5px; }
+  .recorded .who { font-family: var(--font-body); font-size: 12.5px; color: #1A2E40; }
+  .recorded .who b { font-family: var(--font-display); font-weight: 700; }
+  .recorded .ts { margin-left: auto; font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; }
+
+  /* Rich text toolbar */
+  .rt-toolbar { display: flex; gap: 8px; padding: 6px 10px; border: 1px solid #D1E3F3; border-bottom: none; border-radius: 8px 8px 0 0; background: #F8FBFD; }
+  .rt-toolbar button { background: none; border: none; cursor: pointer; color: #5A7A96; padding: 4px; border-radius: 4px; }
+  .rt-toolbar button:hover { background: #E5EFF7; color: #2D6A9F; }
+  .rt-toolbar .lucide { width: 14px; height: 14px; }
+  .rt-toolbar + textarea { border-top-left-radius: 0; border-top-right-radius: 0; }
+
+  /* Upload zone */
+  .upload-zone { border: 1.5px dashed #BFD8EB; background: #F8FBFD; border-radius: 8px; padding: 22px 14px; text-align: center; }
+  .upload-zone .ic { width: 36px; height: 36px; border-radius: 50%; background: #fff; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+  .upload-zone .ic .lucide { width: 18px; height: 18px; }
+  .upload-zone .ttl { font-family: var(--font-display); font-weight: 600; font-size: 12.5px; color: #1A2E40; }
+  .upload-zone .hint { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; margin-top: 4px; }
+  .thumb-row { display: flex; gap: 8px; margin-top: 12px; }
+  .thumb { width: 60px; height: 60px; background: linear-gradient(135deg, #BFD8EB, #5BC0EB); border-radius: 6px; position: relative; }
+  .thumb .x { position: absolute; top: -6px; right: -6px; width: 18px; height: 18px; background: #DC2626; color: #fff; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; line-height: 1; cursor: pointer; }
+
+  /* Photo compare zones */
+  .photo-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 480px; }
+  .photo-up { border: 1.5px dashed #BFD8EB; background: #F8FBFD; border-radius: 8px; height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; }
+  .photo-up .lbl { font-family: var(--font-display); font-weight: 700; font-size: 11px; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .photo-up .ic { color: #2D6A9F; margin-bottom: 8px; }
+  .photo-up .ic .lucide { width: 22px; height: 22px; }
+  .photo-up .txt { font-family: var(--font-body); font-size: 12px; color: #5A7A96; }
+
+  /* Checkbox chips */
+  .chk-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chk-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1.5px solid #D1E3F3; background: #fff; color: #5A7A96; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; }
+  .chk-chip.on { background: #F0F6FC; border-color: #2D6A9F; color: #2D6A9F; }
+  .chk-chip.on .lucide { width: 11px; height: 11px; color: #2D6A9F; }
+  .chk-list { display: flex; flex-direction: column; gap: 8px; }
+  .chk-list label { display: flex; align-items: center; gap: 8px; font-family: var(--font-body); font-size: 12.5px; color: #1A2E40; cursor: pointer; }
+  .chk-list label input { width: 14px; height: 14px; accent-color: #2D6A9F; }
+
+  /* Compare table for measurements */
+  .compare-grid { display: flex; flex-direction: column; gap: 6px; }
+  .compare-grid .row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: #F8FBFD; border-radius: 6px; font-family: var(--font-body); font-size: 12.5px; }
+  .compare-grid .row .k { color: #5A7A96; }
+  .compare-grid .row .vals { display: flex; gap: 10px; align-items: center; }
+  .compare-grid .row .prev { color: #9BBAD4; font-family: var(--font-mono); font-size: 12px; }
+  .compare-grid .delta { padding: 2px 8px; border-radius: 4px; font-family: var(--font-display); font-weight: 700; font-size: 11.5px; display: inline-flex; align-items: center; gap: 3px; }
+  .compare-grid .delta.green { background: #DCFCE7; color: #15803D; }
+  .compare-grid .delta.orange { background: #FED7AA; color: #C2410C; }
+  .compare-grid .delta .lucide { width: 11px; height: 11px; }
+  .summary-card { margin-top: 10px; padding: 12px 14px; background: #DCFCE7; border-radius: 8px; font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #15803D; text-align: center; }
+
+  /* Chart */
+  .chart-wrap { border: 1px solid #E5EFF7; border-radius: 8px; padding: 12px; background: #fff; }
+  .chart-wrap svg { width: 100%; height: 180px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Service Session Stepper — Versions</div>
+        <div class="topbar-crumb">Admin / Patients / Sarah Johnson / Sessions / Clinical Stepper Reference</div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Stepper Versions">
+
+      <!-- ============ VERSION 1 — Doctor's Order ============ -->
+      <div class="ver-label">Version 1 — Step 4: Doctor's Order</div>
+      <div class="step-card">
+        <div class="nodes">
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Service Info</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Schedule</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Consent &amp; History</div><span class="conn"></span></div>
+          <div class="node active"><div class="circle">4</div><div class="lbl">Doctor's Order</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">5</div><div class="lbl">Vital Signs</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">6</div><div class="lbl">Doctor's Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">7</div><div class="lbl">Clinical Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">8</div><div class="lbl">Finalize</div></div>
+        </div>
+        <div class="content-panel">
+          <h2>Doctor's Order</h2>
+          <div class="subtext">Document the physician's treatment plan and authorizations for this session.</div>
+          <div class="col-2">
+            <div>
+              <div class="sec-lbl">Authorized Procedure</div>
+              <div class="chip" style="margin-bottom:14px;">Diamond Glow Facial</div>
+              <div class="field"><label class="fld-lbl">Treatment Areas</label>
+                <div class="tag-input"><span class="chip pill">Full Face <span class="x">×</span></span><span class="chip pill">Neck <span class="x">×</span></span><button class="add">+ Add</button></div>
+              </div>
+              <div class="field"><label class="fld-lbl">Special Instructions</label><textarea rows="3" placeholder="e.g., avoid upper lip area, patient has sensitivity on left cheek…"></textarea></div>
+              <div class="field"><label class="fld-lbl">Contraindications Noted</label>
+                <div class="toggle-row"><button class="switch"></button><span class="note">None recorded</span></div>
+              </div>
+              <div class="sec-lbl">Dosage / Product Authorization</div>
+              <table class="simple">
+                <thead><tr><th>Product / Item</th><th>Unit</th><th>Qty Authorized</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td><input value="BTX Toxin A"></td><td><input value="vials" style="width:80px;"></td><td><input value="2" style="width:60px;"></td><td><input value="forehead + crow's feet"></td></tr>
+                  <tr><td><input value="Hyaluronic Filler"></td><td><input value="syringe" style="width:80px;"></td><td><input value="1" style="width:60px;"></td><td><input value="nasolabial folds"></td></tr>
+                  <tr><td><input placeholder="—"></td><td><input style="width:80px;"></td><td><input style="width:60px;"></td><td><input></td></tr>
+                </tbody>
+              </table>
+              <span class="add-link"><i data-lucide="plus"></i> Add Item</span>
+            </div>
+            <div>
+              <div class="sec-lbl">Ordering Physician</div>
+              <div class="field"><label class="fld-lbl">Physician</label><input value="Dr. Delson Pacyaoen" readonly style="padding-right:32px;background:#F0F6FC;"></div>
+              <div class="field"><label class="fld-lbl">Order Date</label><input type="date" value="2026-05-16"></div>
+              <div class="field"><label class="fld-lbl">Order Status</label>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <select style="flex:1;"><option selected>Draft</option><option>Pending Review</option><option>Finalized</option></select>
+                  <span class="badge-pill orange">Draft</span>
+                </div>
+              </div>
+              <div class="sig-box">
+                <div class="sig-lbl">Physician's Digital Signature</div>
+                <div class="sig-canvas">Sign here using your mouse or trackpad.</div>
+                <div class="sig-actions"><button class="btn-ghost-sm">Clear</button><button class="btn-ghost-sm">Preview</button></div>
+              </div>
+              <button class="btn btn-primary btn-full" style="margin-top:14px;"><i data-lucide="lock"></i> Finalize Order</button>
+              <div class="warn-orange">Once finalized, this order cannot be edited without admin override.</div>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row"><button class="btn btn-ghost">Back</button><button class="btn btn-primary">Save &amp; Continue</button></div>
+      </div>
+
+      <!-- ============ VERSION 2 — Vital Signs ============ -->
+      <div class="ver-label">Version 2 — Step 5: Vital Signs</div>
+      <div class="step-card">
+        <div class="nodes">
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Service Info</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Schedule</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Consent &amp; History</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Doctor's Order</div><span class="conn"></span></div>
+          <div class="node active"><div class="circle">5</div><div class="lbl">Vital Signs</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">6</div><div class="lbl">Doctor's Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">7</div><div class="lbl">Clinical Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">8</div><div class="lbl">Finalize</div></div>
+        </div>
+        <div class="content-panel">
+          <h2>Vital Signs</h2>
+          <div class="subtext">Record patient vitals before the procedure begins.</div>
+          <div class="col-3">
+            <div class="vital-card">
+              <div class="head"><span class="ic"><i data-lucide="heart"></i></span><span class="nm">Blood Pressure</span></div>
+              <div class="row"><input placeholder="Systolic"><input placeholder="Diastolic"><span class="unit">mmHg</span></div>
+            </div>
+            <div class="vital-card">
+              <div class="head"><span class="ic"><i data-lucide="activity"></i></span><span class="nm">Heart Rate</span></div>
+              <div class="row"><input placeholder="—"><span class="unit">bpm</span></div>
+            </div>
+            <div class="vital-card">
+              <div class="head"><span class="ic"><i data-lucide="thermometer"></i></span><span class="nm">Temperature</span></div>
+              <div class="row"><input placeholder="—"><span class="unit">°C</span></div>
+              <div class="radio-row"><label><input type="radio" name="temp" checked>Oral</label><label><input type="radio" name="temp">Axillary</label><label><input type="radio" name="temp">Tympanic</label></div>
+            </div>
+            <div class="vital-card">
+              <div class="head"><span class="ic"><i data-lucide="wind"></i></span><span class="nm">SpO₂</span></div>
+              <div class="row"><input placeholder="—"><span class="unit">%</span></div>
+            </div>
+            <div class="vital-card">
+              <div class="head"><span class="ic"><i data-lucide="bar-chart-2"></i></span><span class="nm">Resp. Rate</span></div>
+              <div class="row"><input placeholder="—"><span class="unit">breaths/min</span></div>
+            </div>
+            <div class="vital-card">
+              <div class="head"><span class="ic"><i data-lucide="scale"></i></span><span class="nm">Weight / Height</span></div>
+              <div style="display:flex;gap:8px;"><input placeholder="kg"><input placeholder="cm"></div>
+              <div class="bmi-badge">BMI: 22.4 — Normal</div>
+            </div>
+          </div>
+          <div class="field" style="margin-top:18px;"><label class="fld-lbl">Vitals Notes / Remarks</label><textarea rows="3" placeholder="Any abnormal findings, patient complaints before procedure…"></textarea></div>
+          <div class="recorded"><span class="av">MS</span><span class="who"><b>Receptionist:</b> Maria Santos</span><span class="ts">Today, 9:41 AM</span></div>
+        </div>
+        <div class="btn-row"><button class="btn btn-ghost">Back</button><button class="btn btn-primary">Save &amp; Continue</button></div>
+      </div>
+
+      <!-- ============ VERSION 3 — Doctor's Notes ============ -->
+      <div class="ver-label">Version 3 — Step 6: Doctor's Notes</div>
+      <div class="step-card">
+        <div class="nodes">
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Service Info</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Schedule</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Consent &amp; History</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Doctor's Order</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Vital Signs</div><span class="conn"></span></div>
+          <div class="node active"><div class="circle">6</div><div class="lbl">Doctor's Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">7</div><div class="lbl">Clinical Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">8</div><div class="lbl">Finalize</div></div>
+        </div>
+        <div class="content-panel">
+          <h2>Doctor's Notes</h2>
+          <div class="subtext">Clinical observations, pre-treatment assessment, and post-treatment remarks by the attending physician.</div>
+
+          <div class="sec-lbl">Section A — Pre-Treatment Assessment</div>
+          <div class="rt-toolbar"><button><i data-lucide="bold"></i></button><button><i data-lucide="italic"></i></button><button><i data-lucide="list"></i></button></div>
+          <textarea rows="6" placeholder="Document skin condition observed, patient complaints, contraindications confirmed, pre-treatment photographs taken…"></textarea>
+          <div class="field" style="margin-top:14px;"><label class="fld-lbl">Pre-treatment Photo Upload</label>
+            <div class="upload-zone">
+              <div class="ic"><i data-lucide="upload-cloud"></i></div>
+              <div class="ttl">Drag photos here or click to upload</div>
+              <div class="hint">.jpg .png — max 5 files</div>
+              <div class="thumb-row"><div class="thumb"><span class="x">×</span></div><div class="thumb" style="background:linear-gradient(135deg,#A78BFA,#7C3AED);"><span class="x">×</span></div></div>
+            </div>
+          </div>
+
+          <div class="sec-lbl">Section B — Procedure Observations</div>
+          <div class="rt-toolbar"><button><i data-lucide="bold"></i></button><button><i data-lucide="italic"></i></button><button><i data-lucide="list"></i></button></div>
+          <textarea rows="5" placeholder="Document technique used, patient tolerance, any unexpected reactions, areas treated in detail…"></textarea>
+
+          <div class="sec-lbl">Section C — Post-Treatment Remarks &amp; Follow-up</div>
+          <div class="col-2">
+            <div><label class="fld-lbl">Post-treatment remarks</label><textarea rows="4" placeholder="Patient response, immediate effects observed, aftercare verbally given…"></textarea></div>
+            <div>
+              <div class="field"><label class="fld-lbl">Next Review / Follow-up</label><input type="date"></div>
+              <div class="field"><label class="fld-lbl">Follow-up Type</label><select><option>In-Person</option><option>Phone Call</option><option>No Follow-up Needed</option></select></div>
+              <div class="field"><label class="fld-lbl">Referred to</label><input placeholder="Refer to specialist if applicable"></div>
+            </div>
+          </div>
+          <div class="recorded" style="margin-top:16px;">
+            <span class="av">DP</span><span class="who"><b>Notes by:</b> Dr. Delson Pacyaoen</span>
+            <button class="btn btn-primary" style="margin-left:auto;"><i data-lucide="lock"></i> Sign &amp; Lock Notes</button>
+          </div>
+          <div class="warn-orange" style="text-align:left;">Signing will lock these notes. An admin can unlock if corrections are needed.</div>
+        </div>
+        <div class="btn-row"><button class="btn btn-ghost">Back</button><button class="btn btn-primary">Save &amp; Continue</button></div>
+      </div>
+
+      <!-- ============ VERSION 4 — Clinical Notes ============ -->
+      <div class="ver-label">Version 4 — Step 7: Clinical Notes</div>
+      <div class="step-card">
+        <div class="nodes">
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Service Info</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Schedule</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Consent &amp; History</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Doctor's Order</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Vital Signs</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Doctor's Notes</div><span class="conn"></span></div>
+          <div class="node active"><div class="circle">7</div><div class="lbl">Clinical Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">8</div><div class="lbl">Finalize</div></div>
+        </div>
+        <div class="content-panel">
+          <h2>Clinical Notes</h2>
+          <div class="subtext">Session documentation by the practitioner — products used, techniques, and aftercare given.</div>
+          <div class="col-2">
+            <div>
+              <div class="sec-lbl">Products &amp; Consumables Used</div>
+              <table class="simple">
+                <thead><tr><th>Product</th><th>Category</th><th>Qty</th><th>Unit</th><th>Batch No.</th><th>Expiry</th></tr></thead>
+                <tbody>
+                  <tr><td>Hyaluronic Serum</td><td>Serum</td><td>1</td><td>vial</td><td>HS-22405</td><td>Dec 2026</td></tr>
+                  <tr><td>Exosome Booster</td><td>Booster</td><td>1</td><td>amp</td><td>EX-1188</td><td>Aug 2026</td></tr>
+                  <tr><td>Diamond Tip Head</td><td>Disposable</td><td>1</td><td>pc</td><td>DT-99</td><td>—</td></tr>
+                </tbody>
+              </table>
+              <span class="add-link"><i data-lucide="plus"></i> Add Product</span>
+              <div class="warn-orange" style="text-align:left;margin-top:6px;">Quantities entered here will automatically deduct from inventory on save.</div>
+
+              <div class="sec-lbl">Procedure Techniques</div>
+              <div class="chk-chips">
+                <span class="chk-chip on"><i data-lucide="check"></i> Microneedling — 1.5mm depth</span>
+                <span class="chk-chip on"><i data-lucide="check"></i> Diamond tip exfoliation</span>
+                <span class="chk-chip">LED red light — 20 min</span>
+                <span class="chk-chip on"><i data-lucide="check"></i> Ultrasound gel applied</span>
+                <span class="chk-chip">Manual extraction</span>
+              </div>
+              <span class="add-link" style="margin-top:8px;"><i data-lucide="plus"></i> Add custom technique</span>
+            </div>
+            <div>
+              <div class="sec-lbl">Aftercare Given to Patient</div>
+              <div class="chk-list">
+                <label><input type="checkbox" checked>Verbal aftercare instructions</label>
+                <label><input type="checkbox" checked>Printed aftercare sheet given</label>
+                <label><input type="checkbox" checked>Sunscreen applied</label>
+                <label><input type="checkbox">Post-care kit given</label>
+                <label><input type="checkbox" checked>Booked follow-up</label>
+              </div>
+              <div class="field" style="margin-top:10px;"><label class="fld-lbl">Additional aftercare notes</label><textarea rows="3"></textarea></div>
+
+              <div class="sec-lbl">Session Summary</div>
+              <textarea rows="4" placeholder="Brief summary of session outcome, patient feedback during treatment…"></textarea>
+
+              <div class="sec-lbl">Next Session Recommendation</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div><label class="fld-lbl">Recommended interval</label><select><option>1 week</option><option>2 weeks</option><option selected>1 month</option><option>Custom</option></select></div>
+                <div><label class="fld-lbl">Priority</label>
+                  <div class="chk-chips"><span class="chk-chip on"><i data-lucide="check"></i>Routine</span><span class="chk-chip">Urgent</span><span class="chk-chip">Optional</span></div>
+                </div>
+              </div>
+              <div class="field" style="margin-top:10px;"><label class="fld-lbl">Recommended next service</label><input placeholder="Type to search services…"></div>
+
+              <div class="recorded" style="margin-top:16px;">
+                <span class="av">JR</span><span class="who"><b>Completed by:</b> Jane Reyes, Practitioner</span>
+                <button class="btn btn-green" style="margin-left:auto;"><i data-lucide="check-circle"></i> Mark Session Complete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row"><button class="btn btn-ghost">Back</button><button class="btn btn-primary">Save &amp; Continue</button></div>
+      </div>
+
+      <!-- ============ VERSION 5 — Weight Monitoring (Slimming, 9-step) ============ -->
+      <div class="ver-label">Version 5 — Step 7W: Weight Monitoring <span class="badge-orange" style="background:#FED7AA;color:#C2410C;padding:2px 8px;border-radius:4px;font-size:11px;">Slimming Session</span></div>
+      <div class="step-card">
+        <div class="nodes">
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Service Info</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Schedule</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Consent &amp; History</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Doctor's Order</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Vital Signs</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Doctor's Notes</div><span class="conn"></span></div>
+          <div class="node active"><div class="circle">7</div><div class="lbl">Weight Monitoring</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">8</div><div class="lbl">Clinical Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">9</div><div class="lbl">Finalize</div></div>
+        </div>
+        <div class="content-panel">
+          <h2>Weight Monitoring <span class="badge-pill orange">Slimming Session</span></h2>
+          <div class="subtext">Track body measurements, weight progress, and slimming product dosage for this session.</div>
+
+          <div class="col-3">
+            <div>
+              <div class="sec-lbl">Body Measurements — Today</div>
+              <div class="field"><label class="fld-lbl">Waist</label><div style="display:flex;gap:8px;align-items:center;"><input placeholder="—"><span class="unit">cm</span></div></div>
+              <div class="field"><label class="fld-lbl">Abdomen</label><div style="display:flex;gap:8px;align-items:center;"><input placeholder="—"><span class="unit">cm</span></div></div>
+              <div class="field"><label class="fld-lbl">Hips</label><div style="display:flex;gap:8px;align-items:center;"><input placeholder="—"><span class="unit">cm</span></div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div class="field"><label class="fld-lbl">Right Thigh</label><input placeholder="cm"></div><div class="field"><label class="fld-lbl">Left Thigh</label><input placeholder="cm"></div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div class="field"><label class="fld-lbl">Right Arm</label><input placeholder="cm"></div><div class="field"><label class="fld-lbl">Left Arm</label><input placeholder="cm"></div></div>
+              <div class="field"><label class="fld-lbl">Weight</label><div style="display:flex;gap:8px;align-items:center;"><input placeholder="—"><span class="unit">kg</span></div></div>
+              <div class="bmi-badge">BMI: 24.1 — Normal</div>
+            </div>
+            <div>
+              <div class="sec-lbl">vs. Last Session</div>
+              <div class="compare-grid">
+                <div class="row"><span class="k">Waist</span><div class="vals"><span class="prev">82 cm</span><span class="delta green"><i data-lucide="arrow-down"></i> −1.5 cm</span></div></div>
+                <div class="row"><span class="k">Abdomen</span><div class="vals"><span class="prev">88 cm</span><span class="delta green"><i data-lucide="arrow-down"></i> −1.0 cm</span></div></div>
+                <div class="row"><span class="k">Hips</span><div class="vals"><span class="prev">96 cm</span><span class="delta green"><i data-lucide="arrow-down"></i> −0.5 cm</span></div></div>
+                <div class="row"><span class="k">R. Thigh</span><div class="vals"><span class="prev">54 cm</span><span class="delta green"><i data-lucide="arrow-down"></i> −0.3 cm</span></div></div>
+                <div class="row"><span class="k">L. Thigh</span><div class="vals"><span class="prev">53.5 cm</span><span class="delta orange"><i data-lucide="arrow-up"></i> +0.2 cm</span></div></div>
+                <div class="row"><span class="k">Weight</span><div class="vals"><span class="prev">63 kg</span><span class="delta green"><i data-lucide="arrow-down"></i> −1.2 kg</span></div></div>
+              </div>
+              <div class="summary-card">Total Circumference Lost This Session: −3.5 cm</div>
+            </div>
+            <div>
+              <div class="sec-lbl">Weight Trend</div>
+              <div class="chart-wrap">
+                <svg viewBox="0 0 320 160" preserveAspectRatio="none">
+                  <g stroke="#F0F6FC" stroke-width="1">
+                    <line x1="0" y1="20" x2="320" y2="20"/>
+                    <line x1="0" y1="60" x2="320" y2="60"/>
+                    <line x1="0" y1="100" x2="320" y2="100"/>
+                    <line x1="0" y1="140" x2="320" y2="140"/>
+                  </g>
+                  <polyline points="20,40 70,55 120,72 170,85 220,100 280,115" fill="none" stroke="#2D6A9F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="20" cy="40" r="3" fill="#2D6A9F"/>
+                  <circle cx="70" cy="55" r="3" fill="#2D6A9F"/>
+                  <circle cx="120" cy="72" r="3" fill="#2D6A9F"/>
+                  <circle cx="170" cy="85" r="3" fill="#2D6A9F"/>
+                  <circle cx="220" cy="100" r="3" fill="#2D6A9F"/>
+                  <circle cx="280" cy="115" r="5" fill="#2D6A9F" stroke="#fff" stroke-width="2"/>
+                </svg>
+                <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:#9BBAD4;margin-top:6px;"><span>Mar 1</span><span>Mar 15</span><span>Apr 1</span><span>Apr 15</span><span>May 1</span><span>May 16</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sec-lbl">Slimming Product Dosage Record</div>
+          <table class="simple">
+            <thead><tr><th>Product / Injectable</th><th>Area Applied</th><th>Dose</th><th>Technique</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>Lipolytic solution</td><td>Abdomen</td><td>10 ml</td><td>Mesotherapy</td><td>bilateral</td></tr>
+              <tr><td>Slimming ampoule</td><td>Right thigh</td><td>5 ml</td><td>Mesotherapy</td><td>—</td></tr>
+            </tbody>
+          </table>
+          <span class="add-link"><i data-lucide="plus"></i> Add row</span>
+
+          <div class="sec-lbl">Progress Photos</div>
+          <div class="photo-compare">
+            <div class="photo-up"><div class="lbl">Before (this session)</div><div class="ic"><i data-lucide="image-up"></i></div><div class="txt">Upload photo</div></div>
+            <div class="photo-up"><div class="lbl">After (this session)</div><div class="ic"><i data-lucide="image-up"></i></div><div class="txt">Upload photo</div></div>
+          </div>
+          <div class="warn-orange" style="text-align:left;margin-top:8px;">Photos are stored privately and accessible only to admin and the assigned practitioner.</div>
+        </div>
+        <div class="btn-row"><button class="btn btn-ghost">Back</button><button class="btn btn-primary">Save &amp; Continue</button></div>
+      </div>
+
+    </section>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+  document.querySelectorAll('.toggle-row .switch').forEach(function (s) {
+    s.addEventListener('click', function () { s.classList.toggle('on'); });
+  });
+  document.querySelectorAll('.chk-chip').forEach(function (c) {
+    c.addEventListener('click', function () { c.classList.toggle('on'); if (window.lucide) window.lucide.createIcons(); });
+  });
+</script>
+</body>
+</html>

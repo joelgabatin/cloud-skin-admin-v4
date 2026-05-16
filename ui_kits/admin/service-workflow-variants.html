@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin — Service Workflow Variants</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: #1A2E40; }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #0F1E2E; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg,#2D6A9F,#5BC0EB); display: flex; align-items: center; justify-content: center; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+
+  .page { padding: 24px 32px 60px; display: flex; flex-direction: column; gap: 24px; }
+  .ver-label { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #fff; background: #2D6A9F; padding: 8px 16px; border-radius: 6px; width: fit-content; }
+
+  /* Service type banner */
+  .svc-banner { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 8px; margin: 14px 18px 0; }
+  .svc-banner.medical { background: #FFF1F0; border-left: 4px solid #DC2626; }
+  .svc-banner.clinical { background: #EFF6FF; border-left: 4px solid #2D6A9F; }
+  .svc-banner.wellness { background: #F0FDF4; border-left: 4px solid #15803D; }
+  .svc-banner .ic { width: 24px; height: 24px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; }
+  .svc-banner.medical .ic { background: rgba(220,38,38,0.12); color: #DC2626; }
+  .svc-banner.clinical .ic { background: rgba(45,106,159,0.12); color: #2D6A9F; }
+  .svc-banner.wellness .ic { background: rgba(21,128,61,0.12); color: #15803D; }
+  .svc-banner .ic .lucide { width: 14px; height: 14px; }
+  .svc-banner .ttl { font-family: var(--font-display); font-weight: 700; font-size: 13px; }
+  .svc-banner.medical .ttl { color: #DC2626; }
+  .svc-banner.clinical .ttl { color: #2D6A9F; }
+  .svc-banner.wellness .ttl { color: #15803D; }
+  .svc-banner .desc { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-left: 4px; }
+  .svc-banner .chip { margin-left: auto; padding: 4px 10px; background: #F0F6FC; color: #2D6A9F; border-radius: 6px; font-family: var(--font-display); font-weight: 700; font-size: 11.5px; }
+
+  .step-card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(26,58,92,0.06); border: 1px solid #E5EFF7; overflow: hidden; }
+  .nodes { display: flex; align-items: flex-start; padding: 20px 32px 14px; gap: 0; position: relative; overflow-x: auto; }
+  .node { flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 76px; position: relative; }
+  .node .circle { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 12px; flex-shrink: 0; z-index: 2; background: #fff; border: 2px solid #E5EFF7; color: #9BBAD4; }
+  .node.done .circle { background: #2D6A9F; border-color: #2D6A9F; color: #fff; }
+  .node.done .circle .lucide { width: 14px; height: 14px; }
+  .node.active .circle { background: #2D6A9F; border-color: #2D6A9F; color: #fff; box-shadow: 0 0 0 4px rgba(45,106,159,0.18); }
+  .node .lbl { font-family: var(--font-display); font-size: 10px; color: #5A7A96; margin-top: 6px; text-align: center; line-height: 1.3; max-width: 80px; }
+  .node.active .lbl { color: #2D6A9F; font-weight: 700; }
+  .node.done .lbl { color: #1A2E40; font-weight: 600; }
+  .node .conn { position: absolute; top: 15px; height: 2px; background: #E5EFF7; left: 50%; right: -50%; z-index: 1; }
+  .node.done .conn { background: #2D6A9F; }
+  .node:last-child .conn { display: none; }
+
+  .content-panel { padding: 22px 32px; border-top: 1px solid #F0F6FC; }
+  .content-panel h2 { font-family: var(--font-display); font-weight: 600; font-size: 18px; color: #1A2E40; margin: 0 0 4px; }
+  .content-panel .subtext { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-bottom: 18px; }
+  .col-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 900px) { .col-2 { grid-template-columns: 1fr; } }
+  .sec-lbl { font-family: var(--font-display); font-weight: 700; font-size: 11px; color: #2D6A9F; text-transform: uppercase; letter-spacing: 0.06em; margin: 12px 0 10px; }
+
+  /* Template card */
+  .tpl-card { border: 1.5px solid #2D6A9F; border-radius: 10px; padding: 18px; }
+  .tpl-card .head-lbl { font-family: var(--font-display); font-weight: 700; font-size: 11px; color: #2D6A9F; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .tpl-dd { display: flex; align-items: center; justify-content: space-between; height: 46px; padding: 0 14px; border: 1px solid #D1E3F3; border-radius: 8px; background: #fff; }
+  .tpl-dd .l { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-display); font-weight: 700; font-size: 13.5px; color: #1A2E40; }
+  .tpl-dd .change { color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; text-decoration: none; }
+  .pill-green { background: #DCFCE7; color: #15803D; padding: 3px 9px; border-radius: 9999px; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; }
+  .summary-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .summary-chips span { padding: 4px 10px; background: #F0F6FC; color: #2D6A9F; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; }
+  .prev-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-family: var(--font-body); font-size: 12px; color: #5A7A96; }
+  .prev-row .lucide { width: 13px; height: 13px; }
+  .prev-row .btn-ghost-sm { margin-left: auto; }
+
+  .tl-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid #E5EFF7; border-radius: 8px; }
+  .tl-row + .tl-row { margin-top: 6px; }
+  .tl-row .ix { width: 20px; height: 20px; border-radius: 50%; background: #2D6A9F; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; }
+  .tl-row .nm { flex: 1; font-family: var(--font-body); font-size: 12.5px; color: #1A2E40; }
+  .tl-row .timing { padding: 3px 9px; border-radius: 9999px; background: #FFF3E0; color: #C2410C; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; }
+
+  .device-card { background: #F0F6FC; border-radius: 8px; padding: 14px 16px; margin-top: 12px; }
+  .dev-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #E5EFF7; font-size: 12.5px; }
+  .dev-row:last-child { border-bottom: none; }
+  .dev-row .k { color: #5A7A96; }
+  .dev-row .v { font-family: var(--font-display); font-weight: 600; color: #1A2E40; }
+
+  /* Sign-off */
+  .signoff { border: 1px solid #E5EFF7; border-radius: 10px; padding: 16px; }
+  .signoff .row { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 12.5px; }
+  .signoff .lbl-row { font-family: var(--font-display); font-weight: 600; font-size: 11.5px; color: #5A7A96; min-width: 120px; }
+  .signoff .nm { font-family: var(--font-display); font-weight: 700; color: #1A2E40; }
+  .signoff .av { width: 26px; height: 26px; border-radius: 50%; background: #2D6A9F; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; }
+  .signoff select { height: 36px; padding: 0 10px; border: 1px solid #D1E3F3; border-radius: 6px; font-family: var(--font-body); font-size: 12.5px; max-width: 160px; }
+  .signoff input[type="date"] { height: 36px; padding: 0 10px; border: 1px solid #D1E3F3; border-radius: 6px; font-family: var(--font-body); font-size: 12.5px; max-width: 160px; }
+  .badge-orange { background: #FED7AA; color: #C2410C; padding: 3px 9px; border-radius: 4px; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; }
+  .sig-canvas { width: 100%; max-width: 280px; height: 100px; background: #F8F9FA; border: 1.5px dashed #BFD8EB; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: var(--font-body); font-size: 12px; color: #BFD8EB; margin: 12px auto 8px; }
+  .sig-actions { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
+  .btn-ghost-sm { background: #fff; border: 1px solid #D0E8F5; color: #5A7A96; padding: 5px 12px; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; cursor: pointer; }
+  .btn-ghost-sm:hover { background: #F0F6FC; }
+  .warn-note { font-family: var(--font-body); font-size: 11.5px; color: #C2410C; text-align: center; margin-top: 8px; font-style: italic; }
+
+  /* V2 consent */
+  .consent-card { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; padding: 12px 14px; }
+  .consent-card + .consent-card { margin-top: 8px; }
+  .consent-card .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .consent-card .nm { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; }
+  .pill-green-sm { background: #DCFCE7; color: #15803D; padding: 4px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; display: inline-flex; align-items: center; gap: 4px; }
+  .pill-green-sm .lucide { width: 11px; height: 11px; }
+  .pill-pending { background: #FED7AA; color: #C2410C; padding: 4px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; }
+  .history-card { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .history-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; }
+  .history-chip.green { background: #DCFCE7; color: #15803D; }
+  .history-chip.orange { background: #FED7AA; color: #C2410C; }
+
+  /* V3 nurse notes */
+  textarea, input[type="text"], input[type="date"], select { width: 100%; height: 40px; padding: 0 12px; border: 1px solid #D1E3F3; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; background: #fff; }
+  textarea { height: auto; padding: 10px 12px; min-height: 80px; resize: vertical; line-height: 1.5; }
+  .chk-list { display: flex; flex-direction: column; gap: 6px; }
+  .chk-list label { display: flex; align-items: center; gap: 8px; font-family: var(--font-body); font-size: 12.5px; color: #1A2E40; }
+  .chk-list input { width: 14px; height: 14px; accent-color: #2D6A9F; }
+  .recorded { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding: 10px 14px; background: #F8FBFD; border-radius: 8px; }
+  .recorded .av { width: 30px; height: 30px; border-radius: 50%; background: #15803D; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 11px; }
+  .recorded .who { font-family: var(--font-body); font-size: 12.5px; color: #1A2E40; }
+  .recorded .who b { font-family: var(--font-display); font-weight: 700; }
+  .recorded .ts { margin-left: auto; font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; }
+
+  /* Buttons */
+  .btn { height: 40px; padding: 0 18px; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 13px; cursor: pointer; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-ghost { background: #fff; color: #5A7A96; border-color: #D0E8F5; }
+  .btn-ghost:hover { background: #F0F6FC; }
+  .btn-primary { background: #2D6A9F; color: #fff; }
+  .btn-primary:hover { background: #1A5685; }
+  .btn-full { width: 100%; justify-content: center; }
+  .btn-row { display: flex; justify-content: space-between; padding: 16px 32px; background: #F8FBFD; border-top: 1px solid #F0F6FC; }
+
+  /* V4 Protocol Templates page */
+  .pg-page { padding: 24px 28px; background: #fff; border-radius: 10px; border: 1px solid #E5EFF7; }
+  .pg-crumb { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-bottom: 8px; }
+  .pg-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+  .pg-head h1 { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; margin: 0 0 4px; }
+  .pg-head .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; max-width: 700px; }
+  .filter-row { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .filter-row select, .filter-row input { max-width: 240px; height: 40px; }
+  .v4-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: flex-start; }
+  @media (max-width: 1100px) { .v4-layout { grid-template-columns: 1fr; } }
+  .tpl-list { border-left: 1px solid #E5EFF7; padding-right: 24px; }
+  .tpl-list-card { background: #fff; border: 1px solid #E5EFF7; border-radius: 10px; padding: 14px 18px; transition: border-color 120ms; }
+  .tpl-list-card + .tpl-list-card { margin-top: 10px; }
+  .tpl-list-card:hover { border-left: 3px solid #2D6A9F; }
+  .tpl-list-card .top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+  .tpl-list-card .ti { font-family: var(--font-display); font-weight: 700; font-size: 14.5px; color: #1A2E40; }
+  .tpl-list-card .actions { margin-left: auto; display: flex; gap: 2px; }
+  .ic-btn { background: none; border: none; color: #5A7A96; cursor: pointer; padding: 5px; border-radius: 4px; }
+  .ic-btn:hover { background: #F0F6FC; color: #2D6A9F; }
+  .ic-btn.danger:hover { color: #DC2626; background: #FEF2F2; }
+  .ic-btn .lucide { width: 14px; height: 14px; }
+  .type-badge { padding: 3px 9px; border-radius: 6px; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .type-badge.medical { background: #FEE2E2; color: #B91C1C; }
+  .type-badge.clinical { background: #DBEAFE; color: #1D4ED8; }
+  .type-badge.wellness { background: #DCFCE7; color: #15803D; }
+  .ts-row { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; margin-top: 8px; }
+  .new-tpl-card { margin-top: 12px; padding: 26px 20px; border: 2px dashed #BFD8EB; background: #F8FBFD; border-radius: 10px; text-align: center; cursor: pointer; }
+  .new-tpl-card .ic { width: 36px; height: 36px; border-radius: 50%; background: #F0F6FC; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+  .new-tpl-card .ic .lucide { width: 18px; height: 18px; }
+  .new-tpl-card .txt { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #2D6A9F; }
+  .help-card { background: #F0F6FC; border-radius: 10px; padding: 18px 20px; }
+  .help-card h3 { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #2D6A9F; margin: 0 0 12px; }
+  .help-step { display: flex; gap: 10px; padding: 8px 0; font-family: var(--font-body); font-size: 13px; color: #1A2E40; line-height: 1.5; }
+  .help-step .num { width: 22px; height: 22px; border-radius: 50%; background: #2D6A9F; color: #fff; flex-shrink: 0; font-family: var(--font-display); font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; }
+
+  /* V5 Service Workflows */
+  .info-box { background: #F0F6FC; border: 1px solid #BFD8EB; border-radius: 8px; padding: 10px 14px; font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-bottom: 14px; }
+  .tabs-row { display: flex; gap: 4px; border-bottom: 1px solid #E5EFF7; margin-bottom: 14px; }
+  .tabs-row button { background: none; border: none; padding: 10px 16px; font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #5A7A96; cursor: pointer; border-bottom: 3px solid transparent; }
+  .tabs-row button.on { color: #2D6A9F; border-bottom-color: #2D6A9F; }
+  table.svc-tbl { width: 100%; border-collapse: collapse; border: 1px solid #E5EFF7; border-radius: 8px; overflow: hidden; }
+  table.svc-tbl th { padding: 11px 14px; background: #F0F6FC; font-family: var(--font-display); font-size: 11px; font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.04em; text-align: left; }
+  table.svc-tbl td { padding: 12px 14px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; border-top: 1px solid #F0F6FC; }
+  table.svc-tbl tr:nth-child(even) td { background: #FAFAFA; }
+  .step-count.green { color: #15803D; font-family: var(--font-display); font-weight: 700; }
+  .step-count.blue { color: #2D6A9F; font-family: var(--font-display); font-weight: 700; }
+  .btn-edit-link { background: none; border: none; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; cursor: pointer; }
+  .pagi-row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-family: var(--font-body); font-size: 12px; color: #5A7A96; }
+  .pagi-row .pagers { display: flex; gap: 6px; }
+  .pagi-row .pagers button { padding: 5px 12px; background: #fff; border: 1px solid #D0E8F5; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; cursor: pointer; color: #5A7A96; }
+
+  /* V5 right edit panel */
+  .v5-layout { display: grid; grid-template-columns: 1fr 400px; gap: 24px; align-items: flex-start; }
+  @media (max-width: 1100px) { .v5-layout { grid-template-columns: 1fr; } }
+  .edit-panel { background: #fff; border: 1px solid #E5EFF7; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(26,58,92,0.06); position: sticky; top: 90px; }
+  .edit-panel h2 { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: #1A2E40; margin: 0 0 2px; }
+  .edit-panel .svc-sub { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-bottom: 16px; }
+  .radio-card { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border: 1.5px solid #E5EFF7; border-radius: 8px; cursor: pointer; margin-bottom: 8px; }
+  .radio-card.on { border-color: #2D6A9F; background: #F8FBFD; }
+  .radio-card .dot { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #BFD8EB; flex-shrink: 0; margin-top: 2px; display: inline-flex; align-items: center; justify-content: center; background: #fff; }
+  .radio-card.on .dot { border-color: #2D6A9F; }
+  .radio-card.on .dot::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #2D6A9F; }
+  .radio-card .nm { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; }
+  .radio-card .desc { font-family: var(--font-body); font-size: 11.5px; color: #5A7A96; margin-top: 3px; line-height: 1.45; }
+  .step-toggle { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid #F0F6FC; }
+  .step-toggle:last-of-type { border-bottom: none; }
+  .step-toggle .nm { flex: 1; font-family: var(--font-body); font-size: 12.5px; color: #1A2E40; display: inline-flex; align-items: center; gap: 6px; }
+  .step-toggle .lock { color: #9BBAD4; }
+  .step-toggle .lock .lucide { width: 12px; height: 12px; }
+  .step-toggle .slim-badge { background: #FED7AA; color: #C2410C; padding: 2px 7px; border-radius: 4px; font-family: var(--font-display); font-weight: 700; font-size: 10px; }
+  .switch { width: 34px; height: 20px; border-radius: 9999px; background: #D0E8F5; padding: 2px; cursor: pointer; border: none; position: relative; flex-shrink: 0; }
+  .switch::after { content: ''; width: 16px; height: 16px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; }
+  .switch.on { background: #2D6A9F; }
+  .switch.on::after { left: 16px; }
+  .switch.locked { opacity: 0.55; cursor: not-allowed; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Service Workflow Variants</div>
+        <div class="topbar-crumb">Admin / Workflows / Variants Reference</div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Workflow Variants">
+
+      <!-- ============ VERSION 1 — Medical Procedure (9 steps) ============ -->
+      <div class="ver-label">Version 1 — Medical Procedure (9 steps)</div>
+      <div class="step-card">
+        <div class="svc-banner medical">
+          <span class="ic"><i data-lucide="cross"></i></span>
+          <span class="ttl">Medical Procedure</span>
+          <span class="desc">Full clinical documentation required — all 9 steps must be completed.</span>
+          <span class="chip">Lipolytic Slimming Injection</span>
+        </div>
+        <div class="nodes">
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Service Info</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Schedule</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Consent &amp; History</div><span class="conn"></span></div>
+          <div class="node active"><div class="circle">4</div><div class="lbl">Doctor's Order</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">5</div><div class="lbl">Vital Signs</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">6</div><div class="lbl">Doctor's Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">7</div><div class="lbl">Nurse's Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">8</div><div class="lbl">Treatment Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">9</div><div class="lbl">Finalize</div></div>
+        </div>
+        <div class="content-panel">
+          <h2>Doctor's Order</h2>
+          <div class="subtext">Select a protocol template to auto-fill, then review and adjust for this patient.</div>
+          <div class="tpl-card">
+            <div class="head-lbl">Protocol Template</div>
+            <div class="tpl-dd">
+              <span class="l">Lipolytic Slimming — Standard Protocol <span class="pill-green">Default</span></span>
+              <a class="change">Change</a>
+            </div>
+            <div class="summary-chips"><span>10ml lipolytic</span><span>Mesotherapy</span><span>Abdomen + Thighs</span><span>3 pre-procedure steps</span></div>
+            <div class="prev-row"><i data-lucide="clock"></i>Last session used same protocol — March 12, 2026<button class="btn-ghost-sm">Use Previous Session</button></div>
+          </div>
+          <div class="col-2" style="margin-top:16px;">
+            <div>
+              <div class="sec-lbl">Pre-Procedure Protocol</div>
+              <div class="tl-row"><span class="ix">1</span><span class="nm">Confirm patient identity and consent</span><span class="timing">15 min before</span></div>
+              <div class="tl-row"><span class="ix">2</span><span class="nm">Cleanse target areas, mark injection grid</span><span class="timing">10 min before</span></div>
+              <div class="tl-row"><span class="ix">3</span><span class="nm">Topical anesthetic on abdomen + thighs</span><span class="timing">5 min before</span></div>
+              <div class="device-card">
+                <div class="dev-row"><span class="k">Solution</span><span class="v">Lipolytic 10ml</span></div>
+                <div class="dev-row"><span class="k">Technique</span><span class="v">Mesotherapy</span></div>
+                <div class="dev-row"><span class="k">Needle</span><span class="v">30G × 13mm</span></div>
+                <div class="dev-row"><span class="k">Pattern</span><span class="v">Grid · 1.5cm spacing</span></div>
+              </div>
+            </div>
+            <div>
+              <div class="sec-lbl">Physician Sign-off</div>
+              <div class="signoff">
+                <div class="row"><span class="lbl-row">Ordering Physician</span><span class="av">DP</span><span class="nm">Dr. Delson Pacyaoen</span></div>
+                <div class="row"><span class="lbl-row">Order Date</span><input type="date" value="2026-05-16"></div>
+                <div class="row"><span class="lbl-row">Order Status</span><select><option>Draft</option><option>Pending Review</option><option>Finalized</option></select><span class="badge-orange">Draft</span></div>
+                <div class="sig-canvas">Sign here</div>
+                <div class="sig-actions"><button class="btn-ghost-sm">Clear</button><button class="btn-ghost-sm">Preview</button></div>
+                <button class="btn btn-primary btn-full"><i data-lucide="lock"></i> Finalize &amp; Lock Order</button>
+                <div class="warn-note">Once finalized, this order cannot be edited without admin override.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row"><button class="btn btn-ghost">Back</button><button class="btn btn-primary">Save &amp; Continue</button></div>
+      </div>
+
+      <!-- ============ VERSION 2 — Clinical Aesthetic (8 steps) ============ -->
+      <div class="ver-label">Version 2 — Clinical Aesthetic (8 steps, no Doctor's Order)</div>
+      <div class="step-card">
+        <div class="svc-banner clinical">
+          <span class="ic"><i data-lucide="info"></i></span>
+          <span class="ttl">Clinical Aesthetic</span>
+          <span class="desc">Doctor's Order not required — clinical assessment and notes apply.</span>
+          <span class="chip">RF Body Contouring</span>
+        </div>
+        <div class="nodes">
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Service Info</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Schedule</div><span class="conn"></span></div>
+          <div class="node active"><div class="circle">3</div><div class="lbl">Consent &amp; History</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">4</div><div class="lbl">Vital Signs</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">5</div><div class="lbl">Doctor's Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">6</div><div class="lbl">Nurse's Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">7</div><div class="lbl">Treatment Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">8</div><div class="lbl">Finalize</div></div>
+        </div>
+        <div class="content-panel">
+          <h2>Consent &amp; History</h2>
+          <div class="subtext">Review consent status and confirm the patient's medical history before proceeding.</div>
+          <div class="col-2">
+            <div>
+              <div class="sec-lbl">Consent Status</div>
+              <div class="consent-card">
+                <div class="row"><span class="nm">General Consent — Signed May 10, 2026</span><span class="pill-green-sm"><i data-lucide="check"></i> Signed</span></div>
+              </div>
+              <div class="consent-card">
+                <div class="row"><span class="nm">RF Body Contouring Consent</span><div style="display:inline-flex;align-items:center;gap:10px;"><span class="pill-pending">Pending Signature</span><button class="btn btn-primary" style="height:34px;padding:0 12px;font-size:12px;"><i data-lucide="mail"></i> Request Signature</button></div></div>
+              </div>
+            </div>
+            <div>
+              <div class="sec-lbl">Medical History Summary</div>
+              <div class="history-card">
+                <div><span class="history-chip green"><i data-lucide="check" style="width:11px;height:11px;"></i> No known allergies</span></div>
+                <div><span class="history-chip green"><i data-lucide="check" style="width:11px;height:11px;"></i> No pacemaker</span></div>
+                <div><span class="history-chip orange"><i data-lucide="alert-triangle" style="width:11px;height:11px;"></i> Hypertension — monitored</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row"><button class="btn btn-ghost">Back</button><button class="btn btn-primary">Save &amp; Continue</button></div>
+      </div>
+
+      <!-- ============ VERSION 3 — Wellness (6 steps) ============ -->
+      <div class="ver-label">Version 3 — Wellness / Aesthetic (6 steps)</div>
+      <div class="step-card">
+        <div class="svc-banner wellness">
+          <span class="ic"><i data-lucide="leaf"></i></span>
+          <span class="ttl">Wellness / Aesthetic</span>
+          <span class="desc">No clinical documentation required — operational steps only.</span>
+          <span class="chip">Slimming Body Wrap</span>
+        </div>
+        <div class="nodes">
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Service Info</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Schedule</div><span class="conn"></span></div>
+          <div class="node done"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Consent</div><span class="conn"></span></div>
+          <div class="node active"><div class="circle">4</div><div class="lbl">Nurse's Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">5</div><div class="lbl">Treatment Notes</div><span class="conn"></span></div>
+          <div class="node"><div class="circle">6</div><div class="lbl">Finalize</div></div>
+        </div>
+        <div class="content-panel">
+          <h2>Nurse's Notes</h2>
+          <div class="subtext">Document patient care and observations during this session.</div>
+
+          <div class="sec-lbl">Section A — Pre-Session Observations</div>
+          <textarea rows="3" placeholder="Patient condition on arrival, any complaints, skin/body observations before treatment…"></textarea>
+
+          <div class="sec-lbl">Section B — During Session</div>
+          <textarea rows="3" placeholder="Patient tolerance, reactions observed, adjustments made during treatment…"></textarea>
+
+          <div class="sec-lbl">Section C — Post-Session Care Given</div>
+          <div class="chk-list">
+            <label><input type="checkbox" checked>Verbal post-care instructions given</label>
+            <label><input type="checkbox" checked>Water encouraged post-session</label>
+            <label><input type="checkbox" checked>Patient rested 10 minutes post-treatment</label>
+            <label><input type="checkbox">Products applied post-session</label>
+          </div>
+          <textarea rows="2" placeholder="Additional notes…" style="margin-top:10px;"></textarea>
+
+          <div class="recorded">
+            <span class="av">JR</span>
+            <span class="who"><b>Nurse:</b> John Reyes</span>
+            <span class="ts">Today, 10:15 AM</span>
+          </div>
+        </div>
+        <div class="btn-row"><button class="btn btn-ghost">Back</button><button class="btn btn-primary">Save &amp; Continue</button></div>
+      </div>
+
+      <!-- ============ VERSION 4 — Protocol Templates settings ============ -->
+      <div class="ver-label">Version 4 — Admin Settings: Protocol Templates</div>
+      <div class="step-card pg-page">
+        <div class="pg-crumb">Settings → Protocol Templates</div>
+        <div class="pg-head">
+          <div>
+            <h1>Protocol Templates</h1>
+            <div class="sub">Manage pre-filled order templates used in the Doctor's Order step. Templates are assigned per service and auto-fill the order form when selected by the physician.</div>
+          </div>
+          <button class="btn btn-primary"><i data-lucide="plus"></i> New Template</button>
+        </div>
+        <div class="filter-row">
+          <select><option>All Categories</option><option>Slimming &amp; Body</option><option>Laser</option><option>Facial</option></select>
+          <select><option>All Services</option><option>Lipolytic Slimming Injection</option><option>CO2 Fractional Laser</option><option>Diamond Glow Facial</option></select>
+          <input type="text" placeholder="Search templates…">
+        </div>
+
+        <div class="v4-layout">
+          <div class="tpl-list" style="border:none;padding:0;">
+            <div class="tpl-list-card">
+              <div class="top"><span class="ti">Lipolytic Slimming — Standard Protocol</span><span class="pill-green">Default</span><span class="type-badge medical">Medical Procedure</span><div class="actions"><button class="ic-btn"><i data-lucide="pencil"></i></button><button class="ic-btn"><i data-lucide="copy"></i></button><button class="ic-btn danger"><i data-lucide="trash-2"></i></button></div></div>
+              <div style="font-family:var(--font-body);font-size:12.5px;color:#5A7A96;">Service: Lipolytic Slimming Injection · Category: Slimming &amp; Body</div>
+              <div class="summary-chips" style="margin-top:8px;"><span>10ml lipolytic</span><span>Mesotherapy</span><span>3 pre-steps</span><span>2 post-steps</span><span>Abdomen + Thighs</span></div>
+              <div class="ts-row">Last updated May 10, 2026 · Dr. Delson Pacyaoen</div>
+            </div>
+            <div class="tpl-list-card">
+              <div class="top"><span class="ti">CO2 Laser — Standard Protocol</span><span class="type-badge medical">Medical Procedure</span><div class="actions"><button class="ic-btn"><i data-lucide="pencil"></i></button><button class="ic-btn"><i data-lucide="copy"></i></button><button class="ic-btn danger"><i data-lucide="trash-2"></i></button></div></div>
+              <div style="font-family:var(--font-body);font-size:12.5px;color:#5A7A96;">Service: CO2 Fractional Laser · Category: Laser</div>
+              <div class="summary-chips" style="margin-top:8px;"><span>15mJ</span><span>15% density</span><span>2 passes</span><span>5 pre-steps</span></div>
+              <div class="ts-row">Last updated Apr 28, 2026 · Dr. Delson Pacyaoen</div>
+            </div>
+            <div class="tpl-list-card">
+              <div class="top"><span class="ti">CO2 Laser — Sensitive Skin Protocol</span><span class="type-badge medical">Medical Procedure</span><div class="actions"><button class="ic-btn"><i data-lucide="pencil"></i></button><button class="ic-btn"><i data-lucide="copy"></i></button><button class="ic-btn danger"><i data-lucide="trash-2"></i></button></div></div>
+              <div style="font-family:var(--font-body);font-size:12.5px;color:#5A7A96;">Service: CO2 Fractional Laser · Category: Laser</div>
+              <div class="summary-chips" style="margin-top:8px;"><span>10mJ</span><span>10% density</span><span>1 pass</span><span>Adjusted periorbital</span></div>
+              <div class="ts-row">Last updated Apr 2, 2026 · Dr. Maria Santos</div>
+            </div>
+            <div class="tpl-list-card">
+              <div class="top"><span class="ti">Diamond Glow — Standard Protocol</span><span class="type-badge clinical">Clinical Aesthetic</span><div class="actions"><button class="ic-btn"><i data-lucide="pencil"></i></button><button class="ic-btn"><i data-lucide="copy"></i></button><button class="ic-btn danger"><i data-lucide="trash-2"></i></button></div></div>
+              <div style="font-family:var(--font-body);font-size:12.5px;color:#5A7A96;">Service: Diamond Glow Facial · Category: Facial</div>
+              <div class="summary-chips" style="margin-top:8px;"><span>Diamond tip</span><span>3 passes</span><span>4 pre-steps</span></div>
+              <div class="ts-row">Last updated Mar 22, 2026 · Dr. Maria Santos</div>
+            </div>
+
+            <div class="new-tpl-card">
+              <div class="ic"><i data-lucide="plus"></i></div>
+              <div class="txt">Add a New Protocol Template</div>
+            </div>
+          </div>
+          <div>
+            <div class="help-card">
+              <h3>How Templates Work</h3>
+              <div class="help-step"><span class="num">1</span><span>Admin creates a template and assigns it to a service.</span></div>
+              <div class="help-step"><span class="num">2</span><span>Doctor opens Doctor's Order and selects a template.</span></div>
+              <div class="help-step"><span class="num">3</span><span>Form auto-fills. Doctor reviews, adjusts, and signs.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ VERSION 5 — Service Workflows settings ============ -->
+      <div class="ver-label">Version 5 — Admin Settings: Service Workflows</div>
+      <div class="step-card pg-page">
+        <div class="pg-crumb">Settings → Service Workflows</div>
+        <div class="pg-head">
+          <div>
+            <h1>Service Workflows</h1>
+            <div class="sub">Configure the clinical documentation steps required for each service. The stepper shown to staff will automatically adjust based on these settings.</div>
+          </div>
+        </div>
+        <div class="info-box"><i data-lucide="info" style="width:14px;height:14px;color:#2D6A9F;margin-right:5px;vertical-align:-2px;"></i>Changes here affect all future sessions. Active sessions already in progress are not affected.</div>
+        <div class="tabs-row">
+          <button class="on">All Services</button>
+          <button>Medical Procedure</button>
+          <button>Clinical Aesthetic</button>
+          <button>Wellness</button>
+        </div>
+
+        <div class="v5-layout">
+          <div>
+            <table class="svc-tbl">
+              <thead><tr><th>Service Name</th><th>Category</th><th>Workflow Type</th><th>Steps Active</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr><td><b style="font-family:var(--font-display);font-weight:700;">Lipolytic Slimming Injection</b></td><td>Slimming &amp; Body</td><td><span class="type-badge medical">Medical Procedure</span></td><td><span class="step-count green">9 / 9</span></td><td><button class="btn-edit-link">Edit</button></td></tr>
+                <tr><td><b style="font-family:var(--font-display);font-weight:700;">CO2 Fractional Laser</b></td><td>Laser</td><td><span class="type-badge medical">Medical Procedure</span></td><td><span class="step-count green">9 / 9</span></td><td><button class="btn-edit-link">Edit</button></td></tr>
+                <tr><td><b style="font-family:var(--font-display);font-weight:700;">RF Body Contouring</b></td><td>Slimming &amp; Body</td><td><span class="type-badge clinical">Clinical Aesthetic</span></td><td><span class="step-count blue">8 / 8</span></td><td><button class="btn-edit-link">Edit</button></td></tr>
+                <tr><td><b style="font-family:var(--font-display);font-weight:700;">Diamond Glow Facial</b></td><td>Facials</td><td><span class="type-badge clinical">Clinical Aesthetic</span></td><td><span class="step-count blue">8 / 8</span></td><td><button class="btn-edit-link">Edit</button></td></tr>
+                <tr><td><b style="font-family:var(--font-display);font-weight:700;">Slimming Body Wrap</b></td><td>Wellness</td><td><span class="type-badge wellness">Wellness</span></td><td><span class="step-count green">6 / 6</span></td><td><button class="btn-edit-link">Edit</button></td></tr>
+                <tr><td><b style="font-family:var(--font-display);font-weight:700;">Relaxation Massage</b></td><td>Wellness</td><td><span class="type-badge wellness">Wellness</span></td><td><span class="step-count green">6 / 6</span></td><td><button class="btn-edit-link">Edit</button></td></tr>
+              </tbody>
+            </table>
+            <div class="pagi-row"><span>Showing 6 of 18 services</span><div class="pagers"><button>Previous</button><button>Next</button></div></div>
+          </div>
+          <div>
+            <div class="edit-panel">
+              <h2>Configure Workflow</h2>
+              <div class="svc-sub">Lipolytic Slimming Injection</div>
+
+              <div class="sec-lbl" style="margin-top:0;">Workflow Type</div>
+              <div class="radio-card on"><span class="dot"></span><div><div class="nm">Medical Procedure</div><div class="desc">Full 9-step clinical documentation. Doctor's Order, Vital Signs, Doctor's Notes, Nurse's Notes, Treatment Notes all required.</div></div></div>
+              <div class="radio-card"><span class="dot"></span><div><div class="nm">Clinical Aesthetic</div><div class="desc">8-step workflow. No Doctor's Order. Vital Signs, Doctor's Notes, Nurse's Notes, Treatment Notes included.</div></div></div>
+              <div class="radio-card"><span class="dot"></span><div><div class="nm">Wellness / Aesthetic</div><div class="desc">6-step minimal workflow. Nurse's Notes and Treatment Notes only. No clinical steps.</div></div></div>
+
+              <div class="sec-lbl">Step Visibility</div>
+              <div style="font-family:var(--font-body);font-size:12px;color:#5A7A96;margin-bottom:6px;">Fine-tune which steps are visible for this service.</div>
+              <div class="step-toggle"><span class="nm">Service Info <span class="lock"><i data-lucide="lock"></i></span></span><button class="switch on locked"></button></div>
+              <div class="step-toggle"><span class="nm">Schedule <span class="lock"><i data-lucide="lock"></i></span></span><button class="switch on locked"></button></div>
+              <div class="step-toggle"><span class="nm">Consent &amp; History <span class="lock"><i data-lucide="lock"></i></span></span><button class="switch on locked"></button></div>
+              <div class="step-toggle"><span class="nm">Doctor's Order</span><button class="switch on"></button></div>
+              <div class="step-toggle"><span class="nm">Vital Signs</span><button class="switch on"></button></div>
+              <div class="step-toggle"><span class="nm">Doctor's Notes</span><button class="switch on"></button></div>
+              <div class="step-toggle"><span class="nm">Nurse's Notes</span><button class="switch on"></button></div>
+              <div class="step-toggle"><span class="nm">Treatment Notes</span><button class="switch on"></button></div>
+              <div class="step-toggle"><span class="nm">Monitoring Sheet <span class="slim-badge">Slimming</span></span><button class="switch on"></button></div>
+              <div class="step-toggle"><span class="nm">Finalize <span class="lock"><i data-lucide="lock"></i></span></span><button class="switch on locked"></button></div>
+              <div style="font-family:var(--font-body);font-size:11.5px;color:#5A7A96;margin-top:8px;">Locked steps are required for all services and cannot be disabled.</div>
+
+              <div style="display:flex;gap:10px;margin-top:18px;">
+                <button class="btn btn-ghost" style="flex:1;justify-content:center;">Cancel</button>
+                <button class="btn btn-primary" style="flex:1;justify-content:center;">Save Workflow</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+  document.querySelectorAll('.switch:not(.locked)').forEach(function (s) {
+    s.addEventListener('click', function () { s.classList.toggle('on'); });
+  });
+  document.querySelectorAll('.radio-card').forEach(function (c) {
+    c.addEventListener('click', function () {
+      c.parentElement.querySelectorAll('.radio-card').forEach(function (x) { x.classList.remove('on'); });
+      c.classList.add('on');
+    });
+  });
+  document.querySelectorAll('.tabs-row button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      b.parentElement.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); });
+      b.classList.add('on');
+    });
+  });
+</script>
+</body>
+</html>

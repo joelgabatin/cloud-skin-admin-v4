@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Suppliers Analytics</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .back-link { background: none; border: none; cursor: pointer; color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; padding: 0; }
+  .btn { height: 40px; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; text-decoration: none; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-outline { background: #F0F6FC; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 18px; }
+  .page-hero h1 { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .page-hero .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 4px; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .stat-card { background: #fff; border-radius: 16px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08), 0 2px 8px rgba(26,58,92,0.04); display: flex; flex-direction: column; gap: 8px; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-card .label { font-size: 13px; color: #5A7A96; }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #5BC0EB; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .stat-card .iplate.success { background: #DCFCE7; color: #15803D; }
+  .stat-card .iplate.info { background: #DBEAFE; color: #1D4ED8; }
+  .stat-card .iplate.warning { background: #FEF3C7; color: #B45309; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 28px; line-height: 1.1; color: #1A2E40; }
+  .stat-card .sub { font-size: 12px; color: #5A7A96; }
+  .analytics-row { display: grid; grid-template-columns: minmax(0,2fr) minmax(0,1fr); gap: 20px; align-items: stretch; }
+  @media (max-width: 1100px) { .analytics-row { grid-template-columns: 1fr; } }
+  .panel { background: #fff; border-radius: 12px; padding: 22px 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; flex-direction: column; gap: 14px; }
+  .panel h3 { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #1A2E40; margin: 0; text-transform: uppercase; letter-spacing: 0.05em; }
+  .panel .sub { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: -8px; }
+  .topbar-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 8px 0; }
+  .topbar-row .nm { color: #1A2E40; font-weight: 600; font-family: var(--font-display); font-size: 13px; }
+  .topbar-row .sub-line { font-family: var(--font-body); font-size: 11px; color: #9BBAD4; margin-top: 2px; }
+  .topbar-row .val { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; text-align: right; }
+  .topbar-row .qty { font-family: var(--font-body); font-size: 11px; color: #5A7A96; margin-top: 2px; text-align: right; }
+  .topbar-bar { grid-column: 1 / -1; height: 6px; background: #F0F6FC; border-radius: 9999px; overflow: hidden; margin-top: 6px; }
+  .topbar-bar > div { height: 100%; border-radius: 9999px; }
+  .topbar-divider { height: 1px; background: #F0F6FC; margin: 4px 0; }
+  .status-list { display: flex; flex-direction: column; gap: 10px; }
+  .status-row { display: grid; grid-template-columns: 14px 1fr auto auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 8px; background: #F8FBFF; }
+  .status-row .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .status-row .nm { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .status-row .count { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #2D6A9F; }
+  .status-row .pct { font-family: var(--font-body); font-size: 11px; color: #5A7A96; min-width: 38px; text-align: right; }
+  .trend-chart { display: grid; grid-template-columns: repeat(12, 1fr); align-items: flex-end; gap: 6px; height: 160px; padding: 8px 0; border-bottom: 1px solid #D0E8F5; }
+  .trend-bar { background: linear-gradient(180deg, #5BC0EB 0%, #2D6A9F 100%); border-radius: 4px 4px 0 0; min-height: 4px; position: relative; transition: opacity 150ms; }
+  .trend-bar:hover { opacity: 0.85; }
+  .trend-bar .tip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #1A2E40; color: #fff; padding: 4px 8px; border-radius: 6px; font-family: var(--font-display); font-size: 11px; font-weight: 600; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 150ms; }
+  .trend-bar:hover .tip { opacity: 1; }
+  .trend-labels { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; padding-top: 8px; }
+  .trend-labels span { text-align: center; font-family: var(--font-mono); font-size: 11px; color: #9BBAD4; }
+  .donut-row { display: flex; align-items: center; gap: 18px; padding: 8px 0; }
+  .donut-svg { position: relative; width: 110px; height: 110px; flex-shrink: 0; }
+  .donut-svg .center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .donut-svg .pct { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; line-height: 1; }
+  .donut-svg .pct-lbl { font-family: var(--font-body); font-size: 10px; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 4px; }
+  .donut-legend { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .donut-legend .leg { display: flex; align-items: center; gap: 8px; font-family: var(--font-body); font-size: 12px; color: #5A7A96; }
+  .donut-legend .leg .d { width: 10px; height: 10px; border-radius: 2px; }
+  .donut-legend .leg strong { font-family: var(--font-display); color: #1A2E40; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Suppliers Analytics</div>
+        <div class="topbar-crumb">Admin / Inventory / Suppliers / Analytics</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div><span class="name">Admin User</span><br><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+    <section class="page" data-screen-label="01 Suppliers Analytics">
+      <button class="back-link" onclick="location.href='inventory-suppliers.html'"><i data-lucide="arrow-left" style="width:14px;height:14px"></i> Back to Suppliers</button>
+
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div class="page-hero">
+          <h1>Suppliers Overview &mdash; Full Analytics</h1>
+          <div class="sub">Portfolio-wide spending, reliability, and order pipeline across all suppliers.</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <select class="btn btn-outline" style="height:38px;">
+            <option>Last 90 days</option>
+            <option>Last 6 months</option>
+            <option selected>Last 12 months (YTD)</option>
+            <option>All time</option>
+          </select>
+          <button class="btn btn-primary" type="button"><i data-lucide="download"></i> Export Report</button>
+        </div>
+      </div>
+
+      <!-- 6 stat cards -->
+      <div class="stat-row" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));">
+        <div class="stat-card"><div class="top"><span class="label">Total Suppliers</span><div class="iplate success"><i data-lucide="building-2"></i></div></div><div class="value">5</div><div class="sub">3 new this quarter</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Active Suppliers</span><div class="iplate info"><i data-lucide="building-2"></i></div></div><div class="value">4</div><div class="sub">1 inactive · 0 on hold</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Total Spend (YTD)</span><div class="iplate"><i data-lucide="banknote"></i></div></div><div class="value">$342,180</div><div class="sub">Across all suppliers</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Open Purchase Orders</span><div class="iplate warning"><i data-lucide="clock"></i></div></div><div class="value">7</div><div class="sub">$24,650 expected · 2 overdue</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Avg On-time Delivery</span><div class="iplate success"><i data-lucide="truck"></i></div></div><div class="value">91%</div><div class="sub">Last 90 days</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Top Supplier (by Spend)</span><div class="iplate info"><i data-lucide="trophy"></i></div></div><div class="value" style="font-size:16px;">Premier Medical Dist.</div><div class="sub">$128,400 · 31 orders</div></div>
+      </div>
+
+      <!-- Top suppliers by spend + Status breakdown -->
+      <div class="analytics-row">
+        <div class="panel">
+          <h3>Top Suppliers by Spend</h3>
+          <div class="sub">YTD purchase volume by vendor</div>
+          <div>
+            <div class="topbar-row"><div><div class="nm">Premier Medical Distributor</div><div class="sub-line">Chicago · 31 orders</div></div><div><div class="val">$128,400</div><div class="qty">37.5% share</div></div><div class="topbar-bar"><div style="width:100%;background:#2D6A9F;"></div></div></div>
+            <div class="topbar-divider"></div>
+            <div class="topbar-row"><div><div class="nm">MediCare Supplies Ltd</div><div class="sub-line">New York · 24 orders</div></div><div><div class="val">$125,430</div><div class="qty">36.7% share</div></div><div class="topbar-bar"><div style="width:97%;background:#5BC0EB;"></div></div></div>
+            <div class="topbar-divider"></div>
+            <div class="topbar-row"><div><div class="nm">Global Health Products</div><div class="sub-line">Los Angeles · 18 orders</div></div><div><div class="val">$58,200</div><div class="qty">17.0% share</div></div><div class="topbar-bar"><div style="width:45%;background:#5BC0EB;"></div></div></div>
+            <div class="topbar-divider"></div>
+            <div class="topbar-row"><div><div class="nm">Express Medical Solutions</div><div class="sub-line">Phoenix · 15 orders</div></div><div><div class="val">$22,150</div><div class="qty">6.5% share</div></div><div class="topbar-bar"><div style="width:17%;background:#8DCDED;"></div></div></div>
+            <div class="topbar-divider"></div>
+            <div class="topbar-row"><div><div class="nm">Elite Pharmaceutical Inc</div><div class="sub-line">Houston · 12 orders · Inactive</div></div><div><div class="val">$8,000</div><div class="qty">2.3% share</div></div><div class="topbar-bar"><div style="width:6%;background:#B8D4EC;"></div></div></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="panel">
+            <h3>Portfolio Delivery Performance</h3>
+            <div class="donut-row">
+              <div class="donut-svg">
+                <svg width="110" height="110" viewBox="0 0 110 110">
+                  <circle cx="55" cy="55" r="42" fill="none" stroke="#F0F6FC" stroke-width="14"/>
+                  <circle cx="55" cy="55" r="42" fill="none" stroke="#15803D" stroke-width="14" stroke-dasharray="240 23" transform="rotate(-90 55 55)" stroke-linecap="round"/>
+                </svg>
+                <div class="center"><div class="pct">91%</div><div class="pct-lbl">On time</div></div>
+              </div>
+              <div class="donut-legend">
+                <div class="leg"><div class="d" style="background:#15803D;"></div>On-time <strong style="margin-left:auto;">89</strong></div>
+                <div class="leg"><div class="d" style="background:#F59E0B;"></div>Delayed <strong style="margin-left:auto;">5</strong></div>
+                <div class="leg"><div class="d" style="background:#F0F6FC;"></div>Pending <strong style="margin-left:auto;">7</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Supplier Status</h3>
+            <div class="status-list">
+              <div class="status-row"><div class="dot" style="background:#15803D;"></div><div class="nm">Active</div><div class="count">4</div><div class="pct">80%</div></div>
+              <div class="status-row"><div class="dot" style="background:#9CA3AF;"></div><div class="nm">Inactive</div><div class="count">1</div><div class="pct">20%</div></div>
+              <div class="status-row"><div class="dot" style="background:#F59E0B;"></div><div class="nm">On Hold</div><div class="count">0</div><div class="pct">0%</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monthly portfolio spend trend -->
+      <div class="panel">
+        <h3>Portfolio Spend Trend — Last 12 Months</h3>
+        <div class="sub">Hover bars to see total monthly spend across all suppliers</div>
+        <div class="trend-chart">
+          <div class="trend-bar" style="height:42%;"><span class="tip">Jun '23 · $22,400</span></div>
+          <div class="trend-bar" style="height:58%;"><span class="tip">Jul '23 · $28,900</span></div>
+          <div class="trend-bar" style="height:48%;"><span class="tip">Aug '23 · $24,500</span></div>
+          <div class="trend-bar" style="height:62%;"><span class="tip">Sep '23 · $31,200</span></div>
+          <div class="trend-bar" style="height:70%;"><span class="tip">Oct '23 · $35,100</span></div>
+          <div class="trend-bar" style="height:54%;"><span class="tip">Nov '23 · $27,800</span></div>
+          <div class="trend-bar" style="height:50%;"><span class="tip">Dec '23 · $25,400</span></div>
+          <div class="trend-bar" style="height:78%;"><span class="tip">Jan '24 · $38,900</span></div>
+          <div class="trend-bar" style="height:82%;"><span class="tip">Feb '24 · $40,500</span></div>
+          <div class="trend-bar" style="height:90%;"><span class="tip">Mar '24 · $44,100</span></div>
+          <div class="trend-bar" style="height:85%;"><span class="tip">Apr '24 · $42,300</span></div>
+          <div class="trend-bar" style="height:100%;"><span class="tip">May '24 · $50,200</span></div>
+        </div>
+        <div class="trend-labels">
+          <span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span>
+          <span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="_sidebar.js"></script>
+</body>
+</html>

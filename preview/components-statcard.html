@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 32px; background: #F0F6FC; display: flex; gap: 16px; flex-wrap: wrap; }
+  .card { background: #fff; border-radius: 16px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08), 0 2px 8px rgba(26,58,92,0.04); width: 240px; }
+  .card-primary { background: #2D6A9F; }
+  .card-warning { border-left: 4px solid #F59E0B; }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .label { font-family: var(--font-body); font-size: 13px; color: #5A7A96; }
+  .label-inverse { color: rgba(255,255,255,0.8); }
+  .icon-plate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #5BC0EB; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; }
+  .icon-plate-inverse { background: rgba(255,255,255,0.2); color: #fff; }
+  .value { font-family: var(--font-display); font-weight: 700; font-size: 32px; color: #1A2E40; line-height: 1.1; margin-bottom: 8px; }
+  .value-inverse { color: #fff; }
+  .delta { font-family: var(--font-body); font-size: 12px; color: #16A34A; }
+  .delta-inverse { color: rgba(255,255,255,0.8); }
+  .delta-warn { color: #92400E; }
+</style>
+</head>
+<body>
+<div class="card card-primary">
+  <div class="top">
+    <span class="label label-inverse">Today's Appointments</span>
+    <div class="icon-plate icon-plate-inverse">📅</div>
+  </div>
+  <div class="value value-inverse">12</div>
+  <div class="delta delta-inverse">↑ +3 vs yesterday</div>
+</div>
+<div class="card">
+  <div class="top">
+    <span class="label">Revenue Today</span>
+    <div class="icon-plate">$</div>
+  </div>
+  <div class="value">₱48,500</div>
+  <div class="delta">↑ +12% this week</div>
+</div>
+<div class="card card-warning">
+  <div class="top">
+    <span class="label">Low Stock Items</span>
+    <div class="icon-plate" style="background:#FEF3C7; color:#D97706">!</div>
+  </div>
+  <div class="value">5</div>
+  <div class="delta delta-warn">⚠ Requires attention</div>
+</div>
+</body>
+</html>

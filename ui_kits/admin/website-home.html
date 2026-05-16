@@ -1,0 +1,1223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Manage Home Page</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+
+  /* ---------- Sidebar (matches the rest of admin) ---------- */
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  /* ---------- Topbar ---------- */
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  /* ---------- Page ---------- */
+  .page { padding: 24px 32px 96px; display: flex; flex-direction: column; gap: 18px; }
+  .page-hero h1 { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .page-hero .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 4px; }
+
+  /* ---------- Tab bar ---------- */
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid #D1E3F3; overflow-x: auto; padding-bottom: 0; }
+  .tabs button { background: none; border: none; padding: 12px 18px; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #5A7A96; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; }
+  .tabs button .lucide { width: 14px; height: 14px; opacity: 0.7; }
+  .tabs button:hover { color: #1A2E40; }
+  .tabs button.active { color: #2D6A9F; border-bottom-color: #2D6A9F; }
+  .tabs button.active .lucide { opacity: 1; }
+
+  /* ---------- Content cards ---------- */
+  .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .card + .card { margin-top: 18px; }
+  .card h2 { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: #1A2E40; margin: 0 0 4px; }
+  .card .desc { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-bottom: 18px; line-height: 1.5; }
+  .card .desc:last-child { margin-bottom: 0; }
+  .pane { display: none; }
+  .pane.active { display: block; }
+
+  /* ---------- Fields ---------- */
+  .field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 800px) { .field-grid-2 { grid-template-columns: 1fr; } }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field + .field { margin-top: 18px; }
+  .field-grid-2 .field + .field { margin-top: 0; }
+  .field-label { font-family: var(--font-display); font-weight: 600; font-size: 12.5px; color: #1A2E40; }
+  .field-help { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; line-height: 1.4; }
+  .field-input, .field-textarea, .field-select { width: 100%; height: 40px; border: 1px solid #D1E3F3; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .field-textarea { height: auto; padding: 10px 12px; resize: vertical; min-height: 80px; line-height: 1.5; }
+  .field-input:focus, .field-textarea:focus, .field-select:focus { border-color: #2D6A9F; }
+
+  /* ---------- Image upload zone ---------- */
+  .upload-zone { border: 1.5px dashed #BFD8EB; border-radius: 10px; background: #F8FBFD; padding: 22px 16px; text-align: center; cursor: pointer; transition: border-color 120ms, background 120ms; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .upload-zone:hover { border-color: #2D6A9F; background: #EBF6FD; }
+  .upload-zone .ic { width: 44px; height: 44px; border-radius: 50%; background: #EBF6FD; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; }
+  .upload-zone .ic .lucide { width: 20px; height: 20px; }
+  .upload-zone .ttl { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .upload-zone .ttl b { color: #2D6A9F; }
+  .upload-zone .helper { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; }
+  .upload-zone.compact { padding: 14px 12px; }
+  .upload-zone.compact .ic { width: 32px; height: 32px; }
+  .upload-zone.compact .ic .lucide { width: 16px; height: 16px; }
+
+  /* ---------- Feature checkbox rows ---------- */
+  .feature-list { display: flex; flex-direction: column; gap: 10px; }
+  .feature-row { display: flex; align-items: center; gap: 10px; }
+  .feature-row .cb { width: 18px; height: 18px; border-radius: 4px; background: #2D6A9F; color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .feature-row .cb .lucide { width: 12px; height: 12px; }
+  .feature-row input { flex: 1; }
+
+  /* ---------- Repeatable cards (treatments, features, steps, testimonials) ---------- */
+  .repeat-list { display: flex; flex-direction: column; gap: 12px; }
+  .repeat-card { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 10px; padding: 14px 16px; display: grid; grid-template-columns: 18px 1fr 32px; gap: 12px; align-items: flex-start; position: relative; }
+  .repeat-card .drag-handle { color: #BFD8EB; cursor: grab; display: inline-flex; align-items: center; justify-content: center; height: 28px; }
+  .repeat-card .drag-handle:hover { color: #2D6A9F; }
+  .repeat-card .drag-handle .lucide { width: 16px; height: 16px; }
+  .repeat-card .body { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .repeat-card .body-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .repeat-card .img-col { width: 120px; flex-shrink: 0; }
+  .repeat-card .delete-btn { width: 28px; height: 28px; border-radius: 7px; background: #fff; border: 1px solid #FCA5A5; color: #DC2626; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+  .repeat-card .delete-btn:hover { background: #FEE2E2; }
+  .repeat-card .delete-btn .lucide { width: 14px; height: 14px; }
+  .repeat-card .index-tag { font-family: var(--font-display); font-size: 10.5px; font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* "+ Add" button */
+  .add-btn { width: 100%; padding: 10px 16px; border: 1.5px dashed #BFD8EB; background: #F8FBFD; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .add-btn:hover { background: #EBF6FD; border-color: #2D6A9F; }
+  .add-btn .lucide { width: 14px; height: 14px; }
+
+  /* ---------- Info / helper boxes ---------- */
+  .info-box { background: #F0F6FC; border: 1px solid #BFD8EB; border-radius: 8px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; line-height: 1.5; }
+  .info-box .lucide { width: 15px; height: 15px; color: #2D6A9F; flex-shrink: 0; margin-top: 2px; }
+  .info-box b { color: #1A2E40; font-family: var(--font-display); font-weight: 600; }
+
+  /* ---------- Toggle switch ---------- */
+  .toggle-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid #E5EFF7; border-radius: 10px; background: #fff; }
+  .toggle-row .body { flex: 1; min-width: 0; }
+  .toggle-row .body .nm { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; color: #1A2E40; }
+  .toggle-row .body .d { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 3px; line-height: 1.45; }
+  .switch { width: 40px; height: 22px; border-radius: 9999px; background: #2D6A9F; cursor: pointer; padding: 2px; position: relative; flex-shrink: 0; border: none; transition: background 150ms; }
+  .switch::after { content: ''; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); position: absolute; top: 2px; right: 2px; transition: right 150ms; }
+  .switch.off { background: #D0E8F5; }
+  .switch.off::after { right: 20px; }
+
+  /* Disabled state for when toggle is off (banner / journal section) */
+  .when-disabled { transition: opacity 150ms; }
+  .when-disabled.disabled { opacity: 0.45; pointer-events: none; }
+
+  /* ---------- Star rating ---------- */
+  .stars { display: inline-flex; gap: 2px; }
+  .stars button { background: none; border: none; cursor: pointer; padding: 4px; color: #FCD34D; }
+  .stars button.off { color: #E5EFF7; }
+  .stars button .lucide { width: 18px; height: 18px; fill: currentColor; }
+
+  /* ---------- Color picker swatch ---------- */
+  .color-field { display: flex; align-items: center; gap: 8px; }
+  .color-field input[type="color"] { width: 44px; height: 40px; border: 1px solid #D1E3F3; border-radius: 8px; padding: 4px; background: #fff; cursor: pointer; }
+  .color-field .hex { font-family: var(--font-mono); font-size: 12.5px; color: #5A7A96; }
+
+  /* ---------- Fixed footer bar ---------- */
+  /* Booking Steps stepper UI */
+  .stepper { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; padding: 24px 0 18px; }
+  .stepper .pill { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px; border-radius: 20px; font-family: var(--font-display); font-size: 12.5px; font-weight: 600; cursor: pointer; background: #fff; color: #5A7A96; border: 1px solid #D1E3F3; white-space: nowrap; transition: background 120ms, color 120ms; }
+  .stepper .pill:hover { color: #1A2E40; }
+  .stepper .pill .ix { width: 22px; height: 22px; border-radius: 50%; background: #F0F6FC; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11.5px; }
+  .stepper .pill .ix .lucide { width: 12px; height: 12px; }
+  .stepper .pill.active { background: #2D6A9F; color: #fff; border-color: #2D6A9F; }
+  .stepper .pill.active .ix { background: rgba(255,255,255,0.20); color: #fff; }
+  .stepper .pill.done { background: #F0F6FC; color: #2D6A9F; border-color: #BFD8EB; }
+  .stepper .pill.done .ix { background: #2D6A9F; color: #fff; }
+  .stepper .connector { flex: 0 0 28px; height: 1px; background: #D1E3F3; min-width: 16px; }
+  .step-edit { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); border: 1px solid #EAF2FB; margin-top: 4px; }
+  .step-edit .top-row { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+  .step-edit .num-badge { background: #2D6A9F; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 16px; padding: 6px 14px; border-radius: 9px; letter-spacing: 0.04em; }
+  .step-edit .icon-line { display: inline-flex; align-items: center; gap: 10px; padding: 6px 12px 6px 6px; border: 1px solid #D1E3F3; border-radius: 8px; background: #F8FBFD; }
+  .step-edit .icon-line .plate { width: 30px; height: 30px; border-radius: 7px; background: #EBF6FD; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; }
+  .step-edit .icon-line .nm { font-family: var(--font-mono); font-size: 12px; color: #5A7A96; }
+  .step-edit .icon-line .change { background: #fff; border: 1px solid #D1E3F3; border-radius: 7px; padding: 5px 10px; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; cursor: pointer; }
+  .step-edit .icon-line .change:hover { background: #F0F6FC; border-color: #2D6A9F; }
+  .step-edit .remove-link { background: none; border: none; color: #DC2626; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; padding: 0; margin-top: 14px; display: inline-flex; align-items: center; gap: 4px; position: relative; }
+  .step-edit .remove-link:hover { text-decoration: underline; }
+  .step-edit .remove-link:disabled { color: #BFD8EB; cursor: not-allowed; text-decoration: none; }
+  .step-edit .remove-link .tip { position: absolute; left: 0; bottom: calc(100% + 6px); background: #1A2E40; color: #fff; padding: 6px 10px; border-radius: 6px; font-family: var(--font-body); font-size: 11.5px; font-weight: 500; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 120ms; }
+  .step-edit .remove-link:disabled:hover .tip { opacity: 1; }
+  .step-nav { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+  .step-nav .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .add-step-link { background: none; border: none; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; cursor: pointer; padding: 4px 0; display: inline-flex; align-items: center; gap: 4px; }
+  .add-step-link:hover { text-decoration: underline; }
+  .add-step-link .lucide { width: 14px; height: 14px; }
+
+  .save-footer { position: fixed; bottom: 0; left: 260px; right: 0; background: #fff; border-top: 1px solid #D1E3F3; padding: 14px 32px; display: flex; justify-content: space-between; align-items: center; gap: 12px; z-index: 50; }
+  @media (max-width: 980px) { .save-footer { left: 0; } }
+  .save-footer .note { font-family: var(--font-body); font-size: 12px; color: #9BBAD4; }
+  .save-footer .actions { display: flex; gap: 10px; margin-left: auto; }
+  .btn { height: 38px; padding: 0 18px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; text-decoration: none; white-space: nowrap; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-ghost { background: none; color: #5A7A96; }
+  .btn-ghost:hover { background: #F0F6FC; color: #1A2E40; }
+  .btn-primary { background: #2D6A9F; color: #fff; }
+  .btn-primary:hover { background: #1A5685; }
+
+  /* Section title block inside a tab */
+  .pane-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 18px; }
+  .pane-head h2 { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .pane-head .desc { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-top: 4px; line-height: 1.5; }
+  .pane-section + .pane-section { margin-top: 22px; padding-top: 22px; border-top: 1px solid #E5EFF7; }
+  .pane-section .sec-ttl { font-family: var(--font-display); font-size: 12px; font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+
+  /* Review cards (Testimonials tab) */
+  .review-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 900px) { .review-grid { grid-template-columns: 1fr; } }
+  .review-card { background: #fff; border-radius: 12px; padding: 18px 18px 16px; border: 1px solid #EAF2FB; box-shadow: 0 1px 4px rgba(26,58,92,0.06); display: flex; flex-direction: column; gap: 10px; position: relative; min-height: 220px; }
+  .review-card .quote-ic { width: 28px; height: 28px; color: #BFD8EB; }
+  .review-card .quote-ic .lucide { width: 28px; height: 28px; }
+  .review-card .quote-txt { font-family: var(--font-body); font-size: 13.5px; color: #5A7A96; font-style: italic; line-height: 1.55; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .review-card .stars-row { display: inline-flex; gap: 2px; color: #F59E0B; }
+  .review-card .stars-row .lucide { width: 14px; height: 14px; fill: currentColor; }
+  .review-card .stars-row .off { color: #E5EFF7; }
+  .review-card .divider { height: 1px; background: #EAF2FB; margin: 2px 0 2px; }
+  .review-card .meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .review-card .client-name { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; }
+  .review-card .service-pill { display: inline-block; padding: 3px 10px; border-radius: 9999px; background: #F0F6FC; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .review-card .unpub-btn { position: absolute; top: 12px; right: 12px; width: 26px; height: 26px; border-radius: 50%; background: rgba(241,245,249,0.85); color: #5A7A96; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: background 120ms, color 120ms; }
+  .review-card .unpub-btn:hover { background: #FEE2E2; color: #DC2626; }
+  .review-card .unpub-btn .lucide { width: 13px; height: 13px; }
+
+  /* Empty state for review grid */
+  .review-empty { grid-column: 1 / -1; background: #F8FBFD; border: 1.5px dashed #BFD8EB; border-radius: 12px; padding: 40px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .review-empty .ic { width: 56px; height: 56px; border-radius: 50%; background: #EBF6FD; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; }
+  .review-empty .ic .lucide { width: 24px; height: 24px; }
+  .review-empty .ttl { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1A2E40; }
+  .review-empty .desc-txt { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; max-width: 380px; line-height: 1.5; }
+  .review-empty .go-btn { margin-top: 6px; height: 38px; padding: 0 18px; background: #2D6A9F; color: #fff; border: none; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .review-empty .go-btn:hover { background: #1A5685; }
+  .review-empty .go-btn .lucide { width: 14px; height: 14px; }
+
+  /* Standalone outline button for the +Add from Reviews CTA */
+  button.btn-outline { height: 38px; padding: 0 16px; background: #fff; color: #2D6A9F; border: 1.5px solid #D1E3F3; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+  button.btn-outline:hover { background: #F0F6FC; border-color: #2D6A9F; }
+  button.btn-outline .lucide { width: 14px; height: 14px; }
+
+  /* Add Reviews modal (reuses sp-modal chrome) */
+  .ar-row { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; cursor: pointer; border: 1px solid #EAF2FB; background: #fff; }
+  .ar-row + .ar-row { margin-top: 8px; }
+  .ar-row:hover { background: #F8FBFD; }
+  .ar-row.selected { background: #EBF6FD; border-color: #BFD8EB; }
+  .ar-row .info { flex: 1; min-width: 0; }
+  .ar-row .top-line { display: inline-flex; align-items: center; gap: 8px; }
+  .ar-row .nm { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; }
+  .ar-row .stars { display: inline-flex; gap: 1px; color: #F59E0B; }
+  .ar-row .stars .lucide { width: 12px; height: 12px; fill: currentColor; }
+  .ar-row .stars .off { color: #E5EFF7; }
+  .ar-row .excerpt { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 320px; }
+  .ar-row .right { display: inline-flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .ar-row .checkmark { width: 18px; height: 18px; border: 1.5px solid #D1E3F3; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; background: #fff; color: #fff; flex-shrink: 0; }
+  .ar-row.selected .checkmark { background: #2D6A9F; border-color: #2D6A9F; }
+  .ar-row .checkmark .lucide { width: 12px; height: 12px; opacity: 0; }
+  .ar-row.selected .checkmark .lucide { opacity: 1; }
+  .ar-empty { padding: 30px 12px; text-align: center; font-family: var(--font-body); font-size: 12.5px; color: #9BBAD4; }
+  /* Promotions Banner preview */
+  .banner-preview { position: relative; background: #1A3A5C; color: #fff; border-radius: 12px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 14px rgba(15,30,48,0.18); flex-wrap: wrap; }
+  .banner-preview .ro-badge { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.12); color: #BFD8EB; padding: 3px 9px; border-radius: 9999px; font-family: var(--font-display); font-weight: 700; font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .banner-preview .emoji { font-size: 22px; line-height: 1; flex-shrink: 0; }
+  .banner-preview .bp-body { flex: 1; min-width: 200px; }
+  .banner-preview .bp-title { font-family: var(--font-display); font-weight: 700; font-size: 14.5px; color: #fff; line-height: 1.35; }
+  .banner-preview .bp-meta { font-family: var(--font-body); font-size: 12px; color: rgba(255,255,255,0.72); margin-top: 4px; }
+  .banner-preview .bp-cta { background: #fff; color: #1A3A5C; border: none; border-radius: 9999px; padding: 6px 14px; font-family: var(--font-display); font-weight: 700; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .banner-preview .bp-cta .lucide { width: 12px; height: 12px; }
+  .banner-preview .bp-cta:hover { background: #EBF6FD; }
+  .banner-empty { background: #F0F6FC; border: 1.5px dashed #D1E3F3; border-radius: 12px; padding: 40px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .banner-empty .ic { width: 52px; height: 52px; border-radius: 50%; background: #fff; color: #9BBAD4; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(45,106,159,0.08); }
+  .banner-empty .ic .lucide { width: 22px; height: 22px; }
+  .banner-empty .ttl { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1A2E40; }
+  .banner-empty .desc-txt { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; max-width: 420px; line-height: 1.5; }
+  .banner-empty .create-btn { margin-top: 8px; height: 38px; padding: 0 18px; background: #2D6A9F; color: #fff; border: none; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .banner-empty .create-btn:hover { background: #1A5685; }
+  .banner-empty .create-btn .lucide { width: 14px; height: 14px; }
+  .slot-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 980px) { .slot-row { grid-template-columns: 1fr; } }
+  .slot { position: relative; border-radius: 12px; min-height: 360px; display: flex; flex-direction: column; }
+  .slot.empty { border: 2px dashed #D1E3F3; background: #F0F6FC; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: border-color 120ms, background 120ms; padding: 24px; }
+  .slot.empty:hover { border-color: #2D6A9F; background: #EBF6FD; }
+  .slot.empty .plus { width: 48px; height: 48px; border-radius: 50%; background: #fff; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(45,106,159,0.18); margin-bottom: 10px; }
+  .slot.empty .plus .lucide { width: 22px; height: 22px; }
+  .slot.empty .lbl { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #2D6A9F; }
+  .slot.empty .sub { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; margin-top: 4px; text-align: center; }
+  .slot.filled { background: #fff; box-shadow: 0 1px 4px rgba(26,58,92,0.08), 0 4px 12px rgba(26,58,92,0.04); overflow: hidden; border: 1px solid #E5EFF7; cursor: grab; transition: transform 120ms, box-shadow 120ms, border-color 120ms; }
+  .slot.filled:active { cursor: grabbing; }
+  .slot.filled.dragging { opacity: 0.45; transform: scale(0.98); }
+  .slot.filled.drop-target { border-color: #2D6A9F; box-shadow: 0 0 0 3px rgba(45,106,159,0.18), 0 1px 4px rgba(26,58,92,0.08); }
+  .slot .drag-handle { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); width: 24px; height: 28px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.10); color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; cursor: grab; z-index: 2; opacity: 0; transition: opacity 120ms; }
+  .slot.filled:hover .drag-handle { opacity: 1; }
+  .slot .drag-handle .lucide { width: 14px; height: 14px; }
+  .slot .remove-btn { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; border-radius: 50%; background: rgba(15,30,48,0.65); color: #fff; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; z-index: 2; }
+  .slot .remove-btn:hover { background: #DC2626; }
+  .slot .remove-btn .lucide { width: 14px; height: 14px; }
+  .slot .photo { height: 180px; background: linear-gradient(135deg, #BFD8EB 0%, #5BC0EB 100%); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .slot .photo .pl-note { font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.85); padding: 6px 10px; background: rgba(15,30,48,0.30); border-radius: 6px; }
+  .slot .pill-badge { position: absolute; top: 12px; left: 12px; padding: 4px 11px; border-radius: 9999px; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase; background: #fff; color: #2D6A9F; box-shadow: 0 1px 3px rgba(15,30,48,0.20); }
+  .slot .pill-badge.facial   { background: #EBF6FD; color: #2D6A9F; }
+  .slot .pill-badge.laser    { background: #EDE9FE; color: #7C3AED; }
+  .slot .pill-badge.trending { background: #FEF3C7; color: #B45309; }
+  .slot .pill-badge.wellness { background: #DCFCE7; color: #15803D; }
+  .slot .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .slot .name { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #1A2E40; line-height: 1.3; }
+  .slot .desc-txt { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; line-height: 1.5; flex: 1; }
+  .slot .book-btn { margin-top: 8px; height: 36px; padding: 0 14px; background: #2D6A9F; color: #fff; border: none; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; align-self: flex-start; }
+  .slot .book-btn:hover { background: #1A5685; }
+
+  /* Add featured button disabled state */
+  .add-btn:disabled, .add-btn.disabled { color: #9BBAD4; cursor: not-allowed; background: #F8FBFD; border-color: #E5EFF7; }
+  .add-btn:disabled:hover, .add-btn.disabled:hover { background: #F8FBFD; border-color: #E5EFF7; }
+
+  /* Service picker modal */
+  .sp-modal { position: fixed; inset: 0; background: rgba(15,30,48,0.55); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 200; }
+  .sp-modal[hidden] { display: none !important; }
+  .sp-card { background: #fff; border-radius: 12px; width: 100%; max-width: 520px; max-height: calc(100vh - 48px); display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(15,30,48,0.35); overflow: hidden; }
+  .sp-head { padding: 18px 22px 14px; border-bottom: 1px solid #E5EFF7; }
+  .sp-head h2 { margin: 0; font-family: var(--font-display); font-size: 17px; font-weight: 700; color: #1A2E40; }
+  .sp-head .sub { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 3px; }
+  .sp-head .close { float: right; width: 30px; height: 30px; border: none; background: none; border-radius: 7px; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-top: -2px; }
+  .sp-head .close:hover { background: #F0F6FC; color: #1A2E40; }
+  .sp-search { padding: 12px 22px; border-bottom: 1px solid #E5EFF7; position: relative; }
+  .sp-search .lucide { position: absolute; left: 34px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .sp-search input { width: 100%; height: 38px; padding: 0 12px 0 34px; border: 1px solid #D1E3F3; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #F8FBFD; }
+  .sp-search input:focus { background: #fff; border-color: #2D6A9F; }
+  .sp-list { flex: 1; overflow-y: auto; padding: 8px 12px 12px; }
+  .sp-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; }
+  .sp-row:hover { background: #F8FBFD; }
+  .sp-row.selected { background: #EBF6FD; }
+  .sp-row.disabled { opacity: 0.45; cursor: not-allowed; }
+  .sp-row .thumb { width: 44px; height: 44px; border-radius: 8px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 13px; }
+  .sp-row .info { flex: 1; min-width: 0; }
+  .sp-row .nm { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; color: #1A2E40; }
+  .sp-row .cat { font-family: var(--font-body); font-size: 11.5px; color: #5A7A96; margin-top: 2px; }
+  .sp-row .picked { width: 20px; height: 20px; border: 1.5px solid #D1E3F3; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; background: #fff; color: #fff; }
+  .sp-row.selected .picked { background: #2D6A9F; border-color: #2D6A9F; }
+  .sp-row .picked .lucide { width: 11px; height: 11px; opacity: 0; }
+  .sp-row.selected .picked .lucide { opacity: 1; }
+  .sp-row .in-use { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-display); font-weight: 600; font-size: 10.5px; color: #15803D; text-transform: uppercase; letter-spacing: 0.04em; }
+  .sp-foot { padding: 14px 22px; border-top: 1px solid #E5EFF7; background: #F8FBFD; display: flex; justify-content: flex-end; gap: 10px; }
+
+  /* View Live Page button (Manage Website pages) */
+  .view-live-btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px; border: 1px solid #2D6A9F; border-radius: 8px; background: #fff; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; text-decoration: none; transition: background 120ms; }
+  .view-live-btn:hover { background: #F0F6FC; }
+  .view-live-btn .lucide { width: 13px; height: 13px; }
+
+  /* Compact info banner replacing the duplicate page hero */
+  .page-info-banner { background: #F0F6FC; border: 1px solid #D1E3F3; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 12.5px; color: #5A7A96; }
+  .page-info-banner .lucide { width: 15px; height: 15px; color: #5A7A96; flex-shrink: 0; }
+  .page-info-banner b { color: #1A2E40; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Manage Home Page</div>
+        <div class="topbar-crumb">Admin / Manage Website / Home Page</div>
+      </div>
+      <div class="topbar-actions">
+        <a class="view-live-btn" href="https://cloudskin.com" target="_blank" rel="noopener">View Live Page <i data-lucide="external-link"></i></a>
+        
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Manage Home Page">
+            <div class="page-info-banner"><i data-lucide="info"></i><span>Changes go live after you click <b>Save Changes</b>.</span></div>
+
+      <!-- Tab bar -->
+      <div class="tabs" id="tabs">
+        <button class="active" data-tab="hero"><i data-lucide="layout"></i> Hero Section</button>
+        <button data-tab="treatments"><i data-lucide="sparkles"></i> Signature Treatments</button>
+        <button data-tab="why"><i data-lucide="check-circle"></i> Why Cloud Skin</button>
+        <button data-tab="steps"><i data-lucide="list-ordered"></i> Booking Steps</button>
+        <button data-tab="testimonials"><i data-lucide="message-square-quote"></i> Testimonials</button>
+        <button data-tab="banner"><i data-lucide="megaphone"></i> Promotions Banner</button>
+        <button data-tab="journal"><i data-lucide="book-open"></i> Cloud Journal</button>
+        <button data-tab="cta"><i data-lucide="zap"></i> CTA Section</button>
+      </div>
+
+      <!-- ============ Tab 1: Hero Section ============ -->
+      <div class="pane active" data-pane="hero">
+        <div class="card">
+          <div class="pane-head"><div><h2>Hero Section</h2><div class="desc">The top-of-page banner. First thing visitors see on the homepage.</div></div></div>
+
+          <div class="pane-section">
+            <div class="sec-ttl">Headline &amp; copy</div>
+            <div class="field">
+              <label class="field-label">Hero Title</label>
+              <input class="field-input" value="Reveal Your Most Radiant Skin">
+            </div>
+            <div class="field">
+              <label class="field-label">Hero Description</label>
+              <textarea class="field-textarea" rows="3">Advanced aesthetic treatments personalized for your skin. Board-certified practitioners, clinical-grade results, and a calm, restorative experience from start to finish.</textarea>
+            </div>
+          </div>
+
+          <div class="pane-section">
+            <div class="sec-ttl">Hero image</div>
+            <div class="upload-zone">
+              <div class="ic"><i data-lucide="image-up"></i></div>
+              <div class="ttl"><b>Click to upload</b> or drag &amp; drop</div>
+              <div class="helper">PNG, JPG up to 5MB · Recommended 1920 × 1080</div>
+            </div>
+          </div>
+
+          <div class="pane-section">
+            <div class="sec-ttl">Feature items (3 items)</div>
+            <div class="feature-list">
+              <div class="feature-row"><span class="cb"><i data-lucide="check"></i></span><input class="field-input" value="Board-Certified Practitioners"></div>
+              <div class="feature-row"><span class="cb"><i data-lucide="check"></i></span><input class="field-input" value="Clinical-Grade Treatments"></div>
+              <div class="feature-row"><span class="cb"><i data-lucide="check"></i></span><input class="field-input" value="Holistic Wellness Solutions"></div>
+            </div>
+          </div>
+
+          <div class="pane-section">
+            <div class="sec-ttl">Call-to-action buttons</div>
+            <div class="field-grid-2">
+              <div class="field"><label class="field-label">Primary CTA Button Label</label><input class="field-input" value="Book an Appointment"></div>
+              <div class="field"><label class="field-label">Secondary CTA Button Label</label><input class="field-input" value="Explore Our Services"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Tab 2: Signature Treatments ============ -->
+      <div class="pane" data-pane="treatments">
+        <div class="card">
+          <div class="pane-head"><div><h2>Signature Treatments</h2><div class="desc">Cards shown on the homepage to highlight your standout services.</div></div></div>
+
+          <div class="field"><label class="field-label">Section Title</label><input class="field-input" value="Our Signature Treatments"></div>
+          <div class="field"><label class="field-label">Section Subtitle</label><input class="field-input" value="From advanced signature treatments to luxurious skin therapies, every service is tailored to you."></div>
+
+          <div class="pane-section">
+            <div class="sec-ttl" style="margin-bottom:4px;">Featured Services <span style="font-family:var(--font-body);font-weight:500;color:#9BBAD4;text-transform:none;letter-spacing:0;">(max. 3)</span></div>
+            <div style="font-family:var(--font-body);font-size:12px;color:#9BBAD4;margin-bottom:14px;line-height:1.4;">Select up to 3 services from your Services list to feature on the homepage. Drag any filled card to reorder.</div>
+            <div class="slot-row" id="featured-slots"></div>
+            <button class="add-btn" type="button" id="add-featured-btn" style="margin-top:14px;"><i data-lucide="plus"></i> Add Featured Service</button>
+          </div>
+
+          <div class="pane-section">
+            <div class="field" style="max-width:320px;">
+              <label class="field-label">"View All" Link Label</label>
+              <input class="field-input" value="View All Services">
+              <div style="font-family:var(--font-body);font-size:11.5px;color:#9BBAD4;margin-top:5px;line-height:1.4;">Shown as the link/button below the featured services on the homepage. Clicking it takes visitors to your full Services page.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Tab 3: Why Cloud Skin ============ -->
+      <div class="pane" data-pane="why">
+        <div class="card">
+          <div class="pane-head"><div><h2>Why Cloud Skin</h2><div class="desc">Feature list explaining what sets your clinic apart.</div></div></div>
+
+          <div class="field"><label class="field-label">Section Title</label><input class="field-input" value="Why Cloud Skin Clinic"></div>
+          <div class="field"><label class="field-label">Section Description</label><textarea class="field-textarea" rows="3">We combine the precision of clinical aesthetics with the calm of a wellness sanctuary. Every visit is personalized — every result, science-backed.</textarea></div>
+
+          <div class="pane-section">
+            <div class="sec-ttl">Feature rows (drag to reorder)</div>
+            <div class="repeat-list" id="why-list"></div>
+            <button class="add-btn" type="button" data-add="why" style="margin-top:12px;"><i data-lucide="plus"></i> Add Feature</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Tab 4: Booking Steps ============ -->
+      <div class="pane" data-pane="steps">
+        <div class="card">
+          <div class="pane-head"><div><h2>Booking Steps</h2><div class="desc">Three-step explainer that demystifies how to book on your site.</div></div></div>
+
+          <div class="field"><label class="field-label">Section Title</label><input class="field-input" value="Book Your Treatment in 3 Simple Steps"></div>
+          <div class="field"><label class="field-label">Section Subtitle</label><input class="field-input" value="A quick guided walkthrough of the booking experience."></div>
+
+          <div class="pane-section">
+            <div class="stepper" id="bs-stepper"></div>
+
+            <div class="step-edit" id="bs-step-edit"></div>
+
+            <div class="step-nav">
+              <button class="btn btn-outline" type="button" id="bs-step-prev" style="background:none;color:#5A7A96;border-color:transparent;"><i data-lucide="arrow-left"></i> Previous</button>
+              <button class="btn btn-primary" type="button" id="bs-step-next">Next <i data-lucide="arrow-right"></i></button>
+            </div>
+          </div>
+
+          <div class="pane-section">
+            <div class="field" style="max-width:320px;"><label class="field-label">CTA Button Label</label><input class="field-input" value="Book Your First Visit"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Tab 5: Testimonials ============ -->
+      <div class="pane" data-pane="testimonials">
+        <div class="card">
+          <div class="pane-head"><div><h2>Testimonials</h2><div class="desc">Client quotes and reviews displayed on the homepage.</div></div></div>
+
+          <div class="toggle-row" style="margin-bottom:18px;">
+            <div class="body">
+              <div class="nm">Show testimonials section on homepage</div>
+              <div class="d">When off, the entire Testimonials section is hidden from the public site. Published reviews stay safe — you can turn the section back on anytime.</div>
+            </div>
+            <button class="switch" id="testimonials-switch" type="button" aria-label="Toggle testimonials section"></button>
+          </div>
+
+          <div class="when-disabled" id="testimonials-fields">
+            <div class="field"><label class="field-label">Section Title</label><input class="field-input" value="Loved by Our Clients"></div>
+            <div class="field"><label class="field-label">Section Subtitle</label><input class="field-input" value="Real reviews from people who trust Cloud Skin with their glow."></div>
+
+            <div class="pane-section">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+                <div>
+                  <div class="sec-ttl" style="margin-bottom:4px;">Published on Website</div>
+                  <div style="font-family:var(--font-body);font-size:12px;color:#9BBAD4;line-height:1.45;max-width:540px;">Only reviews marked as Published will appear on your homepage. Manage and approve reviews from the Reviews page.</div>
+                </div>
+                <a href="reviews.html" style="font-family:var(--font-display);font-weight:600;font-size:12.5px;color:#2D6A9F;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">Go to Reviews <i data-lucide="arrow-right" style="width:13px;height:13px;"></i></a>
+              </div>
+
+              <div class="review-grid" id="review-grid"></div>
+              <button class="btn-outline" type="button" id="add-reviews-btn" style="margin-top:14px;"><i data-lucide="plus"></i> Add from Reviews</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Tab 6: Promotions Banner ============ -->
+      <div class="pane" data-pane="banner">
+        <div class="card">
+          <div class="pane-head"><div><h2>Promotions Banner</h2><div class="desc">A slim banner that floats above the hero when a promotion is active.</div></div></div>
+
+          <div class="toggle-row" id="banner-toggle-row">
+            <div class="body">
+              <div class="nm">Show Promotions Banner</div>
+              <div class="d">When off, the banner is hidden from your homepage even if a promotion is active.</div>
+            </div>
+            <button class="switch" id="banner-switch" type="button" aria-label="Toggle banner"></button>
+          </div>
+
+          <div class="when-disabled" id="banner-fields" style="margin-top:18px;">
+            <div class="info-box" style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;">
+              <div style="display:flex;gap:10px;align-items:flex-start;flex:1;">
+                <i data-lucide="info" style="width:15px;height:15px;color:#2D6A9F;flex-shrink:0;margin-top:2px;"></i>
+                <div>The homepage banner is automatically driven by your active promotions. When a promotion is active and within its valid date range, it appears here automatically. When it expires or is deactivated, the banner is removed from your homepage.</div>
+              </div>
+              <a href="website-promotions.html" style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#2D6A9F;text-decoration:none;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;flex-shrink:0;">Go to Promotions <i data-lucide="arrow-right" style="width:12px;height:12px;"></i></a>
+            </div>
+
+            <div class="pane-section">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+                <div class="sec-ttl" style="margin-bottom:0;">Currently Showing on Homepage</div>
+                <button type="button" id="banner-demo-toggle" style="background:none;border:1px solid #D1E3F3;border-radius:7px;padding:5px 10px;font-family:var(--font-display);font-weight:600;font-size:11px;color:#5A7A96;cursor:pointer;">Preview: <b id="banner-demo-label" style="color:#2D6A9F;">Active</b> ⇆</button>
+              </div>
+
+              <!-- Active promotion preview -->
+              <div id="banner-preview-active">
+                <div class="banner-preview">
+                  <div class="ro-badge">Read-only</div>
+                  <div class="emoji">✨</div>
+                  <div class="bp-body">
+                    <div class="bp-title">May Glow Special — 20% off all facial treatments</div>
+                    <div class="bp-meta">Valid until May 31, 2026 · Limited slots available.</div>
+                  </div>
+                  <button class="bp-cta" type="button">View Offer <i data-lucide="arrow-right"></i></button>
+                </div>
+                <div style="font-family:var(--font-body);font-size:11.5px;color:#9BBAD4;margin-top:10px;line-height:1.5;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                  <span>To edit this promotion, go to the Promotions page.</span>
+                  <a href="website-promotions.html?promo=may-glow" style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#2D6A9F;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">Edit Promotion <i data-lucide="arrow-right" style="width:12px;height:12px;"></i></a>
+                </div>
+              </div>
+
+              <!-- No active promotion empty state -->
+              <div id="banner-preview-empty" hidden>
+                <div class="banner-empty">
+                  <div class="ic"><i data-lucide="megaphone"></i></div>
+                  <div class="ttl">No active promotion</div>
+                  <div class="desc-txt">The banner is currently hidden from your homepage. Once you create or activate a promotion within its date range, it will appear here automatically.</div>
+                  <a class="create-btn" href="website-promotions.html?new=1"><i data-lucide="plus"></i> Create a Promotion</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Tab 7: Cloud Journal ============ -->
+      <div class="pane" data-pane="journal">
+        <div class="card">
+          <div class="pane-head"><div><h2>Cloud Journal Section</h2><div class="desc">Auto-populated by your latest blog posts. Edit only the headline + button copy here.</div></div></div>
+
+          <div class="toggle-row" style="margin-bottom:18px;">
+            <div class="body">
+              <div class="nm">Show this section on homepage</div>
+              <div class="d">When off, the Cloud Journal section is hidden from the public site even if there are published articles.</div>
+            </div>
+            <button class="switch" type="button" id="journal-switch" aria-label="Toggle journal section"></button>
+          </div>
+
+          <div class="when-disabled" id="journal-fields">
+            <div class="field"><label class="field-label">Section Title</label><input class="field-input" value="From the Cloud Journal"></div>
+            <div class="field"><label class="field-label">Section Subtitle</label><input class="field-input" value="Skincare tips, treatment deep-dives, and clinic stories."></div>
+
+            <div class="info-box" style="margin-top:18px;">
+              <i data-lucide="info"></i>
+              <div>Blog posts shown here are pulled automatically from your <b>3 most recent published articles</b>. To add or edit posts, go to <b>Blog</b> in the sidebar.</div>
+            </div>
+
+            <div class="field" style="margin-top:18px;max-width:320px;"><label class="field-label">"Read All Articles" Button Label</label><input class="field-input" value="Read All Articles"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Tab 8: CTA Section ============ -->
+      <div class="pane" data-pane="cta">
+        <div class="card">
+          <div class="pane-head"><div><h2>CTA Section</h2><div class="desc">The closing call-to-action block at the bottom of the homepage.</div></div></div>
+
+          <div class="toggle-row" style="margin-bottom:18px;">
+            <div class="body">
+              <div class="nm">Show CTA Section</div>
+              <div class="d">When off, this section will be hidden from your homepage.</div>
+            </div>
+            <button class="switch" type="button" id="cta-switch" aria-label="Toggle CTA section"></button>
+          </div>
+
+          <div class="when-disabled" id="cta-fields">
+            <div class="field"><label class="field-label">Section Title</label><input class="field-input" value="Ready to Start Your Skin Journey?"></div>
+            <div class="field"><label class="field-label">Section Description</label><textarea class="field-textarea" rows="2">Book your first consultation and let our practitioners craft a treatment plan made for your skin.</textarea></div>
+
+            <div class="field-grid-2" style="margin-top:6px;">
+              <div class="field"><label class="field-label">Primary Button Label</label><input class="field-input" value="Book an Appointment"></div>
+              <div class="field"><label class="field-label">Secondary Button Label</label><input class="field-input" value="Call Us Now"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Fixed save footer -->
+    <div class="save-footer">
+      <span class="note">Unsaved changes apply only after clicking <b style="color:#1A2E40;font-family:var(--font-display);font-weight:600;">Save Changes</b>.</span>
+      <div class="actions">
+        <button class="btn btn-ghost" type="button">Cancel</button>
+        <button class="btn btn-primary" type="button"><i data-lucide="save"></i> Save Changes</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Service picker modal -->
+<div id="sp-modal" class="sp-modal" hidden role="dialog" aria-modal="true" aria-labelledby="sp-title">
+  <div class="sp-card">
+    <div class="sp-head">
+      <button class="close" type="button" id="sp-close-btn" aria-label="Close"><i data-lucide="x"></i></button>
+      <h2 id="sp-title">Select a Service</h2>
+      <div class="sub">Pick a service from your Services list to feature on the homepage.</div>
+    </div>
+    <div class="sp-search">
+      <i data-lucide="search"></i>
+      <input id="sp-search-input" placeholder="Search services by name or category…">
+    </div>
+    <div class="sp-list" id="sp-list"></div>
+    <div class="sp-foot">
+      <button class="btn btn-ghost" type="button" id="sp-cancel-btn">Cancel</button>
+      <button class="btn btn-primary" type="button" id="sp-confirm-btn"><i data-lucide="check"></i> Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Reviews modal -->
+<div id="ar-modal" class="sp-modal" hidden role="dialog" aria-modal="true" aria-labelledby="ar-title">
+  <div class="sp-card">
+    <div class="sp-head">
+      <button class="close" type="button" id="ar-close-btn" aria-label="Close"><i data-lucide="x"></i></button>
+      <h2 id="ar-title">Add Reviews to Homepage</h2>
+      <div class="sub">Pick approved reviews to publish on the homepage testimonials section.</div>
+    </div>
+    <div class="sp-search">
+      <i data-lucide="search"></i>
+      <input id="ar-search-input" placeholder="Search by client name or service…">
+    </div>
+    <div class="sp-list" id="ar-list"></div>
+    <div class="sp-foot">
+      <button class="btn btn-ghost" type="button" id="ar-cancel-btn">Cancel</button>
+      <button class="btn btn-primary" type="button" id="ar-confirm-btn"><i data-lucide="check"></i> Publish Selected</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+
+<script>
+(function () {
+  // ---------- Tab switching ----------
+  var tabs = document.querySelectorAll('#tabs button');
+  var panes = document.querySelectorAll('.pane');
+  function activate(name) {
+    tabs.forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tab') === name); });
+    panes.forEach(function (p) { p.classList.toggle('active', p.getAttribute('data-pane') === name); });
+    var url = new URL(location.href);
+    if (name === 'hero') url.searchParams.delete('tab');
+    else url.searchParams.set('tab', name);
+    history.replaceState({}, '', url);
+  }
+  tabs.forEach(function (b) { b.addEventListener('click', function () { activate(b.getAttribute('data-tab')); }); });
+
+  // Deep-link via ?tab=…
+  var initial = (new URLSearchParams(location.search)).get('tab') || 'hero';
+  activate(initial);
+
+  // ---------- Repeatable lists ----------
+  function makeCard(opts) {
+    var body = opts.bodyHtml;
+    var card = document.createElement('div');
+    card.className = 'repeat-card';
+    card.innerHTML =
+      '<div class="drag-handle" title="Drag to reorder"><i data-lucide="grip-vertical"></i></div>'
+      + '<div class="body">' + body + '</div>'
+      + '<button class="delete-btn" type="button" title="Remove"><i data-lucide="x"></i></button>';
+    card.querySelector('.delete-btn').addEventListener('click', function () { card.remove(); });
+    return card;
+  }
+  function uploadZone(label, helper) {
+    return '<div class="upload-zone compact">'
+      + '<div class="ic"><i data-lucide="image-up"></i></div>'
+      + '<div class="ttl"><b>Click to upload</b> ' + (label || 'image') + '</div>'
+      + '<div class="helper">' + (helper || 'PNG, JPG up to 5MB') + '</div>'
+      + '</div>';
+  }
+
+  // Treatments → Featured Services selector
+  var SERVICES = [
+    { id:'srv-001', name:'HydraFacial Glow',        category:'Facial',     tag:'Facial',     tagCls:'facial',
+      desc:'A deep-cleansing 60-min facial that hydrates and resurfaces — leaves skin instantly glowing.',
+      color:'#2D6A9F', initials:'HF' },
+    { id:'srv-002', name:'Laser Hair Removal',      category:'Laser',      tag:'Laser',      tagCls:'laser',
+      desc:'Long-lasting smooth skin in fewer sessions, calibrated for Filipino skin tones.',
+      color:'#7C3AED', initials:'LH' },
+    { id:'srv-003', name:'Glutathione IV Drip',     category:'Wellness',   tag:'Trending',   tagCls:'trending',
+      desc:'Brighten from the inside out with our wellness IV — under 45 minutes, no downtime.',
+      color:'#B45309', initials:'GD' },
+    { id:'srv-004', name:'Chemical Peel',           category:'Treatment',  tag:'Treatment',  tagCls:'facial',
+      desc:'Resurface and renew with a clinical-grade peel customized to your skin profile.',
+      color:'#0EA5E9', initials:'CP' },
+    { id:'srv-005', name:'Botox Touch-up',          category:'Injectable', tag:'Injectable', tagCls:'laser',
+      desc:'Subtle, expression-preserving wrinkle smoothing performed by a board-certified injector.',
+      color:'#15803D', initials:'BX' },
+    { id:'srv-006', name:'Dermal Fillers',          category:'Injectable', tag:'Injectable', tagCls:'laser',
+      desc:'Restore lost volume and contour with hyaluronic acid fillers tailored to your face.',
+      color:'#DC2626', initials:'DF' },
+    { id:'srv-007', name:'Microneedling + PRP',     category:'Treatment',  tag:'Trending',   tagCls:'trending',
+      desc:'Stimulate collagen and amplify results with platelet-rich plasma drawn from you.',
+      color:'#7C3AED', initials:'MN' },
+    { id:'srv-008', name:'Vitamin C IV Wellness',   category:'Wellness',   tag:'Wellness',   tagCls:'wellness',
+      desc:'Immunity + brightening combo drip, ideal as a monthly maintenance session.',
+      color:'#15803D', initials:'VC' }
+  ];
+  // Featured = ordered array of up to 3 service ids selected for the homepage.
+  var featured = ['srv-001', 'srv-002', 'srv-003'];
+  var pickerTempPick = null;
+
+  function svcById(id) { return SERVICES.find(function (s) { return s.id === id; }); }
+
+  function renderFeaturedSlots() {
+    var host = document.getElementById('featured-slots');
+    if (!host) return;
+    host.innerHTML = '';
+    for (var i = 0; i < 3; i++) {
+      var svc = svcById(featured[i]);
+      var slot;
+      if (svc) {
+        slot = document.createElement('div');
+        slot.className = 'slot filled';
+        slot.setAttribute('data-id', svc.id);
+        slot.setAttribute('draggable', 'true');
+        slot.innerHTML = ''
+          + '<div class="drag-handle" title="Drag to reorder"><i data-lucide="grip-vertical"></i></div>'
+          + '<button class="remove-btn" type="button" title="Remove from featured" aria-label="Remove"><i data-lucide="x"></i></button>'
+          + '<div class="photo" style="background: linear-gradient(135deg, ' + svc.color + ' 0%, #5BC0EB 100%);">'
+            + '<span class="pl-note">Service photo · ' + svc.initials + '</span>'
+            + '<span class="pill-badge ' + svc.tagCls + '">' + svc.tag + '</span>'
+          + '</div>'
+          + '<div class="body">'
+            + '<div class="name">' + svc.name + '</div>'
+            + '<div class="desc-txt">' + svc.desc + '</div>'
+            + '<button class="book-btn" type="button">Book Now</button>'
+          + '</div>';
+        slot.querySelector('.remove-btn').addEventListener('click', function (e) {
+          e.stopPropagation();
+          var id = e.currentTarget.closest('.slot').getAttribute('data-id');
+          featured = featured.filter(function (x) { return x !== id; });
+          renderFeaturedSlots();
+          syncAddBtn();
+        });
+        // Drag-and-drop reordering
+        slot.addEventListener('dragstart', function (e) {
+          slot.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', svc.id);
+        });
+        slot.addEventListener('dragend', function () { slot.classList.remove('dragging'); document.querySelectorAll('.slot.drop-target').forEach(function (s) { s.classList.remove('drop-target'); }); });
+        slot.addEventListener('dragover', function (e) { e.preventDefault(); slot.classList.add('drop-target'); });
+        slot.addEventListener('dragleave', function () { slot.classList.remove('drop-target'); });
+        slot.addEventListener('drop', function (e) {
+          e.preventDefault();
+          slot.classList.remove('drop-target');
+          var fromId = e.dataTransfer.getData('text/plain');
+          var toId = slot.getAttribute('data-id');
+          if (!fromId || fromId === toId) return;
+          var fromIdx = featured.indexOf(fromId);
+          var toIdx = featured.indexOf(toId);
+          if (fromIdx === -1 || toIdx === -1) return;
+          featured.splice(fromIdx, 1);
+          featured.splice(toIdx, 0, fromId);
+          renderFeaturedSlots();
+        });
+      } else {
+        slot = document.createElement('button');
+        slot.type = 'button';
+        slot.className = 'slot empty';
+        slot.setAttribute('data-slot-index', i);
+        slot.innerHTML = ''
+          + '<div style="display:flex;flex-direction:column;align-items:center;">'
+          + '<span class="plus"><i data-lucide="plus"></i></span>'
+          + '<span class="lbl">Add Service</span>'
+          + '<span class="sub">Pick from your services list</span>'
+          + '</div>';
+        slot.addEventListener('click', openServicePicker);
+      }
+      host.appendChild(slot);
+    }
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  function syncAddBtn() {
+    var btn = document.getElementById('add-featured-btn');
+    if (!btn) return;
+    var full = featured.length >= 3;
+    btn.disabled = full;
+    btn.classList.toggle('disabled', full);
+    btn.innerHTML = full
+      ? '<i data-lucide="check"></i> Maximum of 3 reached'
+      : '<i data-lucide="plus"></i> Add Featured Service';
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  function openServicePicker() {
+    pickerTempPick = null;
+    renderPickerList('');
+    var search = document.getElementById('sp-search-input');
+    if (search) search.value = '';
+    document.getElementById('sp-modal').hidden = false;
+    document.body.style.overflow = 'hidden';
+    if (search) setTimeout(function () { search.focus(); }, 30);
+    if (window.lucide) window.lucide.createIcons();
+  }
+  function closeServicePicker() {
+    document.getElementById('sp-modal').hidden = true;
+    document.body.style.overflow = '';
+  }
+  function renderPickerList(query) {
+    var list = document.getElementById('sp-list');
+    if (!list) return;
+    var q = (query || '').trim().toLowerCase();
+    var rows = SERVICES.filter(function (s) {
+      if (!q) return true;
+      return s.name.toLowerCase().indexOf(q) !== -1 || s.category.toLowerCase().indexOf(q) !== -1;
+    });
+    if (!rows.length) {
+      list.innerHTML = '<div style="padding:30px 12px;text-align:center;font-family:var(--font-body);font-size:12.5px;color:#9BBAD4;">No services match “' + q + '”.</div>';
+      return;
+    }
+    list.innerHTML = rows.map(function (s) {
+      var inUse = featured.indexOf(s.id) !== -1;
+      var selected = pickerTempPick === s.id;
+      var cls = 'sp-row' + (inUse ? ' disabled' : '') + (selected ? ' selected' : '');
+      return '<div class="' + cls + '" data-id="' + s.id + '">'
+        + '<div class="thumb" style="background:' + s.color + ';">' + s.initials + '</div>'
+        + '<div class="info"><div class="nm">' + s.name + '</div><div class="cat">' + s.category + '</div></div>'
+        + (inUse
+            ? '<span class="in-use"><i data-lucide="check-circle"></i> In use</span>'
+            : '<span class="picked"><i data-lucide="check"></i></span>')
+        + '</div>';
+    }).join('');
+    list.querySelectorAll('.sp-row').forEach(function (r) {
+      if (r.classList.contains('disabled')) return;
+      r.addEventListener('click', function () {
+        pickerTempPick = r.getAttribute('data-id');
+        list.querySelectorAll('.sp-row').forEach(function (x) { x.classList.remove('selected'); });
+        r.classList.add('selected');
+      });
+    });
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  // Why features
+  var whyItems = [
+    { ico: 'shield-check', title: 'Evidence-Based Treatments', desc: 'Every protocol is grounded in peer-reviewed research and adjusted to your skin profile.' },
+    { ico: 'user-check',   title: 'Board-Certified Practitioners', desc: 'Treatments are delivered only by licensed dermatologists and certified nurse aestheticians.' },
+    { ico: 'leaf',         title: 'Holistic Wellness Approach', desc: 'We pair clinical results with calm — from the music in your room to the products you go home with.' },
+    { ico: 'sparkles',     title: 'Personalized Care Plans', desc: 'A unique routine for every client, refined as your skin evolves session by session.' }
+  ];
+  function renderWhy(w) {
+    var body = ''
+      + '<div class="body-row"><div class="field"><label class="field-label">Icon</label>'
+      + '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #D1E3F3;border-radius:8px;background:#F8FBFD;">'
+      + '<span style="width:34px;height:34px;border-radius:8px;background:#EBF6FD;color:#2D6A9F;display:inline-flex;align-items:center;justify-content:center;"><i data-lucide="' + w.ico + '"></i></span>'
+      + '<span style="font-family:var(--font-mono);font-size:12px;color:#5A7A96;">' + w.ico + '</span>'
+      + '<button type="button" style="margin-left:auto;background:none;border:none;color:#2D6A9F;font-family:var(--font-display);font-weight:600;font-size:12px;cursor:pointer;">Change</button>'
+      + '</div></div>'
+      + '<div class="field"><label class="field-label">Feature Title</label><input class="field-input" value="' + w.title + '"></div>'
+      + '</div>'
+      + '<div class="field"><label class="field-label">Feature Description</label><textarea class="field-textarea" rows="2">' + w.desc + '</textarea></div>';
+    return makeCard({ bodyHtml: body });
+  }
+
+  // Steps
+  var stepItems = [
+    { ico: 'calendar', title: 'Pick a treatment + time', desc: 'Browse services, choose your practitioner, and pick a slot that works for you.' },
+    { ico: 'clipboard-list', title: 'Tell us about your skin', desc: 'A short intake form so your practitioner can prep before you arrive.' },
+    { ico: 'sparkles', title: 'Glow.', desc: 'Walk in. Relax. Leave with a plan, results, and a follow-up booked.' }
+  ];
+  function renderStep(s, idx) {
+    var body = ''
+      + '<div class="body-row"><div class="field"><label class="field-label">Step ' + idx + ' Icon</label>'
+      + '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #D1E3F3;border-radius:8px;background:#F8FBFD;">'
+      + '<span style="width:34px;height:34px;border-radius:8px;background:#EBF6FD;color:#2D6A9F;display:inline-flex;align-items:center;justify-content:center;"><i data-lucide="' + s.ico + '"></i></span>'
+      + '<span style="font-family:var(--font-mono);font-size:12px;color:#5A7A96;">' + s.ico + '</span>'
+      + '<button type="button" style="margin-left:auto;background:none;border:none;color:#2D6A9F;font-family:var(--font-display);font-weight:600;font-size:12px;cursor:pointer;">Change</button>'
+      + '</div></div>'
+      + '<div class="field"><label class="field-label">Step Title</label><input class="field-input" value="' + s.title + '"></div>'
+      + '</div>'
+      + '<div class="field"><label class="field-label">Step Description</label><textarea class="field-textarea" rows="2">' + s.desc + '</textarea></div>';
+    return makeCard({ bodyHtml: body });
+  }
+
+  // Testimonials → Review grid
+  var REVIEWS = [
+    { id:'rv-001', name:'Camille Torres', service:'Botox',       stars:5, published:true,  quote:'The team explained every detail before starting. My results look natural and I felt completely safe.' },
+    { id:'rv-002', name:'Liza Mendoza',   service:'HydraFacial', stars:5, published:true,  quote:'My skin has never been this clear. Worth every minute — and the clinic feels like a spa retreat.' },
+    { id:'rv-003', name:'Joel Aquino',    service:'IV Drip',     stars:4, published:true,  quote:'Quick visit, real difference in energy and skin glow within days. The vibe is amazing.' },
+    { id:'rv-004', name:'Sofia Cruz',     service:'Chemical Peel',stars:5, published:false, quote:'Brighter, smoother skin in 2 weeks. The team is professional and very calming.' },
+    { id:'rv-005', name:'Miguel Cruz',    service:'Botox',       stars:5, published:false, quote:'Dr. Santos is meticulous. Subtle, natural results exactly as I asked for.' },
+    { id:'rv-006', name:'Ana Reyes',      service:'Laser',       stars:4, published:false, quote:'Painless laser sessions. Already seeing big improvement after 3 visits.' },
+    { id:'rv-007', name:'Carlos Garcia',  service:'Microneedling',stars:5,published:false, quote:'Worth every peso. My acne scarring is significantly less visible already.' }
+  ];
+  var arSelection = []; // ids of reviews picked in the Add Reviews modal
+
+  function renderReviewGrid() {
+    var grid = document.getElementById('review-grid');
+    if (!grid) return;
+    var pubs = REVIEWS.filter(function (r) { return r.published; });
+    if (!pubs.length) {
+      grid.innerHTML = '<div class="review-empty">'
+        + '<div class="ic"><i data-lucide="message-square-quote"></i></div>'
+        + '<div class="ttl">No reviews published yet</div>'
+        + '<div class="desc-txt">Approve and publish client reviews from the Reviews page to feature them here on your homepage.</div>'
+        + '<a class="go-btn" href="reviews.html"><i data-lucide="arrow-right"></i> Go to Reviews</a>'
+        + '</div>';
+      if (window.lucide) window.lucide.createIcons();
+      return;
+    }
+    grid.innerHTML = pubs.map(function (r) {
+      var starsHtml = '';
+      for (var i = 1; i <= 5; i++) {
+        starsHtml += '<i data-lucide="star"' + (i > r.stars ? ' class="off"' : '') + '></i>';
+      }
+      return '<div class="review-card" data-id="' + r.id + '">'
+        + '<button class="unpub-btn" type="button" aria-label="Unpublish from homepage" title="Unpublish from homepage"><i data-lucide="x"></i></button>'
+        + '<div class="quote-ic"><i data-lucide="quote"></i></div>'
+        + '<div class="quote-txt">' + r.quote + '</div>'
+        + '<div class="stars-row">' + starsHtml + '</div>'
+        + '<div class="divider"></div>'
+        + '<div class="meta"><span class="client-name">' + r.name + '</span><span class="service-pill">' + r.service + '</span></div>'
+        + '</div>';
+    }).join('');
+    grid.querySelectorAll('.unpub-btn').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var id = btn.closest('.review-card').getAttribute('data-id');
+        var r = REVIEWS.find(function (x) { return x.id === id; });
+        if (r) { r.published = false; renderReviewGrid(); }
+      });
+    });
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  function openAddReviewsModal() {
+    arSelection = [];
+    var search = document.getElementById('ar-search-input');
+    if (search) search.value = '';
+    renderArList('');
+    document.getElementById('ar-modal').hidden = false;
+    document.body.style.overflow = 'hidden';
+    if (search) setTimeout(function () { search.focus(); }, 30);
+    syncArConfirm();
+  }
+  function closeAddReviewsModal() {
+    document.getElementById('ar-modal').hidden = true;
+    document.body.style.overflow = '';
+  }
+  function renderArList(query) {
+    var list = document.getElementById('ar-list');
+    if (!list) return;
+    var q = (query || '').trim().toLowerCase();
+    var rows = REVIEWS.filter(function (r) {
+      if (r.published) return false;
+      if (!q) return true;
+      return r.name.toLowerCase().indexOf(q) !== -1 || r.service.toLowerCase().indexOf(q) !== -1;
+    });
+    if (!rows.length) {
+      list.innerHTML = '<div class="ar-empty">No approved reviews available to publish.</div>';
+      return;
+    }
+    list.innerHTML = rows.map(function (r) {
+      var starsHtml = '';
+      for (var i = 1; i <= 5; i++) {
+        starsHtml += '<i data-lucide="star"' + (i > r.stars ? ' class="off"' : '') + '></i>';
+      }
+      var sel = arSelection.indexOf(r.id) !== -1 ? ' selected' : '';
+      return '<div class="ar-row' + sel + '" data-id="' + r.id + '">'
+        + '<div class="info">'
+          + '<div class="top-line"><span class="nm">' + r.name + '</span><span class="stars">' + starsHtml + '</span></div>'
+          + '<div class="excerpt">' + r.quote + '</div>'
+        + '</div>'
+        + '<div class="right">'
+          + '<span class="service-pill">' + r.service + '</span>'
+          + '<span class="checkmark"><i data-lucide="check"></i></span>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+    list.querySelectorAll('.ar-row').forEach(function (row) {
+      row.addEventListener('click', function () {
+        var id = row.getAttribute('data-id');
+        var idx = arSelection.indexOf(id);
+        if (idx === -1) arSelection.push(id); else arSelection.splice(idx, 1);
+        row.classList.toggle('selected');
+        syncArConfirm();
+      });
+    });
+    if (window.lucide) window.lucide.createIcons();
+  }
+  function syncArConfirm() {
+    var btn = document.getElementById('ar-confirm-btn');
+    if (!btn) return;
+    var n = arSelection.length;
+    btn.disabled = n === 0;
+    btn.style.opacity = n === 0 ? '0.55' : '1';
+    btn.style.pointerEvents = n === 0 ? 'none' : 'auto';
+    btn.innerHTML = '<i data-lucide="check"></i> ' + (n > 0 ? 'Publish ' + n + ' Selected' : 'Publish Selected');
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  // Booking Steps stepper UI (Tab 4)
+  var BS_STEPS = [
+    { ico: 'calendar',       title: 'Pick a treatment + time', desc: 'Browse services, choose your practitioner, and pick a slot that works for you.' },
+    { ico: 'clipboard-list', title: 'Tell us about your skin', desc: 'A short intake form so your practitioner can prep before you arrive.' },
+    { ico: 'sparkles',       title: 'Glow.',                   desc: 'Walk in. Relax. Leave with a plan, results, and a follow-up booked.' }
+  ];
+  var bsActive = 0;
+  function bsPad2(n) { return n < 10 ? '0' + n : '' + n; }
+  function renderBsStepper() {
+    var host = document.getElementById('bs-stepper');
+    if (!host) return;
+    var html = '';
+    BS_STEPS.forEach(function (s, i) {
+      var cls = 'pill';
+      if (i < bsActive) cls += ' done';
+      else if (i === bsActive) cls += ' active';
+      var inner = (i < bsActive) ? '<i data-lucide="check"></i>' : (i + 1);
+      html += '<button type="button" class="' + cls + '" data-i="' + i + '"><span class="ix">' + inner + '</span>' + s.title + '</button>';
+      if (i < BS_STEPS.length - 1) html += '<span class="connector"></span>';
+    });
+    host.innerHTML = html;
+    host.querySelectorAll('.pill').forEach(function (b) {
+      b.addEventListener('click', function () { bsActive = parseInt(b.getAttribute('data-i'), 10); renderBs(); });
+    });
+    if (window.lucide) window.lucide.createIcons();
+  }
+  function renderBsEdit() {
+    var s = BS_STEPS[bsActive];
+    var host = document.getElementById('bs-step-edit');
+    if (!host) return;
+    host.innerHTML =
+      '<div class="top-row">'
+        + '<span class="num-badge">' + bsPad2(bsActive + 1) + '</span>'
+        + '<div class="icon-line"><span class="plate"><i data-lucide="' + s.ico + '"></i></span><span class="nm">' + s.ico + '</span><button class="change" type="button">Change Icon</button></div>'
+      + '</div>'
+      + '<div class="field"><label class="field-label">Step Title</label><input class="field-input" id="bs-se-title" value="' + s.title.replace(/"/g, '&quot;') + '"></div>'
+      + '<div class="field"><label class="field-label">Step Description</label><textarea class="field-textarea" id="bs-se-desc" rows="3">' + s.desc + '</textarea></div>';
+    document.getElementById('bs-se-title').addEventListener('input', function (e) {
+      BS_STEPS[bsActive].title = e.target.value;
+      renderBsStepper();
+    });
+    document.getElementById('bs-se-desc').addEventListener('input', function (e) { BS_STEPS[bsActive].desc = e.target.value; });
+    if (window.lucide) window.lucide.createIcons();
+  }
+  function renderBsNav() {
+    var prev = document.getElementById('bs-step-prev');
+    var next = document.getElementById('bs-step-next');
+    if (!prev || !next) return;
+    prev.disabled = bsActive === 0;
+    var isLast = bsActive === BS_STEPS.length - 1;
+    next.innerHTML = isLast ? '<i data-lucide="check"></i> Done' : 'Next <i data-lucide="arrow-right"></i>';
+    if (window.lucide) window.lucide.createIcons();
+  }
+  function renderBs() { renderBsStepper(); renderBsEdit(); renderBsNav(); }
+  document.getElementById('bs-step-prev').addEventListener('click', function () { if (bsActive > 0) { bsActive--; renderBs(); } });
+  document.getElementById('bs-step-next').addEventListener('click', function () { if (bsActive < BS_STEPS.length - 1) { bsActive++; renderBs(); } });
+  renderBs();
+
+  // Populate lists
+  renderFeaturedSlots();
+  syncAddBtn();
+  whyItems.forEach(function (w) { document.getElementById('why-list').appendChild(renderWhy(w)); });
+  renderReviewGrid();
+
+  // Add buttons
+  document.querySelectorAll('[data-add]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-add');
+      var list = document.getElementById(key + '-list');
+      var card;
+      if (key === 'why') card = renderWhy({ ico: 'star', title: 'New Feature', desc: 'Describe this benefit.' });
+      if (card) {
+        list.appendChild(card);
+        if (window.lucide) window.lucide.createIcons();
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
+  });
+
+  // Add Reviews modal wiring
+  document.getElementById('add-reviews-btn').addEventListener('click', openAddReviewsModal);
+  document.getElementById('ar-close-btn').addEventListener('click', closeAddReviewsModal);
+  document.getElementById('ar-cancel-btn').addEventListener('click', closeAddReviewsModal);
+  document.getElementById('ar-confirm-btn').addEventListener('click', function () {
+    if (!arSelection.length) return;
+    arSelection.forEach(function (id) {
+      var r = REVIEWS.find(function (x) { return x.id === id; });
+      if (r) r.published = true;
+    });
+    closeAddReviewsModal();
+    renderReviewGrid();
+  });
+  document.getElementById('ar-search-input').addEventListener('input', function (e) { renderArList(e.target.value); });
+  document.getElementById('ar-modal').addEventListener('click', function (e) { if (e.target === document.getElementById('ar-modal')) closeAddReviewsModal(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !document.getElementById('ar-modal').hidden) closeAddReviewsModal();
+  });
+
+  // Add Featured Service button + service picker modal wiring
+  document.getElementById('add-featured-btn').addEventListener('click', function () {
+    if (featured.length >= 3) return;
+    openServicePicker();
+  });
+  document.getElementById('sp-close-btn').addEventListener('click', closeServicePicker);
+  document.getElementById('sp-cancel-btn').addEventListener('click', closeServicePicker);
+  document.getElementById('sp-confirm-btn').addEventListener('click', function () {
+    if (!pickerTempPick) return;
+    if (featured.length >= 3) return;
+    if (featured.indexOf(pickerTempPick) === -1) featured.push(pickerTempPick);
+    closeServicePicker();
+    renderFeaturedSlots();
+    syncAddBtn();
+  });
+  document.getElementById('sp-search-input').addEventListener('input', function (e) {
+    renderPickerList(e.target.value);
+  });
+  document.getElementById('sp-modal').addEventListener('click', function (e) {
+    if (e.target === document.getElementById('sp-modal')) closeServicePicker();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !document.getElementById('sp-modal').hidden) closeServicePicker();
+  });
+
+  // ---------- Toggles ----------
+  function wireToggle(switchEl, fieldsEl, defaultOn) {
+    var on = defaultOn;
+    function paint() {
+      switchEl.classList.toggle('off', !on);
+      if (fieldsEl) fieldsEl.classList.toggle('disabled', !on);
+    }
+    switchEl.addEventListener('click', function () { on = !on; paint(); });
+    paint();
+  }
+  wireToggle(document.getElementById('banner-switch'), document.getElementById('banner-fields'), true);
+  wireToggle(document.getElementById('journal-switch'), document.getElementById('journal-fields'), true);
+  wireToggle(document.getElementById('testimonials-switch'), document.getElementById('testimonials-fields'), true);
+  wireToggle(document.getElementById('cta-switch'), document.getElementById('cta-fields'), true);
+
+  // Color picker live hex preview
+  function wireColor(inputId, hexId) {
+    var inp = document.getElementById(inputId);
+    var hex = document.getElementById(hexId);
+    if (!inp || !hex) return;
+    inp.addEventListener('input', function () { hex.textContent = inp.value.toUpperCase(); });
+  }
+
+  // Banner preview — toggle between active promotion and empty state for the demo.
+  var bDemo = document.getElementById('banner-demo-toggle');
+  if (bDemo) {
+    bDemo.addEventListener('click', function () {
+      var active = document.getElementById('banner-preview-active');
+      var empty = document.getElementById('banner-preview-empty');
+      var lbl = document.getElementById('banner-demo-label');
+      var isActive = !active.hidden;
+      active.hidden = isActive;
+      empty.hidden = !isActive;
+      lbl.textContent = isActive ? 'No promotion' : 'Active';
+      if (window.lucide) window.lucide.createIcons();
+    });
+  }
+
+  if (window.lucide) window.lucide.createIcons();
+})();
+</script>
+</body>
+</html>

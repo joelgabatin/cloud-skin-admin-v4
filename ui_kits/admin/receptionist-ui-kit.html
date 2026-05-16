@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Reception — UI Kit</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: #1A2E40; padding: 40px 48px; }
+  h1.kit-title { font-family: var(--font-display); font-weight: 700; font-size: 32px; margin: 0; }
+  .kit-sub { font-family: var(--font-body); font-size: 14px; color: #5A7A96; margin-top: 6px; }
+  .kit-meta { display: flex; gap: 24px; align-items: center; margin-top: 10px; }
+  .kit-meta .pill { display: inline-flex; align-items: center; gap: 6px; background: #FEF3C7; color: #B45309; padding: 6px 12px; border-radius: 9999px; font-family: var(--font-display); font-size: 12px; font-weight: 700; }
+  section { margin-top: 40px; }
+  section > h2 { font-family: var(--font-display); font-size: 11px; font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 14px; }
+  .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); margin-bottom: 16px; }
+  .row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .col { display: flex; flex-direction: column; gap: 16px; }
+  .label { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+
+  /* Color palette */
+  .swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .swatch { border-radius: 10px; overflow: hidden; border: 1px solid #D0E8F5; }
+  .swatch .chip { height: 80px; }
+  .swatch .meta { padding: 10px 12px; background: #fff; }
+  .swatch .nm { font-family: var(--font-display); font-size: 12px; font-weight: 700; color: #1A2E40; }
+  .swatch .hex { font-family: var(--font-mono); font-size: 11px; color: #5A7A96; margin-top: 2px; }
+
+  /* Typography */
+  .type-row { display: grid; grid-template-columns: 140px 1fr auto; gap: 16px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid #F0F6FC; }
+  .type-row:last-child { border-bottom: none; }
+  .type-row .lbl { font-family: var(--font-display); font-size: 11px; font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.06em; }
+  .type-row .spec { font-family: var(--font-mono); font-size: 11px; color: #9BBAD4; }
+
+  /* Buttons */
+  .btn { height: 40px; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 18px; }
+  .btn-primary:hover { background: #1A5685; }
+  .btn-outline { background: #fff; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-success { background: #15803D; color: #fff; padding: 0 18px; }
+  .btn-danger { background: #fff; color: #DC2626; border-color: #FCA5A5; }
+  .btn-ghost { background: transparent; color: #5A7A96; }
+
+  /* Badges */
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .badge.success { background: #DCFCE7; color: #15803D; }
+  .badge.warning { background: #FEF3C7; color: #B45309; }
+  .badge.danger  { background: #FEE2E2; color: #DC2626; }
+  .badge.info    { background: #DBEAFE; color: #1D4ED8; }
+  .badge.slate   { background: #F1F5F9; color: #475569; }
+  .role-pill-rcp { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: #FEF3C7; color: #B45309; border-radius: 9999px; font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+
+  /* Inputs */
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field-input { width: 100%; height: 40px; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .field-input:focus { border-color: #2D6A9F; }
+  .field-label { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: #1A2E40; }
+  .search-input { position: relative; max-width: 320px; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; }
+  .search-input .ico { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9BBAD4; }
+
+  /* Banners */
+  .info-banner { background: #EBF6FD; border: 1px solid #93C5FD; border-radius: 10px; padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start; color: #1E40AF; }
+  .warn-banner { background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 10px; padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start; color: #92400E; }
+  .banner-title { font-family: var(--font-display); font-weight: 700; font-size: 14px; }
+  .banner-desc { font-family: var(--font-body); font-size: 13px; margin-top: 2px; }
+
+  /* Stat card */
+  .stat-card { background: #fff; border-radius: 10px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; flex-direction: column; gap: 8px; min-width: 220px; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-card .lbl { font-size: 12px; color: #5A7A96; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #2D6A9F; display: flex; align-items: center; justify-content: center; }
+  .stat-card .iplate.success { background: #DCFCE7; color: #15803D; }
+  .stat-card .iplate.warning { background: #FEF3C7; color: #B45309; }
+  .stat-card .val { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: #1A2E40; }
+  .stat-card .sub { font-size: 12px; color: #5A7A96; }
+
+  /* Appointment row + task row examples (reception-specific) */
+  .appt-row { display: grid; grid-template-columns: 60px 1fr auto; gap: 14px; align-items: center; padding: 12px 16px; border-bottom: 1px solid #F0F6FC; }
+  .appt-time { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #2D6A9F; }
+  .appt-name { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .appt-svc { font-family: var(--font-body); font-size: 11px; color: #5A7A96; margin-top: 2px; }
+
+  /* Spacing tokens */
+  .space-row { display: flex; gap: 18px; align-items: flex-end; }
+  .space-box { background: #2D6A9F; border-radius: 4px; }
+  .space-label { font-family: var(--font-mono); font-size: 11px; color: #5A7A96; margin-top: 6px; text-align: center; }
+
+  /* Avatar */
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #B45309; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 13px; }
+</style>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<header>
+  <h1 class="kit-title">Cloud Skin Reception · UI Kit</h1>
+  <div class="kit-sub">Components, tokens and patterns used across the receptionist experience.</div>
+  <div class="kit-meta">
+    <span class="role-pill-rcp"><i data-lucide="user" style="width:12px;height:12px"></i>Reception role</span>
+    <span style="font-family:var(--font-body);font-size:12px;color:#9BBAD4;">Companion to the admin design system · v1.0 · May 2026</span>
+  </div>
+</header>
+
+<section>
+  <h2>1. Color Palette (reception accents in amber)</h2>
+  <div class="card">
+    <div class="swatch-grid">
+      <div class="swatch"><div class="chip" style="background:#2D6A9F"></div><div class="meta"><div class="nm">Primary Blue</div><div class="hex">#2D6A9F</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#1A3A5C"></div><div class="meta"><div class="nm">Navy</div><div class="hex">#1A3A5C</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#F0F6FC"></div><div class="meta"><div class="nm">Surface Light</div><div class="hex">#F0F6FC</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#B45309"></div><div class="meta"><div class="nm">Reception Amber</div><div class="hex">#B45309</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#FEF3C7"></div><div class="meta"><div class="nm">Amber Surface</div><div class="hex">#FEF3C7</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#15803D"></div><div class="meta"><div class="nm">Success</div><div class="hex">#15803D</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#DC2626"></div><div class="meta"><div class="nm">Danger</div><div class="hex">#DC2626</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#5A7A96"></div><div class="meta"><div class="nm">Muted Text</div><div class="hex">#5A7A96</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>2. Typography</h2>
+  <div class="card">
+    <div class="type-row"><span class="lbl">Page H1</span><span style="font-family:var(--font-display);font-weight:700;font-size:24px;color:#1A2E40;">My Count Tasks</span><span class="spec">DM Sans 700 · 24px</span></div>
+    <div class="type-row"><span class="lbl">Section</span><span style="font-family:var(--font-display);font-weight:700;font-size:14px;color:#1A2E40;text-transform:uppercase;letter-spacing:0.05em;">Today's Appointments</span><span class="spec">DM Sans 700 · 14px · 0.05em</span></div>
+    <div class="type-row"><span class="lbl">Body</span><span style="font-family:var(--font-body);font-size:13px;color:#5A7A96;">Stock counts assigned to you by the admin.</span><span class="spec">Inter 400 · 13px</span></div>
+    <div class="type-row"><span class="lbl">Mono / SKU</span><span style="font-family:var(--font-mono);font-size:12px;color:#2D6A9F;font-weight:600;">CNT-0012 · MED-HYD-001</span><span class="spec">JetBrains Mono · 12px</span></div>
+    <div class="type-row"><span class="lbl">Label</span><span style="font-family:var(--font-display);font-size:11px;font-weight:600;color:#5A7A96;text-transform:uppercase;letter-spacing:0.04em;">Pending Payments</span><span class="spec">DM Sans 600 · 11px caps</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>3. Buttons</h2>
+  <div class="card row">
+    <button class="btn btn-primary"><i data-lucide="plus"></i> New Booking</button>
+    <button class="btn btn-success"><i data-lucide="check"></i> Check In</button>
+    <button class="btn btn-outline"><i data-lucide="phone"></i> Call Patient</button>
+    <button class="btn btn-danger"><i data-lucide="x-circle"></i> Cancel</button>
+    <button class="btn btn-ghost"><i data-lucide="more-horizontal"></i> More</button>
+  </div>
+</section>
+
+<section>
+  <h2>4. Badges &amp; Status Pills</h2>
+  <div class="card row" style="align-items:center;">
+    <span class="badge success">Checked In</span>
+    <span class="badge info">Confirmed</span>
+    <span class="badge warning">Pending Payment</span>
+    <span class="badge danger">No-show</span>
+    <span class="badge slate">Waiting</span>
+    <span class="role-pill-rcp"><i data-lucide="eye" style="width:11px;height:11px"></i>Read-only · Reception</span>
+  </div>
+</section>
+
+<section>
+  <h2>5. Inputs</h2>
+  <div class="card col">
+    <div class="row" style="gap:20px;">
+      <div class="field" style="flex:1;max-width:260px;">
+        <label class="field-label">Patient Name</label>
+        <input class="field-input" placeholder="Maria Santos">
+      </div>
+      <div class="field" style="flex:1;max-width:200px;">
+        <label class="field-label">Phone</label>
+        <input class="field-input" placeholder="+63 917 555 0142">
+      </div>
+      <div class="field" style="flex:1;max-width:160px;">
+        <label class="field-label">Appointment Date</label>
+        <input class="field-input" type="date" value="2026-05-14">
+      </div>
+    </div>
+    <div class="search-input">
+      <i class="ico" data-lucide="search" style="width:14px;height:14px"></i>
+      <input placeholder="Search patient by name or phone...">
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>6. Stat Cards</h2>
+  <div class="card row">
+    <div class="stat-card"><div class="top"><span class="lbl">Today's Appointments</span><div class="iplate"><i data-lucide="calendar"></i></div></div><div class="val">8</div><div class="sub">3 confirmed · 5 pending</div></div>
+    <div class="stat-card"><div class="top"><span class="lbl">Walk-ins</span><div class="iplate success"><i data-lucide="user-plus"></i></div></div><div class="val">3</div><div class="sub">Since 9:00 AM</div></div>
+    <div class="stat-card"><div class="top"><span class="lbl">Pending Payments</span><div class="iplate warning"><i data-lucide="credit-card"></i></div></div><div class="val">₱8,470</div><div class="sub">2 unpaid bookings</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>7. Banners</h2>
+  <div class="card col">
+    <div class="info-banner"><i data-lucide="info" style="width:18px;height:18px;color:#2D6A9F"></i><div><div class="banner-title">Read-only context</div><div class="banner-desc">Clinical notes are visible to practitioners only. You can update contact info and bookings.</div></div></div>
+    <div class="warn-banner"><i data-lucide="alert-triangle" style="width:18px;height:18px;color:#B45309"></i><div><div class="banner-title">Sofia Cruz has a pending balance of ₱4,250</div><div class="banner-desc">Collect before her 2:45 PM appointment.</div></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>8. Appointment Row (reception pattern)</h2>
+  <div class="card" style="padding:0;">
+    <div class="appt-row"><span class="appt-time">09:30</span><div><div class="appt-name">Maria Santos</div><div class="appt-svc">HydraFacial · Dr. Reyes</div></div><span class="badge success">Checked In</span></div>
+    <div class="appt-row"><span class="appt-time">10:15</span><div><div class="appt-name">Miguel Cruz</div><div class="appt-svc">Botox Touch-up · Dr. Santos</div></div><span class="badge info">Confirmed</span></div>
+    <div class="appt-row"><span class="appt-time">11:00</span><div><div class="appt-name">Walk-in</div><div class="appt-svc">Consultation</div></div><span class="badge slate">Waiting</span></div>
+    <div class="appt-row" style="border-bottom:none;"><span class="appt-time">14:45</span><div><div class="appt-name">Sofia Cruz</div><div class="appt-svc">IV Drip Wellness</div></div><span class="badge warning">Pending Payment</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>9. User Identity</h2>
+  <div class="card row" style="align-items:center;">
+    <div class="avatar">AC</div>
+    <div>
+      <div style="font-family:var(--font-display);font-weight:700;font-size:14px;color:#1A2E40;">A. Cruz</div>
+      <span class="role-pill-rcp" style="margin-top:4px;">Reception</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>10. Spacing Tokens</h2>
+  <div class="card space-row">
+    <div><div class="space-box" style="width:4px;height:32px;"></div><div class="space-label">4</div></div>
+    <div><div class="space-box" style="width:8px;height:32px;"></div><div class="space-label">8</div></div>
+    <div><div class="space-box" style="width:12px;height:32px;"></div><div class="space-label">12</div></div>
+    <div><div class="space-box" style="width:16px;height:32px;"></div><div class="space-label">16</div></div>
+    <div><div class="space-box" style="width:24px;height:32px;"></div><div class="space-label">24</div></div>
+    <div><div class="space-box" style="width:32px;height:32px;"></div><div class="space-label">32</div></div>
+  </div>
+</section>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>

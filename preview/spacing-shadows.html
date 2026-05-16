@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 32px; background: #F6FAFD; display: flex; flex-direction: column; gap: 22px; }
+  .row { display: flex; align-items: center; gap: 22px; }
+  .card { width: 120px; height: 56px; background: #fff; border-radius: 12px; flex-shrink: 0; }
+  .xs { box-shadow: 0 1px 3px rgba(26,58,92,0.06); }
+  .sm { box-shadow: 0 1px 4px rgba(26,58,92,0.08), 0 2px 8px rgba(26,58,92,0.04); }
+  .md { box-shadow: 0 4px 12px rgba(26,58,92,0.08); }
+  .lg { box-shadow: 0 8px 24px rgba(26,58,92,0.12); }
+  .xl { box-shadow: 0 16px 48px rgba(26,58,92,0.16); }
+  .hero { box-shadow: 0 24px 64px rgba(26,58,92,0.20); }
+  .meta { display: flex; flex-direction: column; gap: 2px; }
+  .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: var(--navy-800); }
+  .use { font-family: var(--font-body); font-size: 11px; color: var(--slate-500); }
+</style>
+</head>
+<body>
+<div class="row"><div class="card xs"></div><div class="meta"><span class="name">--shadow-xs</span><span class="use">navbar at rest</span></div></div>
+<div class="row"><div class="card sm"></div><div class="meta"><span class="name">--shadow-sm</span><span class="use">stat cards, panels</span></div></div>
+<div class="row"><div class="card md"></div><div class="meta"><span class="name">--shadow-md</span><span class="use">testimonial, dropdown</span></div></div>
+<div class="row"><div class="card lg"></div><div class="meta"><span class="name">--shadow-lg</span><span class="use">service card hover</span></div></div>
+<div class="row"><div class="card xl"></div><div class="meta"><span class="name">--shadow-xl</span><span class="use">mobile drawer, side-hero photo</span></div></div>
+<div class="row"><div class="card hero"></div><div class="meta"><span class="name">--shadow-hero</span><span class="use">main banner photo</span></div></div>
+</body>
+</html>

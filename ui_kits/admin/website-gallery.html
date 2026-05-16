@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Manage Gallery Page</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  /* View Live Page button */
+  .view-live-btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px; border: 1px solid #2D6A9F; border-radius: 8px; background: #fff; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; text-decoration: none; transition: background 120ms; }
+  .view-live-btn:hover { background: #F0F6FC; }
+  .view-live-btn .lucide { width: 13px; height: 13px; }
+
+  .page { padding: 24px 32px 96px; display: flex; flex-direction: column; gap: 18px; }
+  .page-hero h1 { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .page-hero .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 4px; }
+
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid #D1E3F3; overflow-x: auto; }
+  .tabs button { background: none; border: none; padding: 12px 18px; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #5A7A96; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; }
+  .tabs button .lucide { width: 14px; height: 14px; opacity: 0.7; }
+  .tabs button:hover { color: #1A2E40; }
+  .tabs button.active { color: #2D6A9F; border-bottom-color: #2D6A9F; }
+  .tabs button.active .lucide { opacity: 1; }
+
+  .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .pane { display: none; }
+  .pane.active { display: block; }
+
+  .pane-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 18px; }
+  .pane-head h2 { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .pane-head .desc { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-top: 4px; line-height: 1.5; }
+  .pane-section + .pane-section { margin-top: 22px; padding-top: 22px; border-top: 1px solid #E5EFF7; }
+  .pane-section .sec-ttl { font-family: var(--font-display); font-size: 12px; font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field + .field { margin-top: 18px; }
+  .field-label { font-family: var(--font-display); font-weight: 600; font-size: 12.5px; color: #1A2E40; }
+  .field-input, .field-textarea, .field-select { width: 100%; height: 40px; border: 1px solid #D1E3F3; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .field-textarea { height: auto; padding: 10px 12px; resize: vertical; min-height: 80px; line-height: 1.5; }
+  .field-input:focus, .field-textarea:focus, .field-select:focus { border-color: #2D6A9F; }
+
+  /* Upload zones */
+  .upload-zone { border: 1.5px dashed #D1E3F3; border-radius: 12px; background: #F0F6FC; padding: 28px 16px; text-align: center; cursor: pointer; transition: border-color 120ms, background 120ms; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .upload-zone:hover { border-color: #2D6A9F; background: #EBF6FD; }
+  .upload-zone .ic { width: 48px; height: 48px; border-radius: 50%; background: #fff; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(45,106,159,0.10); }
+  .upload-zone .ic .lucide { width: 22px; height: 22px; }
+  .upload-zone .ttl { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #1A2E40; }
+  .upload-zone .ttl b { color: #2D6A9F; }
+  .upload-zone .helper { font-family: var(--font-body); font-size: 12px; color: #9BBAD4; }
+
+  .info-line { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-bottom: 16px; line-height: 1.5; }
+
+  /* Categories list */
+  .cat-list { display: flex; flex-direction: column; gap: 8px; }
+  .cat-row { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 18px 1fr 32px; gap: 12px; align-items: center; }
+  .cat-row.locked { background: #F0F6FC; border-color: #D1E3F3; }
+  .cat-row .drag-handle { color: #BFD8EB; cursor: grab; display: inline-flex; align-items: center; justify-content: center; height: 28px; }
+  .cat-row .drag-handle:hover { color: #2D6A9F; }
+  .cat-row .drag-handle .lucide { width: 16px; height: 16px; }
+  .cat-row.locked .drag-handle { color: #BFD8EB; cursor: default; opacity: 0.6; }
+  .cat-row .body { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .cat-row .body input { flex: 1; }
+  .cat-row .locked-tag { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 11.5px; color: #5A7A96; font-weight: 600; }
+  .cat-row .locked-tag .lucide { width: 13px; height: 13px; }
+  .cat-row .locked-name { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; color: #1A2E40; }
+  .cat-row .locked-note { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; margin-left: auto; }
+  .cat-row .delete-btn { width: 28px; height: 28px; border-radius: 7px; background: #fff; border: 1px solid #FCA5A5; color: #DC2626; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 0; position: relative; }
+  .cat-row .delete-btn:hover { background: #FEE2E2; }
+  .cat-row .delete-btn:disabled { border-color: #E5EFF7; color: #BFD8EB; cursor: not-allowed; background: #F8FBFD; }
+  .cat-row .delete-btn:disabled:hover { background: #F8FBFD; }
+  .cat-row .delete-btn .lucide { width: 14px; height: 14px; }
+  .cat-row .delete-btn .tip { position: absolute; bottom: calc(100% + 6px); right: 0; background: #1A2E40; color: #fff; padding: 6px 10px; border-radius: 6px; font-family: var(--font-body); font-size: 11.5px; font-weight: 500; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 120ms; }
+  .cat-row .delete-btn:disabled:hover .tip { opacity: 1; }
+
+  .add-btn { width: 100%; padding: 10px 16px; border: 1.5px dashed #BFD8EB; background: #F8FBFD; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; }
+  .add-btn:hover { background: #EBF6FD; border-color: #2D6A9F; }
+  .add-btn .lucide { width: 14px; height: 14px; }
+
+  /* Image grid */
+  .img-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
+  @media (max-width: 980px) { .img-grid { grid-template-columns: repeat(2, 1fr); } }
+  .img-card { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1; cursor: grab; box-shadow: 0 1px 4px rgba(26,58,92,0.08), 0 4px 10px rgba(26,58,92,0.04); }
+  .img-card .photo { width: 100%; height: 100%; background: linear-gradient(135deg, var(--ph-c1, #BFD8EB), var(--ph-c2, #5BC0EB)); position: relative; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.85); font-family: var(--font-mono); font-size: 12px; }
+  .img-card .cat-pill { position: absolute; top: 10px; left: 10px; padding: 4px 10px; border-radius: 9999px; background: #2D6A9F; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; box-shadow: 0 1px 3px rgba(15,30,48,0.20); }
+  .img-card .drag-pill { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.85); color: #5A7A96; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 120ms; }
+  .img-card .drag-pill .lucide { width: 13px; height: 13px; }
+  .img-card .overlay { position: absolute; inset: 0; background: rgba(15,30,48,0.55); display: flex; align-items: center; justify-content: center; gap: 10px; opacity: 0; transition: opacity 150ms; }
+  .img-card .overlay button { width: 40px; height: 40px; border-radius: 9px; background: #fff; color: #2D6A9F; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.20); }
+  .img-card .overlay button.del { color: #DC2626; }
+  .img-card .overlay button .lucide { width: 16px; height: 16px; }
+  .img-card .overlay button:hover { background: #F0F6FC; }
+  .img-card:hover .overlay { opacity: 1; }
+  .img-card:hover .drag-pill { opacity: 1; }
+  .img-card .confirm-bar { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(15,30,48,0.92); padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-family: var(--font-body); font-size: 12px; color: #fff; opacity: 0; pointer-events: none; transition: opacity 150ms; }
+  .img-card.confirming .confirm-bar { opacity: 1; pointer-events: auto; }
+  .img-card.confirming .overlay { opacity: 0; }
+  .img-card .confirm-bar .remove { background: #DC2626; color: #fff; border: none; border-radius: 6px; padding: 5px 10px; font-family: var(--font-display); font-weight: 700; font-size: 11.5px; cursor: pointer; }
+  .img-card .confirm-bar .cancel { background: none; border: none; color: #BFD8EB; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; cursor: pointer; }
+
+  /* Modal */
+  .modal { position: fixed; inset: 0; background: rgba(15,30,48,0.55); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 200; }
+  .modal[hidden] { display: none !important; }
+  .modal-card { background: #fff; border-radius: 12px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(15,30,48,0.35); overflow: hidden; }
+  .modal-head { padding: 18px 22px 14px; border-bottom: 1px solid #E5EFF7; display: flex; align-items: center; gap: 10px; }
+  .modal-head h2 { margin: 0; font-family: var(--font-display); font-size: 16px; font-weight: 700; color: #1A2E40; }
+  .modal-head .close { margin-left: auto; width: 30px; height: 30px; border: none; background: none; border-radius: 7px; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .modal-head .close:hover { background: #F0F6FC; color: #1A2E40; }
+  .modal-body { padding: 18px 22px; }
+  .modal-foot { padding: 14px 22px; border-top: 1px solid #E5EFF7; background: #F8FBFD; display: flex; justify-content: flex-end; gap: 10px; }
+
+  /* Footer */
+  .btn { height: 38px; padding: 0 18px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; text-decoration: none; white-space: nowrap; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-ghost { background: none; color: #5A7A96; }
+  .btn-ghost:hover { background: #F0F6FC; color: #1A2E40; }
+  .btn-primary { background: #2D6A9F; color: #fff; }
+  .btn-primary:hover { background: #1A5685; }
+
+  .save-footer { position: fixed; bottom: 0; left: 260px; right: 0; background: #fff; border-top: 1px solid #D1E3F3; padding: 14px 32px; display: flex; justify-content: space-between; align-items: center; gap: 12px; z-index: 50; }
+  @media (max-width: 980px) { .save-footer { left: 0; } }
+  .save-footer .note { font-family: var(--font-body); font-size: 12px; color: #9BBAD4; }
+  .save-footer .actions { display: flex; gap: 10px; margin-left: auto; }
+
+  /* Compact info banner replacing the duplicate page hero */
+  .page-info-banner { background: #F0F6FC; border: 1px solid #D1E3F3; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 12.5px; color: #5A7A96; }
+  .page-info-banner .lucide { width: 15px; height: 15px; color: #5A7A96; flex-shrink: 0; }
+  .page-info-banner b { color: #1A2E40; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Manage Gallery Page</div>
+        <div class="topbar-crumb">Admin / Manage Website / Gallery Page</div>
+      </div>
+      <div class="topbar-actions">
+        <a class="view-live-btn" href="https://cloudskin.com/gallery" target="_blank" rel="noopener">View Live Page <i data-lucide="external-link"></i></a>
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Manage Gallery Page">
+      <div class="page-info-banner"><i data-lucide="info"></i><span>Changes go live after you click <b>Save Changes</b>.</span></div>
+
+      <div class="tabs" id="tabs">
+        <button class="active" data-tab="hero"><i data-lucide="layout"></i> Page Hero</button>
+        <button data-tab="categories"><i data-lucide="folder"></i> Gallery Categories</button>
+        <button data-tab="images"><i data-lucide="image"></i> Gallery Images</button>
+      </div>
+
+      <!-- Tab 1: Page Hero -->
+      <div class="pane active" data-pane="hero">
+        <div class="card">
+          <div class="pane-head"><div><h2>Page Hero</h2><div class="desc">The top-of-page banner shown when visitors land on the Gallery page.</div></div></div>
+          <div class="field"><label class="field-label">Hero Title</label><input class="field-input" value="Our Gallery"></div>
+          <div class="field"><label class="field-label">Hero Subtitle</label><input class="field-input" value="A glimpse into the Cloud Skin Clinic experience."></div>
+          <div class="pane-section">
+            <div class="sec-ttl">Hero background image</div>
+            <div class="upload-zone">
+              <div class="ic"><i data-lucide="image-up"></i></div>
+              <div class="ttl"><b>Click to upload</b> or drag &amp; drop</div>
+              <div class="helper">PNG, JPG up to 5MB · Recommended 1920 × 720</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Gallery Categories -->
+      <div class="pane" data-pane="categories">
+        <div class="card">
+          <div class="pane-head"><div><h2>Gallery Categories</h2><div class="desc">Filter tabs shown on the public gallery page.</div></div></div>
+          <div class="info-line">Categories appear as filter tabs on the public gallery page. The <b style="color:#1A2E40;font-family:var(--font-display);font-weight:600;">"All"</b> tab is always shown and cannot be removed.</div>
+
+          <div class="cat-list" id="cat-list">
+            <div class="cat-row locked">
+              <div class="drag-handle"><i data-lucide="lock"></i></div>
+              <div class="body">
+                <span class="locked-name">All</span>
+                <span class="locked-tag"><i data-lucide="info"></i> Auto-generated. Cannot be edited or removed.</span>
+              </div>
+              <button class="delete-btn" type="button" disabled aria-label="Cannot delete All"><i data-lucide="x"></i><span class="tip">Auto-generated category</span></button>
+            </div>
+            <!-- Editable category rows rendered by JS -->
+          </div>
+          <button class="add-btn" type="button" id="add-cat-btn"><i data-lucide="plus"></i> Add Category</button>
+        </div>
+      </div>
+
+      <!-- Tab 3: Gallery Images -->
+      <div class="pane" data-pane="images">
+        <div class="card">
+          <div class="pane-head"><div><h2>Gallery Images</h2><div class="desc">Upload, organize, and reorder the photos displayed in the gallery grid.</div></div></div>
+          <div class="info-line">Upload and manage photos shown in the gallery grid. Drag to reorder. Images are displayed in the order set here.</div>
+
+          <div class="upload-zone">
+            <div class="ic"><i data-lucide="image-up"></i></div>
+            <div class="ttl"><b>Click to upload</b> or drag &amp; drop images here</div>
+            <div class="helper">PNG, JPG up to 5MB · You can upload multiple images at once.</div>
+          </div>
+
+          <div class="img-grid" id="img-grid"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <div class="save-footer">
+      <span class="note">Unsaved changes apply only after clicking <b style="color:#1A2E40;font-family:var(--font-display);font-weight:600;">Save Changes</b>.</span>
+      <div class="actions">
+        <button class="btn btn-ghost" type="button">Cancel</button>
+        <button class="btn btn-primary" type="button"><i data-lucide="save"></i> Save Changes</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Edit Image Category modal -->
+<div class="modal" id="edit-cat-modal" hidden role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>Edit Image Category</h2>
+      <button class="close" id="ec-close-btn" type="button" aria-label="Close"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label">Category</label>
+        <select class="field-select" id="ec-select"></select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" type="button" id="ec-cancel-btn">Cancel</button>
+      <button class="btn btn-primary" type="button" id="ec-save-btn"><i data-lucide="check"></i> Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+
+<script>
+(function () {
+  // ---------- Tab switching ----------
+  var tabs = document.querySelectorAll('#tabs button');
+  var panes = document.querySelectorAll('.pane');
+  function activate(name) {
+    tabs.forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tab') === name); });
+    panes.forEach(function (p) { p.classList.toggle('active', p.getAttribute('data-pane') === name); });
+    var url = new URL(location.href);
+    if (name === 'hero') url.searchParams.delete('tab'); else url.searchParams.set('tab', name);
+    history.replaceState({}, '', url);
+  }
+  tabs.forEach(function (b) { b.addEventListener('click', function () { activate(b.getAttribute('data-tab')); }); });
+  activate((new URLSearchParams(location.search)).get('tab') || 'hero');
+
+  // ---------- Categories ----------
+  var CATEGORIES = [
+    { name: 'Clinic',     locked: false },
+    { name: 'Treatments', locked: false },
+    { name: 'Results',    locked: false }
+  ];
+
+  function imageCountForCategory(name) {
+    return IMAGES.filter(function (i) { return i.category === name; }).length;
+  }
+
+  function renderCategories() {
+    var host = document.getElementById('cat-list');
+    // Keep the static "All" row, remove only the dynamic ones (everything after the first .cat-row)
+    var lockedRow = host.querySelector('.cat-row.locked');
+    host.innerHTML = '';
+    host.appendChild(lockedRow);
+    CATEGORIES.forEach(function (c, idx) {
+      var inUse = imageCountForCategory(c.name) > 0;
+      var row = document.createElement('div');
+      row.className = 'cat-row';
+      row.setAttribute('draggable', 'true');
+      row.setAttribute('data-idx', idx);
+      row.innerHTML =
+        '<div class="drag-handle" title="Drag to reorder"><i data-lucide="grip-vertical"></i></div>'
+        + '<div class="body"><input class="field-input" value="' + c.name + '"></div>'
+        + '<button class="delete-btn" type="button" ' + (inUse ? 'disabled' : '') + ' aria-label="Remove category">'
+        +   '<i data-lucide="x"></i>'
+        +   (inUse ? '<span class="tip">Cannot delete a category that has images assigned to it</span>' : '')
+        + '</button>';
+      var input = row.querySelector('input');
+      input.addEventListener('input', function () { CATEGORIES[idx].name = input.value; refreshCategorySelect(); });
+      var del = row.querySelector('.delete-btn');
+      del.addEventListener('click', function () {
+        if (del.disabled) return;
+        CATEGORIES.splice(idx, 1);
+        renderCategories();
+      });
+      // Drag-and-drop
+      row.addEventListener('dragstart', function (e) { row.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', idx); });
+      row.addEventListener('dragend',   function () { row.classList.remove('dragging'); });
+      row.addEventListener('dragover',  function (e) { e.preventDefault(); });
+      row.addEventListener('drop', function (e) {
+        e.preventDefault();
+        var from = parseInt(e.dataTransfer.getData('text/plain'), 10);
+        var to = idx;
+        if (isNaN(from) || from === to) return;
+        var moved = CATEGORIES.splice(from, 1)[0];
+        CATEGORIES.splice(to, 0, moved);
+        renderCategories();
+      });
+      host.appendChild(row);
+    });
+    if (window.lucide) window.lucide.createIcons();
+    refreshCategorySelect();
+  }
+
+  document.getElementById('add-cat-btn').addEventListener('click', function () {
+    CATEGORIES.push({ name: 'New Category', locked: false });
+    renderCategories();
+  });
+
+  function refreshCategorySelect() {
+    var sel = document.getElementById('ec-select');
+    if (!sel) return;
+    sel.innerHTML = CATEGORIES.map(function (c) { return '<option value="' + c.name + '">' + c.name + '</option>'; }).join('');
+  }
+
+  // ---------- Images ----------
+  var GRADIENTS = [
+    ['#BFD8EB', '#5BC0EB'], ['#7C3AED', '#A78BFA'], ['#15803D', '#86EFAC'],
+    ['#B45309', '#FCD34D'], ['#DC2626', '#FCA5A5'], ['#1A3A5C', '#5BC0EB'],
+    ['#0EA5E9', '#BFD8EB'], ['#2D6A9F', '#86EFAC'], ['#7C3AED', '#FCD34D'],
+    ['#15803D', '#BFD8EB'], ['#B45309', '#5BC0EB'], ['#DC2626', '#7C3AED']
+  ];
+  var IMAGES = [
+    { id:'i1', label:'Clinic lobby',          category:'Clinic' },
+    { id:'i2', label:'Reception desk',         category:'Clinic' },
+    { id:'i3', label:'Treatment room A',       category:'Clinic' },
+    { id:'i4', label:'HydraFacial in session', category:'Treatments' },
+    { id:'i5', label:'Laser hair removal',     category:'Treatments' },
+    { id:'i6', label:'IV drip room',           category:'Treatments' },
+    { id:'i7', label:'Botox result · 4 weeks', category:'Results' },
+    { id:'i8', label:'Skin clarity · 6 weeks', category:'Results' }
+  ];
+  IMAGES.forEach(function (img, i) {
+    var g = GRADIENTS[i % GRADIENTS.length];
+    img.gradient = g;
+  });
+
+  function renderImages() {
+    var host = document.getElementById('img-grid');
+    host.innerHTML = '';
+    IMAGES.forEach(function (img) {
+      var card = document.createElement('div');
+      card.className = 'img-card';
+      card.setAttribute('data-id', img.id);
+      card.setAttribute('draggable', 'true');
+      card.style.setProperty('--ph-c1', img.gradient[0]);
+      card.style.setProperty('--ph-c2', img.gradient[1]);
+      card.innerHTML =
+        '<div class="photo">' + img.label + '</div>'
+        + '<span class="cat-pill">' + img.category + '</span>'
+        + '<span class="drag-pill" title="Drag to reorder"><i data-lucide="grip-vertical"></i></span>'
+        + '<div class="overlay">'
+        +   '<button class="edit" type="button" title="Reassign category"><i data-lucide="pencil"></i></button>'
+        +   '<button class="del" type="button" title="Remove image"><i data-lucide="trash-2"></i></button>'
+        + '</div>'
+        + '<div class="confirm-bar">'
+        +   '<span>Remove this image?</span>'
+        +   '<div><button class="cancel" type="button">Cancel</button><button class="remove" type="button">Remove</button></div>'
+        + '</div>';
+      // Edit
+      card.querySelector('.edit').addEventListener('click', function (e) { e.stopPropagation(); openEditModal(img.id); });
+      // Delete confirm flow
+      card.querySelector('.del').addEventListener('click', function (e) { e.stopPropagation(); card.classList.add('confirming'); });
+      card.querySelector('.cancel').addEventListener('click', function (e) { e.stopPropagation(); card.classList.remove('confirming'); });
+      card.querySelector('.remove').addEventListener('click', function (e) {
+        e.stopPropagation();
+        var idx = IMAGES.findIndex(function (x) { return x.id === img.id; });
+        if (idx !== -1) IMAGES.splice(idx, 1);
+        renderImages();
+        renderCategories(); // delete-button disabled state may change
+      });
+      // Drag-and-drop reorder
+      card.addEventListener('dragstart', function (e) { card.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', img.id); });
+      card.addEventListener('dragend',   function () { card.classList.remove('dragging'); });
+      card.addEventListener('dragover',  function (e) { e.preventDefault(); });
+      card.addEventListener('drop', function (e) {
+        e.preventDefault();
+        var fromId = e.dataTransfer.getData('text/plain');
+        var fromIdx = IMAGES.findIndex(function (x) { return x.id === fromId; });
+        var toIdx = IMAGES.findIndex(function (x) { return x.id === img.id; });
+        if (fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) return;
+        var moved = IMAGES.splice(fromIdx, 1)[0];
+        IMAGES.splice(toIdx, 0, moved);
+        renderImages();
+      });
+      host.appendChild(card);
+    });
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  // ---------- Edit Category modal ----------
+  var editingImageId = null;
+  function openEditModal(id) {
+    editingImageId = id;
+    refreshCategorySelect();
+    var img = IMAGES.find(function (x) { return x.id === id; });
+    if (img) document.getElementById('ec-select').value = img.category;
+    document.getElementById('edit-cat-modal').hidden = false;
+    document.body.style.overflow = 'hidden';
+    if (window.lucide) window.lucide.createIcons();
+  }
+  function closeEditModal() {
+    document.getElementById('edit-cat-modal').hidden = true;
+    document.body.style.overflow = '';
+  }
+  document.getElementById('ec-close-btn').addEventListener('click', closeEditModal);
+  document.getElementById('ec-cancel-btn').addEventListener('click', closeEditModal);
+  document.getElementById('ec-save-btn').addEventListener('click', function () {
+    var val = document.getElementById('ec-select').value;
+    var img = IMAGES.find(function (x) { return x.id === editingImageId; });
+    if (img) img.category = val;
+    closeEditModal();
+    renderImages();
+    renderCategories(); // disabled state may change
+  });
+  document.getElementById('edit-cat-modal').addEventListener('click', function (e) {
+    if (e.target === document.getElementById('edit-cat-modal')) closeEditModal();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !document.getElementById('edit-cat-modal').hidden) closeEditModal();
+  });
+
+  // ---------- Init ----------
+  renderCategories();
+  renderImages();
+  if (window.lucide) window.lucide.createIcons();
+})();
+</script>
+</body>
+</html>

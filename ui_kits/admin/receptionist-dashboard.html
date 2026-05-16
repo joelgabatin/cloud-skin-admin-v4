@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Reception — Dashboard</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #FEF3C7; color: #B45309; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .greet { background: linear-gradient(135deg, #2D6A9F 0%, #1A3A5C 100%); border-radius: 14px; padding: 28px 32px; color: #fff; display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .greet h1 { font-family: var(--font-display); font-weight: 700; font-size: 24px; margin: 0; }
+  .greet .sub { font-family: var(--font-body); font-size: 14px; color: rgba(255,255,255,0.85); margin-top: 6px; line-height: 1.5; max-width: 540px; }
+  .greet .date-pill { background: rgba(255,255,255,0.15); padding: 10px 16px; border-radius: 10px; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+  .greet .date-pill .lucide { width: 16px; height: 16px; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .stat-card { background: #fff; border-radius: 10px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; flex-direction: column; gap: 8px; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-card .label { font-size: 12px; color: #5A7A96; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #2D6A9F; display: flex; align-items: center; justify-content: center; }
+  .stat-card .iplate.success { background: #DCFCE7; color: #15803D; }
+  .stat-card .iplate.warning { background: #FEF3C7; color: #B45309; }
+  .stat-card .iplate.danger { background: #FEE2E2; color: #DC2626; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: #1A2E40; }
+  .stat-card .sub { font-size: 12px; color: #5A7A96; }
+  .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+  @media (max-width: 1100px) { .grid-2 { grid-template-columns: 1fr; } }
+  .section-card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  .section-head { padding: 16px 22px; border-bottom: 1px solid #D0E8F5; display: flex; align-items: center; justify-content: space-between; }
+  .section-head .ttl { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #1A2E40; text-transform: uppercase; letter-spacing: 0.05em; }
+  .section-head a { color: #2D6A9F; font-family: var(--font-display); font-size: 12px; font-weight: 600; text-decoration: none; }
+  .appt-row { display: grid; grid-template-columns: 60px 1fr auto; gap: 14px; align-items: center; padding: 12px 22px; border-bottom: 1px solid #F0F6FC; }
+  .appt-row:last-child { border-bottom: none; }
+  .appt-time { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #2D6A9F; }
+  .appt-name { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .appt-svc { font-family: var(--font-body); font-size: 11px; color: #5A7A96; margin-top: 2px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .badge.success { background: #DCFCE7; color: #15803D; }
+  .badge.warning { background: #FEF3C7; color: #B45309; }
+  .badge.info    { background: #DBEAFE; color: #1D4ED8; }
+  .badge.slate   { background: #F1F5F9; color: #475569; }
+  .task-row { display: flex; align-items: center; gap: 12px; padding: 12px 22px; border-bottom: 1px solid #F0F6FC; }
+  .task-row:last-child { border-bottom: none; }
+  .task-ico { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .task-ico.warning { background: #FEF3C7; color: #B45309; }
+  .task-ico.info { background: #DBEAFE; color: #2D6A9F; }
+  .task-ico.success { background: #DCFCE7; color: #15803D; }
+  .task-ico .lucide { width: 16px; height: 16px; }
+  .task-text { flex: 1; }
+  .task-title { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .task-sub { font-family: var(--font-body); font-size: 11px; color: #5A7A96; margin-top: 2px; }
+  .qa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; padding: 18px 22px; }
+  .qa { display: flex; align-items: center; gap: 10px; padding: 14px; background: #F8FBFF; border: 1.5px solid #D0E8F5; border-radius: 10px; cursor: pointer; text-decoration: none; transition: all 150ms; }
+  .qa:hover { border-color: #2D6A9F; background: #EBF6FD; transform: translateY(-1px); }
+  .qa-ico { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #2D6A9F; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .qa .name { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #1A2E40; }
+  .qa .sub { font-family: var(--font-body); font-size: 11px; color: #5A7A96; margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Dashboard</div>
+        <div class="topbar-crumb">Reception / Dashboard</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">2</span></button>
+        <div class="user-pill">
+          <div class="avatar" style="background:#B45309;">AC</div>
+          <div class="meta"><span class="name">A. Cruz</span><span class="role-pill-light">Reception</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+    <section class="page" data-screen-label="01 Reception Dashboard">
+      <div class="greet">
+        <div>
+          <h1>Good morning, Anna 👋</h1>
+          <div class="sub">You have 8 appointments today and 1 active stock-take assigned to you. Let's make it a smooth day.</div>
+        </div>
+        <div class="date-pill"><i data-lucide="calendar"></i> Wednesday, May 13, 2026</div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card"><div class="top"><span class="label">Today's Appointments</span><div class="iplate"><i data-lucide="calendar"></i></div></div><div class="value">8</div><div class="sub">3 confirmed · 5 pending check-in</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Walk-ins</span><div class="iplate success"><i data-lucide="user-plus"></i></div></div><div class="value">3</div><div class="sub">Since 9:00 AM</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Pending Payments</span><div class="iplate warning"><i data-lucide="credit-card"></i></div></div><div class="value">2</div><div class="sub">₱8,470 total to collect</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Count Progress</span><div class="iplate"><i data-lucide="clipboard-check"></i></div></div><div class="value">34 / 60</div><div class="sub">CNT-0012 · due 5:00 PM</div></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="section-card">
+          <div class="section-head"><span class="ttl">Today's Appointments</span><a href="receptionist-appointments.html">View all →</a></div>
+          <div class="appt-row"><span class="appt-time">09:30</span><div><div class="appt-name">Maria Santos</div><div class="appt-svc">HydraFacial · Dr. Reyes</div></div><span class="badge success">Checked In</span></div>
+          <div class="appt-row"><span class="appt-time">10:15</span><div><div class="appt-name">Miguel Cruz</div><div class="appt-svc">Botox Touch-up · Dr. Santos</div></div><span class="badge info">Confirmed</span></div>
+          <div class="appt-row"><span class="appt-time">11:00</span><div><div class="appt-name">Walk-in</div><div class="appt-svc">Consultation</div></div><span class="badge slate">Waiting</span></div>
+          <div class="appt-row"><span class="appt-time">13:30</span><div><div class="appt-name">Bea Mendoza</div><div class="appt-svc">Laser Resurfacing · Dr. Reyes</div></div><span class="badge info">Confirmed</span></div>
+          <div class="appt-row"><span class="appt-time">14:45</span><div><div class="appt-name">Sofia Cruz</div><div class="appt-svc">IV Drip Wellness</div></div><span class="badge warning">Pending Payment</span></div>
+          <div class="appt-row"><span class="appt-time">15:30</span><div><div class="appt-name">Jose Dela Cruz</div><div class="appt-svc">Microneedling</div></div><span class="badge info">Confirmed</span></div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-head"><span class="ttl">My Tasks</span><a href="#">All tasks →</a></div>
+          <div class="task-row"><div class="task-ico warning"><i data-lucide="clipboard-check"></i></div><div class="task-text"><div class="task-title">Physical count CNT-0012</div><div class="task-sub">26 items remaining · due 5:00 PM</div></div></div>
+          <div class="task-row"><div class="task-ico info"><i data-lucide="credit-card"></i></div><div class="task-text"><div class="task-title">Collect ₱4,250 from Sofia Cruz</div><div class="task-sub">2:45 PM appointment</div></div></div>
+          <div class="task-row"><div class="task-ico info"><i data-lucide="phone"></i></div><div class="task-text"><div class="task-title">Confirm tomorrow's bookings</div><div class="task-sub">6 patients to call</div></div></div>
+          <div class="task-row"><div class="task-ico success"><i data-lucide="package"></i></div><div class="task-text"><div class="task-title">Receive Premier Med delivery</div><div class="task-sub">PO-2024-006 · arriving 2:00 PM</div></div></div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-head"><span class="ttl">Quick Actions</span></div>
+        <div class="qa-grid">
+          <a class="qa" href="receptionist-appointments.html"><div class="qa-ico"><i data-lucide="calendar-plus"></i></div><div><div class="name">New Booking</div><div class="sub">Schedule visit</div></div></a>
+          <a class="qa" href="receptionist-patients.html"><div class="qa-ico" style="background:#DCFCE7;color:#15803D;"><i data-lucide="user-plus"></i></div><div><div class="name">Add Patient</div><div class="sub">Register a new client</div></div></a>
+          <a class="qa" href="receptionist-pos.html"><div class="qa-ico" style="background:#F3E8FF;color:#6D28D9;"><i data-lucide="shopping-cart"></i></div><div><div class="name">Open POS</div><div class="sub">Start a new sale</div></div></a>
+          <a class="qa" href="receptionist-audit-logs.html"><div class="qa-ico" style="background:#FEF3C7;color:#B45309;"><i data-lucide="activity"></i></div><div><div class="name">Audit Logs</div><div class="sub">Stock movements you logged</div></div></a>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

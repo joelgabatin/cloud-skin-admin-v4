@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Refunds</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .stat-card { background: #fff; border-radius: 10px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; flex-direction: column; gap: 8px; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-card .label { font-size: 12px; color: #5A7A96; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #2D6A9F; display: flex; align-items: center; justify-content: center; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 28px; line-height: 1.1; color: #1A2E40; }
+  .stat-card .sub { font-size: 12px; color: #5A7A96; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .badge.success { background: #DCFCE7; color: #15803D; }
+  .badge.warning { background: #FEF3C7; color: #B45309; }
+  .badge.danger  { background: #FEE2E2; color: #DC2626; }
+  .badge.info    { background: #DBEAFE; color: #1D4ED8; }
+  .badge.slate   { background: #F1F5F9; color: #475569; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 12px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr.row { cursor: pointer; transition: background 150ms; }
+  tr.row:hover td { background: #F8FBFF; }
+  tr.row:last-child td { border-bottom: none; }
+  .nm { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .sku { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; font-weight: 600; white-space: nowrap; }
+  .price { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .action-btn { width: 32px; height: 32px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #2D6A9F; margin-right: 4px; }
+  .action-btn.danger { background: #FEE2E2; color: #DC2626; }
+  .action-btn .lucide { width: 14px; height: 14px; }
+  .table-card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 16px 20px; border-bottom: 1px solid #D0E8F5; }
+  .search-input { position: relative; flex: 1; max-width: 300px; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; box-sizing: border-box; }
+  .field-select { height: 40px; padding: 0 12px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; max-width: 200px; }
+  .field-input { width: 100%; height: 38px; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; box-sizing: border-box; }
+  .field-label { display: block; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; }
+  .pagination { padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #D0E8F5; }
+  .pagination .info { font-size: 13px; color: #5A7A96; }
+  .pager { display: inline-flex; align-items: center; gap: 6px; }
+  .pager button { width: 32px; height: 32px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 500; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; }
+  .pager button.active { background: #2D6A9F; color: #fff; }
+
+  /* Modals */
+  .modal-mask { position: fixed; inset: 0; background: rgba(26,58,92,0.5); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .modal-mask[hidden] { display: none; }
+  .detail-card { background: #fff; border-radius: 14px; width: 100%; max-width: 560px; box-shadow: 0 16px 48px rgba(26,58,92,0.20); overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; }
+  .detail-head { padding: 20px 24px; border-bottom: 1px solid #D0E8F5; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .detail-head h3 { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .detail-head .sub { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; margin-top: 4px; font-weight: 600; }
+  .modal-close { background: none; border: none; cursor: pointer; color: #5A7A96; padding: 4px; display: flex; }
+  .detail-body { padding: 20px 24px; display: grid; gap: 16px; overflow-y: auto; }
+  .info-grid { background: #F0F6FC; border: 1px solid #D0E8F5; border-radius: 10px; padding: 14px 16px; display: grid; gap: 8px; }
+  .info-grid .row { display: grid; grid-template-columns: 140px 1fr; gap: 12px; font-size: 13px; font-family: var(--font-body); }
+  .info-grid .row .k { color: #5A7A96; font-family: var(--font-display); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .info-grid .row .v { color: #1A2E40; font-weight: 600; font-family: var(--font-display); }
+  .info-grid .row .v.sku { font-family: var(--font-mono); color: #2D6A9F; }
+  .info-grid .row .v.amount { color: #2D6A9F; font-size: 15px; }
+  .reason-block { background: #FFFBEB; border: 1px solid #FCD34D; border-radius: 10px; padding: 14px 16px; }
+  .reason-block .lbl { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #B45309; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .reason-block .lbl .lucide { width: 14px; height: 14px; }
+  .reason-block .text { font-family: var(--font-body); font-size: 13px; color: #1A2E40; line-height: 1.6; }
+  .approval-block { background: #fff; border: 1px solid #D0E8F5; border-radius: 10px; padding: 14px 16px; display: grid; gap: 10px; }
+  .approval-row { display: grid; grid-template-columns: 36px 1fr auto; gap: 12px; align-items: center; }
+  .approval-avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 13px; flex-shrink: 0; }
+  .approval-avatar.pending { background: #FEF3C7; color: #B45309; }
+  .approval-name { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #1A2E40; }
+  .approval-role { font-family: var(--font-body); font-size: 12px; color: #5A7A96; }
+  .approval-time { font-family: var(--font-mono); font-size: 11px; color: #9BBAD4; }
+  .detail-foot { padding: 14px 24px; border-top: 1px solid #D0E8F5; display: flex; gap: 8px; justify-content: flex-end; background: #F8FBFF; }
+  .btn { height: 38px; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-outline { background: #F0F6FC; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 18px; }
+  .btn-success { background: #15803D; color: #fff; padding: 0 18px; }
+  .btn-success:hover { background: #166534; }
+  .btn-danger { background: #DC2626; color: #fff; padding: 0 18px; }
+  .btn-danger:hover { background: #991B1B; }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #15803D; color: #fff; padding: 10px 18px; border-radius: 10px; font-family: var(--font-display); font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.18); z-index: 200; display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateY(8px); transition: opacity 200ms, transform 200ms; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast .lucide { width: 16px; height: 16px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Refunds</div>
+        <div class="topbar-crumb">Admin / POS / Refunds</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+    <section class="page" data-screen-label="01 Refunds">
+      <!-- Stat cards -->
+      <div class="stat-row">
+        <div class="stat-card"><div class="top"><span class="label">Total Refunds</span><div class="iplate"><i data-lucide="rotate-ccw"></i></div></div><div class="value">7</div><div class="sub">This month</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Refunded Amount</span><div class="iplate" style="background:#FEE2E2;color:#DC2626;"><i data-lucide="banknote"></i></div></div><div class="value">₱11,270</div><div class="sub">Total returned to customers</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Pending Approval</span><div class="iplate" style="background:#FEF3C7;color:#B45309;"><i data-lucide="clock"></i></div></div><div class="value">1</div><div class="sub">Awaiting admin review</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Approval Rate</span><div class="iplate" style="background:#DCFCE7;color:#15803D;"><i data-lucide="check-circle"></i></div></div><div class="value">83%</div><div class="sub">5 approved · 1 rejected</div></div>
+      </div>
+
+      <!-- Refunds table -->
+      <div class="table-card">
+        <div class="toolbar">
+          <div class="search-input">
+            <i data-lucide="search"></i>
+            <input id="rf-search" placeholder="Search refund ID, order #, or customer...">
+          </div>
+          <select class="field-select" id="rf-status-filter">
+            <option value="">All statuses</option>
+            <option>Approved</option>
+            <option>Pending</option>
+            <option>Rejected</option>
+          </select>
+          <select class="field-select" id="rf-reason-filter">
+            <option value="">All reasons</option>
+            <option>Defective product</option>
+            <option>Wrong item delivered</option>
+            <option>Customer changed mind</option>
+            <option>Quality issue</option>
+          </select>
+          <button class="btn btn-outline" type="button" style="margin-left:auto;"><i data-lucide="download"></i> Export</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="min-width:1300px;">
+            <thead><tr><th>Refund ID</th><th>Order #</th><th>Date &amp; Time</th><th>Customer</th><th>Amount</th><th>Reason</th><th>Requested By</th><th>Approved By</th><th>Status</th><th style="text-align:center;">Actions</th></tr></thead>
+            <tbody id="rf-tbody">
+              <tr class="row" data-id="RF-2026-0042">
+                <td><span class="sku">RF-2026-0042</span></td>
+                <td><span class="sku">POS-2026-00178</span></td>
+                <td style="font-family:var(--font-mono);font-size:12px;">May 12, 2026 16:18</td>
+                <td><span class="nm">Walk-in</span></td>
+                <td><span class="price">₱4,250</span></td>
+                <td>Wrong item delivered</td>
+                <td><div style="display:flex;flex-direction:column;gap:2px;"><span class="nm">Joel Tan</span><span class="badge slate">Cashier</span></div></td>
+                <td><span class="nm">Dr. Reyes</span></td>
+                <td><span class="badge success">Approved</span></td>
+                <td style="text-align:center;"><button class="action-btn view-refund" data-id="RF-2026-0042" title="View details"><i data-lucide="eye"></i></button></td>
+              </tr>
+              <tr class="row" data-id="RF-2026-0041">
+                <td><span class="sku">RF-2026-0041</span></td>
+                <td><span class="sku">POS-2026-00170</span></td>
+                <td style="font-family:var(--font-mono);font-size:12px;">May 12, 2026 11:02</td>
+                <td><span class="nm">Liza Garcia</span></td>
+                <td><span class="price">₱1,200</span></td>
+                <td>Defective product</td>
+                <td><div style="display:flex;flex-direction:column;gap:2px;"><span class="nm">Anna Reyes</span><span class="badge slate">Cashier</span></div></td>
+                <td><span class="nm">Admin User</span></td>
+                <td><span class="badge success">Approved</span></td>
+                <td style="text-align:center;"><button class="action-btn view-refund" data-id="RF-2026-0041" title="View details"><i data-lucide="eye"></i></button></td>
+              </tr>
+              <tr class="row" data-id="RF-2026-0040">
+                <td><span class="sku">RF-2026-0040</span></td>
+                <td><span class="sku">POS-2026-00165</span></td>
+                <td style="font-family:var(--font-mono);font-size:12px;">May 11, 2026 15:30</td>
+                <td><span class="nm">Mark Villanueva</span></td>
+                <td><span class="price">₱720</span></td>
+                <td>Customer changed mind</td>
+                <td><div style="display:flex;flex-direction:column;gap:2px;"><span class="nm">Joel Tan</span><span class="badge slate">Cashier</span></div></td>
+                <td><span style="color:#9BBAD4;">—</span></td>
+                <td><span class="badge warning">Pending Approval</span></td>
+                <td style="text-align:center;"><button class="action-btn view-refund" data-id="RF-2026-0040" title="View details"><i data-lucide="eye"></i></button><button class="action-btn approve-refund" data-id="RF-2026-0040" title="Approve" style="background:#DCFCE7;color:#15803D;"><i data-lucide="check"></i></button><button class="action-btn danger reject-refund" data-id="RF-2026-0040" title="Reject"><i data-lucide="x"></i></button></td>
+              </tr>
+              <tr class="row" data-id="RF-2026-0039">
+                <td><span class="sku">RF-2026-0039</span></td>
+                <td><span class="sku">POS-2026-00161</span></td>
+                <td style="font-family:var(--font-mono);font-size:12px;">May 11, 2026 09:15</td>
+                <td><span class="nm">Sofia Cruz</span></td>
+                <td><span class="price">₱1,800</span></td>
+                <td>Quality issue</td>
+                <td><div style="display:flex;flex-direction:column;gap:2px;"><span class="nm">Dr. Reyes</span><span class="badge info">Admin</span></div></td>
+                <td><span class="nm">Self-approved</span></td>
+                <td><span class="badge success">Approved</span></td>
+                <td style="text-align:center;"><button class="action-btn view-refund" data-id="RF-2026-0039" title="View details"><i data-lucide="eye"></i></button></td>
+              </tr>
+              <tr class="row" data-id="RF-2026-0038">
+                <td><span class="sku">RF-2026-0038</span></td>
+                <td><span class="sku">POS-2026-00158</span></td>
+                <td style="font-family:var(--font-mono);font-size:12px;">May 10, 2026 13:48</td>
+                <td><span class="nm">Walk-in</span></td>
+                <td><span class="price">₱550</span></td>
+                <td>Defective product</td>
+                <td><div style="display:flex;flex-direction:column;gap:2px;"><span class="nm">Anna Reyes</span><span class="badge slate">Cashier</span></div></td>
+                <td><span class="nm">Admin User</span></td>
+                <td><span class="badge success">Approved</span></td>
+                <td style="text-align:center;"><button class="action-btn view-refund" data-id="RF-2026-0038" title="View details"><i data-lucide="eye"></i></button></td>
+              </tr>
+              <tr class="row" data-id="RF-2026-0037">
+                <td><span class="sku">RF-2026-0037</span></td>
+                <td><span class="sku">POS-2026-00152</span></td>
+                <td style="font-family:var(--font-mono);font-size:12px;">May 09, 2026 17:20</td>
+                <td><span class="nm">Camille Torres</span></td>
+                <td><span class="price">₱2,400</span></td>
+                <td>Wrong item delivered</td>
+                <td><div style="display:flex;flex-direction:column;gap:2px;"><span class="nm">Joel Tan</span><span class="badge slate">Cashier</span></div></td>
+                <td><span style="color:#DC2626;">Rejected by Admin</span></td>
+                <td><span class="badge danger">Rejected</span></td>
+                <td style="text-align:center;"><button class="action-btn view-refund" data-id="RF-2026-0037" title="View details"><i data-lucide="eye"></i></button></td>
+              </tr>
+              <tr class="row" data-id="RF-2026-0036">
+                <td><span class="sku">RF-2026-0036</span></td>
+                <td><span class="sku">POS-2026-00148</span></td>
+                <td style="font-family:var(--font-mono);font-size:12px;">May 09, 2026 10:05</td>
+                <td><span class="nm">Jose Dela Cruz</span></td>
+                <td><span class="price">₱350</span></td>
+                <td>Customer changed mind</td>
+                <td><div style="display:flex;flex-direction:column;gap:2px;"><span class="nm">Anna Reyes</span><span class="badge slate">Cashier</span></div></td>
+                <td><span class="nm">Dr. Reyes</span></td>
+                <td><span class="badge success">Approved</span></td>
+                <td style="text-align:center;"><button class="action-btn view-refund" data-id="RF-2026-0036" title="View details"><i data-lucide="eye"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span class="info">Showing 1 to 7 of 7 refunds</span>
+          <div class="pager">
+            <button disabled style="opacity:0.5;"><i data-lucide="chevron-left"></i></button>
+            <button class="active">1</button>
+            <button disabled style="opacity:0.5;"><i data-lucide="chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detail modal -->
+      <div id="rf-mask" class="modal-mask" hidden>
+        <div class="detail-card">
+          <div class="detail-head">
+            <div>
+              <h3>Refund Details</h3>
+              <div class="sub" id="d-id">RF-2026-0000</div>
+            </div>
+            <button class="modal-close" type="button" id="d-close"><i data-lucide="x"></i></button>
+          </div>
+          <div class="detail-body">
+            <div class="info-grid">
+              <div class="row"><span class="k">Order #</span><span class="v sku" id="d-order">—</span></div>
+              <div class="row"><span class="k">Customer</span><span class="v" id="d-customer">—</span></div>
+              <div class="row"><span class="k">Date &amp; Time</span><span class="v" id="d-date">—</span></div>
+              <div class="row"><span class="k">Items Refunded</span><span class="v" id="d-items">—</span></div>
+              <div class="row"><span class="k">Payback Method</span><span class="v" id="d-payback">—</span></div>
+              <div class="row"><span class="k">Status</span><span class="v" id="d-status">—</span></div>
+              <div class="row"><span class="k">Total Refunded</span><span class="v amount" id="d-amount">₱—</span></div>
+            </div>
+
+            <div class="reason-block">
+              <div class="lbl"><i data-lucide="message-square"></i>Reason for Refund</div>
+              <div style="font-family:var(--font-display);font-weight:700;color:#1A2E40;font-size:13px;margin-bottom:4px;" id="d-reason-title">—</div>
+              <div class="text" id="d-reason-note">—</div>
+            </div>
+
+            <div class="approval-block">
+              <div style="font-family:var(--font-display);font-size:11px;font-weight:600;color:#5A7A96;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:2px;">Approval Trail</div>
+              <div class="approval-row">
+                <div class="approval-avatar" id="d-req-initials">—</div>
+                <div>
+                  <div class="approval-name" id="d-req-name">—</div>
+                  <div class="approval-role"><span id="d-req-role">—</span> · Requested refund</div>
+                </div>
+                <div class="approval-time" id="d-req-time">—</div>
+              </div>
+              <div class="approval-row" id="d-app-row">
+                <div class="approval-avatar" id="d-app-initials">—</div>
+                <div>
+                  <div class="approval-name" id="d-app-name">—</div>
+                  <div class="approval-role" id="d-app-desc">—</div>
+                </div>
+                <div class="approval-time" id="d-app-time">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="detail-foot">
+            <button class="btn btn-outline" type="button" id="d-close2">Close</button>
+            <button class="btn btn-danger" type="button" id="d-reject" hidden><i data-lucide="x"></i> Reject</button>
+            <button class="btn btn-success" type="button" id="d-approve" hidden><i data-lucide="check"></i> Approve Refund</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="toast" class="toast"><i data-lucide="check-circle"></i><span id="toast-msg">Done.</span></div>
+    </section>
+  </main>
+</div>
+<script>
+lucide.createIcons();
+const REFUNDS = [{"id":"RF-2026-0042","order":"POS-2026-00178","date":"May 12, 2026 16:18","customer":"Walk-in","amount":4250,"reason":"Wrong item delivered","reasonNote":"Customer received Multivitamin Daily 10x instead of Probiotics Beauty. Replacement unavailable, full refund issued.","requestedBy":"Joel Tan","role":"Cashier","approvedBy":"Dr. Reyes","status":"Approved","payback":"GCash","items":3},{"id":"RF-2026-0041","order":"POS-2026-00170","date":"May 12, 2026 11:02","customer":"Liza Garcia","amount":1200,"reason":"Defective product","reasonNote":"Glutathione capsules — bottle seal was broken on arrival; customer requested refund instead of replacement.","requestedBy":"Anna Reyes","role":"Cashier","approvedBy":"Admin User","status":"Approved","payback":"Card","items":1},{"id":"RF-2026-0040","order":"POS-2026-00165","date":"May 11, 2026 15:30","customer":"Mark Villanueva","amount":720,"reason":"Customer changed mind","reasonNote":"Patient decided against the Probiotics Beauty product after consultation. Full refund within 7-day window.","requestedBy":"Joel Tan","role":"Cashier","approvedBy":"Pending","status":"Pending","payback":"GCash","items":1},{"id":"RF-2026-0039","order":"POS-2026-00161","date":"May 11, 2026 09:15","customer":"Sofia Cruz","amount":1800,"reason":"Quality issue","reasonNote":"IV Drip Wellness Kit — caused minor skin irritation per patient. Refund approved by medical staff.","requestedBy":"Dr. Reyes","role":"Admin","approvedBy":"Self-approved","status":"Approved","payback":"Cash","items":1},{"id":"RF-2026-0038","order":"POS-2026-00158","date":"May 10, 2026 13:48","customer":"Walk-in","amount":550,"reason":"Defective product","reasonNote":"Retinol Cream tube was damaged in transit. Product disposed; stock not restored.","requestedBy":"Anna Reyes","role":"Cashier","approvedBy":"Admin User","status":"Approved","payback":"Cash","items":1},{"id":"RF-2026-0037","order":"POS-2026-00152","date":"May 09, 2026 17:20","customer":"Camille Torres","amount":2400,"reason":"Wrong item delivered","reasonNote":"Customer ordered SPF 50 Sunscreen but received Sunscreen Lite by mistake.","requestedBy":"Joel Tan","role":"Cashier","approvedBy":"Rejected","status":"Rejected","payback":"—","items":2},{"id":"RF-2026-0036","order":"POS-2026-00148","date":"May 09, 2026 10:05","customer":"Jose Dela Cruz","amount":350,"reason":"Customer changed mind","reasonNote":"Patient decided against the HydraFacial Serum after demo. Within return window.","requestedBy":"Anna Reyes","role":"Cashier","approvedBy":"Dr. Reyes","status":"Approved","payback":"GCash","items":1}];
+function initials(name) { return name.split(/\s+/).slice(0,2).map(function(p){return p[0]||'';}).join('').toUpperCase(); }
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(function () { t.classList.remove('show'); }, 2200);
+}
+
+// Filter
+var search = document.getElementById('rf-search');
+var sFilter = document.getElementById('rf-status-filter');
+var rFilter = document.getElementById('rf-reason-filter');
+function applyFilters() {
+  var q = (search.value || '').toLowerCase().trim();
+  var st = sFilter.value;
+  var rs = rFilter.value;
+  document.querySelectorAll('#rf-tbody tr.row').forEach(function (row) {
+    var hay = row.textContent.toLowerCase();
+    var statusText = row.querySelector('.badge') ? row.querySelector('td:nth-child(9)').textContent.trim() : '';
+    var matchQ = !q || hay.indexOf(q) !== -1;
+    var matchS = !st || statusText.indexOf(st) !== -1;
+    var matchR = !rs || row.children[5].textContent.trim() === rs;
+    row.style.display = (matchQ && matchS && matchR) ? '' : 'none';
+  });
+}
+search.addEventListener('input', applyFilters);
+sFilter.addEventListener('change', applyFilters);
+rFilter.addEventListener('change', applyFilters);
+
+// Detail modal
+function openDetail(id) {
+  var r = REFUNDS.find(function (x) { return x.id === id; });
+  if (!r) return;
+  document.getElementById('d-id').textContent = r.id;
+  document.getElementById('d-order').textContent = r.order;
+  document.getElementById('d-customer').textContent = r.customer;
+  document.getElementById('d-date').textContent = r.date;
+  document.getElementById('d-items').textContent = r.items + ' item' + (r.items > 1 ? 's' : '');
+  document.getElementById('d-payback').textContent = r.payback;
+  var statusHtml = r.status === 'Approved' ? '<span class="badge success">Approved</span>'
+                  : r.status === 'Pending' ? '<span class="badge warning">Pending Approval</span>'
+                  : '<span class="badge danger">Rejected</span>';
+  document.getElementById('d-status').innerHTML = statusHtml;
+  document.getElementById('d-amount').textContent = '₱' + r.amount.toLocaleString();
+  document.getElementById('d-reason-title').textContent = r.reason;
+  document.getElementById('d-reason-note').textContent = r.reasonNote;
+
+  // Approval trail
+  document.getElementById('d-req-initials').textContent = initials(r.requestedBy);
+  document.getElementById('d-req-name').textContent = r.requestedBy;
+  document.getElementById('d-req-role').textContent = r.role;
+  document.getElementById('d-req-time').textContent = r.date;
+
+  var appAvatar = document.getElementById('d-app-initials');
+  var appName = document.getElementById('d-app-name');
+  var appDesc = document.getElementById('d-app-desc');
+  var appTime = document.getElementById('d-app-time');
+  var appRow = document.getElementById('d-app-row');
+  appRow.style.display = '';
+  if (r.status === 'Pending') {
+    appAvatar.textContent = '?';
+    appAvatar.className = 'approval-avatar pending';
+    appName.textContent = 'Awaiting approval';
+    appDesc.textContent = 'Admin review required';
+    appTime.textContent = '—';
+  } else if (r.status === 'Rejected') {
+    appAvatar.textContent = 'AU';
+    appAvatar.className = 'approval-avatar';
+    appAvatar.style.background = '#DC2626';
+    appName.textContent = 'Admin User';
+    appDesc.textContent = 'Admin · Rejected refund';
+    appTime.textContent = r.date;
+  } else {
+    appAvatar.textContent = initials(r.approvedBy === 'Self-approved' ? r.requestedBy : r.approvedBy);
+    appAvatar.className = 'approval-avatar';
+    appAvatar.style.background = '#15803D';
+    appName.textContent = r.approvedBy === 'Self-approved' ? r.requestedBy + ' (self-approved)' : r.approvedBy;
+    appDesc.textContent = 'Admin · Approved refund';
+    appTime.textContent = r.date;
+  }
+
+  // Approve/reject buttons only for Pending
+  document.getElementById('d-approve').hidden = r.status !== 'Pending';
+  document.getElementById('d-reject').hidden = r.status !== 'Pending';
+  document.getElementById('d-approve').setAttribute('data-id', r.id);
+  document.getElementById('d-reject').setAttribute('data-id', r.id);
+
+  document.getElementById('rf-mask').hidden = false;
+  lucide.createIcons();
+}
+document.querySelectorAll('.view-refund').forEach(function (b) {
+  b.addEventListener('click', function (e) { e.stopPropagation(); openDetail(b.getAttribute('data-id')); });
+});
+document.querySelectorAll('tr.row').forEach(function (row) {
+  row.addEventListener('click', function (e) {
+    if (e.target.closest('.action-btn')) return;
+    openDetail(row.getAttribute('data-id'));
+  });
+});
+
+function updateRowStatus(id, newStatus) {
+  var r = REFUNDS.find(function (x) { return x.id === id; });
+  if (r) {
+    r.status = newStatus;
+    if (newStatus === 'Approved') r.approvedBy = 'Admin User';
+  }
+  var row = document.querySelector('tr.row[data-id="' + id + '"]');
+  if (!row) return;
+  var statusCell = row.children[8];
+  var actionCell = row.children[9];
+  if (newStatus === 'Approved') statusCell.innerHTML = '<span class="badge success">Approved</span>';
+  else if (newStatus === 'Rejected') statusCell.innerHTML = '<span class="badge danger">Rejected</span>';
+  // Replace approver cell
+  row.children[7].innerHTML = newStatus === 'Approved' ? '<span class="nm">Admin User</span>' : '<span style="color:#DC2626;">Rejected by Admin</span>';
+  // Remove approve/reject buttons
+  var view = actionCell.querySelector('.view-refund');
+  actionCell.innerHTML = '';
+  if (view) actionCell.appendChild(view);
+}
+
+document.getElementById('d-approve').addEventListener('click', function () {
+  var id = this.getAttribute('data-id');
+  updateRowStatus(id, 'Approved');
+  document.getElementById('rf-mask').hidden = true;
+  showToast('Refund ' + id + ' approved.');
+});
+document.getElementById('d-reject').addEventListener('click', function () {
+  var id = this.getAttribute('data-id');
+  updateRowStatus(id, 'Rejected');
+  document.getElementById('rf-mask').hidden = true;
+  showToast('Refund ' + id + ' rejected.');
+});
+document.querySelectorAll('.approve-refund').forEach(function (b) {
+  b.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var id = b.getAttribute('data-id');
+    updateRowStatus(id, 'Approved');
+    showToast('Refund ' + id + ' approved.');
+  });
+});
+document.querySelectorAll('.reject-refund').forEach(function (b) {
+  b.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var id = b.getAttribute('data-id');
+    updateRowStatus(id, 'Rejected');
+    showToast('Refund ' + id + ' rejected.');
+  });
+});
+
+document.getElementById('d-close').addEventListener('click', function () { document.getElementById('rf-mask').hidden = true; });
+document.getElementById('d-close2').addEventListener('click', function () { document.getElementById('rf-mask').hidden = true; });
+document.getElementById('rf-mask').addEventListener('click', function (e) { if (e.target.id === 'rf-mask') document.getElementById('rf-mask').hidden = true; });
+</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

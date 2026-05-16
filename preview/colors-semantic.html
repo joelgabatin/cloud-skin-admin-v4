@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 28px 32px; background: #fff; }
+  .grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px 20px; }
+  .row { display: flex; align-items: center; gap: 14px; }
+  .swatch { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; }
+  .meta { display: flex; flex-direction: column; }
+  .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: var(--navy-800); }
+  .hex { font-family: var(--font-mono); font-size: 11px; color: var(--slate-500); }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="row"><div class="swatch" style="background:#DCFCE7"></div><div class="meta"><span class="name">Success</span><span class="hex">#DCFCE7 / #15803D</span></div></div>
+  <div class="row"><div class="swatch" style="background:#FEF9C3"></div><div class="meta"><span class="name">Pending</span><span class="hex">#FEF9C3 / #A16207</span></div></div>
+  <div class="row"><div class="swatch" style="background:#DBEAFE"></div><div class="meta"><span class="name">In Progress</span><span class="hex">#DBEAFE / #1D4ED8</span></div></div>
+  <div class="row"><div class="swatch" style="background:#FEE2E2"></div><div class="meta"><span class="name">Danger</span><span class="hex">#FEE2E2 / #B91C1C</span></div></div>
+  <div class="row"><div class="swatch" style="background:#FEF3C7"></div><div class="meta"><span class="name">Warning</span><span class="hex">#FEF3C7 / #92400E</span></div></div>
+  <div class="row"><div class="swatch" style="background:#F1F5F9"></div><div class="meta"><span class="name">Neutral / Inactive</span><span class="hex">#F1F5F9 / #64748B</span></div></div>
+  <div class="row"><span class="badge" style="background:#DCFCE7; color:#15803D">Confirmed</span></div>
+  <div class="row"><span class="badge" style="background:#FEF9C3; color:#A16207">Pending</span></div>
+  <div class="row"><span class="badge" style="background:#DBEAFE; color:#1D4ED8">In Progress</span></div>
+  <div class="row"><span class="badge" style="background:#FEE2E2; color:#B91C1C">Cancelled</span></div>
+</div>
+</body>
+</html>

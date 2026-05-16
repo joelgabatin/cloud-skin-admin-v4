@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 0; background: #fff; }
+  nav { height: 80px; background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.06); display: flex; align-items: center; padding: 0 24px; }
+  .logo-row { display: flex; align-items: center; gap: 10px; margin-right: auto; }
+  .logo { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; }
+  .logo img { width: 36px; height: 36px; object-fit: contain; }
+  .wordmark { font-family: var(--font-display); font-weight: 700; font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; color: #4A4A4A; line-height: 1; }
+  .tagline { font-family: var(--font-display); font-weight: 400; font-size: 7px; letter-spacing: 0.20em; text-transform: uppercase; color: #888; margin-top: 3px; line-height: 1; }
+  .links { display: flex; gap: 4px; }
+  .link { font-family: var(--font-display); font-weight: 500; font-size: 13px; padding: 6px 12px; border-radius: 9999px; color: #1A2E40; text-decoration: none; position: relative; }
+  .link.active { color: #069494; }
+  .link.active::after { content: ""; position: absolute; bottom: -2px; left: 12px; right: 12px; height: 2px; background: #069494; border-radius: 9999px; }
+  .right { display: flex; align-items: center; gap: 12px; margin-left: 16px; }
+  .account { font-family: var(--font-display); font-weight: 500; font-size: 13px; color: #2D6A9F; text-decoration: none; }
+  .book { background: #069494; color: #fff; padding: 9px 20px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 13px; text-decoration: none; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo-row">
+    <img src="../assets/logo-mark.png" alt="Cloud Skin" style="height:48px; width:auto;">
+    <div>
+      <div class="wordmark">Cloud Skin</div>
+      <div class="tagline">Clinic + Wellness</div>
+    </div>
+  </div>
+  <div class="links">
+    <a class="link active" href="#">Home</a>
+    <a class="link" href="#">About</a>
+    <a class="link" href="#">Services</a>
+    <a class="link" href="#">Blog</a>
+    <a class="link" href="#">Contact</a>
+  </div>
+  <div class="right">
+    <a class="account" href="#">My Account</a>
+    <a class="book" href="#">Book Now</a>
+  </div>
+</nav>
+</body>
+</html>

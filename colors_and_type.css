@@ -1,0 +1,291 @@
+/* ============================================================
+   Cloud Skin Clinic + Wellness — Design Tokens
+   Pulled from production codebases:
+     - CloudSkinAdmin    (staff portal)
+     - Cloudskinclinicwellnesswebsite (marketing site + booking)
+   ============================================================ */
+
+/* -----  TYPOGRAPHY  ------------------------------------------------ */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap");
+
+:root {
+  /* Type families ---------------------------------------------------- */
+  --font-display: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;     /* headings, labels, buttons */
+  --font-body:    "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;       /* body copy */
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;     /* SKUs, times, codes */
+  --font-quote:   "Cormorant Garamond", "Times New Roman", serif;                  /* decorative quote marks only */
+
+  /* Type weights ----------------------------------------------------- */
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semibold:600;
+  --weight-bold:    700;
+
+  /* ============================================================
+     COLOR SYSTEM
+     Two surfaces share a navy + sky backbone but split on accent:
+       - Admin (staff)     -> Deep Blue primary  #2D6A9F
+       - Marketing/Booking -> Teal CTA            #069494
+     ============================================================ */
+
+  /* — Brand: Navy / Hero — */
+  --navy-900: #152F4A;   /* sidebar, dense chrome */
+  --navy-800: #1A2E40;   /* primary text on white */
+  --navy-700: #1A3A5C;   /* hero panels, footer */
+  --navy-600: #1E3F61;   /* sidebar hover, deep teal-shift */
+  --navy-500: #2D6A9F;   /* PRIMARY blue — links, active state, admin primary action */
+  --navy-400: #5BC0EB;   /* sky blue accent, active border / highlight */
+
+  /* — Brand: Teal (consumer/marketing CTA) — */
+  --teal-700: #047A7A;   /* hover */
+  --teal-500: #069494;   /* PRIMARY teal — Book Now, marketing CTAs */
+  --teal-100: rgba(6, 148, 148, 0.15);
+
+  /* — Brand: Cool tints / surfaces — */
+  --tint-100: #EBF6FD;   /* badge bg, icon plate */
+  --tint-150: #E8F4FD;   /* section bg (marketing alt) */
+  --tint-200: #D0E8F5;   /* hairline borders, dividers */
+  --tint-300: #B8D4EC;   /* muted text on navy */
+  --tint-400: #A0C4E0;   /* sidebar sub-item */
+  --tint-500: #9BBAD4;   /* footer secondary text, placeholders */
+
+  /* — Slate text (on white) — */
+  --slate-800: #1A2E40;  /* = navy-800; primary text */
+  --slate-500: #5A7A96;  /* secondary text, captions */
+  --slate-300: #9BBAD4;  /* tertiary / disabled */
+  --slate-grey-400:#888888; /* neutral grey used in header lockup */
+  --slate-grey-700:#4A4A4A; /* neutral grey used in header lockup */
+
+  /* — Surface — */
+  --bg-page:      #FFFFFF;
+  --bg-page-alt:  #E8F4FD; /* alternating section in marketing */
+  --bg-table-head:#F0F6FC;
+  --bg-row-hover: #F8FBFF;
+  --bg-card:      #FFFFFF;
+
+  /* — Semantic — */
+  --success-700: #15803D;
+  --success-600: #16A34A;
+  --success-100: #DCFCE7;
+  --success-50:  #F0FDF4;
+  --warning-700: #92400E;
+  --warning-600: #D97706;
+  --warning-500: #F59E0B;
+  --warning-100: #FEF3C7;
+  --warning-50:  #FEF9C3;
+  --danger-700:  #B91C1C;
+  --danger-600:  #DC2626;
+  --danger-500:  #EF4444;
+  --danger-100:  #FEE2E2;
+  --info-700:    #1D4ED8;
+  --info-100:    #DBEAFE;
+  --info-50:     #EFF6FF;
+  --violet-700:  #6D28D9;
+  --violet-600:  #7C3AED;
+  --violet-100:  #F5F3FF;
+  --orange-700:  #C2410C;
+  --orange-600:  #EA580C;
+  --orange-100:  #FFF7ED;
+
+  /* — Chart palette (admin reports) — */
+  --chart-1: #2D6A9F;
+  --chart-2: #5BC0EB;
+  --chart-3: #1A3A5C;
+  --chart-4: #A8CCE8;
+  --chart-5: #069494;
+
+  /* — Elevation / shadow — Navy-tinted, never pure black — */
+  --shadow-xs: 0 1px 3px rgba(26,58,92,0.06);
+  --shadow-sm: 0 1px 4px rgba(26,58,92,0.08), 0 2px 8px rgba(26,58,92,0.04);
+  --shadow-md: 0 4px 12px rgba(26,58,92,0.08);
+  --shadow-lg: 0 8px 24px rgba(26,58,92,0.12);
+  --shadow-xl: 0 16px 48px rgba(26,58,92,0.16);
+  --shadow-hero: 0 24px 64px rgba(26,58,92,0.20);
+
+  /* — Radius — */
+  --radius-xs:  6px;    /* tag */
+  --radius-sm:  8px;    /* inputs, secondary buttons */
+  --radius-md: 10px;    /* logo plate */
+  --radius-lg: 12px;    /* cards, quick-action tiles */
+  --radius-xl: 16px;    /* stat cards */
+  --radius-2xl:20px;    /* service cards */
+  --radius-pill: 9999px;/* primary buttons, badges, dots */
+  --radius-asym: 0 70px 0 70px; /* signature hero photo corner */
+
+  /* — Spacing scale (4px grid) — */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10:40px;
+  --space-12:48px;
+  --space-16:64px;
+  --space-20:80px;
+
+  /* — Layout — */
+  --container-max: 1280px;
+  --sidebar-w:     240px;
+  --sidebar-w-collapsed: 64px;
+  --topbar-h:      60px;
+  --nav-h:         80px;
+
+  /* — Motion — */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-100: 100ms;
+  --dur-150: 150ms;
+  --dur-200: 200ms;
+  --dur-300: 300ms;
+}
+
+/* ============================================================
+   SEMANTIC ALIASES
+   Use these in components so you can re-skin the system later.
+   ============================================================ */
+:root {
+  --color-primary:        var(--teal-500);  /* marketing — switch to navy-500 for admin */
+  --color-primary-hover:  var(--teal-700);
+  --color-primary-admin:  var(--navy-500);
+
+  --color-accent:         var(--navy-400);
+  --color-fg:             var(--navy-800);
+  --color-fg-muted:       var(--slate-500);
+  --color-fg-subtle:      var(--slate-300);
+  --color-fg-inverse:     #FFFFFF;
+
+  --color-bg:             var(--bg-page);
+  --color-bg-alt:         var(--bg-page-alt);
+  --color-bg-elevated:    var(--bg-card);
+  --color-bg-hover:       var(--bg-row-hover);
+  --color-bg-dark:        var(--navy-700);
+
+  --color-border:         var(--tint-200);
+  --color-divider:        var(--tint-200);
+
+  --color-success:        var(--success-600);
+  --color-warning:        var(--warning-500);
+  --color-danger:         var(--danger-500);
+}
+
+/* ============================================================
+   BASE TYPE STYLES
+   Used by every recreation in ui_kits/ and slides/.
+   ============================================================ */
+html { font-size: 16px; }
+body {
+  font-family: var(--font-body);
+  color: var(--color-fg);
+  background: var(--color-bg);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Display / page titles ----------------------------------- */
+.h-display {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: clamp(36px, 5vw, 56px);
+  line-height: 1.1;
+  color: var(--navy-700);
+}
+.h-section {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: clamp(24px, 4vw, 32px);
+  line-height: 1.2;
+  color: var(--navy-700);
+}
+.h-page {                     /* TopBar page title (admin) */
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--navy-800);
+}
+.h-card {                     /* Card title */
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: 15px;
+  line-height: 1.3;
+  color: var(--navy-800);
+}
+.h-service {                  /* Service card title */
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: 20px;
+  line-height: 1.3;
+  color: var(--navy-800);
+}
+
+/* Stat / metric ------------------------------------------- */
+.t-metric {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: 32px;
+  line-height: 1.1;
+  color: var(--navy-800);
+}
+
+/* Body ---------------------------------------------------- */
+.t-body     { font-family: var(--font-body); font-size: 16px; color: var(--slate-500); line-height: 1.6; }
+.t-body-sm  { font-family: var(--font-body); font-size: 14px; color: var(--slate-500); line-height: 1.6; }
+.t-body-xs  { font-family: var(--font-body); font-size: 13px; color: var(--slate-500); line-height: 1.6; }
+.t-caption  { font-family: var(--font-body); font-size: 12px; color: var(--slate-500); }
+.t-micro    { font-family: var(--font-body); font-size: 11px; color: var(--slate-300); }
+
+/* UI labels & meta ---------------------------------------- */
+.t-label {
+  font-family: var(--font-display);
+  font-weight: var(--weight-medium);
+  font-size: 13px;
+  color: var(--navy-800);
+}
+.t-eyebrow {                   /* table headers, "Sign in as", section eyebrows */
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--slate-500);
+}
+.t-badge {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.t-mono {                      /* SKU, time-of-day */
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--navy-800);
+}
+.t-wordmark {                  /* "CLOUD SKIN" lockup */
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: 15px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--slate-grey-700);
+}
+.t-tagline {                   /* "CLINIC + WELLNESS" lockup */
+  font-family: var(--font-display);
+  font-weight: var(--weight-regular);
+  font-size: 8px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--slate-grey-400);
+}
+
+/* Native element defaults --------------------------------- */
+h1 { font-family: var(--font-display); font-weight: var(--weight-bold); font-size: 28px; line-height: 1.2; color: var(--navy-800); }
+h2 { font-family: var(--font-display); font-weight: var(--weight-bold); font-size: 22px; line-height: 1.3; color: var(--navy-800); }
+h3 { font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 18px; line-height: 1.3; color: var(--navy-800); }
+h4 { font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 15px; line-height: 1.4; color: var(--navy-800); }
+p  { font-family: var(--font-body); font-size: 14px; line-height: 1.6; color: var(--slate-500); }
+small { font-size: 12px; color: var(--slate-500); }
+code, kbd, samp { font-family: var(--font-mono); font-size: 0.9em; }
+a { color: var(--navy-500); text-decoration: none; }
+a:hover { text-decoration: underline; }

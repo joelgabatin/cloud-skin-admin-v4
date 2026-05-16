@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — All Patients</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+
+  /* ============ LAYOUT (sidebar + topbar shell) ============ */
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 24px; }
+
+  /* ============ STAT CARDS ============ */
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .stat-card { background: #fff; border-radius: 16px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08), 0 2px 8px rgba(26,58,92,0.04); }
+  .stat-card.primary { background: #2D6A9F; color: #fff; }
+  .stat-card.secondary { background: #1A3A5C; color: #fff; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .stat-card .label { font-size: 13px; color: #5A7A96; }
+  .stat-card.primary .label, .stat-card.secondary .label { color: rgba(255,255,255,0.8); }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #5BC0EB; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .stat-card.primary .iplate, .stat-card.secondary .iplate { background: rgba(255,255,255,0.2); color: #fff; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 32px; line-height: 1.1; color: #1A2E40; }
+  .stat-card.primary .value, .stat-card.secondary .value { color: #fff; }
+
+  /* ============ TABLE CARD ============ */
+  .section-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .search-row { padding: 20px 24px; border-bottom: 1px solid #D0E8F5; display: flex; gap: 12px; align-items: center; position: relative; overflow: visible; }
+  .search-input { position: relative; width: 320px; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #9BBAD4; pointer-events: none; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 36px; border: 1px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; }
+  .icon-square { width: 40px; height: 40px; background: #F0F6FC; color: #2D6A9F; border: none; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .icon-square .lucide { width: 16px; height: 16px; }
+  .export-wrap { position: relative; }
+  .export-menu { position: absolute; top: calc(100% + 6px); right: 0; min-width: 200px; background: #fff; border: 1px solid #D0E8F5; border-radius: 8px; box-shadow: 0 6px 18px rgba(26,58,92,0.15); padding: 6px; z-index: 100; display: none; }
+  .export-menu.open { display: block; }
+  .export-menu button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; background: none; border: none; border-radius: 6px; cursor: pointer; font-family: var(--font-body); font-size: 13px; color: #1A2E40; text-align: left; }
+  .export-menu button:hover { background: #F0F6FC; color: #2D6A9F; }
+  .export-menu button .lucide { width: 15px; height: 15px; flex-shrink: 0; }
+  .export-menu button .word { color: #2B579A; }
+  .export-menu button .pdf  { color: #DC2626; }
+  .export-menu button .excel { color: #15803D; }
+  .filter-select { height: 40px; padding: 0 30px 0 12px; border: 1px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; cursor: pointer; min-width: 160px; }
+  .filter-select:focus { border-color: #2D6A9F; }
+  .add-patient-btn { margin-left: auto; height: 40px; padding: 0 16px; background: #2D6A9F; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .add-patient-btn:hover { background: #1A5685; }
+  .add-patient-btn .lucide { width: 14px; height: 14px; }
+  tr.row.filter-hidden { display: none !important; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 14px 24px; text-align: left; font-family: var(--font-display); font-size: 12px; font-weight: 600; color: #5A7A96; background: #F8FBFF; border-bottom: 2px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+  th.center { text-align: center; }
+  td { padding: 16px 24px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  td.center { text-align: center; }
+  tr.row { cursor: pointer; }
+  tr.row:hover td { background: #F8FBFF; }
+  tr.row:last-child td { border-bottom: none; }
+
+  .name-cell { display: flex; align-items: center; gap: 12px; }
+  .avatar-sm { width: 36px; height: 36px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 600; font-size: 12px; flex-shrink: 0; }
+  .name-text { font-size: 14px; color: #1A2E40; font-weight: 500; }
+  .visits { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1A2E40; }
+  .status-badge { display: inline-block; padding: 3px 12px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .action-btn { width: 32px; height: 32px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #2D6A9F; }
+  .action-btn .lucide { width: 14px; height: 14px; }
+
+  .pagination { padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #D0E8F5; }
+  .pagination .info { font-size: 13px; color: #5A7A96; }
+  .pager { display: inline-flex; align-items: center; gap: 8px; }
+  .pager button { width: 32px; height: 32px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 500; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; }
+  .pager button.active { background: #2D6A9F; color: #fff; }
+  .pager .lucide { width: 14px; height: 14px; }
+
+  .fb-trigger { position: relative; height: 40px; padding: 0 14px; border: 1px solid #D0E8F5; background: #fff; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; color: #5A7A96; display: inline-flex; align-items: center; gap: 8px; }
+  .fb-trigger:hover { background: #F0F6FC; color: #1A2E40; }
+  .fb-trigger.active { background: #EBF6FD; color: #2D6A9F; border-color: #2D6A9F; }
+  .fb-trigger > .lucide { width: 14px; height: 14px; }
+  .fb-trigger > .count { background: #2D6A9F; color: #fff; padding: 0 7px; border-radius: 9999px; font-size: 10.5px; min-width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
+  .fb-trigger > .count[hidden] { display: none !important; }
+  .fb-menu { position: absolute; top: calc(100% + 6px); left: 0; min-width: 220px; background: #fff; border: 1px solid #D1E3F3; border-radius: 8px; box-shadow: 0 10px 24px rgba(15,30,48,0.15); padding: 6px; z-index: 30; display: none; }
+  .fb-menu.open { display: block; }
+  .fb-opt { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; cursor: pointer; font-family: var(--font-body); font-size: 13px; color: #1A2E40; user-select: none; }
+  .fb-opt:hover { background: #F0F6FC; }
+  .fb-opt.selected { background: #EBF6FD; color: #2D6A9F; font-weight: 600; }
+  .fb-opt > .box { width: 16px; height: 16px; border: 1.5px solid #D0E8F5; border-radius: 4px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; background: #fff; color: #fff; }
+  .fb-opt.selected > .box { background: #2D6A9F; border-color: #2D6A9F; }
+  .fb-opt > .box > .lucide { width: 11px; height: 11px; opacity: 0; }
+  .fb-opt.selected > .box > .lucide { opacity: 1; }
+  .fb-opt > .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .fb-opt > .dot.active { background: #15803D; }
+  .fb-opt > .dot.inactive { background: #94A3B8; }
+  .fb-opt > .dot.archive { background: #B45309; }
+.pv-actions-cell { position: relative; display: inline-flex; gap: 4px; align-items: center; }
+.pv-actions-cell { gap: 6px !important; }
+.pv-eye, .pv-menu-trigger { width: 32px; height: 32px; background: #F0F6FC; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #2D6A9F; border-radius: 8px; text-decoration: none; }
+.pv-eye:hover, .pv-menu-trigger:hover { background: #E3EEF8; color: #1A5685; }
+.pv-eye .lucide, .pv-menu-trigger .lucide { width: 14px; height: 14px; }
+.pv-menu { position: absolute; top: calc(100% + 4px); right: 0; min-width: 160px; background: #fff; border-radius: 8px; box-shadow: 0 6px 18px rgba(26,58,92,0.18); padding: 8px 0; z-index: 50; display: none; }
+.pv-menu.open { display: block; }
+.pv-menu button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 0 12px; height: 32px; background: none; border: none; cursor: pointer; font-family: var(--font-display); font-weight: 500; font-size: 14px; text-align: left; color: #1A2E40; }
+.pv-menu button:hover { background: #F8F9FA; }
+.pv-menu button .lucide { width: 14px; height: 14px; }
+.pv-menu .divider { height: 1px; background: #F0F6FC; margin: 4px 0; }
+.pv-menu .archive-btn { color: #F59E0B; }
+.pv-menu .archive-btn .lucide { color: #F59E0B; }
+.pv-menu .delete-btn { color: #DC2626; }
+.pv-menu .delete-btn .lucide { color: #DC2626; }
+.pv-sortable { cursor: pointer; user-select: none; }
+.pv-sortable:hover { color: #2D6A9F; }
+.pv-sortable .arrow { display: inline-block; margin-left: 4px; color: #CBD5E1; font-size: 11px; }
+.pv-sortable.sorted { color: #2D6A9F; }
+.pv-sortable.sorted .arrow { color: #2D6A9F; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside id="sidebar-mount" class="sidebar"></aside>
+
+  <!-- ============ CONTENT ============ -->
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">All Patients</div>
+        <div class="topbar-crumb">Admin / Patients / All Patients</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta">
+            <span class="name">Admin User</span>
+            <span class="role-pill-light">Admin</span>
+          </div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 All Patients">
+      <!-- Analytics cards -->
+      <div class="stat-row">
+        <div class="stat-card primary">
+          <div class="top"><span class="label">Active Patients</span><div class="iplate"><i data-lucide="user-check"></i></div></div>
+          <div class="value">8</div>
+        </div>
+        <div class="stat-card">
+          <div class="top"><span class="label">Inactive Patients</span><div class="iplate"><i data-lucide="user-x"></i></div></div>
+          <div class="value">2</div>
+        </div>
+        <div class="stat-card">
+          <div class="top"><span class="label">Archive Patients</span><div class="iplate"><i data-lucide="archive"></i></div></div>
+          <div class="value">2</div>
+        </div>
+        <div class="stat-card secondary">
+          <div class="top"><span class="label">Total Patients</span><div class="iplate"><i data-lucide="users"></i></div></div>
+          <div class="value">10</div>
+        </div>
+      </div>
+
+      <!-- Search + table -->
+      <div class="section-card">
+        <div class="search-row">
+          <div class="search-input">
+            <i data-lucide="search"></i>
+            <input id="patient-search" placeholder="Search by name or email...">
+          </div>
+          <div class="fb-trigger" id="status-trigger" tabindex="0"><i data-lucide="check-circle"></i><span>Status</span><span class="count" id="status-count" hidden>0</span><i data-lucide="chevron-down"></i><div class="fb-menu" id="status-menu"><div class="fb-opt" data-val="active"><span class="box"><i data-lucide="check"></i></span><span class="dot active"></span>Active</div><div class="fb-opt" data-val="inactive"><span class="box"><i data-lucide="check"></i></span><span class="dot inactive"></span>Inactive</div><div class="fb-opt" data-val="archive"><span class="box"><i data-lucide="check"></i></span><span class="dot archive"></span>Archive</div></div></div>
+          <div class="export-wrap">
+            <button class="icon-square" title="Export" id="export-btn"><i data-lucide="download"></i></button>
+            <div class="export-menu" id="export-menu">
+              <button type="button" data-fmt="word"><i data-lucide="file-text" class="word"></i> Export to Word</button>
+              <button type="button" data-fmt="pdf"><i data-lucide="file-text" class="pdf"></i> Export to PDF</button>
+              <button type="button" data-fmt="excel"><i data-lucide="sheet" class="excel"></i> Export to Excel</button>
+            </div>
+          </div>
+          <a class="add-patient-btn" href="#"><i data-lucide="plus"></i> Add New Patient</a>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th class="pv-sortable sorted" data-pv-sort="name"><span>Patient Name</span><span class="arrow">↑</span></th><th class="pv-sortable" data-pv-sort="email"><span>Email</span><span class="arrow">↕</span></th><th class="pv-sortable" data-pv-sort="last"><span>Last Visit</span><span class="arrow">↕</span></th><th class="pv-sortable center" data-pv-sort="visits"><span>Total Visits</span><span class="arrow">↕</span></th><th class="pv-sortable center" data-pv-sort="status"><span>Status</span><span class="arrow">↕</span></th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr class="row"><td><div class="name-cell"><div class="avatar-sm" style="background:#2D6A9F">SJ</div><span class="name-text">Sarah Johnson</span></div></td><td>sarah.j@email.com</td><td>Apr 15, 2026</td><td class="center"><span class="visits">8</span></td><td class="center"><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td><td><div class="pv-actions-cell"><a class="pv-eye" href="patient-profile.html?id=P001"><i data-lucide="eye"></i></a><button class="pv-menu-trigger"><i data-lucide="more-vertical"></i></button><div class="pv-menu"><button data-pv-act="toggle"><i data-lucide="toggle-right"></i> Toggle Status</button><div class="divider"></div><button class="archive-btn" data-pv-act="archive"><i data-lucide="archive"></i> Archive</button><button class="delete-btn" data-pv-act="delete"><i data-lucide="trash-2"></i> Delete</button></div></div></td></tr>
+              <tr class="row"><td><div class="name-cell"><div class="avatar-sm" style="background:#16A34A">MC</div><span class="name-text">Miguel Cruz</span></div></td><td>miguel.c@email.com</td><td>Apr 20, 2026</td><td class="center"><span class="visits">12</span></td><td class="center"><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td><td><div class="pv-actions-cell"><a class="pv-eye" href="patient-profile.html?id=P001"><i data-lucide="eye"></i></a><button class="pv-menu-trigger"><i data-lucide="more-vertical"></i></button><div class="pv-menu"><button data-pv-act="toggle"><i data-lucide="toggle-right"></i> Toggle Status</button><div class="divider"></div><button class="archive-btn" data-pv-act="archive"><i data-lucide="archive"></i> Archive</button><button class="delete-btn" data-pv-act="delete"><i data-lucide="trash-2"></i> Delete</button></div></div></td></tr>
+              <tr class="row"><td><div class="name-cell"><div class="avatar-sm" style="background:#7C3AED">CT</div><span class="name-text">Camille Torres</span></div></td><td>camille.t@email.com</td><td>Mar 30, 2026</td><td class="center"><span class="visits">4</span></td><td class="center"><span class="status-badge" style="background:#F1F5F9;color:#64748B">Inactive</span></td><td><div class="pv-actions-cell"><a class="pv-eye" href="patient-profile.html?id=P001"><i data-lucide="eye"></i></a><button class="pv-menu-trigger"><i data-lucide="more-vertical"></i></button><div class="pv-menu"><button data-pv-act="toggle"><i data-lucide="toggle-right"></i> Toggle Status</button><div class="divider"></div><button class="archive-btn" data-pv-act="archive"><i data-lucide="archive"></i> Archive</button><button class="delete-btn" data-pv-act="delete"><i data-lucide="trash-2"></i> Delete</button></div></div></td></tr>
+              <tr class="row"><td><div class="name-cell"><div class="avatar-sm" style="background:#EA580C">JD</div><span class="name-text">Jose Dela Cruz</span></div></td><td>jose.dc@email.com</td><td>Apr 10, 2026</td><td class="center"><span class="visits">22</span></td><td class="center"><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td><td><div class="pv-actions-cell"><a class="pv-eye" href="patient-profile.html?id=P001"><i data-lucide="eye"></i></a><button class="pv-menu-trigger"><i data-lucide="more-vertical"></i></button><div class="pv-menu"><button data-pv-act="toggle"><i data-lucide="toggle-right"></i> Toggle Status</button><div class="divider"></div><button class="archive-btn" data-pv-act="archive"><i data-lucide="archive"></i> Archive</button><button class="delete-btn" data-pv-act="delete"><i data-lucide="trash-2"></i> Delete</button></div></div></td></tr>
+              <tr class="row"><td><div class="name-cell"><div class="avatar-sm" style="background:#0891B2">AP</div><span class="name-text">Angela Park</span></div></td><td>angela.p@email.com</td><td>Apr 22, 2026</td><td class="center"><span class="visits">6</span></td><td class="center"><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td><td><div class="pv-actions-cell"><a class="pv-eye" href="patient-profile.html?id=P001"><i data-lucide="eye"></i></a><button class="pv-menu-trigger"><i data-lucide="more-vertical"></i></button><div class="pv-menu"><button data-pv-act="toggle"><i data-lucide="toggle-right"></i> Toggle Status</button><div class="divider"></div><button class="archive-btn" data-pv-act="archive"><i data-lucide="archive"></i> Archive</button><button class="delete-btn" data-pv-act="delete"><i data-lucide="trash-2"></i> Delete</button></div></div></td></tr>
+              <tr class="row"><td><div class="name-cell"><div class="avatar-sm" style="background:#B45309">RT</div><span class="name-text">Roberto Tan</span></div></td><td>roberto.t@email.com</td><td>Mar 15, 2026</td><td class="center"><span class="visits">3</span></td><td class="center"><span class="status-badge" style="background:#FEF3C7;color:#92400E">Archived</span></td><td><div class="pv-actions-cell"><a class="pv-eye" href="patient-profile.html?id=P001"><i data-lucide="eye"></i></a><button class="pv-menu-trigger"><i data-lucide="more-vertical"></i></button><div class="pv-menu"><button data-pv-act="toggle"><i data-lucide="toggle-right"></i> Toggle Status</button><div class="divider"></div><button class="archive-btn" data-pv-act="archive"><i data-lucide="archive"></i> Archive</button><button class="delete-btn" data-pv-act="delete"><i data-lucide="trash-2"></i> Delete</button></div></div></td></tr>
+              <tr class="row"><td><div class="name-cell"><div class="avatar-sm" style="background:#9D174D">LG</div><span class="name-text">Lisa Gomez</span></div></td><td>lisa.g@email.com</td><td>Apr 18, 2026</td><td class="center"><span class="visits">15</span></td><td class="center"><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td><td><div class="pv-actions-cell"><a class="pv-eye" href="patient-profile.html?id=P001"><i data-lucide="eye"></i></a><button class="pv-menu-trigger"><i data-lucide="more-vertical"></i></button><div class="pv-menu"><button data-pv-act="toggle"><i data-lucide="toggle-right"></i> Toggle Status</button><div class="divider"></div><button class="archive-btn" data-pv-act="archive"><i data-lucide="archive"></i> Archive</button><button class="delete-btn" data-pv-act="delete"><i data-lucide="trash-2"></i> Delete</button></div></div></td></tr>
+              <tr class="row"><td><div class="name-cell"><div class="avatar-sm" style="background:#065F46">KB</div><span class="name-text">Kevin Bautista</span></div></td><td>kevin.b@email.com</td><td>Apr 5, 2026</td><td class="center"><span class="visits">2</span></td><td class="center"><span class="status-badge" style="background:#F1F5F9;color:#64748B">Inactive</span></td><td><div class="pv-actions-cell"><a class="pv-eye" href="patient-profile.html?id=P001"><i data-lucide="eye"></i></a><button class="pv-menu-trigger"><i data-lucide="more-vertical"></i></button><div class="pv-menu"><button data-pv-act="toggle"><i data-lucide="toggle-right"></i> Toggle Status</button><div class="divider"></div><button class="archive-btn" data-pv-act="archive"><i data-lucide="archive"></i> Archive</button><button class="delete-btn" data-pv-act="delete"><i data-lucide="trash-2"></i> Delete</button></div></div></td></tr>
+              <tr class="row"><td><div class="name-cell"><div class="avatar-sm" style="background:#6B21A8">DR</div><span class="name-text">Diana Reyes</span></div></td><td>diana.r@email.com</td><td>Feb 28, 2026</td><td class="center"><span class="visits">9</span></td><td class="center"><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td><td><div class="pv-actions-cell"><a class="pv-eye" href="patient-profile.html?id=P001"><i data-lucide="eye"></i></a><button class="pv-menu-trigger"><i data-lucide="more-vertical"></i></button><div class="pv-menu"><button data-pv-act="toggle"><i data-lucide="toggle-right"></i> Toggle Status</button><div class="divider"></div><button class="archive-btn" data-pv-act="archive"><i data-lucide="archive"></i> Archive</button><button class="delete-btn" data-pv-act="delete"><i data-lucide="trash-2"></i> Delete</button></div></div></td></tr>
+              <tr class="row"><td><div class="name-cell"><div class="avatar-sm" style="background:#0C4A6E">MV</div><span class="name-text">Marco Villanueva</span></div></td><td>marco.v@email.com</td><td>Apr 12, 2026</td><td class="center"><span class="visits">30</span></td><td class="center"><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td><td><div class="pv-actions-cell"><a class="pv-eye" href="patient-profile.html?id=P001"><i data-lucide="eye"></i></a><button class="pv-menu-trigger"><i data-lucide="more-vertical"></i></button><div class="pv-menu"><button data-pv-act="toggle"><i data-lucide="toggle-right"></i> Toggle Status</button><div class="divider"></div><button class="archive-btn" data-pv-act="archive"><i data-lucide="archive"></i> Archive</button><button class="delete-btn" data-pv-act="delete"><i data-lucide="trash-2"></i> Delete</button></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span class="info">Showing 1 to 10 of 12</span>
+          <div class="pager">
+            <button disabled style="opacity:0.5"><i data-lucide="chevron-left"></i></button>
+            <button class="active">1</button>
+            <button>2</button>
+            <button><i data-lucide="chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script>lucide.createIcons();</script>
+<script>
+/* === Patients filter + sort + search === */
+(function () {
+  var search = document.getElementById('patient-search');
+  var statusF = document.getElementById('status-filter');
+  var sortBy = document.getElementById('sort-by');
+  var tbody = document.querySelector('tbody');
+  if (!tbody) return;
+  // Snapshot original row order so sorting is stable.
+  var allRows = Array.from(tbody.querySelectorAll('tr.row'));
+
+  function getStatus(row) {
+    var badge = row.querySelector('.status-badge');
+    return badge ? badge.textContent.trim().toLowerCase() : '';
+  }
+  function getName(row) {
+    var el = row.querySelector('.name-text');
+    return el ? el.textContent.trim().toLowerCase() : '';
+  }
+  function getEmail(row) {
+    var tds = row.querySelectorAll('td');
+    return tds[1] ? tds[1].textContent.trim().toLowerCase() : '';
+  }
+  function getLastVisitText(row) {
+    var tds = row.querySelectorAll('td');
+    return tds[2] ? tds[2].textContent.trim() : '';
+  }
+  function parseDate(s) {
+    var d = new Date(s);
+    return isNaN(d.getTime()) ? 0 : d.getTime();
+  }
+  function getVisits(row) {
+    var el = row.querySelector('.visits');
+    return el ? parseInt(el.textContent.trim(), 10) || 0 : 0;
+  }
+
+  function apply() {
+    var q = (search.value || '').trim().toLowerCase();
+    var sb = sortBy.value;
+    // Filter
+    allRows.forEach(function (r) {
+      var hide = false;
+      if (picked && picked.size > 0 && !picked.has(getStatus(r))) hide = true;
+      if (q && (getName(r).indexOf(q) === -1) && (getEmail(r).indexOf(q) === -1)) hide = true;
+      r.classList.toggle('filter-hidden', hide);
+    });
+    // Sort
+    var sorted = allRows.slice();
+    sorted.sort(function (a, b) {
+      switch (sb) {
+        case 'name-asc':       return getName(a).localeCompare(getName(b));
+        case 'name-desc':      return getName(b).localeCompare(getName(a));
+        case 'last-visit-desc':return parseDate(getLastVisitText(b)) - parseDate(getLastVisitText(a));
+        case 'last-visit-asc': return parseDate(getLastVisitText(a)) - parseDate(getLastVisitText(b));
+        case 'visits-desc':    return getVisits(b) - getVisits(a);
+        case 'visits-asc':     return getVisits(a) - getVisits(b);
+        default: return 0;
+      }
+    });
+    sorted.forEach(function (r) { tbody.appendChild(r); });
+  }
+  search.addEventListener('input', apply);
+  window.__applyPatientFilter = apply;
+  sortBy.addEventListener('change', apply);
+
+  // Export dropdown menu
+  var exBtn = document.getElementById('export-btn');
+  var exMenu = document.getElementById('export-menu');
+  if (exBtn && exMenu) {
+    exBtn.addEventListener('click', function (e) { e.stopPropagation(); exMenu.classList.toggle('open'); });
+    exMenu.addEventListener('click', function (e) { e.stopPropagation(); });
+    document.addEventListener('click', function () { exMenu.classList.remove('open'); });
+    exMenu.querySelectorAll('button[data-fmt]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        // Hook to actual export in production. For the prototype just close the menu.
+        exMenu.classList.remove('open');
+      });
+    });
+  }
+})();
+</script>
+<script>
+/* __MW_TOGGLE__ */
+(function(){
+  // Find every parent .nav-item that is followed by a [data-submenu-for] block and wire up click toggle
+  document.querySelectorAll('aside.sidebar .nav-item').forEach(function(item){
+    var next = item.nextElementSibling;
+    if (!next || !next.hasAttribute || !next.hasAttribute('data-submenu-for')) return;
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', function(e){
+      // Don't navigate if it's a link
+      if (item.tagName === 'A') e.preventDefault();
+      var isOpen = next.style.display !== 'none';
+      next.style.display = isOpen ? 'none' : 'block';
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+})();
+</script>
+<script src="_sidebar.js"></script>
+<script src="_patient-modal.js"></script>
+
+<script>
+(function(){var trig=document.getElementById("status-trigger");if(!trig)return;var menu=document.getElementById("status-menu");var count=document.getElementById("status-count");var picked=new Set();function sync(){var n=picked.size;trig.classList.toggle("active",n>0);if(n>0){count.hidden=false;count.textContent=n;}else{count.hidden=true;}menu.querySelectorAll(".fb-opt").forEach(function(o){o.classList.toggle("selected",picked.has(o.getAttribute("data-val")));});if(window.__applyPatientFilter)window.__applyPatientFilter();}trig.addEventListener("click",function(e){if(e.target.closest(".fb-opt"))return;menu.classList.toggle("open");e.stopPropagation();});menu.querySelectorAll(".fb-opt").forEach(function(o){o.addEventListener("click",function(){var v=o.getAttribute("data-val");if(picked.has(v))picked.delete(v);else picked.add(v);sync();});});document.addEventListener("click",function(){menu.classList.remove("open");});window.__getPatientStatusFilter=function(){return picked;};})();
+</script>
+<script>
+(function(){
+  document.querySelectorAll(".pv-menu-trigger").forEach(function(b){ b.addEventListener("click", function(e){ e.stopPropagation(); document.querySelectorAll(".pv-menu.open").forEach(function(m){ if (m!==b.nextElementSibling) m.classList.remove("open"); }); b.nextElementSibling.classList.toggle("open"); }); });
+  document.addEventListener("click", function(){ document.querySelectorAll(".pv-menu.open").forEach(function(m){ m.classList.remove("open"); }); });
+  document.querySelectorAll("[data-pv-act]").forEach(function(b){ b.addEventListener("click", function(e){ e.stopPropagation(); var row=b.closest("tr"); var act=b.getAttribute("data-pv-act"); var statusCell=row && row.querySelector(".status-badge"); var name=(row.querySelector(".name-text")||{}).textContent||"this patient"; if (act==="toggle") { if (statusCell) { var s=(statusCell.textContent||"").trim().toLowerCase(); if (s==="active") { statusCell.textContent="Inactive"; statusCell.style.background="#FEF3C7"; statusCell.style.color="#B45309"; } else if (s==="inactive") { statusCell.textContent="Active"; statusCell.style.background="#DCFCE7"; statusCell.style.color="#15803D"; } } } else if (act==="archive") { if (confirm("Archive "+name+"?")) row.style.display="none"; } else if (act==="delete") { if (confirm("Delete "+name+" permanently?")) row.remove(); } b.closest(".pv-menu").classList.remove("open"); }); });
+  if (window.lucide) window.lucide.createIcons();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Staff Detail</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: #1A2E40; }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; position: sticky; top: 0; max-height: 100vh; font-family: var(--font-display); }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg,#2D6A9F,#5BC0EB); display: flex; align-items: center; justify-content: center; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; }
+  aside.sidebar .side-collapse { height: 44px; padding: 0 16px; display: flex; justify-content: flex-end; align-items: center; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-crumb a { color: #2D6A9F; text-decoration: none; }
+
+  .page { padding: 24px 32px 60px; max-width: 1000px; margin: 0 auto; width: 100%; }
+  .back-link { color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; text-decoration: none; margin-bottom: 14px; }
+  .back-link .lucide { width: 14px; height: 14px; }
+
+  .header-card { background: #fff; border-radius: 12px; padding: 24px 28px; display: flex; align-items: center; gap: 20px; border: 1px solid #E5EFF7; box-shadow: 0 1px 4px rgba(26,58,92,0.06); margin-bottom: 18px; flex-wrap: wrap; }
+  .header-card .avatar-lg { width: 80px; height: 80px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 28px; flex-shrink: 0; }
+  .header-card .info { flex: 1; min-width: 200px; }
+  .header-card .nm { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; }
+  .header-card .meta { display: inline-flex; gap: 10px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
+  .header-card .badge { padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; }
+  .header-card .badge.role { background: #EBF6FD; color: #2D6A9F; }
+  .header-card .badge.status { background: #DCFCE7; color: #15803D; }
+  .header-card .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 6px; }
+  .header-card .actions { display: inline-flex; gap: 8px; }
+  .btn { height: 38px; padding: 0 16px; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; text-decoration: none; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn.ghost { background: #fff; color: #5A7A96; border-color: #D0E8F5; }
+  .btn.ghost:hover { background: #F0F6FC; }
+  .btn.primary { background: #2D6A9F; color: #fff; }
+  .btn.primary:hover { background: #1A5685; }
+  .btn.danger { background: #fff; color: #DC2626; border-color: #FCA5A5; }
+
+  .card { background: #fff; border-radius: 12px; border: 1px solid #E5EFF7; box-shadow: 0 1px 4px rgba(26,58,92,0.06); margin-bottom: 18px; }
+  .sec { padding: 22px 28px; border-top: 1px solid #F0F6FC; }
+  .sec:first-of-type { border-top: none; }
+  .sec-lbl { font-family: var(--font-display); font-weight: 700; font-size: 11px; color: #2D6A9F; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+  .sec-lbl .edit-link { color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; text-transform: none; letter-spacing: 0; }
+  .sec-lbl .edit-link .lucide { width: 13px; height: 13px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+  .kv { }
+  .kv .k { font-family: var(--font-display); font-weight: 600; font-size: 11px; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .kv .v { font-family: var(--font-body); font-size: 14px; color: #1A2E40; }
+  .kv input, .kv select { width: 100%; height: 38px; padding: 0 12px; border: 1px solid #CBD5E1; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; display: none; }
+  .editing .kv .v { display: none; }
+  .editing .kv input, .editing .kv select { display: block; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #15803D; color: #fff; padding: 12px 18px; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 13px; box-shadow: 0 4px 14px rgba(0,0,0,0.18); opacity: 0; transform: translateY(10px); transition: opacity 200ms, transform 200ms; z-index: 1100; pointer-events: none; display: inline-flex; align-items: center; gap: 8px; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast .lucide { width: 16px; height: 16px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title" id="page-title">Staff Detail</div>
+        <div class="topbar-crumb">Admin / Staff / <a href="staff-view-all.html">View All Staff</a> / <span id="crumb-name">Detail</span></div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Staff Detail">
+      <a class="back-link" href="staff-view-all.html"><i data-lucide="arrow-left"></i> Back to Staff</a>
+
+      <!-- Header card -->
+      <div class="header-card">
+        <div class="avatar-lg" id="avatar-init" style="background:#2D6A9F;">MS</div>
+        <div class="info">
+          <div class="nm" id="staff-name">Dr. Maria Santos</div>
+          <div class="meta">
+            <span class="badge role" id="role-badge">Practitioner</span>
+            <span class="badge status" id="status-badge">Active</span>
+          </div>
+          <div class="sub" id="staff-spec">Dermatology · Joined Jan 15, 2024</div>
+        </div>
+        <div class="actions">
+          <button class="btn ghost" id="edit-btn"><i data-lucide="pencil"></i> Edit</button>
+          <button class="btn primary" id="save-btn" style="display:none;"><i data-lucide="check"></i> Save Changes</button>
+          <button class="btn ghost" id="cancel-btn" style="display:none;"><i data-lucide="x"></i> Cancel</button>
+          <button class="btn danger"><i data-lucide="archive"></i> Archive</button>
+        </div>
+      </div>
+
+      <div class="card" id="detail-card">
+        <div class="sec">
+          <div class="sec-lbl">Personal Information</div>
+          <div class="grid-2">
+            <div class="kv"><div class="k">Full Name</div><div class="v" id="v-name">Dr. Maria Santos</div><input type="text" value="Dr. Maria Santos"></div>
+            <div class="kv"><div class="k">Email</div><div class="v" id="v-email">maria.santos@clinic.com</div><input type="email" value="maria.santos@clinic.com"></div>
+            <div class="kv"><div class="k">Phone</div><div class="v" id="v-phone">+63 917-100-0001</div><input type="tel" value="+63 917-100-0001"></div>
+            <div class="kv"><div class="k">Date of Birth</div><div class="v">March 12, 1985</div><input type="date" value="1985-03-12"></div>
+            <div class="kv"><div class="k">Gender</div><div class="v">Female</div><select><option>Male</option><option selected>Female</option><option>Prefer not to say</option></select></div>
+            <div class="kv"><div class="k">Address</div><div class="v">Quezon City, Metro Manila</div><input type="text" value="Quezon City, Metro Manila"></div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-lbl">Employment Details</div>
+          <div class="grid-2">
+            <div class="kv"><div class="k">Role</div><div class="v" id="v-role">Practitioner</div><select><option>Admin</option><option selected>Practitioner</option><option>Receptionist</option></select></div>
+            <div class="kv"><div class="k">Specialty</div><div class="v">Dermatology</div><input type="text" value="Dermatology"></div>
+            <div class="kv"><div class="k">Employment Type</div><div class="v">Full-time</div><select><option selected>Full-time</option><option>Part-time</option><option>Visiting Specialist</option></select></div>
+            <div class="kv"><div class="k">Start Date</div><div class="v">January 15, 2024</div><input type="date" value="2024-01-15"></div>
+            <div class="kv"><div class="k">Status</div><div class="v">Active</div><select><option selected>Active</option><option>Inactive</option><option>Archived</option></select></div>
+            <div class="kv"><div class="k">Patients Assigned</div><div class="v">42 active</div><input type="text" value="42" readonly></div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-lbl">Professional Credentials</div>
+          <div class="grid-2">
+            <div class="kv"><div class="k">PRC License No.</div><div class="v">0123456</div><input type="text" value="0123456"></div>
+            <div class="kv"><div class="k">License Expiry</div><div class="v">December 31, 2027</div><input type="date" value="2027-12-31"></div>
+            <div class="kv"><div class="k">PTR No.</div><div class="v">PTR-2026-0457</div><input type="text" value="PTR-2026-0457"></div>
+            <div class="kv"><div class="k">Years of Experience</div><div class="v">12 years</div><input type="text" value="12"></div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-lbl">Emergency Contact</div>
+          <div class="grid-2">
+            <div class="kv"><div class="k">Contact Name</div><div class="v">Roberto Santos</div><input type="text" value="Roberto Santos"></div>
+            <div class="kv"><div class="k">Contact Phone</div><div class="v">+63 918-555-0102</div><input type="tel" value="+63 918-555-0102"></div>
+            <div class="kv"><div class="k">Relationship</div><div class="v">Spouse</div><select><option selected>Spouse</option><option>Parent</option><option>Sibling</option><option>Friend</option><option>Other</option></select></div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-lbl">Account Access</div>
+          <div class="grid-2">
+            <div class="kv"><div class="k">Login Email</div><div class="v">maria.santos@clinic.com</div><input type="email" value="maria.santos@clinic.com" readonly></div>
+            <div class="kv"><div class="k">Last Login</div><div class="v">May 16, 2026 · 8:42 AM</div><input type="text" value="May 16, 2026 · 8:42 AM" readonly></div>
+            <div class="kv"><div class="k">Permissions</div><div class="v">Practitioner (Clinical access)</div><input type="text" value="Practitioner (Clinical access)" readonly></div>
+            <div class="kv"><div class="k">2FA Enabled</div><div class="v">Yes</div><select><option selected>Yes</option><option>No</option></select></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"><i data-lucide="check-circle"></i><span id="toast-text">Changes saved</span></div>
+
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+(function () {
+  // Sample staff records keyed by ?id=
+  var STAFF = {
+    'DS': { name:"Dr. Maria Santos", initials:"DS", color:"#2D6A9F", role:"Practitioner", spec:"Dermatology", joined:"Jan 15, 2024", email:"maria.santos@clinic.com", phone:"+63 917-100-0001" },
+    'JR': { name:"Dr. Juan Reyes", initials:"JR", color:"#16A34A", role:"Practitioner", spec:"Aesthetic Medicine", joined:"Feb 10, 2024", email:"juan.reyes@clinic.com", phone:"+63 917-100-0002" },
+    'AL': { name:"Dr. Angela Lim", initials:"AL", color:"#7C3AED", role:"Practitioner", spec:"Laser Specialist", joined:"Mar 5, 2024", email:"angela.lim@clinic.com", phone:"+63 917-100-0003" },
+    'RP': { name:"Rose Perez", initials:"RP", color:"#EA580C", role:"Receptionist", spec:"—", joined:"Jan 20, 2024", email:"rose.perez@clinic.com", phone:"+63 917-100-0004" },
+    'CB': { name:"Carlos Bautista", initials:"CB", color:"#0891B2", role:"Receptionist", spec:"—", joined:"Feb 1, 2024", email:"carlos.bautista@clinic.com", phone:"+63 917-100-0005" },
+    'MT': { name:"Maria Torres", initials:"MT", color:"#B45309", role:"Admin", spec:"—", joined:"Dec 1, 2023", email:"maria.torres@clinic.com", phone:"+63 917-100-0006" },
+    'AU': { name:"Admin User", initials:"AU", color:"#2D6A9F", role:"Admin", spec:"—", joined:"Jan 1, 2023", email:"admin@cloudskin.com", phone:"+63 917-000-0001" }
+  };
+  var id = (new URLSearchParams(location.search).get('id') || 'DS').toUpperCase();
+  var s = STAFF[id] || STAFF.DS;
+  document.getElementById('avatar-init').textContent = s.initials;
+  document.getElementById('avatar-init').style.background = s.color;
+  document.getElementById('staff-name').textContent = s.name;
+  document.getElementById('role-badge').textContent = s.role;
+  document.getElementById('staff-spec').textContent = (s.spec === '—' ? '' : s.spec + ' · ') + 'Joined ' + s.joined;
+  document.getElementById('v-name').textContent = s.name;
+  document.getElementById('v-email').textContent = s.email;
+  document.getElementById('v-phone').textContent = s.phone;
+  document.getElementById('v-role').textContent = s.role;
+  document.getElementById('crumb-name').textContent = s.name;
+  document.getElementById('page-title').textContent = s.name;
+
+  // Edit mode
+  var card = document.getElementById('detail-card');
+  var editBtn = document.getElementById('edit-btn');
+  var saveBtn = document.getElementById('save-btn');
+  var cancelBtn = document.getElementById('cancel-btn');
+  editBtn.addEventListener('click', function () {
+    card.classList.add('editing');
+    editBtn.style.display = 'none';
+    saveBtn.style.display = '';
+    cancelBtn.style.display = '';
+  });
+  cancelBtn.addEventListener('click', function () {
+    card.classList.remove('editing');
+    editBtn.style.display = '';
+    saveBtn.style.display = 'none';
+    cancelBtn.style.display = 'none';
+  });
+  saveBtn.addEventListener('click', function () {
+    card.classList.remove('editing');
+    editBtn.style.display = '';
+    saveBtn.style.display = 'none';
+    cancelBtn.style.display = 'none';
+    var t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(function () { t.classList.remove('show'); }, 2200);
+  });
+})();
+</script>
+</body>
+</html>

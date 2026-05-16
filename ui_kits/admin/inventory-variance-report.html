@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Variance Report CNT-0012</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+* { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .back-link { background: none; border: none; cursor: pointer; color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; padding: 0; text-decoration: none; }
+  .btn { height: 36px; padding: 0 14px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; text-decoration: none; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-outline { background: #fff; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-outline.danger { color: #DC2626; border-color: #FCA5A5; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 16px; }
+  .btn-primary:hover { background: #1A5685; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .badge.success { background: #DCFCE7; color: #15803D; }
+  .badge.warning { background: #FEF3C7; color: #B45309; }
+  .badge.danger  { background: #FEE2E2; color: #DC2626; }
+  .badge.info    { background: #DBEAFE; color: #1D4ED8; }
+  .badge.slate   { background: #F1F5F9; color: #475569; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .stat-card { background: #fff; border-radius: 10px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; flex-direction: column; gap: 8px; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-card .label { font-size: 12px; color: #5A7A96; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #2D6A9F; display: flex; align-items: center; justify-content: center; }
+  .stat-card .iplate.success { background: #DCFCE7; color: #15803D; }
+  .stat-card .iplate.warning { background: #FEF3C7; color: #B45309; }
+  .stat-card .iplate.danger { background: #FEE2E2; color: #DC2626; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 26px; line-height: 1.1; color: #1A2E40; }
+  .stat-card .sub { font-size: 12px; color: #5A7A96; }
+  .section-card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 12px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .nm { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .sku { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; font-weight: 600; }
+  .mono { font-family: var(--font-mono); font-size: 13px; color: #5A7A96; }
+  .price { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .field-input { width: 100%; height: 36px; border: 1.5px solid #D0E8F5; border-radius: 6px; padding: 0 10px; font-family: var(--font-body); font-size: 12px; color: #1A2E40; outline: none; background: #fff; box-sizing: border-box; }
+  .search-input { position: relative; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; box-sizing: border-box; }
+
+  .warn-banner { background: #FEF3C7; border: 1px solid #FCD34D; color: #92400E; border-radius: 10px; padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start; }
+  .warn-banner .lucide { width: 18px; height: 18px; color: #B45309; flex-shrink: 0; margin-top: 1px; }
+  .warn-banner .title { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #92400E; }
+  .warn-banner .desc { font-family: var(--font-body); font-size: 13px; color: #92400E; margin-top: 2px; }
+  .var-section-head { padding: 16px 22px; border-bottom: 1px solid #D0E8F5; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .var-section-head .ttl { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #1A2E40; text-transform: uppercase; letter-spacing: 0.05em; }
+  .var-section-head .desc { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 2px; }
+  /* Row states */
+  tr.row-accepted td:first-child { box-shadow: inset 3px 0 0 #15803D; }
+  tr.row-overridden td:first-child { box-shadow: inset 3px 0 0 #2D6A9F; }
+  tr.row-recount td { background: #F8FAFC !important; color: #9BBAD4; }
+  tr.row-recount .nm, tr.row-recount .price, tr.row-recount .mono { color: #9BBAD4 !important; }
+  tr.row-recount .badge.slate { opacity: 0.65; }
+  /* Pill action buttons */
+  .pill-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .pill-btn { height: 28px; padding: 0 10px; border-radius: 9999px; font-family: var(--font-display); font-size: 11px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; border: 1.5px solid transparent; background: #fff; white-space: nowrap; }
+  .pill-btn .lucide { width: 12px; height: 12px; }
+  .pill-accept { color: #15803D; border-color: #86EFAC; }
+  .pill-accept:hover { background: #DCFCE7; }
+  .pill-accept.active { background: #15803D; color: #fff; border-color: #15803D; }
+  .pill-override { color: #2D6A9F; border-color: #93C5FD; }
+  .pill-override:hover { background: #DBEAFE; }
+  .pill-override.active { background: #2D6A9F; color: #fff; border-color: #2D6A9F; }
+  .pill-recount { color: #B45309; border-color: #FCD34D; }
+  .pill-recount:hover { background: #FEF3C7; }
+  .pill-recount.active { background: #B45309; color: #fff; border-color: #B45309; }
+  .pill-saved { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 9999px; font-family: var(--font-display); font-size: 11px; font-weight: 700; background: #DCFCE7; color: #15803D; }
+  .pill-saved.recount { background: #FEF3C7; color: #B45309; }
+  .pill-saved .lucide { width: 12px; height: 12px; }
+  .recount-note { font-family: var(--font-body); font-size: 11px; color: #92400E; margin-top: 4px; font-style: italic; }
+  /* Override editable cell */
+  td.override-cell input { width: 70px; height: 28px; border: 2px solid #2D6A9F; border-radius: 6px; padding: 0 8px; font-family: var(--font-mono); font-size: 13px; color: #1A2E40; outline: none; background: #EBF6FD; text-align: center; font-weight: 700; }
+  .save-mini { height: 28px; padding: 0 10px; background: #2D6A9F; color: #fff; border: none; border-radius: 6px; font-family: var(--font-display); font-size: 11px; font-weight: 600; cursor: pointer; margin-left: 4px; display: inline-flex; align-items: center; gap: 4px; }
+  .save-mini .lucide { width: 11px; height: 11px; }
+
+  /* Reason popover (inline below row) */
+  tr.reason-row td { padding: 0; background: #F8FBFF !important; border-bottom: 1px solid #D0E8F5; }
+  .reason-pop { padding: 14px 22px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; border-left: 3px solid #15803D; background: #F0FDF4; }
+  .reason-pop .lbl { font-family: var(--font-display); font-weight: 700; font-size: 12px; color: #15803D; text-transform: uppercase; letter-spacing: 0.04em; }
+  .reason-pop select { height: 34px; padding: 0 10px; border: 1.5px solid #86EFAC; border-radius: 6px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; min-width: 240px; }
+  .reason-pop .btn-confirm { height: 34px; padding: 0 14px; background: #15803D; color: #fff; border: none; border-radius: 6px; font-family: var(--font-display); font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .reason-pop .btn-confirm .lucide { width: 13px; height: 13px; }
+  .reason-pop .cancel-link { font-family: var(--font-display); font-size: 12px; color: #5A7A96; cursor: pointer; text-decoration: none; }
+  .reason-pop .cancel-link:hover { color: #1A2E40; }
+
+  /* Dim other rows when reason popover open */
+  tbody.dimmed tr:not(.reason-row):not(.dim-anchor) { opacity: 0.55; pointer-events: none; }
+
+  /* Sticky footer */
+  .approve-bar { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); padding: 16px 22px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; position: sticky; bottom: 24px; z-index: 5; }
+  .approve-bar .note { font-family: var(--font-body); font-size: 12px; color: #92400E; display: inline-flex; align-items: center; gap: 6px; }
+  .approve-bar .note .lucide { width: 14px; height: 14px; }
+
+  /* Variance display */
+  .var-up   { color: #15803D; font-family: var(--font-display); font-weight: 700; display: inline-flex; align-items: center; gap: 2px; }
+  .var-down { color: #DC2626; font-family: var(--font-display); font-weight: 700; display: inline-flex; align-items: center; gap: 2px; }
+  .var-up .lucide, .var-down .lucide { width: 12px; height: 12px; }
+  .val-up   { color: #15803D; font-family: var(--font-display); font-weight: 700; }
+  .val-down { color: #DC2626; font-family: var(--font-display); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Variance Report — CNT-0012</div>
+        <div class="topbar-crumb">Admin / Inventory / Physical Count / CNT-0012 / Variance</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+    <section class="page" data-screen-label="01 Variance Report">
+      <a class="back-link" href="inventory-physical-count.html"><i data-lucide="arrow-left" style="width:14px;height:14px"></i> Back to Sessions</a>
+
+      <div class="warn-banner">
+        <i data-lucide="alert-triangle"></i>
+        <div>
+          <div class="title">5 items have stock discrepancies</div>
+          <div class="desc">Review each item individually before approving. You can accept, override, or flag items for recount separately.</div>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card"><div class="top"><span class="label">Items Counted</span><div class="iplate success"><i data-lucide="check-square"></i></div></div><div class="value">60</div><div class="sub">Full inventory scope</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Items with Variance</span><div class="iplate warning"><i data-lucide="alert-triangle"></i></div></div><div class="value">5</div><div class="sub">8.3% of counted items</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Total Units Short</span><div class="iplate danger"><i data-lucide="arrow-down"></i></div></div><div class="value" style="color:#DC2626;">−12</div><div class="sub">Net adjustment to stock</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Estimated Value Impact</span><div class="iplate danger"><i data-lucide="banknote"></i></div></div><div class="value" style="color:#DC2626;">−₱8,400</div><div class="sub">Cost of shrinkage</div></div>
+      </div>
+
+      <div class="section-card">
+        <div class="var-section-head">
+          <div>
+            <div class="ttl">Variance Items</div>
+            <div class="desc">Showing 5 items with stock discrepancies.</div>
+          </div>
+          <button class="btn btn-outline" type="button"><i data-lucide="download"></i> Export Variance Report</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="min-width:1280px;">
+            <thead><tr><th>Product Name</th><th>SKU</th><th>Category</th><th>System Qty</th><th>Physical Qty</th><th>Variance</th><th>Unit Cost</th><th>Value Impact</th><th>Manager Notes</th><th style="text-align:center;width:230px;">Action</th></tr></thead>
+            <tbody id="var-tbody">
+
+              <!-- Row 1: Accepted (Retinol Cream) -->
+              <tr id="row-1" class="row-accepted" data-state="accepted" data-sys="85" data-phys="83" data-cost="200">
+                <td><span class="nm">Retinol Cream</span></td>
+                <td><span class="sku">SKIN-002</span></td>
+                <td><span class="badge slate">Cream</span></td>
+                <td><span class="mono">85</span></td>
+                <td><span class="price">83</span></td>
+                <td><span class="var-down"><i data-lucide="arrow-down"></i>−2</span></td>
+                <td><span class="price">₱200</span></td>
+                <td><span class="val-down">−₱400</span></td>
+                <td><input class="field-input" placeholder="Add note..." value="Tester used in May 2 demo"></td>
+                <td style="text-align:center;"><span class="pill-saved"><i data-lucide="check"></i>Accepted</span></td>
+              </tr>
+
+              <!-- Row 2: Accepted (SPF 50 Sunscreen) -->
+              <tr id="row-2" class="row-accepted" data-state="accepted" data-sys="62" data-phys="65" data-cost="150">
+                <td><span class="nm">SPF 50 Sunscreen</span></td>
+                <td><span class="sku">SKIN-004</span></td>
+                <td><span class="badge slate">Sunscreen</span></td>
+                <td><span class="mono">62</span></td>
+                <td><span class="price">65</span></td>
+                <td><span class="var-up"><i data-lucide="arrow-up"></i>+3</span></td>
+                <td><span class="price">₱150</span></td>
+                <td><span class="val-up">+₱450</span></td>
+                <td><input class="field-input" placeholder="Add note..." value="Unrecorded customer return"></td>
+                <td style="text-align:center;"><span class="pill-saved"><i data-lucide="check"></i>Accepted</span></td>
+              </tr>
+
+              <!-- Row 3: Overridden (Botox 50u) -->
+              <tr id="row-3" class="row-overridden" data-state="overridden" data-sys="8" data-phys="7" data-cost="2500" data-orig-phys="6">
+                <td><span class="nm">Botox (50u)</span></td>
+                <td><span class="sku">INJ-001</span></td>
+                <td><span class="badge slate">Injectable</span></td>
+                <td><span class="mono">8</span></td>
+                <td class="override-cell"><input id="r3-phys" type="number" value="7" min="0"><button class="save-mini" type="button"><i data-lucide="check"></i>Save</button></td>
+                <td id="r3-var"><span class="var-down"><i data-lucide="arrow-down"></i>−1</span></td>
+                <td><span class="price">₱2,500</span></td>
+                <td id="r3-val"><span class="val-down">−₱2,500</span></td>
+                <td><input class="field-input" placeholder="Add note..." value="Recount confirmed 7 vials"></td>
+                <td style="text-align:center;"><span class="pill-saved" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="edit-3"></i>Overridden</span></td>
+              </tr>
+
+              <!-- Row 4: Pending Review (Filler 1mL) — default state, all 3 actions visible -->
+              <tr id="row-4" class="dim-anchor" data-state="pending" data-sys="15" data-phys="12" data-cost="1800">
+                <td><span class="nm">Filler (1mL)</span></td>
+                <td><span class="sku">INJ-002</span></td>
+                <td><span class="badge slate">Injectable</span></td>
+                <td><span class="mono">15</span></td>
+                <td><span class="price">12</span></td>
+                <td><span class="var-down"><i data-lucide="arrow-down"></i>−3</span></td>
+                <td><span class="price">₱1,800</span></td>
+                <td><span class="val-down">−₱5,400</span></td>
+                <td><input class="field-input" placeholder="Add note..."></td>
+                <td style="text-align:center;">
+                  <div class="pill-actions">
+                    <button class="pill-btn pill-accept"  data-act="accept"  data-row="4"><i data-lucide="check"></i>Accept</button>
+                    <button class="pill-btn pill-override" data-act="override" data-row="4"><i data-lucide="edit-3"></i>Override</button>
+                    <button class="pill-btn pill-recount"  data-act="recount"  data-row="4"><i data-lucide="rotate-ccw"></i>Recount</button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 5: Pending Recount (Chemical Peel Solution) -->
+              <tr id="row-5" class="row-recount" data-state="recount" data-sys="30" data-phys="22" data-cost="300">
+                <td><span class="nm">Chemical Peel Solution</span></td>
+                <td><span class="sku">TREAT-001</span></td>
+                <td><span class="badge slate">Treatment</span></td>
+                <td><span class="mono">30</span></td>
+                <td><span class="price">22</span></td>
+                <td><span class="var-down"><i data-lucide="arrow-down"></i>−8</span></td>
+                <td><span class="price">₱300</span></td>
+                <td><span class="val-down">−₱2,400</span></td>
+                <td><input class="field-input" placeholder="Add note..." disabled style="background:#F0F6FC;"></td>
+                <td style="text-align:center;">
+                  <span class="pill-saved recount"><i data-lucide="rotate-ccw"></i>Pending Recount</span>
+                  <div class="recount-note">Sent back to A. Cruz</div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="approve-bar">
+        <span class="note"><i data-lucide="info"></i> Approving will permanently adjust inventory records.</span>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-outline danger" type="button"><i data-lucide="rotate-ccw"></i> Reject All — Send for Recount</button>
+          <button class="btn btn-primary" type="button" id="approve-btn"><i data-lucide="check-circle"></i> Approve Accepted Items (<span id="approved-count">3</span>)</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+(function () {
+  var tbody = document.getElementById('var-tbody');
+  var countEl = document.getElementById('approved-count');
+
+  function refreshCount() {
+    var n = tbody.querySelectorAll('tr[data-state="accepted"], tr[data-state="overridden"]').length;
+    countEl.textContent = n;
+  }
+  refreshCount();
+
+  // Helpers to build the in-row UI for each state
+  function pillActions(rowNum) {
+    return '<div class="pill-actions">'
+      + '<button class="pill-btn pill-accept" data-act="accept" data-row="' + rowNum + '"><i data-lucide="check"></i>Accept</button>'
+      + '<button class="pill-btn pill-override" data-act="override" data-row="' + rowNum + '"><i data-lucide="edit-3"></i>Override</button>'
+      + '<button class="pill-btn pill-recount" data-act="recount" data-row="' + rowNum + '"><i data-lucide="rotate-ccw"></i>Recount</button>'
+      + '</div>';
+  }
+
+  function setAccepted(tr) {
+    tr.setAttribute('data-state', 'accepted');
+    tr.className = 'row-accepted';
+    var lastCell = tr.querySelector('td:last-child');
+    lastCell.innerHTML = '<span class="pill-saved"><i data-lucide="check"></i>Accepted</span>';
+    lucide.createIcons();
+    refreshCount();
+  }
+  function setRecount(tr) {
+    tr.setAttribute('data-state', 'recount');
+    tr.className = 'row-recount';
+    var lastCell = tr.querySelector('td:last-child');
+    lastCell.innerHTML = '<span class="pill-saved recount"><i data-lucide="rotate-ccw"></i>Pending Recount</span><div class="recount-note">Sent back to A. Cruz</div>';
+    // Disable the manager note input
+    var note = tr.querySelector('td:nth-child(9) input');
+    if (note) { note.disabled = true; note.style.background = '#F0F6FC'; }
+    lucide.createIcons();
+    refreshCount();
+  }
+
+  function recalcOverride(tr) {
+    var sys = parseFloat(tr.getAttribute('data-sys')) || 0;
+    var cost = parseFloat(tr.getAttribute('data-cost')) || 0;
+    var input = tr.querySelector('td.override-cell input');
+    var phys = parseFloat(input.value) || 0;
+    var v = phys - sys;
+    var varCell = tr.querySelector('td:nth-child(6)');
+    var valCell = tr.querySelector('td:nth-child(8)');
+    if (v > 0)      varCell.innerHTML = '<span class="var-up"><i data-lucide="arrow-up"></i>+' + v + '</span>';
+    else if (v < 0) varCell.innerHTML = '<span class="var-down"><i data-lucide="arrow-down"></i>' + v + '</span>';
+    else            varCell.innerHTML = '<span class="mono">0</span>';
+    var impact = v * cost;
+    if (impact > 0)      valCell.innerHTML = '<span class="val-up">+₱' + Math.abs(impact).toLocaleString() + '</span>';
+    else if (impact < 0) valCell.innerHTML = '<span class="val-down">−₱' + Math.abs(impact).toLocaleString() + '</span>';
+    else                 valCell.innerHTML = '<span class="mono">₱0</span>';
+    tr.setAttribute('data-phys', String(phys));
+    lucide.createIcons();
+  }
+
+  function startOverride(tr) {
+    tr.setAttribute('data-state', 'overridden');
+    tr.className = 'row-overridden';
+    var sys = tr.getAttribute('data-sys');
+    var phys = tr.getAttribute('data-phys');
+    var physCell = tr.querySelector('td:nth-child(5)');
+    physCell.classList.add('override-cell');
+    physCell.innerHTML = '<input type="number" value="' + phys + '" min="0"><button class="save-mini" type="button"><i data-lucide="check"></i>Save</button>';
+    var lastCell = tr.querySelector('td:last-child');
+    lastCell.innerHTML = '<span class="pill-saved" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="edit-3"></i>Overridden</span>';
+    var input = physCell.querySelector('input');
+    var saveBtn = physCell.querySelector('.save-mini');
+    input.addEventListener('input', function () { recalcOverride(tr); });
+    saveBtn.addEventListener('click', function () { recalcOverride(tr); });
+    input.focus();
+    input.select();
+    lucide.createIcons();
+    refreshCount();
+  }
+
+  function showReasonPopover(tr) {
+    // Mark dim mode + insert reason row beneath the clicked row
+    if (tbody.querySelector('tr.reason-row')) return; // already showing one
+    tbody.classList.add('dimmed');
+    tr.classList.add('dim-anchor');
+    var row = document.createElement('tr');
+    row.className = 'reason-row';
+    row.innerHTML = '<td colspan="10"><div class="reason-pop">'
+      + '<span class="lbl">Select a reason for this variance:</span>'
+      + '<select>'
+        + '<option>Tester / Sample Used</option>'
+        + '<option>Damaged or Expired</option>'
+        + '<option>Unrecorded Return</option>'
+        + '<option>Supplier Delivery Error</option>'
+        + '<option>Theft or Loss</option>'
+        + '<option>Data Entry Error</option>'
+        + '<option>Other</option>'
+      + '</select>'
+      + '<button class="btn-confirm" type="button" data-confirm><i data-lucide="check"></i>Confirm Accept</button>'
+      + '<a class="cancel-link" data-cancel>Cancel</a>'
+      + '</div></td>';
+    tr.parentNode.insertBefore(row, tr.nextSibling);
+    lucide.createIcons();
+
+    row.querySelector('[data-confirm]').addEventListener('click', function () {
+      var reason = row.querySelector('select').value;
+      // Set the manager-notes input to the reason
+      var note = tr.querySelector('td:nth-child(9) input');
+      if (note && !note.value) note.value = reason;
+      tbody.classList.remove('dimmed');
+      tr.classList.remove('dim-anchor');
+      row.remove();
+      setAccepted(tr);
+    });
+    row.querySelector('[data-cancel]').addEventListener('click', function () {
+      tbody.classList.remove('dimmed');
+      tr.classList.remove('dim-anchor');
+      row.remove();
+    });
+  }
+
+  // Delegate clicks on action pills
+  tbody.addEventListener('click', function (e) {
+    var btn = e.target.closest('button.pill-btn');
+    if (!btn) return;
+    var act = btn.getAttribute('data-act');
+    var tr = btn.closest('tr');
+    if (!tr) return;
+    if (act === 'accept')   showReasonPopover(tr);
+    else if (act === 'override') startOverride(tr);
+    else if (act === 'recount')  setRecount(tr);
+  });
+
+  // Override save button on initial Row 3 (live recalc on input)
+  (function wireInitialOverride() {
+    var row3 = document.getElementById('row-3');
+    if (!row3) return;
+    var input = row3.querySelector('td.override-cell input');
+    var save = row3.querySelector('.save-mini');
+    if (input) input.addEventListener('input', function () { recalcOverride(row3); });
+    if (save) save.addEventListener('click', function () { recalcOverride(row3); });
+  })();
+})();
+</script>
+</body>
+</html>

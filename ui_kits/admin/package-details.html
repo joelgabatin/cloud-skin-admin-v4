@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Package Details</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F8FAFC; font-family: var(--font-body); color: #1A2E40; }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #0F1E2E; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-crumb a { color: #2D6A9F; text-decoration: none; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 18px; }
+  .back-link { color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; text-decoration: none; width: fit-content; }
+  .back-link .lucide { width: 14px; height: 14px; }
+  .card { background: #fff; border-radius: 10px; border: 1px solid #E5EFF7; box-shadow: 0 1px 3px rgba(26,58,92,0.05); }
+  .pad { padding: 22px 24px; }
+
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 11px; }
+  .badge.active { background: #DCFCE7; color: #15803D; }
+  .badge.completed { background: #DCFCE7; color: #15803D; }
+  .badge.confirmed { background: #DBEAFE; color: #1D4ED8; }
+  .badge.pending { background: #F1F5F9; color: #6B7280; }
+  .badge.gold { background: #C4A882; color: #3D2E14; }
+
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 800px) { .summary-grid { grid-template-columns: 1fr; } }
+  .pkg-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; margin: 0 0 10px; }
+  .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .info-row { display: flex; gap: 8px; padding: 6px 0; font-size: 13px; }
+  .info-row .k { color: #5A7A96; min-width: 130px; }
+  .info-row .v { color: #1A2E40; font-weight: 500; }
+  .info-row .v a { color: #2D6A9F; text-decoration: none; font-weight: 600; }
+  .value-big { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #2D6A9F; margin: 0 0 4px; }
+  .session-split { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-bottom: 10px; }
+  .session-split b.paid { color: #2D6A9F; }
+  .session-split b.free { color: #8B6F3F; }
+  .progress-bar { height: 10px; background: #F0F6FC; border-radius: 5px; overflow: hidden; }
+  .progress-bar > div { height: 100%; background: #2D6A9F; border-radius: 5px; }
+  .pill-muted { display: inline-block; padding: 3px 10px; background: #F0F6FC; color: #5A7A96; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; }
+
+  .sec-h { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: #1A2E40; margin: 0 0 12px; }
+  .legend { display: inline-flex; gap: 14px; margin-bottom: 14px; font-family: var(--font-body); font-size: 12px; color: #5A7A96; }
+  .legend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; vertical-align: middle; margin-right: 5px; }
+  .legend .dot.paid { background: #2D6A9F; }
+  .legend .dot.free { background: #C4A882; }
+
+  .session-row { background: #fff; border: 1px solid #E5EFF7; border-radius: 10px; border-left: 4px solid #15803D; padding: 18px 20px; display: grid; grid-template-columns: 64px 1fr auto; gap: 16px; align-items: center; }
+  .session-row + .session-row { margin-top: 12px; }
+  .session-row.upcoming { border-left-color: #2D6A9F; }
+  .session-row.pending { border-left: 4px dashed #6B7280; background: #FAFBFC; }
+  .session-row.free { border-left: 4px dashed #C4A882; background: #FBF9F4; }
+  .session-row.free .bonus-banner { background: #F5EFE3; color: #8B6F3F; padding: 6px 12px; border-radius: 6px; font-family: var(--font-display); font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .sn-num { width: 48px; height: 48px; border-radius: 50%; background: #DBEAFE; color: #1D4ED8; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 14px; position: relative; }
+  .sn-num.gold { background: #C4A882; color: #3D2E14; }
+  .sn-num .free-tag { position: absolute; top: -8px; right: -14px; background: #C4A882; color: #3D2E14; padding: 1px 6px; border-radius: 4px; font-family: var(--font-display); font-weight: 800; font-size: 9px; letter-spacing: 0.05em; }
+  .sn-body .top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+  .sn-body .svc { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1A2E40; }
+  .sn-body .meta { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-bottom: 6px; }
+  .sn-body .notes { font-family: var(--font-body); font-size: 12.5px; color: #1A2E40; background: #F8FBFD; border-left: 2px solid #BFD8EB; padding: 8px 12px; border-radius: 0 6px 6px 0; line-height: 1.5; max-width: 540px; }
+  .sn-body .empty-note { font-family: var(--font-body); font-size: 12px; color: #9BBAD4; font-style: italic; }
+  .sn-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+  .sn-tip { font-family: var(--font-body); font-size: 11px; color: #8B6F3F; font-style: italic; max-width: 200px; text-align: right; }
+
+  .btn { padding: 8px 14px; border-radius: 7px; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; border: 1px solid transparent; white-space: nowrap; }
+  .btn .lucide { width: 13px; height: 13px; }
+  .btn-outline { background: #fff; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-outline:hover { background: #F0F6FC; }
+  .btn-primary { background: #2D6A9F; color: #fff; }
+  .btn-primary:hover { background: #1A5685; }
+  .btn-primary[disabled], .btn-primary.disabled { background: #CBD5E1; color: #fff; cursor: not-allowed; }
+  .btn-danger-outline { background: #fff; color: #DC2626; border-color: #FCA5A5; }
+  .btn-danger-outline:hover { background: #FEF2F2; }
+  .btn-ghost { background: none; color: #5A7A96; border-color: #D0E8F5; }
+  .btn-ghost:hover { background: #F0F6FC; }
+
+  .usage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 16px 0 0; }
+  @media (max-width: 800px) { .usage-grid { grid-template-columns: repeat(2,1fr); } }
+  .usage-card { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; padding: 12px 14px; }
+  .usage-card.gold { background: #FBF9F4; border-color: #E5DCC4; }
+  .usage-card .k { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .usage-card .v { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: #1A2E40; }
+  .usage-card.gold .v { color: #8B6F3F; }
+
+  .danger-zone { border: 1px dashed #E5EFF7; border-radius: 10px; padding: 18px 22px; background: #FAFBFC; }
+  .danger-zone .row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .danger-zone .row + .row { margin-top: 12px; }
+  .danger-zone .warn { font-family: var(--font-body); font-size: 12px; color: #5A7A96; flex: 1; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Premium Facial Package</div>
+        <div class="topbar-crumb">Admin / Patients / <a href="patient-profile.html?id=P001">Sarah Johnson</a> / Premium Facial Package</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i></button>
+        <div class="user-pill">
+          <div class="avatar" style="width:36px;height:36px;border-radius:50%;background:#2D6A9F;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Package Details">
+      <a class="back-link" href="patient-profile.html?id=P001"><i data-lucide="arrow-left"></i> Back to Patient Profile</a>
+
+      <!-- Summary card -->
+      <div class="card">
+        <div class="pad">
+          <div class="summary-grid">
+            <div>
+              <h1 class="pkg-title">Premium Facial Package</h1>
+              <div class="badge-row"><span class="badge active">Active</span><span class="badge gold">5 + 1 FREE</span></div>
+              <div class="info-row"><span class="k">Assigned to</span><span class="v"><a href="patient-profile.html?id=P001">Sarah Johnson</a></span></div>
+              <div class="info-row"><span class="k">Assigned by</span><span class="v">Admin</span></div>
+              <div class="info-row"><span class="k">Assigned date</span><span class="v">April 1, 2026</span></div>
+            </div>
+            <div>
+              <div style="font-family:var(--font-display);font-size:11px;font-weight:600;color:#5A7A96;text-transform:uppercase;letter-spacing:0.05em;">Value</div>
+              <p class="value-big">₱15,000</p>
+              <div class="session-split">Paid sessions: <b class="paid">5</b> total • Free sessions: <b class="free">1</b> bonus</div>
+              <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#5A7A96;margin-bottom:6px;"><span>Sessions completed</span><span style="color:#1A2E40;font-weight:600;font-family:var(--font-display);">3 of 6 (including free)</span></div>
+              <div class="progress-bar"><div style="width:50%;"></div></div>
+              <div style="font-size:11.5px;color:#5A7A96;margin-top:6px;">Sessions remaining: <b style="color:#1A2E40;">3</b> (including 1 free)</div>
+              <div class="info-row" style="margin-top:8px;"><span class="k">Start date</span><span class="v">April 1, 2026</span></div>
+              <div class="info-row"><span class="k">Expiry date</span><span class="v">December 31, 2026 <span class="pill-muted" style="margin-left:6px;">230 days left</span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sessions -->
+      <div class="card">
+        <div class="pad">
+          <h2 class="sec-h">Sessions</h2>
+          <div class="legend"><span><span class="dot paid"></span>Paid session</span><span><span class="dot free"></span>Free bonus session</span></div>
+
+          <a class="session-row upcoming" href="package-session-1.html?session=1&amp;patient=P001" style="border-left-color:#15803D;text-decoration:none;color:inherit;">
+            <div class="sn-num">#1</div>
+            <div class="sn-body">
+              <div class="top"><span class="svc">Hydra Facial</span><span class="badge completed">Completed</span></div>
+              <div class="meta">February 10, 2026 • 10:00 AM · Dr. Reyes</div>
+              <div class="notes">"Patient responded well. Skin hydration improved noticeably."</div>
+            </div>
+            <div class="sn-actions"><span class="btn btn-outline"><i data-lucide="file-text"></i> View Treatment Record</span></div>
+          </a>
+
+          <div class="session-row upcoming" style="border-left-color:#15803D;">
+            <div class="sn-num">#2</div>
+            <div class="sn-body">
+              <div class="top"><span class="svc">Hydra Facial</span><span class="badge completed">Completed</span></div>
+              <div class="meta">March 15, 2026 • 10:00 AM · Dr. Reyes</div>
+              <div class="notes">"Follow-up session. Hyperpigmentation showing improvement."</div>
+            </div>
+            <div class="sn-actions"><a class="btn btn-outline" href="#"><i data-lucide="file-text"></i> View Treatment Record</a></div>
+          </div>
+
+          <div class="session-row upcoming" style="border-left-color:#15803D;">
+            <div class="sn-num">#3</div>
+            <div class="sn-body">
+              <div class="top"><span class="svc">Hydra Facial</span><span class="badge completed">Completed</span></div>
+              <div class="meta">April 15, 2026 • 10:00 AM · Dr. Reyes</div>
+              <div class="notes">"Third session completed. Recommended to continue monthly."</div>
+            </div>
+            <div class="sn-actions"><a class="btn btn-outline" href="#"><i data-lucide="file-text"></i> View Treatment Record</a></div>
+          </div>
+
+          <div class="session-row upcoming" onclick="window.location='returning-session-stepper.html?service=hydra-facial&amp;package=premium-facial&amp;session=4&amp;patient=P001'" style="cursor:pointer;">
+            <div class="sn-num">#4</div>
+            <div class="sn-body">
+              <div class="top"><span class="svc">Hydra Facial</span><span class="badge confirmed">Confirmed</span></div>
+              <div class="meta">May 20, 2026 • 10:00 AM · Dr. Reyes</div>
+              <div class="empty-note">No notes yet — session has not been completed.</div>
+            </div>
+            <div class="sn-actions" onclick="event.stopPropagation();">
+              <a class="btn btn-outline" href="returning-session-stepper.html?service=hydra-facial&amp;package=premium-facial&amp;session=4&amp;patient=P001"><i data-lucide="calendar"></i> View Appointment</a>
+              <a class="btn btn-ghost" href="returning-session-stepper.html?service=hydra-facial&amp;package=premium-facial&amp;session=4&amp;patient=P001#schedule"><i data-lucide="clock"></i> Reschedule</a>
+            </div>
+          </div>
+
+          <div class="session-row pending">
+            <div class="sn-num">#5</div>
+            <div class="sn-body">
+              <div class="top"><span class="svc">Hydra Facial</span><span class="badge pending">Pending</span></div>
+              <div class="meta">Not yet scheduled · —</div>
+              <div class="empty-note">Schedule this session to lock in your next visit.</div>
+            </div>
+            <div class="sn-actions"><a class="btn btn-primary" href="#"><i data-lucide="plus"></i> Schedule Session</a></div>
+          </div>
+
+          <div class="session-row free">
+            <div class="sn-num gold">#6<span class="free-tag">FREE</span></div>
+            <div class="sn-body">
+              <span class="bonus-banner">🎁 Bonus Session — Complimentary</span>
+              <div class="top"><span class="svc">Hydra Facial</span><span class="badge pending">Pending</span></div>
+              <div class="meta">Not yet scheduled · —</div>
+              <div class="empty-note">Unlocked after completing all 5 paid sessions. Available to schedule once Session 5 is completed.</div>
+            </div>
+            <div class="sn-actions">
+              <button class="btn btn-primary disabled" disabled><i data-lucide="plus"></i> Schedule Session</button>
+              <span class="sn-tip">Available after Session 5 is completed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Usage Summary -->
+      <div class="card">
+        <div class="pad">
+          <h2 class="sec-h">Usage Summary</h2>
+          <div class="usage-grid">
+            <div class="usage-card"><div class="k">Paid Sessions</div><div class="v">5</div></div>
+            <div class="usage-card gold"><div class="k">Free Sessions</div><div class="v">1</div></div>
+            <div class="usage-card"><div class="k">Total Sessions</div><div class="v">6</div></div>
+            <div class="usage-card"><div class="k">Completed</div><div class="v" style="color:#15803D;">3</div></div>
+            <div class="usage-card"><div class="k">Remaining</div><div class="v">3 <span style="font-size:11px;color:#8B6F3F;font-weight:500;">(incl. 1 free)</span></div></div>
+            <div class="usage-card"><div class="k">Package Value</div><div class="v">₱15,000</div></div>
+            <div class="usage-card"><div class="k">Value per Paid Session</div><div class="v">₱3,000</div></div>
+            <div class="usage-card"><div class="k">Value Used</div><div class="v" style="color:#15803D;">₱9,000</div></div>
+            <div class="usage-card"><div class="k">Value Remaining</div><div class="v" style="color:#2D6A9F;">₱6,000</div></div>
+            <div class="usage-card gold" style="grid-column:1/-1;"><div class="k">Bonus Value Earned</div><div class="v">₱3,000 <span style="font-size:11px;color:#8B6F3F;font-weight:500;">— complimentary session</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin actions -->
+      <div class="card">
+        <div class="pad">
+          <h2 class="sec-h" style="color:#5A7A96;">Admin Actions</h2>
+          <div class="danger-zone">
+            <div class="row">
+              <div class="warn"><b style="color:#1A2E40;font-family:var(--font-display);">Voiding this package</b> will cancel all remaining sessions including the bonus.</div>
+              <button class="btn btn-danger-outline"><i data-lucide="ban"></i> Void Package</button>
+            </div>
+            <div class="row">
+              <div class="warn"><b style="color:#1A2E40;font-family:var(--font-display);">Extend the expiry date</b> if the patient needs more time to complete remaining sessions.</div>
+              <button class="btn btn-ghost"><i data-lucide="calendar-clock"></i> Extend Expiry</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

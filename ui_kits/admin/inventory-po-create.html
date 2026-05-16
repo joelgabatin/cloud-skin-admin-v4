@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Create Purchase Order</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+* { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .page-hero h1 { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .page-hero .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 4px; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .stat-card { background: #fff; border-radius: 10px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; flex-direction: column; gap: 8px; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-card .label { font-size: 12px; color: #5A7A96; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #2D6A9F; display: flex; align-items: center; justify-content: center; }
+  .stat-card .iplate.success { background: #DCFCE7; color: #15803D; }
+  .stat-card .iplate.warning { background: #FEF3C7; color: #B45309; }
+  .stat-card .iplate.violet  { background: #EDE9FE; color: #7C3AED; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: #1A2E40; }
+  .stat-card .value.warning { color: #B45309; }
+  .stat-card .sub { font-size: 12px; color: #5A7A96; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .badge.draft   { background: #F1F5F9; color: #475569; }
+  .badge.pending { background: #FEF3C7; color: #B45309; }
+  .badge.approved { background: #DBEAFE; color: #1D4ED8; }
+  .badge.sent    { background: #EDE9FE; color: #7C3AED; }
+  .badge.partial { background: #FEF3C7; color: #B45309; }
+  .badge.completed { background: #DCFCE7; color: #15803D; }
+  .badge.cancelled { background: #FEE2E2; color: #DC2626; }
+  .badge.slate   { background: #F1F5F9; color: #475569; }
+  .badge.success { background: #DCFCE7; color: #15803D; }
+  .badge.warning { background: #FEF3C7; color: #B45309; }
+  .badge.danger  { background: #FEE2E2; color: #DC2626; }
+  .badge.info    { background: #DBEAFE; color: #1D4ED8; }
+  .section-card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 12px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .nm { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .sku { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; font-weight: 600; }
+  .po-num { font-family: var(--font-mono); font-size: 13px; color: #2D6A9F; font-weight: 700; }
+  .mono { font-family: var(--font-mono); font-size: 13px; color: #5A7A96; }
+  .price { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .btn { height: 38px; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; text-decoration: none; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-outline { background: #fff; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-outline.danger { color: #DC2626; border-color: #FCA5A5; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 18px; }
+  .btn-primary:hover { background: #1A5685; }
+  .btn-success { background: #15803D; color: #fff; padding: 0 18px; }
+  .btn-success:hover { background: #166534; }
+  .btn-danger  { background: #DC2626; color: #fff; padding: 0 18px; }
+  .field-input, .field-select { width: 100%; height: 40px; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .field-input.qty { width: 90px; height: 36px; border: 2px solid #2D6A9F; background: #EBF6FD; text-align: center; font-family: var(--font-mono); font-weight: 700; }
+  .field-textarea { width: 100%; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 10px 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; resize: vertical; min-height: 64px; background: #fff; }
+  .field-label { display: block; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; }
+  .back-link { background: none; border: none; cursor: pointer; color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; padding: 0; text-decoration: none; }
+  .search-input { position: relative; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .info-banner { background: #EBF6FD; border: 1px solid #93C5FD; border-radius: 10px; padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start; }
+  .info-banner .lucide { width: 18px; height: 18px; color: #2D6A9F; flex-shrink: 0; margin-top: 1px; }
+  .info-banner .title { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1E40AF; }
+  .info-banner .desc  { font-family: var(--font-body); font-size: 13px; color: #1E40AF; margin-top: 2px; }
+  .warn-banner { background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 10px; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start; color: #92400E; }
+  .warn-banner .lucide { width: 16px; height: 16px; color: #B45309; flex-shrink: 0; margin-top: 1px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: flex-start; }
+  @media (max-width: 1180px) { .grid-2 { grid-template-columns: 1fr; } }
+  .card-h { padding: 16px 22px; border-bottom: 1px solid #D0E8F5; display: flex; align-items: center; justify-content: space-between; }
+  .card-h .ttl { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #1A2E40; text-transform: uppercase; letter-spacing: 0.05em; }
+  .card-h .ct  { font-family: var(--font-display); font-size: 12px; font-weight: 700; color: #2D6A9F; background: #EBF6FD; padding: 2px 10px; border-radius: 9999px; }
+  .supplier-info { background: #ECFEFF; border: 1px solid #67E8F9; border-radius: 8px; padding: 12px 14px; display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; margin-top: 10px; }
+  .supplier-info .pill { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-body); font-size: 12px; color: #155E75; }
+  .supplier-info .pill .lucide { width: 13px; height: 13px; color: #0E7490; }
+  .supplier-info .pill .v { font-family: var(--font-display); font-weight: 700; color: #0E2A33; }
+  .supplier-info .div-dot { width: 3px; height: 3px; background: #67E8F9; border-radius: 50%; }
+  .supplier-info .view-link { margin-left: auto; font-family: var(--font-display); font-size: 12px; font-weight: 700; color: #0E7490; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; }
+  .add-row { width: 100%; padding: 14px; background: #F8FBFF; border: 2px dashed #93C5FD; border-radius: 8px; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .summary { position: sticky; top: 96px; background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+  .summary h3 { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #1A2E40; margin: 0; text-transform: uppercase; letter-spacing: 0.05em; }
+  .summary .sup-box { background: #F0F6FC; border: 1px solid #D0E8F5; border-radius: 8px; padding: 12px 14px; }
+  .summary .sup-box .nm { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1A2E40; }
+  .summary .sup-box .sub { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 4px; }
+  .summary .row { display: flex; justify-content: space-between; font-family: var(--font-body); font-size: 13px; color: #5A7A96; }
+  .summary .row .v { font-family: var(--font-display); font-weight: 600; color: #1A2E40; }
+  .summary .grand { padding-top: 10px; border-top: 1px dashed #D0E8F5; }
+  .summary .grand .k { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #1A2E40; }
+  .summary .grand .v { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #2D6A9F; }
+  .stock-badge { font-family: var(--font-display); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.04em; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Create Purchase Order</div>
+        <div class="topbar-crumb">Admin / Inventory / Purchase Orders / Create New</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+    <section class="page" data-screen-label="01 PO Create">
+      <a class="back-link" href="inventory-po-list.html"><i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Back to Purchase Orders</a>
+      <div class="page-hero">
+        <h1 id="create-title">Create Purchase Order</h1>
+        <div class="sub" id="create-sub">Fill in the details and add items to order.</div>
+      </div>
+      <div class="grid-2">
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <!-- Order Details -->
+          <div class="section-card">
+            <div class="card-h"><span class="ttl">Order Details</span></div>
+            <div style="padding:20px 22px;display:grid;gap:14px;">
+              <div>
+                <label class="field-label">Supplier *</label>
+                <div style="position:relative;">
+                  <select class="field-select" style="padding-left:38px;"><option>DermaCare Distributors</option><option>MedSupply PH</option><option>Wellness Depot</option><option>PharmaCo Manila</option></select>
+                  <i data-lucide="search" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:#9BBAD4;pointer-events:none;"></i>
+                </div>
+                <div class="supplier-info">
+                  <span class="pill"><i data-lucide="building-2"></i><span class="v">DermaCare Distributors</span></span>
+                  <span class="div-dot"></span>
+                  <span class="pill"><i data-lucide="user"></i>Contact: <span class="v">Maria Reyes</span></span>
+                  <span class="div-dot"></span>
+                  <span class="pill"><i data-lucide="phone"></i><span class="v">+63 917 123 4567</span></span>
+                  <span class="div-dot"></span>
+                  <span class="pill"><i data-lucide="credit-card"></i>Payment Terms: <span class="v">Net 30</span></span>
+                  <a class="view-link" href="inventory-supplier-detail.html">View Supplier <i data-lucide="arrow-right" style="width:13px;height:13px;"></i></a>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div><label class="field-label">Expected Delivery Date *</label><input type="date" class="field-input" value="2026-05-21"></div>
+                <div><label class="field-label">Internal Notes <span style="color:#9BBAD4;font-weight:500;">(optional)</span></label><input class="field-input" type="text" placeholder="e.g. Q2 replenishment…"></div>
+              </div>
+              <div><label class="field-label">Delivery Address</label><div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#F8FBFF;border:1px solid #D0E8F5;border-radius:8px;"><span style="font-family:var(--font-body);font-size:13px;color:#1A2E40;">Cloud Skin Clinic + Wellness · Session Road, Baguio City</span><a href="#" style="font-family:var(--font-display);font-size:12px;font-weight:600;color:#2D6A9F;">Change</a></div></div>
+            </div>
+          </div>
+
+          <!-- Order Items -->
+          <div class="section-card">
+            <div class="card-h"><span class="ttl">Order Items</span><span class="ct">3 items</span></div>
+            <div style="overflow-x:auto;">
+              <table style="min-width:1000px;">
+                <thead><tr><th>Product</th><th>SKU</th><th>Current Stock</th><th>Order Qty</th><th>Unit Cost</th><th style="text-align:right;">Line Total</th><th></th></tr></thead>
+                <tbody>
+              <tr>
+                <td><span class="nm">Retinol Cream</span></td>
+                <td><span class="sku">SKIN-002</span></td>
+                <td><span class="mono" style="color:#1A2E40;font-weight:600;">0</span> <span class="stock-badge badge danger" style="margin-left:4px;">No Stock</span></td>
+                <td><input class="field-input qty" type="number" value="50"></td>
+                <td><input class="field-input" type="number" value="180" style="width:110px;height:36px;font-family:var(--font-mono);"></td>
+                <td style="text-align:right;"><span class="price">₱9,000</span></td>
+                <td style="text-align:center;"><button class="btn btn-outline" style="width:32px;height:32px;padding:0;color:#DC2626;border-color:#FCA5A5;"><i data-lucide="x"></i></button></td>
+              </tr>
+              <tr>
+                <td><span class="nm">Chemical Peel Solution</span></td>
+                <td><span class="sku">TREAT-001</span></td>
+                <td><span class="mono" style="color:#1A2E40;font-weight:600;">4</span> <span class="stock-badge badge warning" style="margin-left:4px;">Low</span></td>
+                <td><input class="field-input qty" type="number" value="30"></td>
+                <td><input class="field-input" type="number" value="280" style="width:110px;height:36px;font-family:var(--font-mono);"></td>
+                <td style="text-align:right;"><span class="price">₱8,400</span></td>
+                <td style="text-align:center;"><button class="btn btn-outline" style="width:32px;height:32px;padding:0;color:#DC2626;border-color:#FCA5A5;"><i data-lucide="x"></i></button></td>
+              </tr>
+              <tr>
+                <td><span class="nm">Filler 1mL</span></td>
+                <td><span class="sku">INJ-002</span></td>
+                <td><span class="mono" style="color:#1A2E40;font-weight:600;">3</span> <span class="stock-badge badge warning" style="margin-left:4px;">Low</span></td>
+                <td><input class="field-input qty" type="number" value="20"></td>
+                <td><input class="field-input" type="number" value="1600" style="width:110px;height:36px;font-family:var(--font-mono);"></td>
+                <td style="text-align:right;"><span class="price">₱32,000</span></td>
+                <td style="text-align:center;"><button class="btn btn-outline" style="width:32px;height:32px;padding:0;color:#DC2626;border-color:#FCA5A5;"><i data-lucide="x"></i></button></td>
+              </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="padding:16px 22px;">
+              <button class="add-row"><i data-lucide="plus"></i> Add Item</button>
+              <div style="font-family:var(--font-body);font-size:12px;color:#5A7A96;margin-top:10px;display:flex;align-items:center;gap:6px;justify-content:center;"><i data-lucide="info" style="width:13px;height:13px;color:#2D6A9F;"></i> One PO per supplier. All items must be from the selected supplier.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Summary -->
+        <div class="summary">
+          <h3>Order Summary</h3>
+          <div class="sup-box">
+            <div class="nm">DermaCare Distributors</div>
+            <div class="sub">Contact: Maria Reyes · +63 917 123 4567</div>
+            <div class="sub">Payment Terms: <strong style="color:#1A2E40;font-family:var(--font-display);font-weight:700;">Net 30</strong></div>
+          </div>
+          <div class="row"><span>Items</span><span class="v">3</span></div>
+          <div class="row"><span>Subtotal</span><span class="v">₱49,400.00</span></div>
+          <div class="row"><span>VAT (12%)</span><span class="v">₱5,928.00</span></div>
+          <div class="row grand"><span class="k">Grand Total</span><span class="v">₱55,328.00</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px;padding-top:8px;border-top:1px solid #F0F6FC;" id="create-cta">
+            <button class="btn btn-outline" style="width:100%;justify-content:center;"><i data-lucide="save"></i> Save as Draft</button>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;"><i data-lucide="send"></i> Submit for Approval</button>
+          </div>
+          <div id="create-warn" style="font-family:var(--font-body);font-size:11px;color:#B45309;display:flex;align-items:flex-start;gap:6px;"><i data-lucide="alert-triangle" style="width:13px;height:13px;flex-shrink:0;margin-top:1px;"></i><span>Once submitted, items cannot be edited.</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+  // Edit mode: when ?edit=PO-… is present, retitle and re-purpose the create form.
+  // ?status=draft | pending | approved controls which fields are locked.
+  // Draft: fully editable. Pending/Approved: only delivery date + notes editable;
+  // supplier and line items are locked.
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var editPo = params.get('edit');
+    if (!editPo) return;
+    var po = editPo.toUpperCase();
+    var status = (params.get('status') || 'draft').toLowerCase();
+
+    document.title = 'Cloud Skin Admin — Edit ' + po;
+    var topTitle = document.querySelector('.topbar-title');
+    if (topTitle) topTitle.textContent = (status === 'draft' ? 'Edit Purchase Order' : 'Edit Delivery Details');
+    var crumb = document.querySelector('.topbar-crumb');
+    if (crumb) crumb.textContent = 'Admin / Inventory / Purchase Orders / ' + po + ' / Edit';
+    var back = document.querySelector('.back-link');
+    if (back) {
+      back.setAttribute('href', 'inventory-po-detail.html?po=' + po + '&status=' + status);
+      back.innerHTML = '<i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Back to ' + po;
+    }
+
+    // Status badge map
+    var badgeMap = {
+      draft:    { cls: 'draft',    label: 'Draft' },
+      pending:  { cls: 'pending',  label: 'Pending Approval' },
+      approved: { cls: 'approved', label: 'Approved' }
+    };
+    var badge = badgeMap[status] || badgeMap.draft;
+    var heroTitle = document.getElementById('create-title');
+    if (heroTitle) {
+      var label = status === 'draft' ? 'Edit Purchase Order' : 'Edit Delivery Details';
+      heroTitle.innerHTML = label + ' — <span style="font-family:var(--font-mono);color:#2D6A9F;">' + po + '</span> <span class="badge ' + badge.cls + '" style="vertical-align:6px;margin-left:8px;">' + badge.label + '</span>';
+    }
+    var heroSub = document.getElementById('create-sub');
+    if (heroSub) {
+      var subs = {
+        draft:    'All fields are editable. Submit to send this PO into the approval queue.',
+        pending:  'Only delivery date and notes can be updated while the PO is under review.',
+        approved: 'Only delivery date and notes can be updated once the PO is approved.'
+      };
+      heroSub.textContent = subs[status] || subs.draft;
+    }
+
+    // Inject a status banner above the form (after the back link / hero)
+    if (status !== 'draft') {
+      var banner = document.createElement('div');
+      var bcfg = status === 'pending'
+        ? { bg:'#EBF6FD', bd:'#93C5FD', fg:'#1E40AF', icon:'info', title:'PO is under review', desc:'Only the delivery date and notes can be updated. To change line items, reject this PO back to Draft first.' }
+        : { bg:'#FEF3C7', bd:'#FCD34D', fg:'#92400E', icon:'alert-triangle', title:'PO is approved — line items locked', desc:'Line items and supplier are locked. You may only update the expected delivery date and notes.' };
+      banner.style.cssText = 'background:'+bcfg.bg+';border:1px solid '+bcfg.bd+';color:'+bcfg.fg+';border-radius:10px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;';
+      banner.innerHTML = '<i data-lucide="'+bcfg.icon+'" style="width:18px;height:18px;flex-shrink:0;margin-top:1px;"></i>' +
+        '<div><div style="font-family:var(--font-display);font-weight:700;font-size:14px;">'+bcfg.title+'</div>' +
+        '<div style="font-family:var(--font-body);font-size:13px;margin-top:2px;">'+bcfg.desc+'</div></div>';
+      var hero = document.querySelector('.page-hero');
+      hero.parentNode.insertBefore(banner, hero.nextSibling);
+
+      // Lock supplier
+      var supSelect = document.querySelector('.field-select');
+      if (supSelect) {
+        supSelect.disabled = true;
+        supSelect.style.background = '#F1F5F9';
+        supSelect.style.color = '#5A7A96';
+        supSelect.style.cursor = 'not-allowed';
+        // Replace search icon with lock icon
+        var supWrap = supSelect.parentNode;
+        var searchIcon = supWrap.querySelector('[data-lucide="search"]');
+        if (searchIcon) searchIcon.setAttribute('data-lucide', 'lock');
+        // Add lock chevron at right
+        var lockBadge = document.createElement('span');
+        lockBadge.style.cssText = 'position:absolute;right:38px;top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;gap:4px;font-family:var(--font-display);font-size:11px;font-weight:700;color:#9BBAD4;text-transform:uppercase;letter-spacing:0.04em;pointer-events:none;';
+        lockBadge.innerHTML = '<i data-lucide="lock" style="width:12px;height:12px;"></i> Locked';
+        supWrap.appendChild(lockBadge);
+      }
+
+      // Lock all line items: disable inputs, gray rows, add lock icon column
+      var itemRows = document.querySelectorAll('.section-card table tbody tr');
+      itemRows.forEach(function (tr) {
+        tr.style.background = '#F8FAFC';
+        tr.style.opacity = '0.85';
+        tr.querySelectorAll('input').forEach(function (inp) {
+          inp.disabled = true;
+          inp.style.background = '#F1F5F9';
+          inp.style.color = '#5A7A96';
+          inp.style.borderColor = '#E2E8F0';
+          inp.style.cursor = 'not-allowed';
+        });
+        // Replace × remove button with a lock icon
+        var lastTd = tr.querySelector('td:last-child');
+        if (lastTd) {
+          lastTd.innerHTML = '<span style="display:inline-flex;width:32px;height:32px;align-items:center;justify-content:center;color:#9BBAD4;"><i data-lucide="lock"></i></span>';
+        }
+      });
+
+      // Disable Add Item button
+      var addRow = document.querySelector('.add-row');
+      if (addRow) {
+        addRow.disabled = true;
+        addRow.style.opacity = '0.5';
+        addRow.style.cursor = 'not-allowed';
+        addRow.innerHTML = '<i data-lucide="lock"></i> Line items locked';
+      }
+      // Replace footer note
+      var addNote = addRow && addRow.nextElementSibling;
+      if (addNote && addNote.tagName === 'DIV') {
+        addNote.innerHTML = '<i data-lucide="info" style="width:13px;height:13px;color:#2D6A9F;vertical-align:-2px;margin-right:4px;"></i>Line items cannot be edited at this status.';
+        addNote.style.color = '#5A7A96';
+      }
+
+      // Update Order Items header subtitle
+      var itemsCardHead = document.querySelectorAll('.card-h')[1];
+      if (itemsCardHead) {
+        var ct = itemsCardHead.querySelector('.ct');
+        if (ct) ct.innerHTML = '<i data-lucide="lock" style="width:11px;height:11px;vertical-align:-1px;margin-right:3px;"></i> Locked';
+      }
+    }
+
+    // CTAs
+    var cta = document.getElementById('create-cta');
+    if (cta) {
+      if (status === 'draft') {
+        cta.innerHTML =
+          '<button class="btn btn-outline" style="width:100%;justify-content:center;"><i data-lucide="x"></i> Cancel</button>' +
+          '<button class="btn btn-primary" style="width:100%;justify-content:center;"><i data-lucide="save"></i> Save Changes</button>';
+      } else {
+        cta.innerHTML =
+          '<button class="btn btn-outline" style="width:100%;justify-content:center;"><i data-lucide="x"></i> Cancel</button>' +
+          '<button class="btn btn-primary" style="width:100%;justify-content:center;"><i data-lucide="save"></i> Save Changes</button>';
+      }
+    }
+    // CTA footnote: pending shows reject-to-draft link
+    var warn = document.getElementById('create-warn');
+    if (warn) {
+      if (status === 'draft') {
+        warn.querySelector('span').textContent = 'Submitting moves this PO into Pending Approval.';
+        warn.querySelector('i').setAttribute('data-lucide', 'info');
+        warn.style.color = '#2D6A9F';
+      } else if (status === 'pending') {
+        warn.innerHTML = '<i data-lucide="rotate-ccw" style="width:13px;height:13px;flex-shrink:0;margin-top:1px;"></i><span>Need to edit items? <a href="inventory-po-detail.html?status=pending&po='+po+'" style="color:#DC2626;font-weight:700;text-decoration:underline;">Reject to Draft →</a></span>';
+        warn.style.color = '#DC2626';
+      } else {
+        warn.innerHTML = '<i data-lucide="info" style="width:13px;height:13px;flex-shrink:0;margin-top:1px;"></i><span>Saving updates delivery details only. Line items will not change.</span>';
+        warn.style.color = '#5A7A96';
+      }
+    }
+
+    if (window.lucide) window.lucide.createIcons();
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Service Detail</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: #1A2E40; }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #0F1E2E; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg,#2D6A9F,#5BC0EB); display: flex; align-items: center; justify-content: center; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-crumb a { color: #2D6A9F; text-decoration: none; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .role-pill-light { background: #EBF6FD; color: #2D6A9F; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; text-transform: uppercase; margin-top: 2px; }
+
+  .page { padding: 24px 32px 60px; display: flex; flex-direction: column; gap: 14px; }
+  .back-link { color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; text-decoration: none; width: fit-content; }
+  .back-link .lucide { width: 14px; height: 14px; }
+  .title-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .title-row h1 { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; margin: 0; }
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 11px; }
+  .badge.green { background: #DCFCE7; color: #15803D; }
+  .badge.blue { background: #DBEAFE; color: #1D4ED8; }
+  .badge.orange { background: #FED7AA; color: #C2410C; }
+
+  /* Service-type banner */
+  .svc-banner { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 8px; }
+  .svc-banner.clinical { background: #EFF6FF; border-left: 4px solid #2D6A9F; }
+  .svc-banner.medical { background: #FFF1F0; border-left: 4px solid #DC2626; }
+  .svc-banner.medical .ic { background: rgba(220,38,38,0.12); color: #DC2626; }
+  .svc-banner.medical .ttl { color: #DC2626; }
+  .svc-banner .ic { width: 24px; height: 24px; border-radius: 6px; background: rgba(45,106,159,0.12); color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; }
+  .svc-banner .ic .lucide { width: 14px; height: 14px; }
+  .svc-banner .ttl { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #2D6A9F; }
+  .svc-banner .desc { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-left: 4px; }
+  .svc-banner .chip { margin-left: auto; padding: 4px 10px; background: #F0F6FC; color: #2D6A9F; border-radius: 6px; font-family: var(--font-display); font-weight: 700; font-size: 11.5px; }
+
+  .step-card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(26,58,92,0.06); border: 1px solid #E5EFF7; overflow: hidden; }
+
+  /* Horizontal stepper */
+  .nodes { display: flex; align-items: flex-start; padding: 22px 28px 14px; gap: 0; overflow-x: auto; }
+  .node { flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 76px; position: relative; cursor: pointer; }
+  .node .circle { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 12px; flex-shrink: 0; z-index: 2; background: #fff; border: 2px solid #E5EFF7; color: #9BBAD4; transition: all 120ms; }
+  .node.done .circle { background: #2D6A9F; border-color: #2D6A9F; color: #fff; }
+  .node.done .circle .lucide { width: 14px; height: 14px; }
+  .node.active .circle { background: #2D6A9F; border-color: #2D6A9F; color: #fff; box-shadow: 0 0 0 4px rgba(45,106,159,0.18); }
+  .node .lbl { font-family: var(--font-display); font-size: 10.5px; color: #5A7A96; margin-top: 6px; text-align: center; line-height: 1.3; max-width: 86px; }
+  .node.active .lbl { color: #2D6A9F; font-weight: 700; }
+  .node.done .lbl { color: #1A2E40; font-weight: 600; }
+  .node .conn { position: absolute; top: 15px; height: 2px; background: #E5EFF7; left: 50%; right: -50%; z-index: 1; }
+  .node.done .conn { background: #2D6A9F; }
+  .node:last-child .conn { display: none; }
+
+  .step-nav { padding: 10px 28px; display: flex; justify-content: space-between; align-items: center; background: #F8FBFD; border-top: 1px solid #F0F6FC; border-bottom: 1px solid #F0F6FC; }
+  .viewing { font-family: var(--font-body); font-size: 13px; color: #1A2E40; }
+  .viewing .pfx { color: #5A7A96; }
+  .arrows { display: flex; gap: 6px; }
+  .arr-btn { width: 28px; height: 28px; border: 1px solid #D0E8F5; background: #fff; border-radius: 6px; cursor: pointer; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; }
+  .arr-btn .lucide { width: 13px; height: 13px; }
+
+  .content-panel { padding: 24px 28px; }
+  .content-panel h2 { font-family: var(--font-display); font-weight: 700; font-size: 17px; color: #1A2E40; margin: 0 0 4px; }
+  .content-panel .subtext { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-bottom: 16px; }
+  .pane { display: none; }
+  .pane[data-active] { display: block; }
+
+  .kv { display: flex; gap: 8px; padding: 6px 0; font-size: 13px; }
+  .kv .k { color: #5A7A96; min-width: 140px; }
+  .kv .v { color: #1A2E40; font-weight: 600; font-family: var(--font-display); }
+  .kv .v.mono { font-family: var(--font-mono); }
+  .grid-2c { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 700px) { .grid-2c { grid-template-columns: 1fr; } }
+  .note { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 7px; padding: 10px 12px; font-size: 12.5px; color: #5A7A96; margin-top: 10px; line-height: 1.5; }
+  .sec-lbl { font-family: var(--font-display); font-weight: 700; font-size: 11px; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin: 14px 0 8px; }
+
+  .vitals { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; }
+  @media (max-width: 700px) { .vitals { grid-template-columns: repeat(2,1fr); } }
+  .vital { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 7px; padding: 10px; text-align: center; }
+  .vital .v { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1A2E40; }
+  .vital .k { font-size: 10px; color: #9BBAD4; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+  .blockquote { background: #F8FBFD; border-left: 3px solid #2D6A9F; padding: 12px 14px; border-radius: 0 7px 7px 0; font-size: 12.5px; color: #1A2E40; line-height: 1.6; }
+  .checklist { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; padding: 0; list-style: none; }
+  .checklist li { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #1A2E40; }
+  .checklist li .lucide { width: 13px; height: 13px; color: #15803D; }
+
+  .pay-paid { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: #1A2E40; }
+  .receipt-link { color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12px; text-decoration: none; margin-top: 8px; display: inline-flex; align-items: center; gap: 4px; }
+  .receipt-link .lucide { width: 13px; height: 13px; }
+
+  .cons-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #E5EFF7; border-radius: 7px; }
+  .cons-row + .cons-row { margin-top: 8px; }
+  .cons-row .ic { width: 24px; height: 24px; border-radius: 50%; background: #DCFCE7; color: #15803D; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .cons-row .ic .lucide { width: 13px; height: 13px; }
+  .cons-row .body { flex: 1; }
+  .cons-row .nm { font-family: var(--font-display); font-weight: 700; font-size: 12.5px; color: #1A2E40; }
+  .cons-row .meta { font-size: 11.5px; color: #5A7A96; margin-top: 2px; }
+  .view-doc { color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; text-decoration: none; }
+
+  .btn-row { display: flex; justify-content: space-between; gap: 10px; padding: 16px 28px; background: #F8FBFD; border-top: 1px solid #F0F6FC; }
+  .btn { height: 38px; padding: 0 16px; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; cursor: pointer; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .btn-ghost { background: #fff; color: #5A7A96; border-color: #D0E8F5; }
+  .btn-ghost:hover { background: #F0F6FC; }
+  .btn-primary { background: #2D6A9F; color: #fff; }
+  .btn-primary:hover { background: #1A5685; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Hydra Facial — Service Detail</div>
+        <div class="topbar-crumb">Admin / Patients / <a href="patient-profile.html?id=P001">Sarah Johnson</a> / Services / Hydra Facial — April 15, 2026</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i></button>
+        <div class="user-pill"><div class="avatar">AU</div><div><div class="name">Admin User</div><div class="role-pill-light">Admin</div></div></div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Service Detail">
+      <a class="back-link" href="patient-profile.html?id=P001"><i data-lucide="arrow-left"></i> Back to Services</a>
+      <div class="title-row">
+        <h1>Hydra Facial — April 15, 2026</h1>
+        <span class="badge green">Completed</span>
+        <span class="badge green">Paid</span>
+      </div>
+
+      <div class="step-card">
+        <div style="padding:14px 18px 0;"><div class="svc-banner clinical">
+          <span class="ic"><i data-lucide="info"></i></span>
+          <span class="ttl">Clinical Aesthetic</span>
+          <span class="desc">Doctor's Order not required — clinical assessment and notes apply.</span>
+          <span class="chip">Hydra Facial · Facials</span>
+        </div></div>
+
+        <div class="nodes" id="nodes">
+          <div class="node done" data-step="1"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Service Info</div><span class="conn"></span></div>
+          <div class="node done" data-step="2"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Schedule</div><span class="conn"></span></div>
+          <div class="node done" data-step="3"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Consent &amp; History</div><span class="conn"></span></div>
+          <div class="node done" data-step="4"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Vital Signs</div><span class="conn"></span></div>
+          <div class="node done" data-step="5"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Doctor's Notes</div><span class="conn"></span></div>
+          <div class="node done" data-step="6"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Nurse's Notes</div><span class="conn"></span></div>
+          <div class="node done" data-step="7"><div class="circle"><i data-lucide="check"></i></div><div class="lbl">Treatment Notes</div><span class="conn"></span></div>
+          <div class="node active" data-step="8"><div class="circle">8</div><div class="lbl">Finalize</div></div>
+        </div>
+
+        <div class="step-nav">
+          <span class="viewing"><span class="pfx">Viewing:</span> <b id="viewing-label">Step 8 — Finalize</b></span>
+          <div class="arrows"><button class="arr-btn" id="prev-step"><i data-lucide="chevron-left"></i></button><button class="arr-btn" id="next-step"><i data-lucide="chevron-right"></i></button></div>
+        </div>
+
+        <div class="content-panel">
+          <div class="pane" data-pane="1">
+            <h2>Service Info</h2><div class="subtext">Service overview and booking details.</div>
+            <div class="grid-2c">
+              <div>
+                <div class="kv"><span class="k">Service</span><span class="v">Hydra Facial</span></div>
+                <div class="kv"><span class="k">Category</span><span class="v">Facials</span></div>
+                <div class="kv"><span class="k">Duration</span><span class="v">60 minutes</span></div>
+                <div class="kv"><span class="k">Workflow Type</span><span class="v">Clinical Aesthetic (8 steps)</span></div>
+              </div>
+              <div>
+                <div class="kv"><span class="k">Amount Charged</span><span class="v">₱2,800</span></div>
+                <div class="kv"><span class="k">Discount</span><span class="v" style="color:#15803D;">₱300 (voucher)</span></div>
+                <div class="kv"><span class="k">Amount Paid</span><span class="v pay-paid">₱2,500</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pane" data-pane="2">
+            <h2>Schedule</h2><div class="subtext">Appointment scheduling details.</div>
+            <div class="grid-2c">
+              <div>
+                <div class="kv"><span class="k">Date</span><span class="v">April 15, 2026</span></div>
+                <div class="kv"><span class="k">Time</span><span class="v">10:00 AM – 11:00 AM</span></div>
+                <div class="kv"><span class="k">Practitioner</span><span class="v">Dr. Reyes</span></div>
+              </div>
+              <div>
+                <div class="kv"><span class="k">Booked by</span><span class="v">Admin User</span></div>
+                <div class="kv"><span class="k">Booked on</span><span class="v">April 10, 2026</span></div>
+                <div class="kv"><span class="k">Status</span><span class="v"><span class="badge green">Completed</span></span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pane" data-pane="3">
+            <h2>Consent &amp; History</h2><div class="subtext">All required consent forms signed and medical history reviewed.</div>
+            <div class="cons-row"><span class="ic"><i data-lucide="check"></i></span><div class="body"><div class="nm">General Consent Form</div><div class="meta">Signed April 1, 2026 by Sarah Johnson</div></div><a class="view-doc" href="#">View →</a></div>
+            <div class="cons-row"><span class="ic"><i data-lucide="check"></i></span><div class="body"><div class="nm">Medical History Questionnaire</div><div class="meta">Completed April 1, 2026</div></div><a class="view-doc" href="#">View →</a></div>
+            <div class="cons-row"><span class="ic"><i data-lucide="check"></i></span><div class="body"><div class="nm">Facial Treatment Consent</div><div class="meta">Signed April 1, 2026 by Sarah Johnson</div></div><a class="view-doc" href="#">View →</a></div>
+          </div>
+
+          <div class="pane" data-pane="4">
+            <h2>Vital Signs</h2><div class="subtext">Recorded by Dr. Reyes · April 15, 2026 · 10:00 AM</div>
+            <div class="vitals">
+              <div class="vital"><div class="v">120/80</div><div class="k">BP (mmHg)</div></div>
+              <div class="vital"><div class="v">78</div><div class="k">HR (bpm)</div></div>
+              <div class="vital"><div class="v">98%</div><div class="k">SpO₂</div></div>
+              <div class="vital"><div class="v">58 kg</div><div class="k">Weight</div></div>
+              <div class="vital"><div class="v">162 cm</div><div class="k">Height</div></div>
+            </div>
+            <div class="note">All vital signs within normal range. Procedure cleared to proceed.</div>
+          </div>
+
+          <div class="pane" data-pane="5">
+            <h2>Doctor's Notes</h2><div class="subtext">Pre-treatment assessment by Dr. Reyes · April 15, 2026 · 9:45 AM</div>
+            <div class="blockquote">Patient presented with mild hyperpigmentation on cheeks and forehead. No active breakouts. No contraindications. Cleared for Hydra Facial with exosome booster.</div>
+            <div class="sec-lbl">Procedure protocol</div>
+            <div class="kv"><span class="k">Equipment</span><span class="v">Korea Hydra Facial Machine — Standard</span></div>
+            <div class="kv"><span class="k">Topical anesthesia</span><span class="v">None required</span></div>
+            <div class="kv"><span class="k">Products</span><span class="v">Hyaluronic serum, Exosome booster</span></div>
+          </div>
+
+          <div class="pane" data-pane="6">
+            <h2>Nurse's Notes</h2><div class="subtext">Patient care during the session · Nurse Maria Santos · April 15, 2026</div>
+            <div class="sec-lbl">Pre-Session</div>
+            <div class="note">Patient arrived calm. No complaints. Cleansed face in prep room.</div>
+            <div class="sec-lbl">During Session</div>
+            <div class="note">Patient comfortable throughout. No adverse reactions. Hydration step very well tolerated.</div>
+            <div class="sec-lbl">Post-Session Care Given</div>
+            <ul class="checklist">
+              <li><i data-lucide="check-circle"></i> Verbal post-care instructions given</li>
+              <li><i data-lucide="check-circle"></i> Water encouraged post-session</li>
+              <li><i data-lucide="check-circle"></i> SPF 50 applied before patient left</li>
+              <li><i data-lucide="check-circle"></i> Printed aftercare sheet provided</li>
+            </ul>
+          </div>
+
+          <div class="pane" data-pane="7">
+            <h2>Treatment Notes</h2><div class="subtext">Practitioner documentation · Dr. Reyes · April 15, 2026 · 11:35 AM</div>
+            <div class="blockquote">Hydra facial performed with exosome booster concentrate. Skin responded well — improved hydration and brightness immediately post-procedure. Mild redness resolved within 20 minutes. Recommended monthly sessions for optimal results.</div>
+            <div class="sec-lbl">Post-procedure instructions given</div>
+            <ul class="checklist">
+              <li><i data-lucide="check-circle"></i> Avoid sun exposure for 48 hours</li>
+              <li><i data-lucide="check-circle"></i> Apply SPF 50 daily</li>
+              <li><i data-lucide="check-circle"></i> No heavy makeup for 24 hours</li>
+              <li><i data-lucide="check-circle"></i> Use gentle cleanser only for 3 days</li>
+              <li><i data-lucide="check-circle"></i> Follow-up in 4 weeks recommended</li>
+            </ul>
+          </div>
+
+          <div class="pane" data-pane="8" data-active>
+            <h2>Finalize</h2><div class="subtext">Payment recorded and service marked complete.</div>
+            <div class="grid-2c">
+              <div>
+                <div class="kv"><span class="k">Amount Charged</span><span class="v">₱2,800</span></div>
+                <div class="kv"><span class="k">Discount</span><span class="v" style="color:#15803D;">₱300 (voucher)</span></div>
+                <div class="kv"><span class="k">Amount Paid</span><span class="v pay-paid">₱2,500</span></div>
+                <div class="kv"><span class="k">Payment Method</span><span class="v">GCash</span></div>
+              </div>
+              <div>
+                <div class="kv"><span class="k">Receipt No.</span><span class="v mono">CSC-2026-00041</span></div>
+                <div class="kv"><span class="k">Transaction Date</span><span class="v">April 15, 2026</span></div>
+                <div class="kv"><span class="k">Recorded by</span><span class="v">Admin User</span></div>
+                <div class="kv"><span class="k">Status</span><span class="v"><span class="badge green">Paid · Completed</span></span></div>
+                <a class="receipt-link" href="#"><i data-lucide="download"></i> Download Receipt</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <a class="btn btn-ghost" href="patient-profile.html?id=P001"><i data-lucide="arrow-left"></i> Back to Patient</a>
+          <a class="btn btn-primary" href="#"><i data-lucide="printer"></i> Print Record</a>
+        </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var serviceParam = params.get('service');
+  if (serviceParam === 'co2-laser') {
+    document.getElementById('nodes-clinical').hidden = true;
+    document.getElementById('clinical-content').hidden = true;
+    document.getElementById('nodes-medical').hidden = false;
+    document.getElementById('medical-doctors-order').hidden = false;
+    var banner = document.getElementById('svc-banner');
+    banner.classList.remove('clinical'); banner.classList.add('medical');
+    document.getElementById('banner-ttl').textContent = 'Medical Procedure';
+    document.getElementById('banner-desc').textContent = 'Full clinical documentation required — all 9 steps must be completed.';
+    document.getElementById('banner-chip').textContent = 'CO2 Fractional Laser · Laser';
+    document.querySelector('.title-row h1').textContent = 'CO2 Fractional Laser — May 27, 2026';
+    var badges = document.querySelectorAll('.title-row .badge');
+    if (badges[0]) { badges[0].textContent = 'In Progress'; badges[0].className = 'badge orange'; }
+    if (badges[1]) { badges[1].textContent = 'Pending Payment'; badges[1].className = 'badge orange'; }
+    document.querySelector('.topbar-title').textContent = 'CO2 Fractional Laser — Service Detail';
+    document.querySelector('.topbar-crumb').innerHTML = 'Admin / Patients / <a href="patient-profile.html?id=P001">Sarah Johnson</a> / Services / CO2 Fractional Laser';
+    document.title = 'Cloud Skin Admin — CO2 Fractional Laser';
+    if (window.lucide) window.lucide.createIcons();
+    return;
+  }
+  var labels = ['', 'Service Info', 'Schedule', "Consent & History", 'Vital Signs', "Doctor's Notes", "Nurse's Notes", 'Treatment Notes', 'Finalize'];
+  var current = 8;
+  var nodes = document.querySelectorAll('#nodes .node');
+  var panes = document.querySelectorAll('[data-pane]');
+  var viewing = document.getElementById('viewing-label');
+  function show(n) {
+    current = n;
+    nodes.forEach(function (x) { x.classList.remove('active'); });
+    nodes[n - 1].classList.add('active');
+    panes.forEach(function (p) {
+      if (parseInt(p.getAttribute('data-pane'),10) === n) p.setAttribute('data-active',''); else p.removeAttribute('data-active');
+    });
+    viewing.textContent = 'Step ' + n + ' — ' + labels[n];
+  }
+  nodes.forEach(function (node, i) { node.addEventListener('click', function () { show(i + 1); }); });
+  document.getElementById('prev-step').addEventListener('click', function () { if (current > 1) show(current - 1); });
+  document.getElementById('next-step').addEventListener('click', function () { if (current < 8) show(current + 1); });
+})();
+</script>
+</body>
+</html>

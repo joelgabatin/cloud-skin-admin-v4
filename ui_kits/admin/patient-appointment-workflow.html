@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Appointment Workflow — Full 8-Step Flow</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: #1A2E40; padding: 40px 24px; }
+  .stack { max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+  .scene-label { font-family: var(--font-display); font-weight: 700; font-size: 17px; color: #1A2E40; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+  .scene-label .num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #2D6A9F; color: #fff; font-size: 13px; }
+  .scene-label .sub { font-family: var(--font-body); font-weight: 400; font-size: 13px; color: #5A7A96; }
+  .scene { position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(15,30,48,0.10); background: #fff; min-height: 380px; }
+  .scene.with-overlay .bg { filter: blur(1.5px); opacity: 0.45; }
+
+  /* Background patient-profile preview */
+  .bg { padding: 22px 26px; min-height: 380px; }
+  .bg .crumb { font-size: 12px; color: #5A7A96; margin-bottom: 14px; }
+  .bg .profile-card { background: #F0F6FC; border-radius: 8px; padding: 16px 18px; display: flex; gap: 14px; align-items: center; }
+  .bg .av { width: 56px; height: 56px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 18px; }
+  .bg .nm { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: #1A2E40; }
+  .bg .meta { font-size: 12.5px; color: #5A7A96; margin-top: 3px; }
+  .bg .tabs { display: flex; gap: 2px; border-bottom: 1px solid #E5EFF7; margin-top: 14px; }
+  .bg .tabs span { padding: 10px 14px; font-family: var(--font-display); font-weight: 500; font-size: 12.5px; color: #5A7A96; border-bottom: 3px solid transparent; }
+  .bg .tabs span.on { color: #2D6A9F; border-bottom-color: #2D6A9F; font-weight: 700; }
+
+  /* Multi-step modal */
+  .overlay { position: absolute; inset: 0; background: rgba(15,30,48,0.55); display: flex; align-items: flex-start; justify-content: center; padding: 36px 24px; overflow-y: auto; }
+  .modal { background: #fff; border-radius: 12px; width: 100%; max-width: 720px; box-shadow: 0 20px 60px rgba(15,30,48,0.35); display: flex; flex-direction: column; }
+  .mh { padding: 18px 24px 14px; border-bottom: 1px solid #E5EFF7; position: relative; }
+  .mh h2 { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: #1A2E40; margin: 0 0 3px; }
+  .mh .sub { font-size: 12px; color: #5A7A96; }
+  .mh .close { position: absolute; top: 14px; right: 14px; width: 28px; height: 28px; background: none; border: none; cursor: pointer; border-radius: 6px; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; }
+  .mh .close:hover { background: #F0F6FC; color: #1A2E40; }
+  .mb { padding: 20px 24px; }
+  .mf { padding: 14px 22px; border-top: 1px solid #E5EFF7; background: #F8FBFD; display: flex; justify-content: space-between; align-items: center; }
+
+  /* Stepper */
+  .stepper { display: flex; align-items: center; padding: 14px 22px; background: #F8FBFD; border-bottom: 1px solid #E5EFF7; gap: 6px; flex-wrap: nowrap; overflow-x: auto; }
+  .stepper .st { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .stepper .st .ix { width: 22px; height: 22px; border-radius: 50%; background: #E5EFF7; color: #5A7A96; font-family: var(--font-display); font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; }
+  .stepper .st .lb { font-family: var(--font-display); font-weight: 600; font-size: 11.5px; color: #5A7A96; white-space: nowrap; }
+  .stepper .st.done .ix { background: #15803D; color: #fff; }
+  .stepper .st.done .lb { color: #15803D; }
+  .stepper .st.on .ix { background: #2D6A9F; color: #fff; }
+  .stepper .st.on .lb { color: #2D6A9F; }
+  .stepper .arrow { color: #BFD8EB; font-size: 14px; flex-shrink: 0; padding: 0 2px; }
+
+  /* Buttons */
+  .btn { padding: 9px 16px; border-radius: 7px; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; cursor: pointer; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn.ghost { background: #fff; color: #5A7A96; border-color: #D0E8F5; }
+  .btn.ghost:hover { background: #F0F6FC; }
+  .btn.primary { background: #2D6A9F; color: #fff; }
+  .btn.primary:hover { background: #1A5685; }
+  .btn.primary[disabled] { background: #CBD5E1; cursor: not-allowed; color: #fff; }
+  .btn.outline-blue { background: #fff; color: #2D6A9F; border-color: #2D6A9F; }
+  .btn.outline-blue:hover { background: #F0F6FC; }
+  .btn.outline-orange { background: #fff; color: #B45309; border-color: #B45309; }
+  .btn.outline-orange:hover { background: #FFFBEB; }
+
+  /* Step 1 — type cards */
+  .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 700px) { .type-grid { grid-template-columns: 1fr; } }
+  .type-card { border: 2px solid #E5EFF7; border-radius: 10px; padding: 18px; cursor: pointer; transition: border-color 120ms, background 120ms; }
+  .type-card.on { border-color: #2D6A9F; background: #F8FBFF; }
+  .type-card .ic { width: 44px; height: 44px; border-radius: 10px; background: #EBF6FD; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .type-card.on .ic { background: #2D6A9F; color: #fff; }
+  .type-card .ic .lucide { width: 20px; height: 20px; }
+  .type-card .ttl { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #1A2E40; margin-bottom: 6px; }
+  .type-card .desc { font-size: 12.5px; color: #5A7A96; line-height: 1.5; }
+
+  /* Step 2 — service catalog */
+  .svc-search { position: relative; margin-bottom: 14px; }
+  .svc-search input { width: 100%; height: 38px; padding: 0 11px 0 32px; border: 1px solid #D1E3F3; border-radius: 7px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .svc-search .lucide { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .svc-cat { font-family: var(--font-display); font-weight: 700; font-size: 10.5px; color: #2D6A9F; letter-spacing: 0.07em; text-transform: uppercase; margin: 14px 0 8px; padding-top: 12px; border-top: 1px solid #F0F6FC; }
+  .svc-cat:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+  .svc-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 4px; cursor: pointer; }
+  .svc-item .left { display: flex; align-items: center; gap: 10px; }
+  .svc-item .radio { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #D1E3F3; background: #fff; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+  .svc-item.on .radio { border-color: #2D6A9F; }
+  .svc-item.on .radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #2D6A9F; }
+  .svc-item .nm { font-family: var(--font-body); font-size: 13px; color: #1A2E40; }
+  .svc-item .price { font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #2D6A9F; }
+  .info-blue { background: #EBF6FD; border: 1px solid #BFE0F5; border-radius: 7px; padding: 11px 14px; font-size: 12.5px; color: #1E40AF; line-height: 1.5; margin-top: 14px; display: flex; flex-direction: column; gap: 4px; }
+  .info-blue .ln { display: flex; gap: 6px; align-items: flex-start; }
+  .info-blue .lucide { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; color: #2D6A9F; }
+
+  /* Step 3 — calendar */
+  .grid-3 { display: grid; grid-template-columns: 280px 1fr; gap: 18px; }
+  @media (max-width: 700px) { .grid-3 { grid-template-columns: 1fr; } }
+  .mini-cal { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; padding: 14px; }
+  .mini-cal .mc-head { display: flex; justify-content: space-between; align-items: center; font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; margin-bottom: 10px; }
+  .mini-cal .nav { background: none; border: 1px solid #D1E3F3; width: 24px; height: 24px; border-radius: 6px; cursor: pointer; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; }
+  .mini-cal .grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+  .mini-cal .dow { font-family: var(--font-display); font-weight: 700; font-size: 9.5px; color: #9BBAD4; text-align: center; padding: 4px 0; text-transform: uppercase; }
+  .mini-cal .day { padding: 6px 0; text-align: center; font-family: var(--font-body); font-size: 12px; color: #1A2E40; border-radius: 5px; cursor: pointer; position: relative; }
+  .mini-cal .day.muted { color: #C7D7E5; }
+  .mini-cal .day.booked { color: #BFD8EB; cursor: not-allowed; text-decoration: line-through; text-decoration-color: #BFD8EB; }
+  .mini-cal .day.sel { background: #2D6A9F; color: #fff; font-weight: 700; }
+  .mini-cal .day.today::after { content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: #F59E0B; }
+  .field-label { font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; display: block; }
+  .pill-row { display: flex; gap: 7px; flex-wrap: wrap; }
+  .pill-row .pill { padding: 8px 14px; border-radius: 9999px; border: 1.5px solid #D1E3F3; background: #fff; color: #5A7A96; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; }
+  .pill-row .pill.on { background: #2D6A9F; color: #fff; border-color: #2D6A9F; }
+  .pill-row .pill.booked { color: #BFD8EB; text-decoration: line-through; cursor: not-allowed; }
+  .select-row select { width: 100%; height: 38px; padding: 0 11px; border: 1px solid #D1E3F3; border-radius: 7px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; background: #fff; }
+  .preview-box { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; padding: 12px 14px; margin-top: 14px; font-size: 12.5px; color: #1A2E40; line-height: 1.6; }
+  .preview-box b { font-family: var(--font-display); font-weight: 700; }
+
+  /* Step 4 — consent checklist */
+  .consent-row { display: flex; gap: 14px; align-items: flex-start; padding: 12px 14px; border: 1px solid #E5EFF7; border-radius: 8px; margin-bottom: 10px; }
+  .consent-row .status { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .consent-row .status.ok { background: #DCFCE7; color: #15803D; }
+  .consent-row .status.bad { background: #FEE2E2; color: #DC2626; }
+  .consent-row .status .lucide { width: 16px; height: 16px; }
+  .consent-row .body { flex: 1; }
+  .consent-row .ttl { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; color: #1A2E40; }
+  .consent-row .meta { font-size: 12px; color: #5A7A96; margin-top: 3px; }
+  .consent-row.bad .ttl { color: #B91C1C; }
+  .warn-red { background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; border-radius: 7px; padding: 10px 12px; font-size: 12px; margin: 10px 0; }
+  .consent-actions { display: flex; gap: 8px; margin-top: 8px; }
+  .note { background: #F0F6FC; border: 1px solid #D1E3F3; border-radius: 7px; padding: 10px 14px; font-size: 12px; color: #5A7A96; line-height: 1.5; margin-top: 12px; }
+
+  /* Step 5 — summary */
+  .summary-card { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 10px; padding: 18px 20px; }
+  .summary-card .ln { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+  .summary-card .ln .k { color: #5A7A96; }
+  .summary-card .ln .v { color: #1A2E40; font-weight: 700; font-family: var(--font-display); }
+  .warn-orange { background: #FFFBEB; border: 1px solid #FCD34D; color: #92400E; border-radius: 7px; padding: 11px 14px; font-size: 12.5px; line-height: 1.5; margin-top: 14px; display: flex; gap: 8px; align-items: flex-start; }
+  .warn-orange .lucide { width: 16px; height: 16px; color: #B45309; flex-shrink: 0; margin-top: 1px; }
+  .toggle-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #fff; border: 1px solid #E5EFF7; border-radius: 8px; margin-top: 12px; }
+  .toggle-row .body { flex: 1; }
+  .toggle-row .body .t { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .toggle-row .body .d { font-size: 11.5px; color: #5A7A96; margin-top: 3px; }
+  .switch { width: 38px; height: 22px; border-radius: 9999px; background: #2D6A9F; padding: 2px; position: relative; cursor: pointer; border: none; flex-shrink: 0; }
+  .switch::after { content: ''; width: 18px; height: 18px; border-radius: 50%; background: #fff; position: absolute; top: 2px; right: 2px; }
+
+  /* Steps 6–8 — services tab + service detail */
+  .info-blue-banner { background: #EBF6FD; border: 1px solid #BFE0F5; border-radius: 7px; padding: 10px 12px; font-size: 12.5px; color: #1E40AF; margin: 14px 0; display: flex; gap: 8px; align-items: center; }
+  .info-blue-banner .lucide { width: 14px; height: 14px; color: #2D6A9F; }
+  table.svc-tab { width: 100%; border-collapse: collapse; }
+  .svc-tab th { padding: 11px 12px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 700; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #E5EFF7; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+  .svc-tab td { padding: 13px 12px; border-bottom: 1px solid #F0F6FC; font-size: 12.5px; color: #1A2E40; vertical-align: middle; }
+  .svc-tab tr.new { background: #F0F9FF; }
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .badge.scheduled { background: #DBEAFE; color: #1D4ED8; }
+  .badge.paid { background: #DCFCE7; color: #15803D; }
+  .badge.completed { background: #DCFCE7; color: #15803D; }
+  .fill-btn { padding: 6px 10px; background: #fff; color: #B45309; border: 1px solid #FCD34D; border-radius: 6px; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; }
+  .fill-btn:hover { background: #FFFBEB; }
+  .fill-btn .lucide { width: 12px; height: 12px; }
+
+  /* Service detail page */
+  .sd-page { padding: 22px 26px; background: #F0F6FC; }
+  .sd-page .crumb { font-size: 12px; color: #5A7A96; margin-bottom: 14px; }
+  .sd-page h1 { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; margin: 0 0 6px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .sd-progress { background: #fff; border: 1px solid #E5EFF7; border-radius: 8px; padding: 12px 16px; margin: 16px 0; display: flex; align-items: center; gap: 14px; }
+  .sd-progress .ttl { font-family: var(--font-display); font-weight: 700; font-size: 12px; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; }
+  .sd-progress .count { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; }
+  .sd-progress .bar { flex: 1; height: 8px; background: #F0F6FC; border-radius: 5px; overflow: hidden; }
+  .sd-progress .bar > div { height: 100%; background: #2D6A9F; }
+  .sd-progress .bar > div.full { background: #15803D; }
+  .accord { background: #fff; border: 1px solid #E5EFF7; border-radius: 8px; margin-bottom: 12px; }
+  .accord-head { display: flex; align-items: center; gap: 12px; padding: 14px 18px; cursor: pointer; }
+  .accord-head .ix { width: 28px; height: 28px; border-radius: 50%; background: #F0F6FC; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 12px; }
+  .accord-head.done .ix { background: #DCFCE7; color: #15803D; }
+  .accord-head.done .ix .lucide { width: 14px; height: 14px; }
+  .accord-head .ttl { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1A2E40; flex: 1; }
+  .accord-head .ttl .sub { display: block; font-weight: 400; font-size: 12px; color: #5A7A96; margin-top: 2px; }
+  .accord-head .tag { padding: 3px 9px; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .accord-head .tag.warn { background: #FEF3C7; color: #B45309; }
+  .accord-head .tag.done { background: #DCFCE7; color: #15803D; }
+  .accord-head .chev { color: #9BBAD4; }
+  .accord-body { padding: 0 18px 18px; border-top: 1px solid #F0F6FC; padding-top: 16px; display: none; }
+  .accord.open .accord-body { display: block; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px; }
+  @media (max-width: 700px) { .form-row { grid-template-columns: 1fr; } }
+  .form-field label { display: block; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; color: #1A2E40; margin-bottom: 4px; }
+  .form-field input, .form-field select, .form-field textarea { width: 100%; height: 36px; padding: 0 10px; border: 1px solid #D1E3F3; border-radius: 6px; font-family: var(--font-body); font-size: 12.5px; color: #1A2E40; outline: none; }
+  .form-field textarea { height: auto; padding: 8px 10px; min-height: 64px; resize: vertical; line-height: 1.5; }
+  .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: #2D6A9F; }
+</style>
+</head>
+<body>
+<div class="stack">
+
+  <!-- STEP 1 -->
+  <section>
+    <div class="scene-label"><span class="num">1</span>Admin clicks "+ New Appointment" <span class="sub">Step 1: Select appointment type</span></div>
+    <div class="scene with-overlay">
+      <div class="bg">
+        <div class="crumb">Admin / Patients / Sarah Johnson</div>
+        <div class="profile-card"><div class="av">SJ</div><div><div class="nm">Sarah Johnson</div><div class="meta">Age 36 · Active</div></div></div>
+        <div class="tabs"><span class="on">Overview</span><span>Services</span><span>Packages</span><span>Appointments</span><span>Skin</span></div>
+      </div>
+      <div class="overlay">
+        <div class="modal">
+          <div class="mh"><button class="close"><i data-lucide="x"></i></button><h2>New Appointment — Sarah Johnson</h2><div class="sub">Schedule a new consultation or procedure.</div></div>
+          <div class="stepper">
+            <span class="st on"><span class="ix">1</span><span class="lb">Type</span></span><span class="arrow">›</span>
+            <span class="st"><span class="ix">2</span><span class="lb">Service</span></span><span class="arrow">›</span>
+            <span class="st"><span class="ix">3</span><span class="lb">Date &amp; Practitioner</span></span><span class="arrow">›</span>
+            <span class="st"><span class="ix">4</span><span class="lb">Consent</span></span><span class="arrow">›</span>
+            <span class="st"><span class="ix">5</span><span class="lb">Confirm</span></span>
+          </div>
+          <div class="mb">
+            <div class="type-grid">
+              <div class="type-card on">
+                <div class="ic"><i data-lucide="message-square"></i></div>
+                <div class="ttl">Consultation</div>
+                <div class="desc">First visit or follow-up discussion. Doctor discusses treatment plan with patient. No procedure performed.</div>
+              </div>
+              <div class="type-card">
+                <div class="ic"><i data-lucide="stethoscope"></i></div>
+                <div class="ttl">Procedure</div>
+                <div class="desc">Patient is coming in for an actual treatment or service. Requires service selection and clinical documentation.</div>
+              </div>
+            </div>
+          </div>
+          <div class="mf"><button class="btn ghost">Cancel</button><button class="btn primary">Next <i data-lucide="arrow-right"></i></button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section>
+    <div class="scene-label"><span class="num">2</span>Select Service <span class="sub">grouped catalog with radio select</span></div>
+    <div class="scene with-overlay">
+      <div class="bg">
+        <div class="profile-card"><div class="av">SJ</div><div><div class="nm">Sarah Johnson</div><div class="meta">Service selection</div></div></div>
+      </div>
+      <div class="overlay">
+        <div class="modal">
+          <div class="mh"><button class="close"><i data-lucide="x"></i></button><h2>New Appointment — Sarah Johnson</h2><div class="sub">Choose a service from your catalog.</div></div>
+          <div class="stepper">
+            <span class="st done"><span class="ix"><i data-lucide="check" style="width:12px;height:12px;"></i></span><span class="lb">Type</span></span><span class="arrow">›</span>
+            <span class="st on"><span class="ix">2</span><span class="lb">Service</span></span><span class="arrow">›</span>
+            <span class="st"><span class="ix">3</span><span class="lb">Date &amp; Practitioner</span></span><span class="arrow">›</span>
+            <span class="st"><span class="ix">4</span><span class="lb">Consent</span></span><span class="arrow">›</span>
+            <span class="st"><span class="ix">5</span><span class="lb">Confirm</span></span>
+          </div>
+          <div class="mb">
+            <div class="svc-search"><i data-lucide="search"></i><input type="text" placeholder="Search services..."></div>
+
+            <div class="svc-cat">Facials</div>
+            <div class="svc-item"><div class="left"><span class="radio"></span><span class="nm">Deep Cleanse Facial</span></div><span class="price">₱999/session</span></div>
+            <div class="svc-item"><div class="left"><span class="radio"></span><span class="nm">Korea Hydra Facial + Exosomes</span></div><span class="price">₱4,999/session</span></div>
+            <div class="svc-item"><div class="left"><span class="radio"></span><span class="nm">Vampire Facial</span></div><span class="price">₱5,499/session</span></div>
+
+            <div class="svc-cat">IV Therapy</div>
+            <div class="svc-item"><div class="left"><span class="radio"></span><span class="nm">Maintenance Glutathione Drip</span></div><span class="price">₱1,999/session</span></div>
+            <div class="svc-item"><div class="left"><span class="radio"></span><span class="nm">Cloud Skin Premium Glutathione Drip</span></div><span class="price">₱2,499/session</span></div>
+            <div class="svc-item"><div class="left"><span class="radio"></span><span class="nm">Bio-NAD+ Drip</span></div><span class="price">₱10,000/session</span></div>
+
+            <div class="svc-cat">Machines &amp; Lasers</div>
+            <div class="svc-item on"><div class="left"><span class="radio"></span><span class="nm">eCO2 + Subcision + PRP</span></div><span class="price">₱14,999/session</span></div>
+            <div class="svc-item"><div class="left"><span class="radio"></span><span class="nm">Pico Laser Face</span></div><span class="price">₱3,499/session</span></div>
+            <div class="svc-item"><div class="left"><span class="radio"></span><span class="nm">Hair Removal PRO Underarms</span></div><span class="price">₱2,499/session</span></div>
+
+            <div class="svc-cat">Slim Protocols</div>
+            <div class="svc-item"><div class="left"><span class="radio"></span><span class="nm">Mesotherapy for Abdomen</span></div><span class="price">₱3,999/session</span></div>
+            <div class="svc-item"><div class="left"><span class="radio"></span><span class="nm">Mesotherapy for Abdomen + RF + Cavitation</span></div><span class="price">₱19,999/5 sessions</span></div>
+
+            <div class="info-blue">
+              <div class="ln"><i data-lucide="file-text"></i><div>This procedure requires a specific consent form to be signed before it can be performed. You will be reminded in Step 4.</div></div>
+              <div class="ln"><i data-lucide="clock"></i><div>Estimated duration: <b>90 minutes</b></div></div>
+              <div class="ln"><i data-lucide="user-check"></i><div>Can be performed by: <b>Dr. Reyes, Dr. Santos</b></div></div>
+            </div>
+          </div>
+          <div class="mf"><button class="btn ghost"><i data-lucide="arrow-left"></i> Back</button><button class="btn primary">Next <i data-lucide="arrow-right"></i></button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section>
+    <div class="scene-label"><span class="num">3</span>Select Date, Time &amp; Practitioner</div>
+    <div class="scene with-overlay">
+      <div class="bg">
+        <div class="profile-card"><div class="av">SJ</div><div><div class="nm">Sarah Johnson</div><div class="meta">Scheduling eCO2 + Subcision + PRP</div></div></div>
+      </div>
+      <div class="overlay">
+        <div class="modal" style="max-width:760px;">
+          <div class="mh"><button class="close"><i data-lucide="x"></i></button><h2>New Appointment — Sarah Johnson</h2></div>
+          <div class="stepper">
+            <span class="st done"><span class="ix"><i data-lucide="check" style="width:12px;height:12px;"></i></span><span class="lb">Type</span></span><span class="arrow">›</span>
+            <span class="st done"><span class="ix"><i data-lucide="check" style="width:12px;height:12px;"></i></span><span class="lb">Service</span></span><span class="arrow">›</span>
+            <span class="st on"><span class="ix">3</span><span class="lb">Date &amp; Practitioner</span></span><span class="arrow">›</span>
+            <span class="st"><span class="ix">4</span><span class="lb">Consent</span></span><span class="arrow">›</span>
+            <span class="st"><span class="ix">5</span><span class="lb">Confirm</span></span>
+          </div>
+          <div class="mb">
+            <div class="grid-3">
+              <div>
+                <label class="field-label">Date</label>
+                <div class="mini-cal">
+                  <div class="mc-head"><button class="nav"><i data-lucide="chevron-left" style="width:13px;height:13px;"></i></button><span>May 2026</span><button class="nav"><i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button></div>
+                  <div class="grid">
+                    <div class="dow">Su</div><div class="dow">Mo</div><div class="dow">Tu</div><div class="dow">We</div><div class="dow">Th</div><div class="dow">Fr</div><div class="dow">Sa</div>
+                    <div class="day muted">26</div><div class="day muted">27</div><div class="day muted">28</div><div class="day muted">29</div><div class="day muted">30</div><div class="day">1</div><div class="day">2</div>
+                    <div class="day">3</div><div class="day">4</div><div class="day">5</div><div class="day">6</div><div class="day">7</div><div class="day">8</div><div class="day">9</div>
+                    <div class="day">10</div><div class="day">11</div><div class="day">12</div><div class="day">13</div><div class="day">14</div><div class="day today">15</div><div class="day">16</div>
+                    <div class="day">17</div><div class="day">18</div><div class="day">19</div><div class="day">20</div><div class="day">21</div><div class="day">22</div><div class="day">23</div>
+                    <div class="day">24</div><div class="day">25</div><div class="day booked">26</div><div class="day sel">27</div><div class="day">28</div><div class="day">29</div><div class="day">30</div>
+                    <div class="day">31</div><div class="day muted">1</div><div class="day muted">2</div><div class="day muted">3</div><div class="day muted">4</div><div class="day muted">5</div><div class="day muted">6</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label class="field-label">Available Time Slots</label>
+                <div class="pill-row">
+                  <span class="pill on">10:00 AM</span>
+                  <span class="pill">11:00 AM</span>
+                  <span class="pill booked">12:00 PM</span>
+                  <span class="pill">2:00 PM</span>
+                </div>
+                <div class="select-row" style="margin-top:14px;">
+                  <label class="field-label">Practitioner</label>
+                  <select>
+                    <option selected>Dr. Reyes — Available May 27</option>
+                    <option disabled>Dr. Santos — On leave May 27</option>
+                    <option>Dr. Angela Lim — Available May 27</option>
+                  </select>
+                </div>
+                <div class="preview-box">
+                  <b>eCO2 + Subcision + PRP</b> on <b>May 27, 2026</b> at <b>10:00 AM</b> — 90 mins with <b>Dr. Reyes</b><br>
+                  <span style="color:#5A7A96;">Estimated end time: 11:30 AM</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mf"><button class="btn ghost"><i data-lucide="arrow-left"></i> Back</button><button class="btn primary">Next <i data-lucide="arrow-right"></i></button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section>
+    <div class="scene-label"><span class="num">4</span>Consent &amp; Requirements Check</div>
+    <div class="scene with-overlay">
+      <div class="bg"><div class="profile-card"><div class="av">SJ</div><div><div class="nm">Sarah Johnson</div><div class="meta">Verifying consent</div></div></div></div>
+      <div class="overlay">
+        <div class="modal">
+          <div class="mh"><button class="close"><i data-lucide="x"></i></button><h2>New Appointment — Sarah Johnson</h2></div>
+          <div class="stepper">
+            <span class="st done"><span class="ix"><i data-lucide="check" style="width:12px;height:12px;"></i></span><span class="lb">Type</span></span><span class="arrow">›</span>
+            <span class="st done"><span class="ix"><i data-lucide="check" style="width:12px;height:12px;"></i></span><span class="lb">Service</span></span><span class="arrow">›</span>
+            <span class="st done"><span class="ix"><i data-lucide="check" style="width:12px;height:12px;"></i></span><span class="lb">Date</span></span><span class="arrow">›</span>
+            <span class="st on"><span class="ix">4</span><span class="lb">Consent</span></span><span class="arrow">›</span>
+            <span class="st"><span class="ix">5</span><span class="lb">Confirm</span></span>
+          </div>
+          <div class="mb">
+            <div style="font-family:var(--font-display);font-weight:700;font-size:13px;color:#5A7A96;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:14px;">Required before this procedure can proceed</div>
+
+            <div class="consent-row"><div class="status ok"><i data-lucide="check"></i></div><div class="body"><div class="ttl">General Consent Form</div><div class="meta">Signed on March 1, 2026</div></div></div>
+            <div class="consent-row"><div class="status ok"><i data-lucide="check"></i></div><div class="body"><div class="ttl">Medical History Questionnaire</div><div class="meta">Completed on March 1, 2026</div></div></div>
+
+            <div class="consent-row bad">
+              <div class="status bad"><i data-lucide="x"></i></div>
+              <div class="body">
+                <div class="ttl">eCO2 Laser Procedure Consent</div>
+                <div class="meta">Not yet signed</div>
+                <div class="warn-red">This consent form must be signed before the procedure date.</div>
+                <div class="consent-actions">
+                  <button class="btn outline-blue"><i data-lucide="mail"></i> Send to Patient via Email</button>
+                  <button class="btn ghost"><i data-lucide="clock"></i> Mark as Will Sign on Arrival</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="consent-row"><div class="status ok"><i data-lucide="check"></i></div><div class="body"><div class="ttl">PRP Procedure Consent</div><div class="meta">Signed on April 1, 2026</div></div></div>
+
+            <div class="note">You can still schedule this appointment. The missing consent form must be completed before the procedure begins on <b>May 27, 2026</b>.</div>
+          </div>
+          <div class="mf">
+            <button class="btn ghost"><i data-lucide="arrow-left"></i> Back</button>
+            <button class="btn primary" title="Appointment will be flagged until consent is signed">Next <i data-lucide="arrow-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section>
+    <div class="scene-label"><span class="num">5</span>Confirm Appointment</div>
+    <div class="scene with-overlay">
+      <div class="bg"><div class="profile-card"><div class="av">SJ</div><div><div class="nm">Sarah Johnson</div><div class="meta">Final review</div></div></div></div>
+      <div class="overlay">
+        <div class="modal">
+          <div class="mh"><button class="close"><i data-lucide="x"></i></button><h2>New Appointment — Sarah Johnson</h2><div class="sub">Review the summary, then confirm.</div></div>
+          <div class="stepper">
+            <span class="st done"><span class="ix"><i data-lucide="check" style="width:12px;height:12px;"></i></span><span class="lb">Type</span></span><span class="arrow">›</span>
+            <span class="st done"><span class="ix"><i data-lucide="check" style="width:12px;height:12px;"></i></span><span class="lb">Service</span></span><span class="arrow">›</span>
+            <span class="st done"><span class="ix"><i data-lucide="check" style="width:12px;height:12px;"></i></span><span class="lb">Date</span></span><span class="arrow">›</span>
+            <span class="st done"><span class="ix"><i data-lucide="check" style="width:12px;height:12px;"></i></span><span class="lb">Consent</span></span><span class="arrow">›</span>
+            <span class="st on"><span class="ix">5</span><span class="lb">Confirm</span></span>
+          </div>
+          <div class="mb">
+            <div class="summary-card">
+              <div class="ln"><span class="k">Patient</span><span class="v">Sarah Johnson</span></div>
+              <div class="ln"><span class="k">Appointment Type</span><span class="v">Procedure</span></div>
+              <div class="ln"><span class="k">Service</span><span class="v">eCO2 + Subcision + PRP</span></div>
+              <div class="ln"><span class="k">Date</span><span class="v">May 27, 2026</span></div>
+              <div class="ln"><span class="k">Time</span><span class="v">10:00 AM – 11:30 AM</span></div>
+              <div class="ln"><span class="k">Practitioner</span><span class="v">Dr. Reyes</span></div>
+              <div class="ln"><span class="k">Price</span><span class="v">₱14,999</span></div>
+              <div class="ln"><span class="k">Payment</span><span class="v" style="color:#B45309;">Pending (to be collected on the day)</span></div>
+            </div>
+            <div class="warn-orange"><i data-lucide="alert-triangle"></i><div><b style="font-family:var(--font-display);font-weight:700;">eCO2 Laser Procedure Consent</b> is pending. Patient will be notified via email.</div></div>
+            <div class="toggle-row">
+              <div class="body"><div class="t">Send appointment reminder</div><div class="d">Patient will receive an email and SMS reminder 24 hours before the appointment.</div></div>
+              <button class="switch"></button>
+            </div>
+          </div>
+          <div class="mf"><button class="btn ghost"><i data-lucide="arrow-left"></i> Back</button><button class="btn primary" style="padding:9px 22px;"><i data-lucide="check"></i> Confirm &amp; Schedule Appointment</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 6 — Services tab after scheduling -->
+  <section>
+    <div class="scene-label"><span class="num">6</span>Services tab updated <span class="sub">new row appears at top with "Fill Clinical Records" CTA</span></div>
+    <div class="scene">
+      <div class="bg">
+        <div class="crumb">Admin / Patients / Sarah Johnson</div>
+        <div class="profile-card"><div class="av">SJ</div><div><div class="nm">Sarah Johnson</div><div class="meta">Services tab</div></div></div>
+        <div class="tabs"><span>Overview</span><span class="on">Services</span><span>Packages</span><span>Appointments</span><span>Skin</span></div>
+
+        <div class="info-blue-banner"><i data-lucide="info"></i><span><b>1 upcoming service</b> requires clinical records to be filled on the procedure date.</span></div>
+
+        <div style="border:1px solid #E5EFF7;border-radius:8px;overflow:hidden;">
+          <table class="svc-tab">
+            <thead><tr><th>Service</th><th>Date</th><th>Practitioner</th><th>Charged</th><th>Discount</th><th>Paid</th><th>Method</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
+            <tbody>
+              <tr class="new">
+                <td>eCO2 + Subcision + PRP</td><td>May 27, 2026</td><td>Dr. Reyes</td>
+                <td>₱14,999</td><td>—</td><td>—</td><td>—</td>
+                <td><span class="badge scheduled">Scheduled</span></td>
+                <td style="text-align:right;display:flex;gap:6px;justify-content:flex-end;">
+                  <a class="btn ghost" style="padding:6px 10px;" href="#"><i data-lucide="eye"></i></a>
+                  <button class="fill-btn"><i data-lucide="clipboard-list"></i> Fill Clinical Records</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Hydra Facial</td><td>Apr 15, 2026</td><td>Dr. Reyes</td>
+                <td>₱2,800</td><td>₱300</td><td>₱2,500</td><td>GCash</td>
+                <td><span class="badge paid">Paid</span></td>
+                <td style="text-align:right;"><a class="btn ghost" style="padding:6px 10px;" href="#"><i data-lucide="eye"></i></a></td>
+              </tr>
+              <tr>
+                <td>LED Therapy</td><td>Mar 20, 2026</td><td>Dr. Santos</td>
+                <td>₱1,800</td><td>—</td><td>₱1,800</td><td>Cash</td>
+                <td><span class="badge paid">Paid</span></td>
+                <td style="text-align:right;"><a class="btn ghost" style="padding:6px 10px;" href="#"><i data-lucide="eye"></i></a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 7 — Service detail page (records incomplete) -->
+  <section>
+    <div class="scene-label"><span class="num">7</span>On procedure day: open service record <span class="sub">accordion sections with status tags</span></div>
+    <div class="scene">
+      <div class="sd-page">
+        <div class="crumb">Admin / Patients / Sarah Johnson / Services / eCO2 + Subcision + PRP</div>
+        <h1>eCO2 + Subcision + PRP — May 27, 2026 <span class="badge scheduled">Scheduled</span></h1>
+
+        <div class="sd-progress">
+          <span class="ttl">Clinical Records</span>
+          <span class="count">0 of 4 completed</span>
+          <div class="bar"><div style="width:0%;"></div></div>
+        </div>
+
+        <div class="accord open">
+          <div class="accord-head">
+            <div class="ix">1</div>
+            <div class="ttl">Doctor's Order / Procedure Protocol<span class="sub">CO2 laser settings and pre-procedure setup</span></div>
+            <span class="tag warn">Not yet filled</span>
+            <i data-lucide="chevron-up" class="chev"></i>
+          </div>
+          <div class="accord-body">
+            <div class="form-row">
+              <div class="form-field"><label>Topical Anesthesia</label><select><option selected>Apply 30 minutes before procedure</option><option>None required</option><option>Local injection</option></select></div>
+              <div class="form-field"><label>CO2 Laser Power (mJ)</label><input type="text" placeholder="e.g. 80"></div>
+              <div class="form-field"><label>Pulse</label><input type="text" placeholder="e.g. Single / Double"></div>
+            </div>
+            <div class="form-row" style="grid-template-columns:1fr 1fr;">
+              <div class="form-field"><label>Scan Size</label><input type="text" placeholder="e.g. 8x8 mm"></div>
+              <div class="form-field"><label>Operator</label><input type="text" value="Dr. Reyes"></div>
+            </div>
+            <div class="form-row" style="grid-template-columns:1fr;">
+              <div class="form-field"><label>Pre-procedure prep</label><textarea placeholder="Enter pre-procedure setup steps..."></textarea></div>
+              <div class="form-field"><label>Special instructions</label><textarea placeholder="Any additional protocol notes..."></textarea></div>
+            </div>
+            <div style="margin-top:12px;text-align:right;"><button class="btn primary"><i data-lucide="save"></i> Save Doctor's Order</button></div>
+          </div>
+        </div>
+
+        <div class="accord">
+          <div class="accord-head">
+            <div class="ix">2</div>
+            <div class="ttl">Vital Signs<span class="sub">BP, HR, SpO2, weight, height</span></div>
+            <span class="tag warn">Not yet recorded</span>
+            <i data-lucide="chevron-down" class="chev"></i>
+          </div>
+        </div>
+
+        <div class="accord">
+          <div class="accord-head">
+            <div class="ix">3</div>
+            <div class="ttl">Clinical Notes<span class="sub">Doctor's procedure notes and observations</span></div>
+            <span class="tag warn">Not yet written</span>
+            <i data-lucide="chevron-down" class="chev"></i>
+          </div>
+        </div>
+
+        <div class="accord">
+          <div class="accord-head">
+            <div class="ix">4</div>
+            <div class="ttl">Payment<span class="sub">Method, amount, receipt</span></div>
+            <span class="tag warn">Pending</span>
+            <i data-lucide="chevron-down" class="chev"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 8 — Service detail page complete -->
+  <section>
+    <div class="scene-label"><span class="num">8</span>All records filled: Service complete <span class="sub">status: Completed &amp; Paid</span></div>
+    <div class="scene">
+      <div class="sd-page">
+        <div class="crumb">Admin / Patients / Sarah Johnson / Services / eCO2 + Subcision + PRP</div>
+        <h1>eCO2 + Subcision + PRP — May 27, 2026 <span class="badge completed">Completed &amp; Paid</span></h1>
+
+        <div class="sd-progress">
+          <span class="ttl">Clinical Records</span>
+          <span class="count">4 of 4 completed</span>
+          <div class="bar"><div class="full" style="width:100%;"></div></div>
+        </div>
+
+        <div class="accord">
+          <div class="accord-head done">
+            <div class="ix"><i data-lucide="check"></i></div>
+            <div class="ttl">Doctor's Order<span class="sub">Filled by Dr. Reyes, May 27 9:45 AM</span></div>
+            <span class="tag done">Completed</span>
+            <i data-lucide="chevron-down" class="chev"></i>
+          </div>
+        </div>
+        <div class="accord">
+          <div class="accord-head done">
+            <div class="ix"><i data-lucide="check"></i></div>
+            <div class="ttl">Vital Signs<span class="sub">Recorded May 27 10:00 AM — BP 120/80 · HR 78 · SpO2 98%</span></div>
+            <span class="tag done">Completed</span>
+            <i data-lucide="chevron-down" class="chev"></i>
+          </div>
+        </div>
+        <div class="accord">
+          <div class="accord-head done">
+            <div class="ix"><i data-lucide="check"></i></div>
+            <div class="ttl">Clinical Notes<span class="sub">Written by Dr. Reyes, May 27 11:35 AM</span></div>
+            <span class="tag done">Completed</span>
+            <i data-lucide="chevron-down" class="chev"></i>
+          </div>
+        </div>
+        <div class="accord">
+          <div class="accord-head done">
+            <div class="ix"><i data-lucide="check"></i></div>
+            <div class="ttl">Payment<span class="sub">₱14,999 paid via GCash · Receipt CSC-2026-00052</span></div>
+            <span class="tag done">Paid</span>
+            <i data-lucide="chevron-down" class="chev"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

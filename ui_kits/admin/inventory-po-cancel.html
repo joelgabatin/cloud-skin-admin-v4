@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Cancel Purchase Order</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+* { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .page-hero h1 { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .page-hero .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 4px; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .stat-card { background: #fff; border-radius: 10px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; flex-direction: column; gap: 8px; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-card .label { font-size: 12px; color: #5A7A96; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #2D6A9F; display: flex; align-items: center; justify-content: center; }
+  .stat-card .iplate.success { background: #DCFCE7; color: #15803D; }
+  .stat-card .iplate.warning { background: #FEF3C7; color: #B45309; }
+  .stat-card .iplate.violet  { background: #EDE9FE; color: #7C3AED; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: #1A2E40; }
+  .stat-card .value.warning { color: #B45309; }
+  .stat-card .sub { font-size: 12px; color: #5A7A96; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .badge.draft   { background: #F1F5F9; color: #475569; }
+  .badge.pending { background: #FEF3C7; color: #B45309; }
+  .badge.approved { background: #DBEAFE; color: #1D4ED8; }
+  .badge.sent    { background: #EDE9FE; color: #7C3AED; }
+  .badge.partial { background: #FEF3C7; color: #B45309; }
+  .badge.completed { background: #DCFCE7; color: #15803D; }
+  .badge.cancelled { background: #FEE2E2; color: #DC2626; }
+  .badge.slate   { background: #F1F5F9; color: #475569; }
+  .badge.success { background: #DCFCE7; color: #15803D; }
+  .badge.warning { background: #FEF3C7; color: #B45309; }
+  .badge.danger  { background: #FEE2E2; color: #DC2626; }
+  .badge.info    { background: #DBEAFE; color: #1D4ED8; }
+  .section-card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 12px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .nm { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .sku { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; font-weight: 600; }
+  .po-num { font-family: var(--font-mono); font-size: 13px; color: #2D6A9F; font-weight: 700; }
+  .mono { font-family: var(--font-mono); font-size: 13px; color: #5A7A96; }
+  .price { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .btn { height: 38px; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; text-decoration: none; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-outline { background: #fff; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-outline.danger { color: #DC2626; border-color: #FCA5A5; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 18px; }
+  .btn-primary:hover { background: #1A5685; }
+  .btn-success { background: #15803D; color: #fff; padding: 0 18px; }
+  .btn-success:hover { background: #166534; }
+  .btn-danger  { background: #DC2626; color: #fff; padding: 0 18px; }
+  .field-input, .field-select { width: 100%; height: 40px; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .field-input.qty { width: 90px; height: 36px; border: 2px solid #2D6A9F; background: #EBF6FD; text-align: center; font-family: var(--font-mono); font-weight: 700; }
+  .field-textarea { width: 100%; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 10px 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; resize: vertical; min-height: 64px; background: #fff; }
+  .field-label { display: block; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; }
+  .back-link { background: none; border: none; cursor: pointer; color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; padding: 0; text-decoration: none; }
+  .search-input { position: relative; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .info-banner { background: #EBF6FD; border: 1px solid #93C5FD; border-radius: 10px; padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start; }
+  .info-banner .lucide { width: 18px; height: 18px; color: #2D6A9F; flex-shrink: 0; margin-top: 1px; }
+  .info-banner .title { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1E40AF; }
+  .info-banner .desc  { font-family: var(--font-body); font-size: 13px; color: #1E40AF; margin-top: 2px; }
+  .warn-banner { background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 10px; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start; color: #92400E; }
+  .warn-banner .lucide { width: 16px; height: 16px; color: #B45309; flex-shrink: 0; margin-top: 1px; }
+
+  /* Contextual dropdown menu */
+  .row-actions { position: relative; display: inline-flex; align-items: center; gap: 6px; }
+  .kebab-btn { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #D0E8F5; background: #fff; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: background 120ms, color 120ms, border-color 120ms; }
+  .kebab-btn:hover { background: #F0F6FC; color: #2D6A9F; }
+  .kebab-btn.active { background: #2D6A9F; color: #fff; border-color: #2D6A9F; box-shadow: 0 2px 6px rgba(45,106,159,0.30); }
+  .kebab-btn .lucide { width: 16px; height: 16px; }
+  .po-menu { position: absolute; right: 0; top: 40px; width: 248px; background: #fff; border-radius: 10px; box-shadow: 0 12px 32px rgba(26,46,64,0.18), 0 2px 8px rgba(26,46,64,0.08); border: 1px solid #E5EFF7; padding: 6px; z-index: 20; text-align: left; }
+  .po-menu.flip-up { top: auto; bottom: 40px; }
+  .po-menu::before { content: ''; position: absolute; top: -6px; right: 14px; width: 12px; height: 12px; background: #fff; border-top: 1px solid #E5EFF7; border-left: 1px solid #E5EFF7; transform: rotate(45deg); }
+  .po-menu.flip-up::before { top: auto; bottom: -6px; transform: rotate(225deg); }
+  .po-menu .mitem { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; border: none; background: none; cursor: pointer; border-radius: 7px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; text-align: left; }
+  .po-menu .mitem .ico { width: 22px; height: 22px; border-radius: 6px; background: #F0F6FC; color: #2D6A9F; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .po-menu .mitem .ico .lucide { width: 12px; height: 12px; }
+  .po-menu .mitem .label { font-family: var(--font-display); font-weight: 600; font-size: 13px; }
+  .po-menu .mitem .sub-label { display: block; font-family: var(--font-body); font-weight: 400; font-size: 11px; color: #9BBAD4; margin-top: 1px; }
+  .po-menu .mitem:hover { background: #EBF6FD; }
+  .po-menu .mitem.primary .ico { background: #DBEAFE; color: #1D4ED8; }
+  .po-menu .mitem.success .ico { background: #DCFCE7; color: #15803D; }
+  .po-menu .mitem.warning .ico { background: #FEF3C7; color: #B45309; }
+  .po-menu .mitem.danger { color: #DC2626; }
+  .po-menu .mitem.danger .ico { background: #FEE2E2; color: #DC2626; }
+  .po-menu .mitem.danger .label { color: #DC2626; }
+  .po-menu .mitem.danger:hover { background: #FEF2F2; }
+  .po-menu .mdiv { height: 1px; background: #E5EFF7; margin: 6px 4px; }
+  .menu-section { padding: 4px 10px 6px; font-family: var(--font-display); font-size: 10px; font-weight: 700; color: #9BBAD4; text-transform: uppercase; letter-spacing: 0.08em; }
+  /* Cancel screen: hide all spec-view dropdowns and kebab active states */
+  .page .po-menu { display: none !important; }
+  .page .kebab-btn.active { background: #fff !important; color: #5A7A96 !important; border-color: #D0E8F5 !important; box-shadow: none !important; }
+  .page .kebab-btn.active .lucide { color: #5A7A96 !important; }
+
+  /* Modal overlay */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(15,30,50,0.55); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(2px); }
+  .modal-card { width: 480px; max-width: 100%; background: #fff; border-radius: 12px; box-shadow: 0 24px 64px rgba(15,30,50,0.30); overflow: hidden; animation: pop 200ms ease-out; }
+  @keyframes pop { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal-head { padding: 22px 24px 14px; display: flex; align-items: flex-start; gap: 14px; }
+  .modal-head .warn-icon { width: 44px; height: 44px; border-radius: 50%; background: #FEE2E2; color: #DC2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .modal-head .warn-icon .lucide { width: 22px; height: 22px; }
+  .modal-head h2 { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .modal-head .sub { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 4px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .modal-head .sub .pin { font-family: var(--font-mono); font-weight: 700; color: #2D6A9F; }
+  .modal-head .sub .dot { width: 3px; height: 3px; background: #9BBAD4; border-radius: 50%; }
+  .modal-body { padding: 0 24px 18px; font-family: var(--font-body); font-size: 13px; color: #5A7A96; line-height: 1.55; }
+  .modal-body p { margin: 0 0 14px; }
+  .modal-body .field-label { font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; display: block; }
+  .modal-body .req { color: #DC2626; }
+  .modal-foot { padding: 16px 24px; background: #F8FBFF; border-top: 1px solid #D0E8F5; display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
+  .modal-foot .note { margin-right: auto; font-family: var(--font-body); font-size: 11px; color: #5A7A96; display: inline-flex; align-items: center; gap: 6px; }
+  .modal-foot .note .lucide { width: 13px; height: 13px; color: #2D6A9F; }
+  .modal-close { position: absolute; top: 14px; right: 14px; width: 28px; height: 28px; border-radius: 50%; border: none; background: #F1F5F9; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .modal-close .lucide { width: 14px; height: 14px; }
+  .modal-card { position: relative; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Purchase Orders</div>
+        <div class="topbar-crumb">Admin / Inventory / Purchase Orders / Cancel</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+    <section class="page" data-screen-label="05 Cancel PO Modal" style="filter: blur(2px) saturate(0.85); pointer-events:none;">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div class="page-hero">
+          <h1>Purchase Orders</h1>
+          <div class="sub">Manage supplier orders and stock replenishment.</div>
+        </div>
+        <a class="btn btn-primary" href="inventory-po-create.html"><i data-lucide="plus"></i> Create Purchase Order</a>
+      </div>
+      <div class="stat-row">
+        <div class="stat-card"><div class="top"><span class="label">Total POs This Month</span><div class="iplate"><i data-lucide="file-text"></i></div></div><div class="value">12</div><div class="sub">May 2026</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Pending Approval</span><div class="iplate warning"><i data-lucide="alert-triangle"></i></div></div><div class="value warning">3</div><div class="sub">Awaiting admin review</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Awaiting Delivery</span><div class="iplate violet"><i data-lucide="truck"></i></div></div><div class="value">4</div><div class="sub">In transit · sent to suppliers</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Completed This Month</span><div class="iplate success"><i data-lucide="check-circle"></i></div></div><div class="value">5</div><div class="sub">Inventory updated</div></div>
+      </div>
+      <div class="warn-banner" style="background:#EBF6FD;border-color:#93C5FD;color:#1E40AF;display:none;">
+        <i data-lucide="mouse-pointer-click" style="color:#2D6A9F;"></i>
+        <div style="font-family:var(--font-body);font-size:13px;"><strong style="font-family:var(--font-display);font-weight:700;">Spec view:</strong> all five contextual menus are shown open simultaneously to illustrate each PO status. In the real UI only one opens at a time.</div>
+      </div>
+      <div class="section-card has-menus">
+        <div style="padding:16px 20px;border-bottom:1px solid #D0E8F5;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div class="search-input" style="flex:1;max-width:280px;"><i data-lucide="search"></i><input placeholder="Search PO number or supplier…"></div>
+          <select class="field-select" style="max-width:200px;height:38px;"><option>All Statuses</option><option>Draft</option><option>Pending Approval</option><option>Approved</option><option>Sent</option><option>Partially Received</option><option>Completed</option><option>Cancelled</option></select>
+          <select class="field-select" style="max-width:180px;height:38px;"><option>All Suppliers</option><option>MedSupply PH</option><option>DermaCare Distributors</option><option>Wellness Depot</option><option>PharmaCo Manila</option></select>
+          <input type="date" class="field-input" style="max-width:150px;height:38px;" value="2026-05-01">
+          <span style="font-family:var(--font-body);font-size:11px;color:#9BBAD4;">to</span>
+          <input type="date" class="field-input" style="max-width:150px;height:38px;" value="2026-05-31">
+        </div>
+        <div class="table-wrap" style="overflow-x:auto;">
+          <table style="min-width:1100px;">
+            <thead><tr><th>PO Number</th><th>Supplier</th><th>Date Created</th><th>Expected Delivery</th><th>Items</th><th>Total Amount</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><a class="po-num" href="inventory-po-detail.html">PO-2026-0045</a></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:28px;height:28px;border-radius:6px;background:#EBF6FD;color:#2D6A9F;display:flex;align-items:center;justify-content:center;"><i data-lucide="building-2" style="width:14px;height:14px;"></i></div><span class="nm">MedSupply PH</span></div></td>
+                <td><span style="font-family:var(--font-mono);font-size:12px;color:#9BBAD4;">May 13, 2026</span></td>
+                <td><span style="font-family:var(--font-mono);font-size:12px;color:#5A7A96;">May 18, 2026</span></td>
+                <td><span class="mono">8</span></td>
+                <td><span class="price">₱55,328</span></td>
+                <td><span class="badge pending">Pending Approval</span></td>
+                <td class="actions-cell" style="text-align:right;">
+                  <div class="row-actions" style="justify-content:flex-end;">
+                    <a class="btn btn-outline" href="inventory-po-detail.html" style="height:32px;padding:0 10px;font-size:12px;"><i data-lucide="eye"></i></a>
+                    <button class="kebab-btn active" data-menu="m1"><i data-lucide="more-vertical"></i></button>
+                    <div class="po-menu" id="m1">
+                      <div class="menu-section">Pending Approval</div>
+                      <button class="mitem success"><span class="ico"><i data-lucide="check"></i></span><span class="label">Approve</span></button>
+                      <button class="mitem warning"><span class="ico"><i data-lucide="x-circle"></i></span><span class="label">Reject</span></button>
+                      <div class="mdiv"></div>
+                      <button class="mitem"><span class="ico"><i data-lucide="copy"></i></span><span class="label">Duplicate PO</span></button>
+                      <button class="mitem danger"><span class="ico"><i data-lucide="ban"></i></span><span class="label">Cancel PO</span></button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><a class="po-num" href="inventory-po-detail.html">PO-2026-0044</a></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:28px;height:28px;border-radius:6px;background:#EBF6FD;color:#2D6A9F;display:flex;align-items:center;justify-content:center;"><i data-lucide="building-2" style="width:14px;height:14px;"></i></div><span class="nm">DermaCare Distributors</span></div></td>
+                <td><span style="font-family:var(--font-mono);font-size:12px;color:#9BBAD4;">May 12, 2026</span></td>
+                <td><span style="font-family:var(--font-mono);font-size:12px;color:#5A7A96;">May 16, 2026</span></td>
+                <td><span class="mono">5</span></td>
+                <td><span class="price">₱38,200</span></td>
+                <td><span class="badge approved">Approved</span></td>
+                <td class="actions-cell" style="text-align:right;">
+                  <div class="row-actions" style="justify-content:flex-end;">
+                    <a class="btn btn-outline" href="inventory-po-detail.html" style="height:32px;padding:0 10px;font-size:12px;"><i data-lucide="eye"></i></a>
+                    <button class="kebab-btn active" data-menu="m2"><i data-lucide="more-vertical"></i></button>
+                    <div class="po-menu" id="m2">
+                      <div class="menu-section">Approved</div>
+                      <button class="mitem primary"><span class="ico"><i data-lucide="send"></i></span><span class="label">Mark as Sent to Supplier</span></button>
+                      <button class="mitem"><span class="ico"><i data-lucide="printer"></i></span><span class="label">Print / Export PDF</span></button>
+                      <div class="mdiv"></div>
+                      <button class="mitem"><span class="ico"><i data-lucide="copy"></i></span><span class="label">Duplicate PO</span></button>
+                      <button class="mitem danger"><span class="ico"><i data-lucide="ban"></i></span><span class="label">Cancel PO</span></button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><a class="po-num" href="inventory-po-detail.html">PO-2026-0043</a></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:28px;height:28px;border-radius:6px;background:#EBF6FD;color:#2D6A9F;display:flex;align-items:center;justify-content:center;"><i data-lucide="building-2" style="width:14px;height:14px;"></i></div><span class="nm">Wellness Depot</span></div></td>
+                <td><span style="font-family:var(--font-mono);font-size:12px;color:#9BBAD4;">May 11, 2026</span></td>
+                <td><span style="font-family:var(--font-mono);font-size:12px;color:#5A7A96;">May 14, 2026</span></td>
+                <td><span class="mono">12</span></td>
+                <td><span class="price">₱72,450</span></td>
+                <td><span class="badge sent">Sent</span></td>
+                <td class="actions-cell" style="text-align:right;">
+                  <div class="row-actions" style="justify-content:flex-end;">
+                    <a class="btn btn-outline" href="inventory-po-receive.html" style="height:32px;padding:0 10px;font-size:12px;"><i data-lucide="eye"></i></a>
+                    <button class="kebab-btn active" data-menu="m3"><i data-lucide="more-vertical"></i></button>
+                    <div class="po-menu" id="m3">
+                      <div class="menu-section">Sent</div>
+                      <button class="mitem primary"><span class="ico"><i data-lucide="package-check"></i></span><span class="label">Receive Goods</span></button>
+                      <button class="mitem"><span class="ico"><i data-lucide="printer"></i></span><span class="label">Print / Export PDF</span></button>
+                      <div class="mdiv"></div>
+                      <button class="mitem"><span class="ico"><i data-lucide="copy"></i></span><span class="label">Duplicate PO</span></button>
+                      <button class="mitem danger"><span class="ico"><i data-lucide="ban"></i></span><span class="label">Cancel PO</span></button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><a class="po-num" href="inventory-po-detail.html">PO-2026-0042</a></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:28px;height:28px;border-radius:6px;background:#EBF6FD;color:#2D6A9F;display:flex;align-items:center;justify-content:center;"><i data-lucide="building-2" style="width:14px;height:14px;"></i></div><span class="nm">PharmaCo Manila</span></div></td>
+                <td><span style="font-family:var(--font-mono);font-size:12px;color:#9BBAD4;">May 10, 2026</span></td>
+                <td><span style="font-family:var(--font-mono);font-size:12px;color:#5A7A96;">May 15, 2026</span></td>
+                <td><span class="mono">6</span></td>
+                <td><span class="price">₱24,890</span></td>
+                <td><span class="badge partial">Partially Received</span></td>
+                <td class="actions-cell" style="text-align:right;">
+                  <div class="row-actions" style="justify-content:flex-end;">
+                    <a class="btn btn-outline" href="inventory-po-detail.html" style="height:32px;padding:0 10px;font-size:12px;"><i data-lucide="eye"></i></a>
+                    <button class="kebab-btn active" data-menu="m4"><i data-lucide="more-vertical"></i></button>
+                    <div class="po-menu flip-up" id="m4">
+                      <div class="menu-section">Partially Received</div>
+                      <button class="mitem primary"><span class="ico"><i data-lucide="package-plus"></i></span><span class="label">Receive Remaining Goods</span></button>
+                      <button class="mitem"><span class="ico"><i data-lucide="printer"></i></span><span class="label">Print / Export PDF</span></button>
+                      <div class="mdiv"></div>
+                      <button class="mitem"><span class="ico"><i data-lucide="copy"></i></span><span class="label">Duplicate PO</span></button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><a class="po-num" href="inventory-po-detail.html">PO-2026-0041</a></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:28px;height:28px;border-radius:6px;background:#EBF6FD;color:#2D6A9F;display:flex;align-items:center;justify-content:center;"><i data-lucide="building-2" style="width:14px;height:14px;"></i></div><span class="nm">DermaCare Distributors</span></div></td>
+                <td><span style="font-family:var(--font-mono);font-size:12px;color:#9BBAD4;">May 08, 2026</span></td>
+                <td><span style="font-family:var(--font-mono);font-size:12px;color:#5A7A96;">May 13, 2026</span></td>
+                <td><span class="mono">9</span></td>
+                <td><span class="price">₱61,750</span></td>
+                <td><span class="badge sent">Sent</span></td>
+                <td class="actions-cell" style="text-align:right;">
+                  <div class="row-actions" style="justify-content:flex-end;">
+                    <a class="btn btn-outline" href="inventory-po-receive.html" style="height:32px;padding:0 10px;font-size:12px;"><i data-lucide="eye"></i></a>
+                    <button class="kebab-btn" data-menu="m5b"><i data-lucide="more-vertical"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><a class="po-num" href="inventory-po-detail.html">PO-2026-0040</a></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:28px;height:28px;border-radius:6px;background:#EBF6FD;color:#2D6A9F;display:flex;align-items:center;justify-content:center;"><i data-lucide="building-2" style="width:14px;height:14px;"></i></div><span class="nm">MedSupply PH</span></div></td>
+                <td><span style="font-family:var(--font-mono);font-size:12px;color:#9BBAD4;">May 05, 2026</span></td>
+                <td><span style="font-family:var(--font-mono);font-size:12px;color:#5A7A96;">May 09, 2026</span></td>
+                <td><span class="mono">4</span></td>
+                <td><span class="price">₱18,200</span></td>
+                <td><span class="badge completed">Completed</span></td>
+                <td class="actions-cell" style="text-align:right;">
+                  <div class="row-actions" style="justify-content:flex-end;">
+                    <a class="btn btn-outline" href="inventory-po-detail.html" style="height:32px;padding:0 10px;font-size:12px;"><i data-lucide="eye"></i></a>
+                    <button class="kebab-btn active" data-menu="m5"><i data-lucide="more-vertical"></i></button>
+                    <div class="po-menu flip-up" id="m5">
+                      <div class="menu-section">Completed</div>
+                      <button class="mitem primary"><span class="ico"><i data-lucide="file-text"></i></span><span class="label">View Delivery Receipt</span></button>
+                      <button class="mitem"><span class="ico"><i data-lucide="printer"></i></span><span class="label">Print / Export PDF</span></button>
+                      <div class="mdiv"></div>
+                      <button class="mitem"><span class="ico"><i data-lucide="copy"></i></span><span style="display:flex;flex-direction:column;"><span class="label">Duplicate PO</span><span class="sub-label">Re-order same items</span></span></button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding:14px 22px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #D0E8F5;">
+          <span style="font-family:var(--font-body);font-size:13px;color:#5A7A96;">Showing 1–6 of 12 purchase orders</span>
+          <div style="display:flex;gap:4px;">
+            <button class="btn btn-outline" style="height:32px;padding:0 10px;font-size:12px;">‹</button>
+            <button class="btn btn-primary" style="height:32px;padding:0 12px;font-size:12px;">1</button>
+            <button class="btn btn-outline" style="height:32px;padding:0 12px;font-size:12px;">2</button>
+            <button class="btn btn-outline" style="height:32px;padding:0 10px;font-size:12px;">›</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close" aria-label="Close"><i data-lucide="x"></i></button>
+      <div class="modal-head">
+        <div class="warn-icon"><i data-lucide="alert-triangle"></i></div>
+        <div>
+          <h2>Cancel Purchase Order</h2>
+          <div class="sub">
+            <span class="pin">PO-2026-0045</span><span class="dot"></span>
+            <span>MedSupply PH</span><span class="dot"></span>
+            <span style="font-family:var(--font-display);font-weight:700;color:#1A2E40;">₱55,328.00</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <p>Cancelling this PO cannot be undone. Please provide a reason for the cancellation record so finance and inventory can audit the change.</p>
+        <div style="margin-bottom:12px;">
+          <label class="field-label">Reason for cancellation <span class="req">*</span></label>
+          <select class="field-select">
+            <option>Select a reason…</option>
+            <option>Supplier Unavailable</option>
+            <option>Items No Longer Needed</option>
+            <option>Budget Constraint</option>
+            <option>Duplicate Order</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Notes <span style="color:#9BBAD4;font-weight:500;">(optional)</span></label>
+          <textarea class="field-textarea" placeholder="Additional context for the cancellation…"></textarea>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <span class="note"><i data-lucide="info"></i>Completed or partially received POs cannot be cancelled.</span>
+        <a class="btn btn-outline" href="inventory-po-list.html">Keep PO</a>
+        <button class="btn btn-danger"><i data-lucide="ban"></i> Confirm Cancellation</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+  // Contextual menu toggle behavior. Spec view starts with menus open.
+  (function () {
+    var kebabs = document.querySelectorAll('.kebab-btn');
+    function closeAll() {
+      kebabs.forEach(function (k) {
+        k.classList.remove('active');
+        var id = k.getAttribute('data-menu');
+        var menu = document.getElementById(id);
+        if (menu) menu.style.display = 'none';
+      });
+    }
+    kebabs.forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var id = btn.getAttribute('data-menu');
+        var menu = document.getElementById(id);
+        var wasOpen = btn.classList.contains('active');
+        closeAll();
+        if (!wasOpen && menu) {
+          btn.classList.add('active');
+          menu.style.display = 'block';
+        }
+      });
+    });
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.row-actions')) closeAll();
+    });
+  })();
+</script>
+</body>
+</html>

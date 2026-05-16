@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 24px; background: #fff; }
+  .grid { display: grid; grid-template-columns: 80px 1fr; gap: 8px 14px; align-items: center; }
+  .swatch { height: 16px; background: #2D6A9F; border-radius: 4px; opacity: 0.85; }
+  .name { font-family: var(--font-display); font-weight: 600; font-size: 12px; color: var(--navy-800); }
+  .meta { font-family: var(--font-mono); font-size: 11px; color: var(--slate-500); }
+  .row { display: contents; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="swatch" style="width:4px"></div><div><span class="name">4 px</span> <span class="meta">space-1 · sub-line gap inside meta rows</span></div>
+  <div class="swatch" style="width:8px"></div><div><span class="name">8 px</span> <span class="meta">space-2 · icon→label gap</span></div>
+  <div class="swatch" style="width:12px"></div><div><span class="name">12 px</span> <span class="meta">space-3 · in-row gaps</span></div>
+  <div class="swatch" style="width:16px"></div><div><span class="name">16 px</span> <span class="meta">space-4 · default card row gap</span></div>
+  <div class="swatch" style="width:20px"></div><div><span class="name">20 px</span> <span class="meta">space-5 · card padding (sm)</span></div>
+  <div class="swatch" style="width:24px"></div><div><span class="name">24 px</span> <span class="meta">space-6 · card padding (md)</span></div>
+  <div class="swatch" style="width:32px"></div><div><span class="name">32 px</span> <span class="meta">space-8 · section padding (admin)</span></div>
+  <div class="swatch" style="width:48px"></div><div><span class="name">48 px</span> <span class="meta">space-12 · login splash padding</span></div>
+  <div class="swatch" style="width:80px"></div><div><span class="name">80 px</span> <span class="meta">space-20 · marketing section vertical</span></div>
+</div>
+</body>
+</html>

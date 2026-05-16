@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — All Packages</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+
+  /* ============ LAYOUT (sidebar + topbar shell) ============ */
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 24px; }
+
+  /* ============ STAT CARDS ============ */
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .stat-card { background: #fff; border-radius: 16px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08), 0 2px 8px rgba(26,58,92,0.04); }
+  .stat-card.primary { background: #2D6A9F; color: #fff; }
+  .stat-card.secondary { background: #1A3A5C; color: #fff; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .stat-card .label { font-size: 13px; color: #5A7A96; }
+  .stat-card.primary .label, .stat-card.secondary .label { color: rgba(255,255,255,0.8); }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #5BC0EB; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .stat-card.primary .iplate, .stat-card.secondary .iplate { background: rgba(255,255,255,0.2); color: #fff; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 32px; line-height: 1.1; color: #1A2E40; }
+  .stat-card.primary .value, .stat-card.secondary .value { color: #fff; }
+
+  /* ============ TABLE CARD ============ */
+  .section-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  .search-row { padding: 20px 24px; border-bottom: 1px solid #D0E8F5; display: flex; gap: 12px; align-items: center; }
+  .search-input { flex: 1; position: relative; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #9BBAD4; pointer-events: none; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 36px; border: 1px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; }
+  .icon-square { width: 40px; height: 40px; background: #F0F6FC; color: #2D6A9F; border: none; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .icon-square .lucide { width: 16px; height: 16px; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 14px 24px; text-align: left; font-family: var(--font-display); font-size: 12px; font-weight: 600; color: #5A7A96; background: #F8FBFF; border-bottom: 2px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+  th.center { text-align: center; }
+  td { padding: 16px 24px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  td.center { text-align: center; }
+  tr.row { cursor: pointer; }
+  tr.row:hover td { background: #F8FBFF; }
+  tr.row:last-child td { border-bottom: none; }
+
+  .name-cell { display: flex; align-items: center; gap: 12px; }
+  .avatar-sm { width: 36px; height: 36px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 600; font-size: 12px; flex-shrink: 0; }
+  .name-text { font-size: 14px; color: #1A2E40; font-weight: 500; }
+  .visits { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1A2E40; }
+  .status-badge { display: inline-block; padding: 3px 12px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .action-btn { width: 32px; height: 32px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #2D6A9F; }
+  .action-btn .lucide { width: 14px; height: 14px; }
+
+  .pagination { padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #D0E8F5; }
+  .pagination .info { font-size: 13px; color: #5A7A96; }
+  .pager { display: inline-flex; align-items: center; gap: 8px; }
+  .pager button { width: 32px; height: 32px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 500; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; }
+  .pager button.active { background: #2D6A9F; color: #fff; }
+  .pager .lucide { width: 14px; height: 14px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside id="sidebar-mount" class="sidebar"></aside>
+
+  <!-- ============ CONTENT ============ -->
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">All Packages</div>
+        <div class="topbar-crumb">Admin / Packages / All Packages</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta">
+            <span class="name">Admin User</span>
+            <span class="role-pill-light">Admin</span>
+          </div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 All Packages">
+      <!-- Analytics cards -->
+      <div class="stat-row">
+        <div class="stat-card primary">
+          <div class="top"><span class="label">Active Packages</span><div class="iplate"><i data-lucide="user-check"></i></div></div>
+          <div class="value">3</div>
+        </div>
+        <div class="stat-card">
+          <div class="top"><span class="label">Inactive Packages</span><div class="iplate"><i data-lucide="user-x"></i></div></div>
+          <div class="value">2</div>
+        </div>
+        <div class="stat-card">
+          <div class="top"><span class="label">Archive Packages</span><div class="iplate"><i data-lucide="archive"></i></div></div>
+          <div class="value">1</div>
+        </div>
+        <div class="stat-card secondary">
+          <div class="top"><span class="label">Total Packages</span><div class="iplate"><i data-lucide="package"></i></div></div>
+          <div class="value">5</div>
+        </div>
+      </div>
+
+      <!-- Search + table -->
+      <div class="section-card">
+        <div class="search-row">
+          <div class="search-input">
+            <i data-lucide="search"></i>
+            <input placeholder="Search by package name or category...">
+          </div>
+          <button class="icon-square" title="Export"><i data-lucide="download"></i></button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th class="center">Image</th><th>Package Name</th><th>Category</th><th class="center">Sessions</th><th>Price</th><th class="center">Status</th><th class="center">Actions</th>
+            </tr></thead>
+            <tbody>
+              <tr class="row"><td class="center"><img src="../../assets/service-hydra-facial.jpg" alt="" style="width:50px;height:50px;border-radius:6px;object-fit:cover"></td><td><span class="name-text">5+1 Premium Facial Package</span></td><td>Facial</td><td class="center"><span class="name-text">6</span></td><td><span class="name-text">₱15,000</span></td><td class="center"><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td><td class="center"><button class="action-btn"><i data-lucide="eye"></i></button> <button class="action-btn"><i data-lucide="more-vertical"></i></button></td></tr>
+              <tr class="row"><td class="center"><img src="../../assets/service-botox.jpg" alt="" style="width:50px;height:50px;border-radius:6px;object-fit:cover"></td><td><span class="name-text">Anti-Aging Package</span></td><td>Anti-Aging</td><td class="center"><span class="name-text">4</span></td><td><span class="name-text">₱12,000</span></td><td class="center"><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td><td class="center"><button class="action-btn"><i data-lucide="eye"></i></button> <button class="action-btn"><i data-lucide="more-vertical"></i></button></td></tr>
+              <tr class="row"><td class="center"><img src="../../assets/service-prp-hair.jpg" alt="" style="width:50px;height:50px;border-radius:6px;object-fit:cover"></td><td><span class="name-text">Hair Restoration Package</span></td><td>Hair</td><td class="center"><span class="name-text">6</span></td><td><span class="name-text">₱18,000</span></td><td class="center"><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td><td class="center"><button class="action-btn"><i data-lucide="eye"></i></button> <button class="action-btn"><i data-lucide="more-vertical"></i></button></td></tr>
+              <tr class="row"><td class="center"><img src="../../assets/service-chemical-peel.jpg" alt="" style="width:50px;height:50px;border-radius:6px;object-fit:cover"></td><td><span class="name-text">Acne Clear Package</span></td><td>Acne</td><td class="center"><span class="name-text">3</span></td><td><span class="name-text">₱8,500</span></td><td class="center"><span class="status-badge" style="background:#FEF3C7;color:#B45309">Inactive</span></td><td class="center"><button class="action-btn"><i data-lucide="eye"></i></button> <button class="action-btn"><i data-lucide="more-vertical"></i></button></td></tr>
+              <tr class="row"><td class="center"><img src="../../assets/service-hydra-facial.jpg" alt="" style="width:50px;height:50px;border-radius:6px;object-fit:cover"></td><td><span class="name-text">Wellness Plus Package</span></td><td>Wellness</td><td class="center"><span class="name-text">4</span></td><td><span class="name-text">₱20,000</span></td><td class="center"><span class="status-badge" style="background:#DCFCE7;color:#15803D">Active</span></td><td class="center"><button class="action-btn"><i data-lucide="eye"></i></button> <button class="action-btn"><i data-lucide="more-vertical"></i></button></td></tr>
+              <tr class="row"><td class="center"><img src="../../assets/service-chemical-peel.jpg" alt="" style="width:50px;height:50px;border-radius:6px;object-fit:cover"></td><td><span class="name-text">Starter Package</span></td><td>Facial</td><td class="center"><span class="name-text">2</span></td><td><span class="name-text">₱5,000</span></td><td class="center"><span class="status-badge" style="background:#FEF3C7;color:#B45309">Inactive</span></td><td class="center"><button class="action-btn"><i data-lucide="eye"></i></button> <button class="action-btn"><i data-lucide="more-vertical"></i></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span class="info">Showing 1 to 6 of 6</span>
+          <div class="pager">
+            <button disabled style="opacity:0.5"><i data-lucide="chevron-left"></i></button>
+            <button class="active">1</button>
+            <button disabled style="opacity:0.5"><i data-lucide="chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script>lucide.createIcons();</script>
+<script>
+/* __MW_TOGGLE__ */
+(function(){
+  // Find every parent .nav-item that is followed by a [data-submenu-for] block and wire up click toggle
+  document.querySelectorAll('aside.sidebar .nav-item').forEach(function(item){
+    var next = item.nextElementSibling;
+    if (!next || !next.hasAttribute || !next.hasAttribute('data-submenu-for')) return;
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', function(e){
+      // Don't navigate if it's a link
+      if (item.tagName === 'A') e.preventDefault();
+      var isOpen = next.style.display !== 'none';
+      next.style.display = isOpen ? 'none' : 'block';
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+})();
+</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

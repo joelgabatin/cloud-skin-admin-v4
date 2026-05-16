@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Add New Blog Post</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: #1A2E40; }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; position: sticky; top: 0; max-height: 100vh; font-family: var(--font-display); }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg,#2D6A9F,#5BC0EB); display: flex; align-items: center; justify-content: center; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; }
+  aside.sidebar .side-collapse { height: 44px; padding: 0 16px; display: flex; justify-content: flex-end; align-items: center; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-crumb a { color: #2D6A9F; text-decoration: none; }
+
+  .page { padding: 24px 32px 60px; max-width: 1100px; margin: 0 auto; width: 100%; }
+  .back-link { color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; text-decoration: none; margin-bottom: 14px; }
+  .back-link .lucide { width: 14px; height: 14px; }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.06); border: 1px solid #E5EFF7; }
+  .card + .card { margin-top: 18px; }
+
+  .sec { padding: 22px 26px; border-top: 1px solid #F0F6FC; }
+  .sec:first-of-type { border-top: none; }
+  .sec-lbl { font-family: var(--font-display); font-weight: 700; font-size: 11px; color: #2D6A9F; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; }
+  .field label .req { color: #DC2626; }
+  .field input, .field select, .field textarea { width: 100%; padding: 10px 12px; border: 1px solid #CBD5E1; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .field input, .field select { height: 40px; padding: 0 12px; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: #2D6A9F; }
+  .field .helper { font-family: var(--font-body); font-size: 11px; color: #9BBAD4; margin-top: 4px; }
+
+  .editor-toolbar { display: flex; gap: 4px; padding: 8px; background: #F8FBFD; border: 1px solid #CBD5E1; border-bottom: none; border-radius: 8px 8px 0 0; flex-wrap: wrap; }
+  .editor-toolbar button { height: 30px; min-width: 30px; padding: 0 8px; background: none; border: 1px solid transparent; border-radius: 5px; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 600; font-size: 12px; }
+  .editor-toolbar button:hover { background: #fff; border-color: #CBD5E1; color: #2D6A9F; }
+  .editor-toolbar .sep { width: 1px; background: #E5EFF7; margin: 4px 2px; }
+  .editor-toolbar .lucide { width: 14px; height: 14px; }
+  textarea.editor { width: 100%; min-height: 320px; padding: 14px 16px; border: 1px solid #CBD5E1; border-top: none; border-radius: 0 0 8px 8px; font-family: var(--font-body); font-size: 14px; color: #1A2E40; line-height: 1.6; resize: vertical; outline: none; }
+
+  .upload-area { border: 2px dashed #CBD5E1; border-radius: 10px; background: #F8FBFD; padding: 32px 16px; text-align: center; cursor: pointer; transition: all 150ms; }
+  .upload-area:hover { border-color: #2D6A9F; background: #F0F6FC; }
+  .upload-area .lucide { width: 32px; height: 32px; color: #5A7A96; margin-bottom: 8px; }
+  .upload-area .ttl { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .upload-area .sub { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; margin-top: 4px; }
+
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; min-height: 44px; border: 1px solid #CBD5E1; border-radius: 8px; background: #fff; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; background: #EBF6FD; color: #2D6A9F; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; }
+  .chip .x { cursor: pointer; opacity: 0.7; }
+  .chip-row input { flex: 1; min-width: 100px; height: 28px; border: none; outline: none; font-family: var(--font-body); font-size: 13px; background: transparent; padding: 0 4px; }
+
+  .toggle-wrap { display: flex; align-items: center; gap: 10px; }
+  .toggle { width: 38px; height: 22px; border-radius: 9999px; background: #2D6A9F; cursor: pointer; position: relative; padding: 2px; transition: background 120ms; }
+  .toggle .knob { width: 18px; height: 18px; border-radius: 50%; background: #fff; margin-left: auto; transition: margin 150ms; }
+  .toggle.off { background: #CBD5E1; }
+  .toggle.off .knob { margin-left: 0; }
+
+  .seo-preview { padding: 14px; border: 1px dashed #CBD5E1; border-radius: 8px; background: #F8FBFD; }
+  .seo-preview .url { font-family: var(--font-mono); font-size: 11.5px; color: #15803D; margin-bottom: 4px; }
+  .seo-preview .ttl { font-family: var(--font-body); font-size: 16px; color: #1A0DAB; line-height: 1.3; }
+  .seo-preview .desc { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; line-height: 1.5; margin-top: 4px; }
+
+  .foot-bar { background: #fff; border: 1px solid #E5EFF7; border-radius: 12px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 18px; box-shadow: 0 1px 4px rgba(26,58,92,0.06); }
+  .foot-bar .l { display: inline-flex; gap: 10px; }
+  .foot-bar .r { display: inline-flex; gap: 10px; }
+  .btn { height: 40px; padding: 0 18px; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; text-decoration: none; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn.ghost { background: #fff; color: #5A7A96; border-color: #D0E8F5; }
+  .btn.ghost:hover { background: #F0F6FC; }
+  .btn.primary { background: #2D6A9F; color: #fff; }
+  .btn.primary:hover { background: #1A5685; }
+  .btn.danger-ghost { background: #fff; color: #DC2626; border-color: #FCA5A5; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #15803D; color: #fff; padding: 12px 18px; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 13px; box-shadow: 0 4px 14px rgba(0,0,0,0.18); opacity: 0; transform: translateY(10px); transition: opacity 200ms, transform 200ms; z-index: 1100; pointer-events: none; display: inline-flex; align-items: center; gap: 8px; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast .lucide { width: 16px; height: 16px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Add New Blog Post</div>
+        <div class="topbar-crumb">Admin / <a href="blog.html">Blog</a> / Add New Post</div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Add New Blog Post">
+      <a class="back-link" href="blog.html"><i data-lucide="arrow-left"></i> Back to Blog</a>
+
+      <div class="grid">
+
+        <!-- Left column -->
+        <div>
+          <div class="card">
+            <div class="sec">
+              <div class="sec-lbl">Post Content</div>
+              <div class="field"><label>Title <span class="req">*</span></label><input id="f-title" placeholder="e.g., 5 Skincare Myths Debunked"></div>
+              <div class="field"><label>URL Slug</label><input id="f-slug" placeholder="skincare-myths-debunked"><div class="helper">cloudskin.com/blog/<span id="slug-preview">skincare-myths-debunked</span></div></div>
+              <div class="field"><label>Excerpt</label><textarea rows="3" placeholder="A short summary that appears on the blog list and social previews (max 160 chars)." style="min-height:auto;"></textarea></div>
+            </div>
+            <div class="sec">
+              <div class="sec-lbl">Body</div>
+              <div class="editor-toolbar">
+                <button title="Bold"><b>B</b></button>
+                <button title="Italic"><i style="font-style:italic;">I</i></button>
+                <button title="Underline"><u>U</u></button>
+                <span class="sep"></span>
+                <button title="Heading 1">H1</button>
+                <button title="Heading 2">H2</button>
+                <button title="Heading 3">H3</button>
+                <span class="sep"></span>
+                <button title="Bulleted list"><i data-lucide="list"></i></button>
+                <button title="Numbered list"><i data-lucide="list-ordered"></i></button>
+                <button title="Quote"><i data-lucide="quote"></i></button>
+                <span class="sep"></span>
+                <button title="Link"><i data-lucide="link"></i></button>
+                <button title="Image"><i data-lucide="image"></i></button>
+                <button title="Embed video"><i data-lucide="video"></i></button>
+              </div>
+              <textarea class="editor" placeholder="Write your blog post here…"></textarea>
+            </div>
+            <div class="sec">
+              <div class="sec-lbl">SEO Preview</div>
+              <div class="seo-preview">
+                <div class="url">cloudskin.com › blog › <span>skincare-myths-debunked</span></div>
+                <div class="ttl" id="seo-ttl">5 Skincare Myths Debunked — Cloud Skin Clinic + Wellness</div>
+                <div class="desc">A short summary that appears on the blog list and social previews.</div>
+              </div>
+              <div class="field" style="margin-top:14px;"><label>Meta Title</label><input id="f-meta-title" placeholder="Optional — defaults to post title"></div>
+              <div class="field"><label>Meta Description</label><textarea rows="2" placeholder="160 characters recommended" style="min-height:auto;"></textarea></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column (sidebar) -->
+        <div>
+
+          <div class="card">
+            <div class="sec">
+              <div class="sec-lbl">Publish</div>
+              <div class="field"><label>Status</label><select id="f-status"><option>Draft</option><option>Scheduled</option><option>Published</option></select></div>
+              <div class="field"><label>Publish Date</label><input id="f-date" type="datetime-local"></div>
+              <div class="field" style="margin-bottom:0;"><label>Visibility</label><select><option>Public</option><option>Private (Admin only)</option></select></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="sec">
+              <div class="sec-lbl">Cover Image</div>
+              <div class="upload-area">
+                <i data-lucide="image-plus"></i>
+                <div class="ttl">Upload Cover Image</div>
+                <div class="sub">PNG / JPG · 1200×630 recommended · Max 2MB</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="sec">
+              <div class="sec-lbl">Category &amp; Tags</div>
+              <div class="field"><label>Category</label><select id="f-cat"><option>Skincare Tips</option><option>Treatment Guides</option><option>Wellness</option><option>Clinic News</option><option>Behind the Scenes</option></select></div>
+              <div class="field" style="margin-bottom:0;"><label>Tags</label>
+                <div class="chip-row" id="tag-row">
+                  <span class="chip">skincare <span class="x">×</span></span>
+                  <span class="chip">tips <span class="x">×</span></span>
+                  <input id="f-tag-in" placeholder="Add tag…">
+                </div>
+                <div class="helper">Press Enter to add a tag.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="sec">
+              <div class="sec-lbl">Author</div>
+              <div class="field"><label>Posted by</label><select id="f-author"><option>Dr. Maria Santos</option><option>Dr. Ana Reyes</option><option>Dr. James Lim</option><option>Admin User</option></select></div>
+              <div class="field" style="margin-bottom:0;"><label>Allow Comments</label>
+                <div class="toggle-wrap"><div class="toggle" id="cm-toggle"><div class="knob"></div></div><span style="font-family:var(--font-display);font-weight:600;font-size:13px;color:#1A2E40;" id="cm-lbl">Enabled</span></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Sticky-feel footer bar -->
+      <div class="foot-bar">
+        <div class="l">
+          <a class="btn ghost" href="blog.html"><i data-lucide="x"></i> Cancel</a>
+          <button class="btn danger-ghost" id="discard-btn"><i data-lucide="trash-2"></i> Discard</button>
+        </div>
+        <div class="r">
+          <button class="btn ghost" id="save-draft-btn"><i data-lucide="save"></i> Save Draft</button>
+          <button class="btn ghost" id="preview-btn"><i data-lucide="eye"></i> Preview</button>
+          <button class="btn primary" id="publish-btn"><i data-lucide="send"></i> Publish</button>
+        </div>
+      </div>
+
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"><i data-lucide="check-circle"></i><span id="toast-text">Saved</span></div>
+
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+(function () {
+  // Slug autofill from title
+  var title = document.getElementById('f-title');
+  var slug = document.getElementById('f-slug');
+  var slugPrev = document.getElementById('slug-preview');
+  var seoTtl = document.getElementById('seo-ttl');
+  title.addEventListener('input', function () {
+    var s = title.value.toLowerCase().trim().replace(/[^a-z0-9 ]+/g, '').replace(/\s+/g, '-');
+    slug.value = s;
+    slugPrev.textContent = s || 'your-slug-here';
+    seoTtl.textContent = (title.value || 'New Post') + ' — Cloud Skin Clinic + Wellness';
+  });
+  slug.addEventListener('input', function () { slugPrev.textContent = slug.value || 'your-slug-here'; });
+
+  // Tag input
+  var tagIn = document.getElementById('f-tag-in');
+  var tagRow = document.getElementById('tag-row');
+  tagIn.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && tagIn.value.trim()) {
+      e.preventDefault();
+      var c = document.createElement('span');
+      c.className = 'chip';
+      c.innerHTML = tagIn.value.trim() + ' <span class="x">×</span>';
+      tagRow.insertBefore(c, tagIn);
+      tagIn.value = '';
+    }
+  });
+  tagRow.addEventListener('click', function (e) {
+    if (e.target.classList.contains('x')) e.target.parentElement.remove();
+  });
+
+  // Comments toggle
+  var cmTog = document.getElementById('cm-toggle');
+  var cmLbl = document.getElementById('cm-lbl');
+  cmTog.addEventListener('click', function () {
+    cmTog.classList.toggle('off');
+    cmLbl.textContent = cmTog.classList.contains('off') ? 'Disabled' : 'Enabled';
+  });
+
+  // Save / publish actions
+  var toast = document.getElementById('toast');
+  var toastText = document.getElementById('toast-text');
+  function flash(msg, ok) {
+    toastText.textContent = msg;
+    toast.style.background = ok === false ? '#DC2626' : '#15803D';
+    toast.classList.add('show');
+    setTimeout(function () { toast.classList.remove('show'); }, 2200);
+  }
+  function savePost(status) {
+    var t = title.value.trim();
+    if (!t) { flash('Title is required', false); return false; }
+    try {
+      var list = JSON.parse(localStorage.getItem('cs.newBlogPosts') || '[]');
+      list.push({
+        id: 'B' + Date.now(),
+        title: t, slug: slug.value, status: status,
+        category: document.getElementById('f-cat').value,
+        author: document.getElementById('f-author').value,
+        date: document.getElementById('f-date').value || new Date().toISOString(),
+        createdAt: new Date().toISOString()
+      });
+      localStorage.setItem('cs.newBlogPosts', JSON.stringify(list));
+    } catch (e) {}
+    return true;
+  }
+  document.getElementById('save-draft-btn').addEventListener('click', function () { if (savePost('Draft')) flash('✓ Draft saved'); });
+  document.getElementById('preview-btn').addEventListener('click', function () { flash('Opening preview…'); });
+  document.getElementById('publish-btn').addEventListener('click', function () {
+    if (savePost('Published')) { flash('✓ Post published'); setTimeout(function(){ location.href='blog.html'; }, 1200); }
+  });
+  document.getElementById('discard-btn').addEventListener('click', function () {
+    if (confirm('Discard this post? Any unsaved changes will be lost.')) location.href = 'blog.html';
+  });
+})();
+</script>
+</body>
+</html>

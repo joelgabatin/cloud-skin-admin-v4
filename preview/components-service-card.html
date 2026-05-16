@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 28px; background: #E8F4FD; }
+  .card { width: 320px; background: #fff; border-radius: 20px; box-shadow: 0 4px 12px rgba(26,58,92,0.08); overflow: hidden; display: flex; flex-direction: column; }
+  .photo { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: linear-gradient(135deg, #5BC0EB 0%, #D0E8F5 100%); }
+  .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .chip { position: absolute; top: 12px; right: 12px; padding: 4px 12px; border-radius: 9999px; background: rgba(255,255,255,0.92); backdrop-filter: blur(4px); border: 1.5px solid #2D6A9F; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12px; }
+  .body { padding: 24px; display: flex; flex-direction: column; gap: 12px; }
+  h3 { font-family: var(--font-display); font-weight: 600; font-size: 20px; color: #1A2E40; margin: 0; }
+  p { font-family: var(--font-body); font-size: 14px; color: #5A7A96; line-height: 1.6; margin: 0; }
+  .btn { display: block; text-align: center; background: #069494; color: #fff; padding: 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 14px; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="photo">
+    <img src="../assets/service-hydra-facial.jpg" alt="HydraFacial">
+    <span class="chip">Facial</span>
+  </div>
+  <div class="body">
+    <h3>HydraFacial</h3>
+    <p>Deep cleansing, exfoliation, and hydration in one rejuvenating session for all skin types.</p>
+    <a class="btn" href="#">Book Now</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Email Integration</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+* { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 28px 32px; display: flex; flex-direction: column; gap: 22px; max-width: 1024px; }
+  .page-hero h1 { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .page-hero .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 6px; max-width: 620px; line-height: 1.55; }
+
+  /* Toggle between connected and not-connected demo state */
+  .state-toggle { display: inline-flex; gap: 0; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 9px; padding: 3px; font-family: var(--font-display); font-size: 12px; font-weight: 600; width: fit-content; }
+  .state-toggle button { padding: 6px 14px; border-radius: 6px; border: none; background: none; color: #5A7A96; cursor: pointer; }
+  .state-toggle button.active { background: #2D6A9F; color: #fff; }
+
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); padding: 32px; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; }
+  .gmail-icon { width: 72px; height: 72px; border-radius: 18px; background: #F8FBFD; border: 1.5px solid #D0E8F5; display: flex; align-items: center; justify-content: center; }
+  .gmail-icon svg { width: 40px; height: 40px; }
+  .card h2 { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .card .desc { font-family: var(--font-body); font-size: 13.5px; color: #5A7A96; line-height: 1.55; max-width: 480px; margin: 0; }
+
+  .btn { height: 42px; padding: 0 22px; border-radius: 9px; cursor: pointer; font-family: var(--font-display); font-size: 13.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid transparent; text-decoration: none; white-space: nowrap; }
+  .btn .lucide { width: 15px; height: 15px; }
+  .btn-primary { background: #2D6A9F; color: #fff; }
+  .btn-primary:hover { background: #1A5685; }
+  .btn-outline { background: #fff; color: #2D6A9F; border-color: #D0E8F5; height: 36px; padding: 0 14px; font-size: 12.5px; }
+  .btn-outline:hover { background: #F0F6FC; }
+  .btn-ghost-red { background: none; color: #DC2626; border: none; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; cursor: pointer; padding: 0; }
+  .btn-ghost-red:hover { text-decoration: underline; }
+
+  .card .auth-note { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 10px; padding: 12px 16px; font-family: var(--font-body); font-size: 12px; color: #5A7A96; max-width: 520px; display: flex; gap: 8px; align-items: flex-start; line-height: 1.5; }
+  .card .auth-note .lucide { width: 14px; height: 14px; color: #2D6A9F; flex-shrink: 0; margin-top: 2px; }
+
+  /* Connected state */
+  .connected-card { padding: 28px 32px; display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+  .connected-card .gmail-icon { width: 60px; height: 60px; flex-shrink: 0; }
+  .connected-card .gmail-icon svg { width: 32px; height: 32px; }
+  .connected-card .body { flex: 1; min-width: 280px; text-align: left; }
+  .connected-card .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; background: #DCFCE7; color: #15803D; border-radius: 9999px; font-family: var(--font-display); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
+  .connected-card .status-pill .lucide { width: 12px; height: 12px; }
+  .connected-card h2 { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .connected-card .meta { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-top: 4px; line-height: 1.6; }
+  .connected-card .actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+
+  .sync-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); padding: 18px 22px; }
+  .sync-grid .k { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+  .sync-grid .v { font-family: var(--font-display); font-size: 13.5px; font-weight: 600; color: #1A2E40; display: inline-flex; align-items: center; gap: 6px; }
+  .sync-grid .v .lucide { width: 13px; height: 13px; }
+  .sync-grid .v.success { color: #15803D; }
+
+  .warn-banner { background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 10px; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start; font-family: var(--font-body); font-size: 12.5px; color: #92400E; line-height: 1.5; }
+  .warn-banner .lucide { width: 16px; height: 16px; color: #B45309; flex-shrink: 0; margin-top: 2px; }
+  .warn-banner b { color: #78350F; font-family: var(--font-display); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Email Integration</div>
+        <div class="topbar-crumb">Admin / Settings / Integrations / Email</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Email Integration">
+      <div class="page-hero">
+        <h1>Email Integration</h1>
+        <div class="sub">Connect your clinic's Gmail account to manage emails directly from the dashboard. Once connected, emails sent to your clinic's address appear in the unified Inbox alongside contact form submissions.</div>
+      </div>
+
+      <div class="state-toggle" role="tablist" aria-label="Demo connection state">
+        <button type="button" data-state="not-connected" class="active">Before Connection</button>
+        <button type="button" data-state="connected">After Connection</button>
+      </div>
+
+      <!-- Not-connected state -->
+      <div class="card" id="state-not-connected">
+        <div class="gmail-icon">
+          <!-- Inline Gmail-style envelope icon (red accent) -->
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="5" width="20" height="14" rx="2" stroke="#D44638" stroke-width="1.8" fill="#fff"/>
+            <path d="M3 6 L12 13 L21 6" stroke="#D44638" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 18 L9.5 12.5" stroke="#D44638" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            <path d="M21 18 L14.5 12.5" stroke="#D44638" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h2>Connect Gmail Account</h2>
+        <p class="desc">Once connected, emails sent to your clinic's Gmail will appear in your dashboard inbox. You can read and reply without opening Gmail.</p>
+        <button class="btn btn-primary" type="button"><i data-lucide="link-2"></i> Connect Gmail <i data-lucide="arrow-right"></i></button>
+        <div class="auth-note">
+          <i data-lucide="shield-check"></i>
+          <div>You'll be redirected to Google to authorize access. Cloud Skin Clinic will only access emails (read &amp; send) — it cannot delete your Gmail messages or change your account settings.</div>
+        </div>
+      </div>
+
+      <!-- Connected state -->
+      <div id="state-connected" hidden>
+        <div class="card connected-card">
+          <div class="gmail-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="2" y="5" width="20" height="14" rx="2" stroke="#D44638" stroke-width="1.8" fill="#fff"/>
+              <path d="M3 6 L12 13 L21 6" stroke="#D44638" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3 18 L9.5 12.5" stroke="#D44638" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+              <path d="M21 18 L14.5 12.5" stroke="#D44638" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="body">
+            <span class="status-pill"><i data-lucide="check-circle"></i> Connected</span>
+            <h2>support@cloudskin.com</h2>
+            <div class="meta">Connected by <b style="color:#1A2E40;font-family:var(--font-display);">Admin User</b> · May 13, 2026<br>Granted scopes: Read messages, Send mail, Manage labels.</div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-outline" type="button"><i data-lucide="refresh-cw"></i> Sync Now</button>
+            <button class="btn-ghost-red" type="button">Disconnect Gmail</button>
+          </div>
+        </div>
+
+        <div class="sync-grid" style="margin-top:14px;">
+          <div>
+            <div class="k">Sync Status</div>
+            <div class="v success"><i data-lucide="check-circle"></i> Healthy</div>
+          </div>
+          <div>
+            <div class="k">Last Synced</div>
+            <div class="v"><i data-lucide="clock"></i> 2 minutes ago</div>
+          </div>
+          <div>
+            <div class="k">Sync Frequency</div>
+            <div class="v"><i data-lucide="repeat"></i> Every 5 minutes</div>
+          </div>
+          <div>
+            <div class="k">Messages Fetched (Today)</div>
+            <div class="v">42</div>
+          </div>
+          <div>
+            <div class="k">Replies Sent (Today)</div>
+            <div class="v">8</div>
+          </div>
+          <div>
+            <div class="k">OAuth Token</div>
+            <div class="v" style="font-family:var(--font-mono);font-size:12px;color:#5A7A96;">Valid · Refreshes Nov 13, 2026</div>
+          </div>
+        </div>
+
+        <div class="warn-banner" style="margin-top:14px;">
+          <i data-lucide="alert-triangle"></i>
+          <div><b>Disconnecting</b> will stop fetching new emails but will not delete existing messages in your inbox. You can reconnect at any time and synced messages from this account will be re-linked automatically.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+  // Demo: toggle between not-connected and connected states.
+  (function () {
+    var notC = document.getElementById('state-not-connected');
+    var conC = document.getElementById('state-connected');
+    document.querySelectorAll('.state-toggle button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.querySelectorAll('.state-toggle button').forEach(function (x) { x.classList.remove('active'); });
+        b.classList.add('active');
+        var s = b.getAttribute('data-state');
+        notC.hidden = (s !== 'not-connected');
+        conC.hidden = (s !== 'connected');
+        if (window.lucide) window.lucide.createIcons();
+      });
+    });
+    // Allow ?state=connected deep-link to land on the connected variant
+    if ((new URLSearchParams(location.search)).get('state') === 'connected') {
+      document.querySelector('.state-toggle button[data-state="connected"]').click();
+    }
+  })();
+</script>
+</body>
+</html>

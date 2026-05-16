@@ -1,0 +1,1477 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Reports</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill-side { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 24px; }
+
+  /* Report type pills */
+  .type-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .type-pill { padding: 10px 16px; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 500; color: #5A7A96; display: inline-flex; align-items: center; gap: 6px; }
+  .type-pill .lucide { width: 14px; height: 14px; }
+  .type-pill.active { background: #2D6A9F; border-color: #2D6A9F; color: #fff; }
+
+  /* Toolbar */
+  .toolbar { display: flex; align-items: center; gap: 12px; }
+  .date-range { display: flex; gap: 8px; align-items: center; }
+  .date-range label { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: #5A7A96; }
+  .date-range input { height: 36px; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px; font-family: var(--font-mono); font-size: 12px; color: #1A2E40; outline: none; background: #fff; }
+  .right-actions { margin-left: auto; display: flex; gap: 8px; }
+  .btn-secondary { height: 36px; padding: 0 14px; background: #F0F6FC; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-secondary .lucide { width: 14px; height: 14px; }
+  .btn-primary { height: 36px; padding: 0 14px; background: #2D6A9F; border: none; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #fff; display: inline-flex; align-items: center; gap: 6px; }
+
+  /* KPI row */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .kpi { background: #fff; border-radius: 12px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .kpi.primary { background: #2D6A9F; color: #fff; }
+  .kpi .l { font-size: 13px; color: #5A7A96; margin-bottom: 8px; }
+  .kpi.primary .l { color: rgba(255,255,255,0.8); }
+  .kpi .v { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.1; }
+  .kpi.primary .v { color: #fff; }
+  .kpi .d { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #16A34A; margin-top: 8px; }
+  .kpi.primary .d { color: rgba(255,255,255,0.8); }
+
+  /* Chart placeholder */
+  .chart-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  .chart-head { padding: 16px 20px; border-bottom: 1px solid #D0E8F5; display: flex; justify-content: space-between; align-items: center; }
+  .chart-title { font-family: var(--font-display); font-weight: 600; font-size: 15px; color: #1A2E40; }
+  .chart-sub { font-size: 12px; color: #5A7A96; }
+  .chart-body { padding: 24px; }
+
+  /* Bar chart (SVG) */
+  .bar-chart { display: flex; align-items: flex-end; gap: 12px; height: 240px; padding: 16px 0; border-bottom: 1px solid #F0F6FC; }
+  .bar-col { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px; }
+  .bar { width: 100%; max-width: 60px; background: linear-gradient(to top, #2D6A9F, #5BC0EB); border-radius: 6px 6px 0 0; transition: height 200ms; }
+  .bar-label { font-family: var(--font-display); font-size: 11px; font-weight: 500; color: #5A7A96; }
+  .bar-value { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #1A2E40; }
+
+  /* Two-column layout */
+  .two-col { display: grid; grid-template-columns: 60fr 40fr; gap: 20px; }
+
+  /* Donut placeholder */
+  .donut-wrap { padding: 20px; }
+  .donut { width: 100%; max-width: 180px; aspect-ratio: 1; margin: 0 auto 16px; border-radius: 50%; background: conic-gradient(#2D6A9F 0 39%, #5BC0EB 0 69%, #1A3A5C 0 92%, #A8CCE8 0 100%); display: flex; align-items: center; justify-content: center; position: relative; }
+  .donut::after { content: ""; width: 65%; aspect-ratio: 1; border-radius: 50%; background: #fff; }
+  .legend { display: flex; flex-direction: column; gap: 8px; }
+  .legend .lr { display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
+  .legend .lr .lt { display: flex; align-items: center; gap: 8px; color: #5A7A96; }
+  .legend .lr .dot { width: 10px; height: 10px; border-radius: 3px; }
+  .legend .lr .val { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+
+  /* Top services table */
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #F0F6FC; padding: 10px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; }
+  td { padding: 12px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; }
+  tr:last-child td { border-bottom: none; }
+  .nm { font-family: var(--font-display); font-weight: 500; color: #1A2E40; }
+  .amount { font-family: var(--font-display); font-weight: 700; color: #2D6A9F; }
+
+  /* Range presets + Custom modal */
+  .range-pill { height: 36px; padding: 0 14px; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 500; color: #5A7A96; }
+  .range-pill.active { background: #2D6A9F; border-color: #2D6A9F; color: #fff; }
+  .modal-back { position: fixed; inset: 0; background: rgba(26,58,92,0.5); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .modal-back[hidden] { display: none !important; }
+  .modal-card { background: #fff; border-radius: 16px; width: 100%; max-width: 500px; box-shadow: 0 8px 32px rgba(26,58,92,0.18); overflow: hidden; }
+  .modal-head { padding: 18px 22px; border-bottom: 1px solid #D0E8F5; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-display); font-weight: 600; font-size: 16px; color: #1A2E40; }
+  .modal-head button { background: none; border: none; cursor: pointer; color: #5A7A96; padding: 4px; border-radius: 6px; }
+  .modal-body { padding: 22px; }
+  .modal-foot { padding: 14px 22px; border-top: 1px solid #D0E8F5; background: #F8FBFD; display: flex; gap: 10px; justify-content: flex-end; }
+  .type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 18px; }
+  .type-btn { height: 38px; padding: 0 10px; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 12px; font-weight: 500; color: #5A7A96; }
+  .type-btn.on { background: #2D6A9F; border-color: #2D6A9F; color: #fff; }
+  .modal-body label.fld { display: block; font-family: var(--font-display); font-weight: 500; font-size: 13px; color: #1A2E40; margin-bottom: 6px; }
+  .modal-body input[type="date"], .modal-body input[type="month"], .modal-body input[type="number"] { width: 100%; height: 44px; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 14px; color: #1A2E40; outline: none; }
+  .modal-body .field-pair { margin-bottom: 14px; }
+  .btn-cancel { height: 38px; padding: 0 14px; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #5A7A96; }
+  /* Tab panes */
+  .tab-pane { display: none; }
+  .tab-pane.is-active { display: block; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside id="sidebar-mount" class="sidebar"></aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Sales Report</div>
+        <div class="topbar-crumb">Admin / Reports / Sales</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Sales Report">
+      <a href="reports-hub.html" style="display:inline-flex;align-items:center;gap:6px;font-family:var(--font-display);font-size:13px;font-weight:500;color:#2D6A9F;text-decoration:none;margin-bottom:8px;width:fit-content;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'"><i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Back to Reports</a>
+
+      <div class="toolbar" id="rep-toolbar">
+        <button class="range-pill active" data-range="today">Today</button>
+        <button class="range-pill" data-range="week">This Week</button>
+        <button class="range-pill" data-range="month">This Month</button>
+        <button class="range-pill" data-range="custom" id="range-custom">Custom</button>
+
+        <div id="voucher-filter" hidden style="display:inline-flex;align-items:center;gap:6px;margin-left:14px;">
+          <span style="font-family:var(--font-display);font-size:13px;color:#5A7A96;">Filter:</span>
+          <select id="voucher-filter-select" style="height:36px;padding:0 12px;background:#fff;border:1.5px solid #D0E8F5;border-radius:8px;cursor:pointer;font-family:var(--font-display);font-size:13px;color:#1A2E40;outline:none;">
+            <option value="all">All Vouchers</option>
+            <option value="active">Active Vouchers</option>
+            <option value="inactive">Inactive Vouchers</option>
+          </select>
+        </div>
+
+        <div class="right-actions" style="position:relative;">
+          <button class="btn-primary" id="export-btn"><i data-lucide="download"></i> Export <i data-lucide="chevron-down" style="width:13px;height:13px;"></i></button>
+          <div id="export-menu" hidden style="position:absolute;top:calc(100% + 4px);right:0;background:#fff;border:1px solid #D0E8F5;border-radius:8px;box-shadow:0 4px 12px rgba(26,58,92,0.15);z-index:50;min-width:170px;overflow:hidden;">
+            <button class="exp-opt" data-fmt="csv" style="width:100%;padding:10px 16px;background:none;border:none;border-bottom:1px solid #F0F6FC;text-align:left;cursor:pointer;font-family:var(--font-display);font-size:13px;color:#1A2E40;display:flex;align-items:center;gap:10px;"><i data-lucide="file-spreadsheet" style="width:16px;height:16px;color:#16A34A;"></i> Export as CSV</button>
+            <button class="exp-opt" data-fmt="pdf" style="width:100%;padding:10px 16px;background:none;border:none;border-bottom:1px solid #F0F6FC;text-align:left;cursor:pointer;font-family:var(--font-display);font-size:13px;color:#1A2E40;display:flex;align-items:center;gap:10px;"><i data-lucide="file-text" style="width:16px;height:16px;color:#DC2626;"></i> Export as PDF</button>
+            <button class="exp-opt" data-fmt="word" style="width:100%;padding:10px 16px;background:none;border:none;text-align:left;cursor:pointer;font-family:var(--font-display);font-size:13px;color:#1A2E40;display:flex;align-items:center;gap:10px;"><i data-lucide="file-text" style="width:16px;height:16px;color:#2D6A9F;"></i> Export as Word</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane is-active" data-tab="sales">
+      <div class="kpi-row">
+        <div class="kpi primary"><div class="l">Total Revenue</div><div class="v">₱438,500</div><div class="d"><i data-lucide="trending-up" style="width:13px;height:13px"></i> +18% vs last period</div></div>
+        <div class="kpi"><div class="l">Transactions</div><div class="v">142</div><div class="d"><i data-lucide="trending-up" style="width:13px;height:13px"></i> +12 vs last period</div></div>
+        <div class="kpi"><div class="l">Avg Transaction</div><div class="v">₱3,088</div><div class="d"><i data-lucide="trending-up" style="width:13px;height:13px"></i> +₱120</div></div>
+        <div class="kpi"><div class="l">Discount Given</div><div class="v">₱28,400</div><div class="d" style="color:#5A7A96"><i data-lucide="tag" style="width:13px;height:13px"></i> Across 18 vouchers</div></div>
+      </div>
+
+      <!-- Revenue by Day bar chart -->
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Daily Revenue</div>
+            <div class="chart-sub">April 2026 · last 14 days</div>
+          </div>
+        </div>
+        <div class="chart-body">
+          <div class="bar-chart">
+            <div class="bar-col"><div class="bar-value">₱28K</div><div class="bar" style="height:55%"></div><div class="bar-label">Apr 14</div></div>
+            <div class="bar-col"><div class="bar-value">₱22K</div><div class="bar" style="height:42%"></div><div class="bar-label">Apr 15</div></div>
+            <div class="bar-col"><div class="bar-value">₱18K</div><div class="bar" style="height:35%"></div><div class="bar-label">Apr 16</div></div>
+            <div class="bar-col"><div class="bar-value">₱34K</div><div class="bar" style="height:68%"></div><div class="bar-label">Apr 17</div></div>
+            <div class="bar-col"><div class="bar-value">₱41K</div><div class="bar" style="height:82%"></div><div class="bar-label">Apr 18</div></div>
+            <div class="bar-col"><div class="bar-value">₱26K</div><div class="bar" style="height:52%"></div><div class="bar-label">Apr 19</div></div>
+            <div class="bar-col"><div class="bar-value">₱32K</div><div class="bar" style="height:64%"></div><div class="bar-label">Apr 20</div></div>
+            <div class="bar-col"><div class="bar-value">₱48K</div><div class="bar" style="height:95%"></div><div class="bar-label">Apr 21</div></div>
+            <div class="bar-col"><div class="bar-value">₱38K</div><div class="bar" style="height:76%"></div><div class="bar-label">Apr 22</div></div>
+            <div class="bar-col"><div class="bar-value">₱28K</div><div class="bar" style="height:56%"></div><div class="bar-label">Apr 23</div></div>
+            <div class="bar-col"><div class="bar-value">₱20K</div><div class="bar" style="height:40%"></div><div class="bar-label">Apr 24</div></div>
+            <div class="bar-col"><div class="bar-value">₱36K</div><div class="bar" style="height:72%"></div><div class="bar-label">Apr 25</div></div>
+            <div class="bar-col"><div class="bar-value">₱44K</div><div class="bar" style="height:88%"></div><div class="bar-label">Apr 26</div></div>
+            <div class="bar-col"><div class="bar-value">₱30K</div><div class="bar" style="height:60%"></div><div class="bar-label">Apr 27</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Top services table -->
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Top Services by Revenue</div><div class="chart-sub">This period</div></div></div>
+          <table>
+            <thead><tr><th>Service</th><th>Sessions</th><th>Revenue</th></tr></thead>
+            <tbody>
+              <tr><td><span class="nm">Hydra Facial</span></td><td>32</td><td class="amount">₱80,000</td></tr>
+              <tr><td><span class="nm">Laser Resurfacing</span></td><td>8</td><td class="amount">₱75,000</td></tr>
+              <tr><td><span class="nm">Botox Treatment</span></td><td>14</td><td class="amount">₱68,000</td></tr>
+              <tr><td><span class="nm">Dermal Fillers</span></td><td>6</td><td class="amount">₱54,000</td></tr>
+              <tr><td><span class="nm">PRP Therapy</span></td><td>4</td><td class="amount">₱48,000</td></tr>
+              <tr><td><span class="nm">Chemical Peel</span></td><td>18</td><td class="amount">₱42,000</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Donut: payment method -->
+        <div class="chart-card donut-wrap">
+          <div class="chart-head" style="border-bottom:none;padding:0 0 16px"><div><div class="chart-title">Revenue by Method</div><div class="chart-sub">All transactions</div></div></div>
+          <div class="donut"></div>
+          <div class="legend">
+            <div class="lr"><div class="lt"><span class="dot" style="background:#2D6A9F"></span>GCash</div><span class="val">₱170,000</span></div>
+            <div class="lr"><div class="lt"><span class="dot" style="background:#5BC0EB"></span>Cash</div><span class="val">₱131,500</span></div>
+            <div class="lr"><div class="lt"><span class="dot" style="background:#1A3A5C"></span>Card</div><span class="val">₱100,000</span></div>
+            <div class="lr"><div class="lt"><span class="dot" style="background:#A8CCE8"></span>Transfer</div><span class="val">₱37,000</span></div>
+          </div>
+        </div>
+      </div>
+      </div><!-- /sales pane -->
+
+      <!-- ============ Revenue Breakdown tab ============ -->
+      <div class="tab-pane" data-tab="revenue-breakdown" hidden>
+        <div class="kpi-row">
+          <div class="kpi primary"><div class="l">Total Revenue</div><div class="v">₱438,500</div><div class="d"><i data-lucide="trending-up" style="width:13px;height:13px"></i> +18% vs last period</div></div>
+          <div class="kpi"><div class="l">Top Category</div><div class="v">₱165,400</div><div class="d" style="color:#5A7A96"><i data-lucide="award" style="width:13px;height:13px"></i> Injectables</div></div>
+          <div class="kpi"><div class="l">Top Practitioner</div><div class="v">Dr. Lim</div><div class="d" style="color:#16A34A"><i data-lucide="user-check" style="width:13px;height:13px"></i> ₱135,000</div></div>
+          <div class="kpi"><div class="l">Top Method</div><div class="v">GCash</div><div class="d" style="color:#5A7A96"><i data-lucide="smartphone" style="width:13px;height:13px"></i> 38.8% of total</div></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Revenue by Service Category</div><div class="chart-sub">This period · 4 categories</div></div></div>
+          <table>
+            <thead><tr><th>Category</th><th>Sessions</th><th>Revenue</th><th>Share</th></tr></thead>
+            <tbody>
+              <tr><td><span class="nm">Injectables</span></td><td>54</td><td class="amount">₱165,400</td><td><span style="background:#F0F6FC;color:#2D6A9F;padding:2px 10px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">37.7%</span></td></tr>
+              <tr><td><span class="nm">Laser</span></td><td>22</td><td class="amount">₱112,000</td><td><span style="background:#F0F6FC;color:#2D6A9F;padding:2px 10px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">25.5%</span></td></tr>
+              <tr><td><span class="nm">Skin Treatments</span></td><td>78</td><td class="amount">₱98,300</td><td><span style="background:#F0F6FC;color:#2D6A9F;padding:2px 10px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">22.4%</span></td></tr>
+              <tr><td><span class="nm">IV Therapy &amp; Other</span></td><td>18</td><td class="amount">₱62,800</td><td><span style="background:#F0F6FC;color:#2D6A9F;padding:2px 10px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">14.3%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Revenue by Practitioner</div><div class="chart-sub">This period</div></div></div>
+            <table>
+              <thead><tr><th>Practitioner</th><th>Sessions</th><th>Revenue</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">Dr. James Lim</span> · Laser</td><td>18</td><td class="amount">₱135,000</td></tr>
+                <tr><td><span class="nm">Dr. Ana Reyes</span> · Aesthetic</td><td>24</td><td class="amount">₱112,000</td></tr>
+                <tr><td><span class="nm">Dr. Maria Santos</span> · Dermatology</td><td>28</td><td class="amount">₱89,500</td></tr>
+                <tr><td><span class="nm">Dr. Angela Lim</span> · General</td><td>15</td><td class="amount">₱48,200</td></tr>
+                <tr><td><span class="nm">Dr. Olivia Bautista</span> · Visiting</td><td>8</td><td class="amount">₱53,800</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="chart-card donut-wrap">
+            <div class="chart-head" style="border-bottom:none;padding:0 0 16px"><div><div class="chart-title">Revenue by Payment Method</div><div class="chart-sub">All transactions</div></div></div>
+            <div class="donut" style="background:conic-gradient(#2D6A9F 0% 38.8%, #5BC0EB 38.8% 68.8%, #1A3A5C 68.8% 91.6%, #A8CCE8 91.6% 100%);"></div>
+            <div class="legend">
+              <div class="lr"><div class="lt"><span class="dot" style="background:#2D6A9F"></span>GCash</div><span class="val">₱170,000 · 38.8%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#5BC0EB"></span>Cash</div><span class="val">₱131,500 · 30.0%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#1A3A5C"></span>Card</div><span class="val">₱100,000 · 22.8%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#A8CCE8"></span>Bank Transfer</div><span class="val">₱37,000 · 8.4%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Daily Revenue Trend</div><div class="chart-sub">April 2026 · last 14 days</div></div></div>
+          <div class="chart-body">
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar-value">₱28K</div><div class="bar" style="height:55%"></div><div class="bar-label">Apr 14</div></div>
+              <div class="bar-col"><div class="bar-value">₱22K</div><div class="bar" style="height:42%"></div><div class="bar-label">Apr 15</div></div>
+              <div class="bar-col"><div class="bar-value">₱18K</div><div class="bar" style="height:35%"></div><div class="bar-label">Apr 16</div></div>
+              <div class="bar-col"><div class="bar-value">₱34K</div><div class="bar" style="height:68%"></div><div class="bar-label">Apr 17</div></div>
+              <div class="bar-col"><div class="bar-value">₱41K</div><div class="bar" style="height:82%"></div><div class="bar-label">Apr 18</div></div>
+              <div class="bar-col"><div class="bar-value">₱26K</div><div class="bar" style="height:52%"></div><div class="bar-label">Apr 19</div></div>
+              <div class="bar-col"><div class="bar-value">₱32K</div><div class="bar" style="height:64%"></div><div class="bar-label">Apr 20</div></div>
+              <div class="bar-col"><div class="bar-value">₱48K</div><div class="bar" style="height:95%"></div><div class="bar-label">Apr 21</div></div>
+              <div class="bar-col"><div class="bar-value">₱38K</div><div class="bar" style="height:76%"></div><div class="bar-label">Apr 22</div></div>
+              <div class="bar-col"><div class="bar-value">₱28K</div><div class="bar" style="height:56%"></div><div class="bar-label">Apr 23</div></div>
+              <div class="bar-col"><div class="bar-value">₱20K</div><div class="bar" style="height:40%"></div><div class="bar-label">Apr 24</div></div>
+              <div class="bar-col"><div class="bar-value">₱36K</div><div class="bar" style="height:72%"></div><div class="bar-label">Apr 25</div></div>
+              <div class="bar-col"><div class="bar-value">₱44K</div><div class="bar" style="height:88%"></div><div class="bar-label">Apr 26</div></div>
+              <div class="bar-col"><div class="bar-value">₱30K</div><div class="bar" style="height:60%"></div><div class="bar-label">Apr 27</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Monthly Revenue · 2026 YTD</div><div class="chart-sub">Period over period growth</div></div></div>
+          <table>
+            <thead><tr><th>Month</th><th>Sessions</th><th>Revenue</th><th>Growth</th></tr></thead>
+            <tbody>
+              <tr><td><span class="nm">January 2026</span></td><td>118</td><td class="amount">₱362,500</td><td><span style="color:#5A7A96;font-family:var(--font-display);font-weight:600;">—</span></td></tr>
+              <tr><td><span class="nm">February 2026</span></td><td>132</td><td class="amount">₱398,200</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">↑ 9.8%</span></td></tr>
+              <tr><td><span class="nm">March 2026</span></td><td>128</td><td class="amount">₱371,400</td><td><span style="color:#DC2626;font-family:var(--font-display);font-weight:700;">↓ 6.7%</span></td></tr>
+              <tr><td><span class="nm">April 2026</span></td><td>142</td><td class="amount">₱438,500</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">↑ 18.1%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============ Appointments tab ============ -->
+      <div class="tab-pane" data-tab="appointments" hidden>
+        <div class="kpi-row" style="grid-template-columns:repeat(5,1fr);">
+          <div class="kpi primary"><div class="l">Total Appointments</div><div class="v">70</div><div class="d"><i data-lucide="calendar" style="width:13px;height:13px"></i> This period</div></div>
+          <div class="kpi"><div class="l">Completed</div><div class="v">52</div><div class="d" style="color:#16A34A"><i data-lucide="check-circle" style="width:13px;height:13px"></i> 74% rate</div></div>
+          <div class="kpi"><div class="l">Cancelled</div><div class="v">8</div><div class="d" style="color:#DC2626"><i data-lucide="x-circle" style="width:13px;height:13px"></i> 11%</div></div>
+          <div class="kpi"><div class="l">No-Shows</div><div class="v">4</div><div class="d" style="color:#F59E0B"><i data-lucide="alert-circle" style="width:13px;height:13px"></i> 5.7%</div></div>
+          <div class="kpi"><div class="l">Pending</div><div class="v">6</div><div class="d" style="color:#A16207"><i data-lucide="clock" style="width:13px;height:13px"></i> Awaiting</div></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Appointments Per Day</div><div class="chart-sub">This period</div></div></div>
+          <div class="chart-body">
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar-value">8</div><div class="bar" style="height:55%"></div><div class="bar-label">Apr 19</div></div>
+              <div class="bar-col"><div class="bar-value">11</div><div class="bar" style="height:75%"></div><div class="bar-label">Apr 20</div></div>
+              <div class="bar-col"><div class="bar-value">7</div><div class="bar" style="height:48%"></div><div class="bar-label">Apr 21</div></div>
+              <div class="bar-col"><div class="bar-value">13</div><div class="bar" style="height:90%"></div><div class="bar-label">Apr 22</div></div>
+              <div class="bar-col"><div class="bar-value">10</div><div class="bar" style="height:68%"></div><div class="bar-label">Apr 23</div></div>
+              <div class="bar-col"><div class="bar-value">9</div><div class="bar" style="height:62%"></div><div class="bar-label">Apr 24</div></div>
+              <div class="bar-col"><div class="bar-value">12</div><div class="bar" style="height:82%"></div><div class="bar-label">Apr 25</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="chart-card donut-wrap">
+            <div class="chart-head" style="border-bottom:none;padding:0 0 16px"><div><div class="chart-title">By Status</div><div class="chart-sub">All appointments</div></div></div>
+            <div class="donut" style="background:conic-gradient(#2D6A9F 0% 60%, #5BC0EB 60% 80%, #EF4444 80% 90%, #F59E0B 90% 95%, #A16207 95% 100%);"></div>
+            <div class="legend">
+              <div class="lr"><div class="lt"><span class="dot" style="background:#2D6A9F"></span>Completed</div><span class="val">52</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#5BC0EB"></span>Confirmed</div><span class="val">18</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#EF4444"></span>Cancelled</div><span class="val">8</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#F59E0B"></span>No Show</div><span class="val">4</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#A16207"></span>Pending</div><span class="val">6</span></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Practitioner Performance</div><div class="chart-sub">This period</div></div></div>
+            <table>
+              <thead><tr><th>Practitioner</th><th>Sessions</th><th>Revenue</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">Dr. Maria Santos</span></td><td>28</td><td class="amount">₱89,500</td></tr>
+                <tr><td><span class="nm">Dr. Ana Reyes</span></td><td>24</td><td class="amount">₱112,000</td></tr>
+                <tr><td><span class="nm">Dr. James Lim</span></td><td>18</td><td class="amount">₱135,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Inventory tab ============ -->
+      <div class="tab-pane" data-tab="inventory" hidden>
+        <div class="kpi-row">
+          <div class="kpi primary"><div class="l">Total Stock Value</div><div class="v">₱642,800</div><div class="d"><i data-lucide="package" style="width:13px;height:13px"></i> Across 84 SKUs</div></div>
+          <div class="kpi"><div class="l">Low Stock Alerts</div><div class="v" style="color:#C2410C;">3</div><div class="d" style="color:#C2410C"><i data-lucide="alert-triangle" style="width:13px;height:13px"></i> Reorder soon</div></div>
+          <div class="kpi"><div class="l">Expiring Soon</div><div class="v" style="color:#DC2626;">2</div><div class="d" style="color:#DC2626"><i data-lucide="clock" style="width:13px;height:13px"></i> Within 60 days</div></div>
+          <div class="kpi"><div class="l">Stock Turnover</div><div class="v">4.2×</div><div class="d" style="color:#16A34A"><i data-lucide="refresh-cw" style="width:13px;height:13px"></i> Quarterly</div></div>
+        </div>
+
+        <div class="kpi-row">
+          <div class="kpi"><div class="l">Items Restocked</div><div class="v">12</div><div class="d" style="color:#5A7A96"><i data-lucide="truck" style="width:13px;height:13px"></i> This period</div></div>
+          <div class="kpi"><div class="l">Items Written Off</div><div class="v">3</div><div class="d" style="color:#DC2626"><i data-lucide="trash-2" style="width:13px;height:13px"></i> ₱8,400 lost</div></div>
+          <div class="kpi"><div class="l">Total Used</div><div class="v">383 units</div><div class="d" style="color:#5A7A96"><i data-lucide="activity" style="width:13px;height:13px"></i> Across sessions</div></div>
+          <div class="kpi"><div class="l">Most Used Item</div><div class="v bold-small">HA Serum</div><div class="d" style="color:#5A7A96"><i data-lucide="star" style="width:13px;height:13px"></i> 120 units</div></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Current Stock Status</div><div class="chart-sub">Live levels with reorder thresholds</div></div></div>
+          <table>
+            <thead><tr><th>Item</th><th>Category</th><th>On Hand</th><th>Reorder Point</th><th>Days of Cover</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><span class="nm">Hyaluronic Acid Serum</span></td><td>Serum</td><td>48 vials</td><td>30</td><td>22 days</td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">OK</span></td></tr>
+              <tr><td><span class="nm">Vitamin C Serum</span></td><td>Serum</td><td>62 vials</td><td>40</td><td>34 days</td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">OK</span></td></tr>
+              <tr><td><span class="nm">Chemical Peel Solution</span></td><td>Treatment</td><td>18 bottles</td><td>20</td><td>9 days</td><td><span style="background:#FEF3C7;color:#B45309;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Low</span></td></tr>
+              <tr><td><span class="nm">Botox (50u)</span></td><td>Injectable</td><td>14 vials</td><td>10</td><td>16 days</td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">OK</span></td></tr>
+              <tr><td><span class="nm">Filler (1mL)</span></td><td>Injectable</td><td>3 syringes</td><td>8</td><td>4 days</td><td><span style="background:#FEE2E2;color:#B91C1C;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Very Low</span></td></tr>
+              <tr><td><span class="nm">EMLA Cream 5%</span></td><td>Anesthetic</td><td>22 tubes</td><td>15</td><td>28 days</td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">OK</span></td></tr>
+              <tr><td><span class="nm">Microneedling Cartridges</span></td><td>Disposable</td><td>6 pcs</td><td>15</td><td>5 days</td><td><span style="background:#FEF3C7;color:#B45309;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Low</span></td></tr>
+              <tr><td><span class="nm">Exosome Booster</span></td><td>Booster</td><td>0 amps</td><td>10</td><td>0 days</td><td><span style="background:#FEE2E2;color:#B91C1C;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Out of Stock</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card donut-wrap">
+            <div class="chart-head" style="border-bottom:none;padding:0 0 16px"><div><div class="chart-title">Stock Health</div><div class="chart-sub">All 84 SKUs</div></div></div>
+            <div class="donut" style="background:conic-gradient(#16A34A 0% 72%, #F59E0B 72% 88%, #DC2626 88% 96%, #6B7280 96% 100%);"></div>
+            <div class="legend">
+              <div class="lr"><div class="lt"><span class="dot" style="background:#16A34A"></span>OK Stock</div><span class="val">60 · 72%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#F59E0B"></span>Low Stock</div><span class="val">14 · 16%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#DC2626"></span>Very Low / Out</div><span class="val">7 · 8%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#6B7280"></span>Expired</div><span class="val">3 · 4%</span></div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Top Items Used</div><div class="chart-sub">By units consumed this period</div></div></div>
+            <table>
+              <thead><tr><th>Item</th><th>Units Used</th><th>Top Service</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">Hyaluronic Acid Serum</span></td><td>120</td><td>HydraFacial</td></tr>
+                <tr><td><span class="nm">Vitamin C Serum</span></td><td>95</td><td>Facial Refresh</td></tr>
+                <tr><td><span class="nm">Chemical Peel Solution</span></td><td>88</td><td>Chemical Peel</td></tr>
+                <tr><td><span class="nm">Botox (50u)</span></td><td>42</td><td>Botox Treatment</td></tr>
+                <tr><td><span class="nm">Filler (1mL)</span></td><td>38</td><td>Dermal Fillers</td></tr>
+                <tr><td><span class="nm">EMLA Cream 5%</span></td><td>52</td><td>Microneedling</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Items Expiring Within 90 Days</div><div class="chart-sub">Use-by-date watchlist</div></div></div>
+          <table>
+            <thead><tr><th>Item</th><th>Batch</th><th>Quantity</th><th>Expiry Date</th><th>Days Left</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td><span class="nm">Botox (50u)</span></td><td>BT-22405</td><td>3 vials</td><td>Jun 2026</td><td><span style="color:#DC2626;font-family:var(--font-display);font-weight:700;">22 days</span></td><td><span style="color:#DC2626;">Use first</span></td></tr>
+              <tr><td><span class="nm">Filler (1mL)</span></td><td>FL-1188</td><td>1 syringe</td><td>Jul 2026</td><td><span style="color:#C2410C;font-family:var(--font-display);font-weight:700;">52 days</span></td><td><span style="color:#C2410C;">Schedule promo</span></td></tr>
+              <tr><td><span class="nm">Soothing Mask</span></td><td>SM-445</td><td>14 sheets</td><td>Aug 2026</td><td><span style="color:#C2410C;font-family:var(--font-display);font-weight:700;">87 days</span></td><td><span style="color:#5A7A96;">Monitor</span></td></tr>
+              <tr><td><span class="nm">Exosome Amp</span></td><td>EX-1188</td><td>5 amps</td><td>Aug 2026</td><td><span style="color:#5A7A96;font-family:var(--font-display);font-weight:700;">90 days</span></td><td><span style="color:#5A7A96;">Monitor</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Top Suppliers by Spend</div><div class="chart-sub">This period</div></div></div>
+            <table>
+              <thead><tr><th>Supplier</th><th>POs</th><th>Total Spend</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">PharmaCo Manila</span></td><td>8</td><td class="amount">₱248,000</td></tr>
+                <tr><td><span class="nm">MediCare Supplies</span></td><td>5</td><td class="amount">₱156,400</td></tr>
+                <tr><td><span class="nm">Korean Beauty Importers</span></td><td>4</td><td class="amount">₱132,800</td></tr>
+                <tr><td><span class="nm">Local Wellness Co.</span></td><td>3</td><td class="amount">₱54,200</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Inventory Movement</div><div class="chart-sub">Receipts vs consumption</div></div></div>
+            <div class="chart-body">
+              <div class="bar-chart">
+                <div class="bar-col"><div class="bar-value">42</div><div class="bar" style="height:68%"></div><div class="bar-label">Jan</div></div>
+                <div class="bar-col"><div class="bar-value">38</div><div class="bar" style="height:62%"></div><div class="bar-label">Feb</div></div>
+                <div class="bar-col"><div class="bar-value">52</div><div class="bar" style="height:84%"></div><div class="bar-label">Mar</div></div>
+                <div class="bar-col"><div class="bar-value">61</div><div class="bar" style="height:98%"></div><div class="bar-label">Apr</div></div>
+              </div>
+            </div>
+            <div style="padding:0 22px 18px;font-family:var(--font-body);font-size:12px;color:#5A7A96;">Units consumed per month — usage is trending up with appointment growth.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Vouchers tab ============ -->
+      <div class="tab-pane" data-tab="vouchers" hidden>
+        <div class="kpi-row">
+          <div class="kpi primary"><div class="l">Vouchers Redeemed</div><div class="v">88</div><div class="d"><i data-lucide="gift" style="width:13px;height:13px"></i> This period</div></div>
+          <div class="kpi"><div class="l">Total Discount Given</div><div class="v">₱41,200</div><div class="d" style="color:#DC2626"><i data-lucide="tag" style="width:13px;height:13px"></i> Across 4 codes</div></div>
+          <div class="kpi"><div class="l">Active Vouchers</div><div class="v">18</div><div class="d" style="color:#16A34A"><i data-lucide="check-circle" style="width:13px;height:13px"></i> Bookable</div></div>
+          <div class="kpi"><div class="l">Avg Discount / Sale</div><div class="v">₱468</div><div class="d" style="color:#5A7A96"><i data-lucide="dollar-sign" style="width:13px;height:13px"></i> Per redemption</div></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Voucher Breakdown</div><div class="chart-sub">Filter applies — see selector above</div></div></div>
+          <table id="voucher-table">
+            <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Used / Issued</th><th>Discount Given</th><th>Conversion</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr data-vstatus="active"><td><span class="nm" style="font-family:var(--font-mono);background:#EBF6FD;color:#2D6A9F;padding:2px 8px;border-radius:6px;">WELCOME20</span></td><td>Percentage</td><td>20%</td><td>45 / 60</td><td class="amount" style="color:#DC2626;">₱22,500</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">75%</span></td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Active</span></td></tr>
+              <tr data-vstatus="active"><td><span class="nm" style="font-family:var(--font-mono);background:#EBF6FD;color:#2D6A9F;padding:2px 8px;border-radius:6px;">SKIN50</span></td><td>Fixed</td><td>₱500</td><td>20 / 30</td><td class="amount" style="color:#DC2626;">₱10,000</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">67%</span></td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Active</span></td></tr>
+              <tr data-vstatus="inactive"><td><span class="nm" style="font-family:var(--font-mono);background:#EBF6FD;color:#2D6A9F;padding:2px 8px;border-radius:6px;">SUMMER25</span></td><td>Percentage</td><td>25%</td><td>15 / 40</td><td class="amount" style="color:#DC2626;">₱6,200</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">38%</span></td><td><span style="background:#FEE2E2;color:#B91C1C;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Inactive</span></td></tr>
+              <tr data-vstatus="inactive"><td><span class="nm" style="font-family:var(--font-mono);background:#EBF6FD;color:#2D6A9F;padding:2px 8px;border-radius:6px;">BOTOX500</span></td><td>Fixed</td><td>₱500</td><td>8 / 25</td><td class="amount" style="color:#DC2626;">₱4,000</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">32%</span></td><td><span style="background:#FEE2E2;color:#B91C1C;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Inactive</span></td></tr>
+              <tr data-vstatus="active"><td><span class="nm" style="font-family:var(--font-mono);background:#EBF6FD;color:#2D6A9F;padding:2px 8px;border-radius:6px;">REFER15</span></td><td>Percentage</td><td>15%</td><td>12 / 20</td><td class="amount" style="color:#DC2626;">₱3,800</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">60%</span></td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Active</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card donut-wrap">
+            <div class="chart-head" style="border-bottom:none;padding:0 0 16px"><div><div class="chart-title">Discount Type Split</div><div class="chart-sub">Percentage vs Fixed amount</div></div></div>
+            <div class="donut" style="background:conic-gradient(#2D6A9F 0% 65%, #5BC0EB 65% 100%);"></div>
+            <div class="legend">
+              <div class="lr"><div class="lt"><span class="dot" style="background:#2D6A9F"></span>Percentage Off</div><span class="val">72 · 65%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#5BC0EB"></span>Fixed Amount</div><span class="val">28 · 35%</span></div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Top Vouchers by Revenue Impact</div><div class="chart-sub">Net revenue after discount</div></div></div>
+            <table>
+              <thead><tr><th>Code</th><th>Sales Driven</th><th>Net Revenue</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm" style="font-family:var(--font-mono);font-size:11px;">WELCOME20</span></td><td>45</td><td class="amount">₱90,000</td></tr>
+                <tr><td><span class="nm" style="font-family:var(--font-mono);font-size:11px;">SKIN50</span></td><td>20</td><td class="amount">₱40,000</td></tr>
+                <tr><td><span class="nm" style="font-family:var(--font-mono);font-size:11px;">SUMMER25</span></td><td>15</td><td class="amount">₱18,600</td></tr>
+                <tr><td><span class="nm" style="font-family:var(--font-mono);font-size:11px;">REFER15</span></td><td>12</td><td class="amount">₱21,500</td></tr>
+                <tr><td><span class="nm" style="font-family:var(--font-mono);font-size:11px;">BOTOX500</span></td><td>8</td><td class="amount">₱60,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Redemptions Per Day</div><div class="chart-sub">Last 14 days</div></div></div>
+          <div class="chart-body">
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar-value">5</div><div class="bar" style="height:42%"></div><div class="bar-label">Apr 14</div></div>
+              <div class="bar-col"><div class="bar-value">7</div><div class="bar" style="height:58%"></div><div class="bar-label">Apr 15</div></div>
+              <div class="bar-col"><div class="bar-value">4</div><div class="bar" style="height:34%"></div><div class="bar-label">Apr 16</div></div>
+              <div class="bar-col"><div class="bar-value">9</div><div class="bar" style="height:75%"></div><div class="bar-label">Apr 17</div></div>
+              <div class="bar-col"><div class="bar-value">12</div><div class="bar" style="height:100%"></div><div class="bar-label">Apr 18</div></div>
+              <div class="bar-col"><div class="bar-value">8</div><div class="bar" style="height:67%"></div><div class="bar-label">Apr 19</div></div>
+              <div class="bar-col"><div class="bar-value">6</div><div class="bar" style="height:50%"></div><div class="bar-label">Apr 20</div></div>
+              <div class="bar-col"><div class="bar-value">10</div><div class="bar" style="height:83%"></div><div class="bar-label">Apr 21</div></div>
+              <div class="bar-col"><div class="bar-value">7</div><div class="bar" style="height:58%"></div><div class="bar-label">Apr 22</div></div>
+              <div class="bar-col"><div class="bar-value">5</div><div class="bar" style="height:42%"></div><div class="bar-label">Apr 23</div></div>
+              <div class="bar-col"><div class="bar-value">4</div><div class="bar" style="height:34%"></div><div class="bar-label">Apr 24</div></div>
+              <div class="bar-col"><div class="bar-value">6</div><div class="bar" style="height:50%"></div><div class="bar-label">Apr 25</div></div>
+              <div class="bar-col"><div class="bar-value">3</div><div class="bar" style="height:25%"></div><div class="bar-label">Apr 26</div></div>
+              <div class="bar-col"><div class="bar-value">2</div><div class="bar" style="height:17%"></div><div class="bar-label">Apr 27</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Most Used by Patient Segment</div><div class="chart-sub">Voucher use by customer type</div></div></div>
+            <table>
+              <thead><tr><th>Segment</th><th>Vouchers Used</th><th>Avg Discount</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">New Patients</span></td><td>54</td><td class="amount">₱520</td></tr>
+                <tr><td><span class="nm">Returning Patients</span></td><td>22</td><td class="amount">₱380</td></tr>
+                <tr><td><span class="nm">VIP / Loyal</span></td><td>12</td><td class="amount">₱440</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Top Services Discounted</div><div class="chart-sub">Most paired with vouchers</div></div></div>
+            <table>
+              <thead><tr><th>Service</th><th>Redemptions</th><th>Total Discount</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">HydraFacial</span></td><td>32</td><td class="amount" style="color:#DC2626;">₱14,800</td></tr>
+                <tr><td><span class="nm">Chemical Peel</span></td><td>22</td><td class="amount" style="color:#DC2626;">₱9,400</td></tr>
+                <tr><td><span class="nm">Botox Treatment</span></td><td>18</td><td class="amount" style="color:#DC2626;">₱8,600</td></tr>
+                <tr><td><span class="nm">Glutathione IV</span></td><td>10</td><td class="amount" style="color:#DC2626;">₱4,200</td></tr>
+                <tr><td><span class="nm">Laser Resurfacing</span></td><td>6</td><td class="amount" style="color:#DC2626;">₱4,200</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+        </div>
+      </div>
+
+      <!-- ============ Patients tab ============ -->
+      <div class="tab-pane" data-tab="patients" hidden>
+        <div class="kpi-row">
+          <div class="kpi primary"><div class="l">Total Patients</div><div class="v">1,248</div><div class="d"><i data-lucide="users" style="width:13px;height:13px"></i> All time</div></div>
+          <div class="kpi"><div class="l">New This Month</div><div class="v">87</div><div class="d" style="color:#16A34A"><i data-lucide="user-plus" style="width:13px;height:13px"></i> +15% MoM</div></div>
+          <div class="kpi"><div class="l">Active Patients</div><div class="v">892</div><div class="d" style="color:#5A7A96"><i data-lucide="user-check" style="width:13px;height:13px"></i> 71.5%</div></div>
+          <div class="kpi"><div class="l">Retention Rate</div><div class="v">78%</div><div class="d" style="color:#16A34A"><i data-lucide="trending-up" style="width:13px;height:13px"></i> +3pts</div></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Patient Demographics</div><div class="chart-sub">By age group</div></div></div>
+          <table>
+            <thead><tr><th>Age Group</th><th>Count</th><th>Percentage</th><th>Top Service</th></tr></thead>
+            <tbody>
+              <tr><td><span class="nm">18–25</span></td><td>156</td><td>12.5%</td><td>Acne Treatment</td></tr>
+              <tr><td><span class="nm">26–35</span></td><td>412</td><td>33.0%</td><td>Hydra Facial</td></tr>
+              <tr><td><span class="nm">36–45</span></td><td>389</td><td>31.2%</td><td>Botox Treatment</td></tr>
+              <tr><td><span class="nm">46–55</span></td><td>198</td><td>15.9%</td><td>Dermal Fillers</td></tr>
+              <tr><td><span class="nm">55+</span></td><td>93</td><td>7.4%</td><td>Laser Resurfacing</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============ Services tab ============ -->
+      <div class="tab-pane" data-tab="services" hidden>
+        <div class="kpi-row">
+          <div class="kpi primary"><div class="l">Total Services</div><div class="v">11</div><div class="d"><i data-lucide="scissors" style="width:13px;height:13px"></i> 10 active · 1 inactive</div></div>
+          <div class="kpi"><div class="l">Most Booked</div><div class="v">HydraFacial</div><div class="d" style="color:#5A7A96"><i data-lucide="star" style="width:13px;height:13px"></i> 156 sessions</div></div>
+          <div class="kpi"><div class="l">Highest Revenue</div><div class="v">Botox</div><div class="d" style="color:#16A34A"><i data-lucide="dollar-sign" style="width:13px;height:13px"></i> ₱712K</div></div>
+          <div class="kpi"><div class="l">Avg Revenue / Session</div><div class="v">₱2,470</div><div class="d" style="color:#16A34A"><i data-lucide="trending-up" style="width:13px;height:13px"></i> +₱210 vs last</div></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Service Performance</div><div class="chart-sub">Bookings, revenue, rating, and rebooking rate</div></div></div>
+          <table>
+            <thead><tr><th>Service</th><th>Category</th><th>Bookings</th><th>Revenue</th><th>Avg ₱/Session</th><th>Rebook Rate</th><th>Rating</th></tr></thead>
+            <tbody>
+              <tr><td><span class="nm">HydraFacial</span></td><td>Skin Treatments</td><td>156</td><td class="amount">₱390,000</td><td>₱2,500</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">68%</span></td><td><span style="color:#F59E0B;font-weight:600;">4.9 ★</span></td></tr>
+              <tr><td><span class="nm">Botox Treatment</span></td><td>Injectables</td><td>89</td><td class="amount">₱712,000</td><td>₱8,000</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">72%</span></td><td><span style="color:#F59E0B;font-weight:600;">4.8 ★</span></td></tr>
+              <tr><td><span class="nm">Chemical Peel</span></td><td>Skin Treatments</td><td>78</td><td class="amount">₱273,000</td><td>₱3,500</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">54%</span></td><td><span style="color:#F59E0B;font-weight:600;">4.6 ★</span></td></tr>
+              <tr><td><span class="nm">Laser Resurfacing</span></td><td>Laser</td><td>45</td><td class="amount">₱675,000</td><td>₱15,000</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">62%</span></td><td><span style="color:#F59E0B;font-weight:600;">4.9 ★</span></td></tr>
+              <tr><td><span class="nm">Dermal Fillers</span></td><td>Injectables</td><td>34</td><td class="amount">₱612,000</td><td>₱18,000</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">75%</span></td><td><span style="color:#F59E0B;font-weight:600;">4.7 ★</span></td></tr>
+              <tr><td><span class="nm">PRP Therapy</span></td><td>Injectables</td><td>22</td><td class="amount">₱220,000</td><td>₱10,000</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">48%</span></td><td><span style="color:#F59E0B;font-weight:600;">4.6 ★</span></td></tr>
+              <tr><td><span class="nm">Glutathione IV</span></td><td>IV Therapy</td><td>62</td><td class="amount">₱155,000</td><td>₱2,500</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">81%</span></td><td><span style="color:#F59E0B;font-weight:600;">4.7 ★</span></td></tr>
+              <tr><td><span class="nm">RF Body Contouring</span></td><td>Slim Protocols</td><td>18</td><td class="amount">₱144,000</td><td>₱8,000</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">56%</span></td><td><span style="color:#F59E0B;font-weight:600;">4.5 ★</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card donut-wrap">
+            <div class="chart-head" style="border-bottom:none;padding:0 0 16px"><div><div class="chart-title">Revenue by Category</div><div class="chart-sub">Service catalog split</div></div></div>
+            <div class="donut" style="background:conic-gradient(#2D6A9F 0% 47%, #5BC0EB 47% 70%, #1A3A5C 70% 87%, #A8CCE8 87% 95%, #BFD8EB 95% 100%);"></div>
+            <div class="legend">
+              <div class="lr"><div class="lt"><span class="dot" style="background:#2D6A9F"></span>Injectables</div><span class="val">₱1,544K · 47%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#5BC0EB"></span>Laser</div><span class="val">₱755K · 23%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#1A3A5C"></span>Skin Treatments</div><span class="val">₱663K · 17%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#A8CCE8"></span>IV Therapy</div><span class="val">₱261K · 8%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#BFD8EB"></span>Slim Protocols</div><span class="val">₱165K · 5%</span></div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Cancellation & No-Show by Service</div><div class="chart-sub">Lower is better</div></div></div>
+            <table>
+              <thead><tr><th>Service</th><th>Cancelled</th><th>No-Show</th><th>Combined Rate</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">HydraFacial</span></td><td>4</td><td>2</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">3.8%</span></td></tr>
+                <tr><td><span class="nm">Botox Treatment</span></td><td>2</td><td>1</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">3.4%</span></td></tr>
+                <tr><td><span class="nm">Chemical Peel</span></td><td>6</td><td>3</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">11.5%</span></td></tr>
+                <tr><td><span class="nm">Laser Resurfacing</span></td><td>3</td><td>1</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">8.9%</span></td></tr>
+                <tr><td><span class="nm">RF Body Contouring</span></td><td>3</td><td>2</td><td><span style="color:#DC2626;font-family:var(--font-display);font-weight:700;">27.8%</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Booking Trend — Top 4 Services</div><div class="chart-sub">Weekly bookings over the last 6 weeks</div></div></div>
+          <div class="chart-body">
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar-value">28</div><div class="bar" style="height:55%"></div><div class="bar-label">W14</div></div>
+              <div class="bar-col"><div class="bar-value">32</div><div class="bar" style="height:62%"></div><div class="bar-label">W15</div></div>
+              <div class="bar-col"><div class="bar-value">35</div><div class="bar" style="height:68%"></div><div class="bar-label">W16</div></div>
+              <div class="bar-col"><div class="bar-value">38</div><div class="bar" style="height:74%"></div><div class="bar-label">W17</div></div>
+              <div class="bar-col"><div class="bar-value">42</div><div class="bar" style="height:82%"></div><div class="bar-label">W18</div></div>
+              <div class="bar-col"><div class="bar-value">48</div><div class="bar" style="height:94%"></div><div class="bar-label">W19</div></div>
+            </div>
+          </div>
+          <div style="padding:0 22px 18px;font-family:var(--font-body);font-size:12px;color:#5A7A96;">HydraFacial + Botox + Chemical Peel + Laser combined — steady upward trend.</div>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Practitioner Mix per Service</div><div class="chart-sub">Sessions handled this period</div></div></div>
+            <table>
+              <thead><tr><th>Service</th><th>Practitioners</th><th>Primary</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">HydraFacial</span></td><td>3</td><td>Dr. Reyes (62%)</td></tr>
+                <tr><td><span class="nm">Botox Treatment</span></td><td>2</td><td>Dr. Reyes (71%)</td></tr>
+                <tr><td><span class="nm">Laser Resurfacing</span></td><td>1</td><td>Dr. Lim (100%)</td></tr>
+                <tr><td><span class="nm">Dermal Fillers</span></td><td>2</td><td>Dr. Reyes (68%)</td></tr>
+                <tr><td><span class="nm">Chemical Peel</span></td><td>3</td><td>Dr. Santos (52%)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Avg Inventory Cost per Service</div><div class="chart-sub">Consumables cost (informs true margin)</div></div></div>
+            <table>
+              <thead><tr><th>Service</th><th>Price</th><th>Consumables</th><th>Gross Margin</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">HydraFacial</span></td><td>₱2,500</td><td>₱420</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">83%</span></td></tr>
+                <tr><td><span class="nm">Botox Treatment</span></td><td>₱8,000</td><td>₱2,800</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">65%</span></td></tr>
+                <tr><td><span class="nm">Chemical Peel</span></td><td>₱3,500</td><td>₱680</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">81%</span></td></tr>
+                <tr><td><span class="nm">Laser Resurfacing</span></td><td>₱15,000</td><td>₱1,200</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">92%</span></td></tr>
+                <tr><td><span class="nm">Dermal Fillers</span></td><td>₱18,000</td><td>₱6,500</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">64%</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Time Slot Demand Heatmap</div><div class="chart-sub">Bookings by day-of-week × time</div></div></div>
+          <div style="padding:18px 22px;">
+            <div style="display:grid;grid-template-columns:60px repeat(7,1fr);gap:4px;font-family:var(--font-body);font-size:11px;">
+              <div></div><div style="text-align:center;color:#5A7A96;font-weight:600;">Mon</div><div style="text-align:center;color:#5A7A96;font-weight:600;">Tue</div><div style="text-align:center;color:#5A7A96;font-weight:600;">Wed</div><div style="text-align:center;color:#5A7A96;font-weight:600;">Thu</div><div style="text-align:center;color:#5A7A96;font-weight:600;">Fri</div><div style="text-align:center;color:#5A7A96;font-weight:600;">Sat</div><div style="text-align:center;color:#5A7A96;font-weight:600;">Sun</div>
+              <div style="color:#5A7A96;font-weight:600;">9–11</div><div style="background:#BFD8EB;height:32px;border-radius:4px;"></div><div style="background:#7AAFD3;height:32px;border-radius:4px;"></div><div style="background:#5BC0EB;height:32px;border-radius:4px;"></div><div style="background:#7AAFD3;height:32px;border-radius:4px;"></div><div style="background:#2D6A9F;height:32px;border-radius:4px;"></div><div style="background:#1A3A5C;height:32px;border-radius:4px;"></div><div style="background:#BFD8EB;height:32px;border-radius:4px;"></div>
+              <div style="color:#5A7A96;font-weight:600;">11–1</div><div style="background:#7AAFD3;height:32px;border-radius:4px;"></div><div style="background:#2D6A9F;height:32px;border-radius:4px;"></div><div style="background:#2D6A9F;height:32px;border-radius:4px;"></div><div style="background:#1A3A5C;height:32px;border-radius:4px;"></div><div style="background:#1A3A5C;height:32px;border-radius:4px;"></div><div style="background:#1A3A5C;height:32px;border-radius:4px;"></div><div style="background:#7AAFD3;height:32px;border-radius:4px;"></div>
+              <div style="color:#5A7A96;font-weight:600;">1–3</div><div style="background:#7AAFD3;height:32px;border-radius:4px;"></div><div style="background:#2D6A9F;height:32px;border-radius:4px;"></div><div style="background:#1A3A5C;height:32px;border-radius:4px;"></div><div style="background:#1A3A5C;height:32px;border-radius:4px;"></div><div style="background:#2D6A9F;height:32px;border-radius:4px;"></div><div style="background:#2D6A9F;height:32px;border-radius:4px;"></div><div style="background:#BFD8EB;height:32px;border-radius:4px;"></div>
+              <div style="color:#5A7A96;font-weight:600;">3–5</div><div style="background:#BFD8EB;height:32px;border-radius:4px;"></div><div style="background:#7AAFD3;height:32px;border-radius:4px;"></div><div style="background:#7AAFD3;height:32px;border-radius:4px;"></div><div style="background:#2D6A9F;height:32px;border-radius:4px;"></div><div style="background:#1A3A5C;height:32px;border-radius:4px;"></div><div style="background:#1A3A5C;height:32px;border-radius:4px;"></div><div style="background:#BFD8EB;height:32px;border-radius:4px;"></div>
+              <div style="color:#5A7A96;font-weight:600;">5–7</div><div style="background:#BFD8EB;height:32px;border-radius:4px;"></div><div style="background:#BFD8EB;height:32px;border-radius:4px;"></div><div style="background:#BFD8EB;height:32px;border-radius:4px;"></div><div style="background:#7AAFD3;height:32px;border-radius:4px;"></div><div style="background:#2D6A9F;height:32px;border-radius:4px;"></div><div style="background:#7AAFD3;height:32px;border-radius:4px;"></div><div style="background:#BFD8EB;height:32px;border-radius:4px;"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:14px;font-family:var(--font-body);font-size:11px;color:#5A7A96;">
+              <span>Less</span>
+              <div style="display:flex;gap:3px;"><div style="width:18px;height:14px;background:#BFD8EB;border-radius:3px;"></div><div style="width:18px;height:14px;background:#7AAFD3;border-radius:3px;"></div><div style="width:18px;height:14px;background:#2D6A9F;border-radius:3px;"></div><div style="width:18px;height:14px;background:#1A3A5C;border-radius:3px;"></div></div>
+              <span>More</span>
+              <span style="margin-left:auto;">Peak: <b style="color:#1A2E40;font-family:var(--font-display);">Thu &amp; Fri afternoons</b></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Packages tab ============ -->
+      <div class="tab-pane" data-tab="packages" hidden>
+        <div class="kpi-row">
+          <div class="kpi primary"><div class="l">Total Packages</div><div class="v">4</div><div class="d"><i data-lucide="sparkles" style="width:13px;height:13px"></i> 3 active · 1 inactive</div></div>
+          <div class="kpi"><div class="l">Active Sold</div><div class="v">67</div><div class="d" style="color:#5A7A96"><i data-lucide="package" style="width:13px;height:13px"></i> This period</div></div>
+          <div class="kpi"><div class="l">Package Revenue</div><div class="v">₱892,500</div><div class="d" style="color:#16A34A"><i data-lucide="trending-up" style="width:13px;height:13px"></i> +22%</div></div>
+          <div class="kpi"><div class="l">Package Share</div><div class="v">38%</div><div class="d" style="color:#5A7A96"><i data-lucide="pie-chart" style="width:13px;height:13px"></i> of total revenue</div></div>
+        </div>
+
+        <div class="kpi-row">
+          <div class="kpi"><div class="l">Active Packages</div><div class="v" style="color:#16A34A;">42</div><div class="d" style="color:#5A7A96"><i data-lucide="check-circle" style="width:13px;height:13px"></i> Currently running</div></div>
+          <div class="kpi"><div class="l">Completed</div><div class="v">18</div><div class="d" style="color:#5A7A96"><i data-lucide="award" style="width:13px;height:13px"></i> All sessions used</div></div>
+          <div class="kpi"><div class="l">Expiring Soon</div><div class="v" style="color:#C2410C;">3</div><div class="d" style="color:#C2410C"><i data-lucide="alert-triangle" style="width:13px;height:13px"></i> Within 30 days</div></div>
+          <div class="kpi"><div class="l">Cancelled / Refunded</div><div class="v" style="color:#DC2626;">4</div><div class="d" style="color:#DC2626"><i data-lucide="x-circle" style="width:13px;height:13px"></i> ₱58,000 refunded</div></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Package Performance</div><div class="chart-sub">Sales, fulfillment, and free-session redemption</div></div></div>
+          <table>
+            <thead><tr><th>Package</th><th>Price</th><th>Sold</th><th>Revenue</th><th>Avg Used</th><th>FREE Redeemed</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><span class="nm">Premium Facial Package</span><div style="font-size:11px;color:#9BBAD4;">5 + 1 FREE · HydraFacial</div></td><td>₱15,000</td><td>28</td><td class="amount">₱420,000</td><td>3.4 / 5</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">12 of 18</span></td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Active</span></td></tr>
+              <tr><td><span class="nm">Anti-Aging Package</span><div style="font-size:11px;color:#9BBAD4;">4 sessions · Botox + Filler</div></td><td>₱12,000</td><td>22</td><td class="amount">₱264,000</td><td>2.8 / 4</td><td><span style="color:#5A7A96;font-family:var(--font-display);">N/A</span></td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Active</span></td></tr>
+              <tr><td><span class="nm">Hair Restoration Package</span><div style="font-size:11px;color:#9BBAD4;">6 sessions · PRP Therapy</div></td><td>₱18,000</td><td>12</td><td class="amount">₱216,000</td><td>4.1 / 6</td><td><span style="color:#5A7A96;font-family:var(--font-display);">N/A</span></td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Active</span></td></tr>
+              <tr><td><span class="nm">Acne Clear Package</span><div style="font-size:11px;color:#9BBAD4;">3 sessions · Peel + LED</div></td><td>₱8,500</td><td>5</td><td class="amount">₱42,500</td><td>1.4 / 3</td><td><span style="color:#5A7A96;font-family:var(--font-display);">N/A</span></td><td><span style="background:#FEE2E2;color:#B91C1C;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Inactive</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card donut-wrap">
+            <div class="chart-head" style="border-bottom:none;padding:0 0 16px"><div><div class="chart-title">Active Package States</div><div class="chart-sub">Lifecycle distribution</div></div></div>
+            <div class="donut" style="background:conic-gradient(#2D6A9F 0% 62%, #16A34A 62% 80%, #F59E0B 80% 92%, #DC2626 92% 100%);"></div>
+            <div class="legend">
+              <div class="lr"><div class="lt"><span class="dot" style="background:#2D6A9F"></span>Active</div><span class="val">42 · 62%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#16A34A"></span>Completed</div><span class="val">18 · 27%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#F59E0B"></span>Expiring (≤30d)</div><span class="val">3 · 4%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#DC2626"></span>Cancelled</div><span class="val">4 · 6%</span></div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Expiring Within…</div><div class="chart-sub">Renewal opportunity windows</div></div></div>
+            <table>
+              <thead><tr><th>Window</th><th>Packages</th><th>Remaining Value</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm" style="color:#DC2626;">≤ 30 days</span></td><td>3</td><td class="amount" style="color:#DC2626;">₱22,500</td></tr>
+                <tr><td><span class="nm" style="color:#C2410C;">31–60 days</span></td><td>5</td><td class="amount">₱48,000</td></tr>
+                <tr><td><span class="nm" style="color:#5A7A96;">61–90 days</span></td><td>8</td><td class="amount">₱94,500</td></tr>
+                <tr><td><span class="nm">90+ days</span></td><td>26</td><td class="amount">₱312,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Monthly Package Sales Trend</div><div class="chart-sub">2026 YTD</div></div></div>
+          <div class="chart-body">
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar-value">14</div><div class="bar" style="height:50%"></div><div class="bar-label">Jan</div></div>
+              <div class="bar-col"><div class="bar-value">18</div><div class="bar" style="height:64%"></div><div class="bar-label">Feb</div></div>
+              <div class="bar-col"><div class="bar-value">15</div><div class="bar" style="height:54%"></div><div class="bar-label">Mar</div></div>
+              <div class="bar-col"><div class="bar-value">20</div><div class="bar" style="height:72%"></div><div class="bar-label">Apr</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Top Patients by Package Count</div><div class="chart-sub">Loyal package buyers</div></div></div>
+            <table>
+              <thead><tr><th>Patient</th><th>Packages</th><th>Total Spent</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">Maria Cruz</span></td><td>4</td><td class="amount">₱58,000</td></tr>
+                <tr><td><span class="nm">Sarah Johnson</span></td><td>3</td><td class="amount">₱45,000</td></tr>
+                <tr><td><span class="nm">Ana Garcia</span></td><td>3</td><td class="amount">₱42,500</td></tr>
+                <tr><td><span class="nm">Isabella Santos</span></td><td>2</td><td class="amount">₱30,000</td></tr>
+                <tr><td><span class="nm">Sofia Reyes</span></td><td>2</td><td class="amount">₱24,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Engagement & Cancellation Reasons</div><div class="chart-sub">Refund breakdown for cancelled packages</div></div></div>
+            <table>
+              <thead><tr><th>Reason</th><th>Count</th><th>Refunded</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">Patient relocated</span></td><td>2</td><td class="amount" style="color:#DC2626;">₱28,000</td></tr>
+                <tr><td><span class="nm">Medical / pregnancy</span></td><td>1</td><td class="amount" style="color:#DC2626;">₱15,000</td></tr>
+                <tr><td><span class="nm">Adverse reaction</span></td><td>1</td><td class="amount" style="color:#DC2626;">₱15,000</td></tr>
+                <tr><td colspan="3" style="padding-top:12px;color:#5A7A96;font-size:12px;">Avg time between sessions across active packages: <b style="color:#1A2E40;font-family:var(--font-display);">21 days</b></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- ============ Messages tab ============ -->
+      <div class="tab-pane" data-tab="messages" hidden>
+        <div class="kpi-row">
+          <div class="kpi primary"><div class="l">Total Messages</div><div class="v">142</div><div class="d"><i data-lucide="message-square" style="width:13px;height:13px"></i> +24 vs last period</div></div>
+          <div class="kpi"><div class="l">Response Rate</div><div class="v">88%</div><div class="d" style="color:#16A34A"><i data-lucide="check-circle" style="width:13px;height:13px"></i> +3 pts</div></div>
+          <div class="kpi"><div class="l">Avg Reply Time</div><div class="v">2h 14m</div><div class="d" style="color:#16A34A"><i data-lucide="clock" style="width:13px;height:13px"></i> 32min faster</div></div>
+          <div class="kpi"><div class="l">Unread</div><div class="v">5</div><div class="d" style="color:#C2410C"><i data-lucide="alert-circle" style="width:13px;height:13px"></i> Needs attention</div></div>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card donut-wrap">
+            <div class="chart-head" style="border-bottom:none;padding:0 0 16px"><div><div class="chart-title">Messages by Source</div><div class="chart-sub">All inbound messages</div></div></div>
+            <div class="donut" style="background:conic-gradient(#7C3AED 0% 56%, #2D6A9F 56% 100%);"></div>
+            <div class="legend">
+              <div class="lr"><div class="lt"><span class="dot" style="background:#7C3AED"></span>Contact Forms</div><span class="val">79 · 56%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#2D6A9F"></span>Email</div><span class="val">63 · 44%</span></div>
+            </div>
+          </div>
+          <div class="chart-card donut-wrap">
+            <div class="chart-head" style="border-bottom:none;padding:0 0 16px"><div><div class="chart-title">Message Status</div><div class="chart-sub">Current state</div></div></div>
+            <div class="donut" style="background:conic-gradient(#16A34A 0% 78%, #5BC0EB 78% 92%, #F59E0B 92% 96%, #DC2626 96% 100%);"></div>
+            <div class="legend">
+              <div class="lr"><div class="lt"><span class="dot" style="background:#16A34A"></span>Responded</div><span class="val">111</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#5BC0EB"></span>Assigned</div><span class="val">20</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#F59E0B"></span>Pending</div><span class="val">6</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#DC2626"></span>Unread</div><span class="val">5</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Messages Per Day</div><div class="chart-sub">Last 14 days</div></div></div>
+          <div class="chart-body">
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar-value">8</div><div class="bar" style="height:55%"></div><div class="bar-label">Apr 14</div></div>
+              <div class="bar-col"><div class="bar-value">11</div><div class="bar" style="height:75%"></div><div class="bar-label">Apr 15</div></div>
+              <div class="bar-col"><div class="bar-value">7</div><div class="bar" style="height:48%"></div><div class="bar-label">Apr 16</div></div>
+              <div class="bar-col"><div class="bar-value">14</div><div class="bar" style="height:95%"></div><div class="bar-label">Apr 17</div></div>
+              <div class="bar-col"><div class="bar-value">10</div><div class="bar" style="height:68%"></div><div class="bar-label">Apr 18</div></div>
+              <div class="bar-col"><div class="bar-value">12</div><div class="bar" style="height:82%"></div><div class="bar-label">Apr 19</div></div>
+              <div class="bar-col"><div class="bar-value">9</div><div class="bar" style="height:62%"></div><div class="bar-label">Apr 20</div></div>
+              <div class="bar-col"><div class="bar-value">15</div><div class="bar" style="height:100%"></div><div class="bar-label">Apr 21</div></div>
+              <div class="bar-col"><div class="bar-value">11</div><div class="bar" style="height:75%"></div><div class="bar-label">Apr 22</div></div>
+              <div class="bar-col"><div class="bar-value">8</div><div class="bar" style="height:55%"></div><div class="bar-label">Apr 23</div></div>
+              <div class="bar-col"><div class="bar-value">6</div><div class="bar" style="height:40%"></div><div class="bar-label">Apr 24</div></div>
+              <div class="bar-col"><div class="bar-value">10</div><div class="bar" style="height:68%"></div><div class="bar-label">Apr 25</div></div>
+              <div class="bar-col"><div class="bar-value">12</div><div class="bar" style="height:82%"></div><div class="bar-label">Apr 26</div></div>
+              <div class="bar-col"><div class="bar-value">9</div><div class="bar" style="height:62%"></div><div class="bar-label">Apr 27</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Top Inquiry Topics</div><div class="chart-sub">Auto-categorized</div></div></div>
+            <table>
+              <thead><tr><th>Topic</th><th>Messages</th><th>Share</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">Booking inquiries</span></td><td>48</td><td class="amount">33.8%</td></tr>
+                <tr><td><span class="nm">Service pricing</span></td><td>32</td><td class="amount">22.5%</td></tr>
+                <tr><td><span class="nm">Treatment questions</span></td><td>24</td><td class="amount">16.9%</td></tr>
+                <tr><td><span class="nm">Package details</span></td><td>18</td><td class="amount">12.7%</td></tr>
+                <tr><td><span class="nm">Reschedule/cancel</span></td><td>12</td><td class="amount">8.5%</td></tr>
+                <tr><td><span class="nm">Spam / other</span></td><td>8</td><td class="amount">5.6%</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Staff Response Performance</div><div class="chart-sub">This period</div></div></div>
+            <table>
+              <thead><tr><th>Staff</th><th>Handled</th><th>Avg Reply</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">Maria Santos</span></td><td>48</td><td class="amount">1h 42m</td></tr>
+                <tr><td><span class="nm">Admin User</span></td><td>36</td><td class="amount">2h 18m</td></tr>
+                <tr><td><span class="nm">Reception Desk</span></td><td>27</td><td class="amount">3h 05m</td></tr>
+                <tr><td><span class="nm">Marketing Team</span></td><td>20</td><td class="amount">4h 32m</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Website & Online Bookings tab ============ -->
+      <div class="tab-pane" data-tab="website" hidden>
+        <div class="kpi-row">
+          <div class="kpi primary"><div class="l">Page Views</div><div class="v">8,420</div><div class="d"><i data-lucide="trending-up" style="width:13px;height:13px"></i> +22% vs last period</div></div>
+          <div class="kpi"><div class="l">Unique Visitors</div><div class="v">3,142</div><div class="d" style="color:#16A34A"><i data-lucide="users" style="width:13px;height:13px"></i> +14%</div></div>
+          <div class="kpi"><div class="l">Online Bookings</div><div class="v">34</div><div class="d" style="color:#16A34A"><i data-lucide="calendar-check" style="width:13px;height:13px"></i> +8 vs last period</div></div>
+          <div class="kpi"><div class="l">Conversion Rate</div><div class="v">62%</div><div class="d" style="color:#16A34A"><i data-lucide="target" style="width:13px;height:13px"></i> +5 pts</div></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Daily Page Views</div><div class="chart-sub">April 2026 · last 14 days</div></div></div>
+          <div class="chart-body">
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar-value">520</div><div class="bar" style="height:55%"></div><div class="bar-label">Apr 14</div></div>
+              <div class="bar-col"><div class="bar-value">480</div><div class="bar" style="height:48%"></div><div class="bar-label">Apr 15</div></div>
+              <div class="bar-col"><div class="bar-value">410</div><div class="bar" style="height:42%"></div><div class="bar-label">Apr 16</div></div>
+              <div class="bar-col"><div class="bar-value">680</div><div class="bar" style="height:74%"></div><div class="bar-label">Apr 17</div></div>
+              <div class="bar-col"><div class="bar-value">920</div><div class="bar" style="height:95%"></div><div class="bar-label">Apr 18</div></div>
+              <div class="bar-col"><div class="bar-value">620</div><div class="bar" style="height:64%"></div><div class="bar-label">Apr 19</div></div>
+              <div class="bar-col"><div class="bar-value">580</div><div class="bar" style="height:60%"></div><div class="bar-label">Apr 20</div></div>
+              <div class="bar-col"><div class="bar-value">740</div><div class="bar" style="height:78%"></div><div class="bar-label">Apr 21</div></div>
+              <div class="bar-col"><div class="bar-value">610</div><div class="bar" style="height:63%"></div><div class="bar-label">Apr 22</div></div>
+              <div class="bar-col"><div class="bar-value">490</div><div class="bar" style="height:50%"></div><div class="bar-label">Apr 23</div></div>
+              <div class="bar-col"><div class="bar-value">430</div><div class="bar" style="height:44%"></div><div class="bar-label">Apr 24</div></div>
+              <div class="bar-col"><div class="bar-value">650</div><div class="bar" style="height:68%"></div><div class="bar-label">Apr 25</div></div>
+              <div class="bar-col"><div class="bar-value">880</div><div class="bar" style="height:90%"></div><div class="bar-label">Apr 26</div></div>
+              <div class="bar-col"><div class="bar-value">560</div><div class="bar" style="height:58%"></div><div class="bar-label">Apr 27</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Most Viewed Pages</div><div class="chart-sub">This period</div></div></div>
+            <table>
+              <thead><tr><th>Page</th><th>Views</th><th>Avg Time</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">/services/hydrafacial</span></td><td>1,420</td><td class="amount">2:18</td></tr>
+                <tr><td><span class="nm">/services</span></td><td>1,180</td><td class="amount">1:42</td></tr>
+                <tr><td><span class="nm">/home</span></td><td>1,020</td><td class="amount">0:54</td></tr>
+                <tr><td><span class="nm">/promotions</span></td><td>820</td><td class="amount">1:12</td></tr>
+                <tr><td><span class="nm">/about</span></td><td>640</td><td class="amount">1:30</td></tr>
+                <tr><td><span class="nm">/contact</span></td><td>540</td><td class="amount">0:48</td></tr>
+                <tr><td><span class="nm">/blog</span></td><td>420</td><td class="amount">3:24</td></tr>
+                <tr><td><span class="nm">/gallery</span></td><td>380</td><td class="amount">1:54</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="chart-card donut-wrap">
+            <div class="chart-head" style="border-bottom:none;padding:0 0 16px"><div><div class="chart-title">Traffic Sources</div><div class="chart-sub">All sessions</div></div></div>
+            <div class="donut" style="background:conic-gradient(#2D6A9F 0% 42%, #5BC0EB 42% 67%, #1A3A5C 67% 84%, #A8CCE8 84% 100%);"></div>
+            <div class="legend">
+              <div class="lr"><div class="lt"><span class="dot" style="background:#2D6A9F"></span>Google Search</div><span class="val">42%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#5BC0EB"></span>Direct</div><span class="val">25%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#1A3A5C"></span>Social Media</div><span class="val">17%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#A8CCE8"></span>Referral / Other</div><span class="val">16%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Online Bookings by Service</div><div class="chart-sub">Bookings made via public website</div></div></div>
+          <table>
+            <thead><tr><th>Service</th><th>Bookings</th><th>Completed</th><th>No-Show / Cancel</th><th>Conversion</th></tr></thead>
+            <tbody>
+              <tr><td><span class="nm">HydraFacial</span></td><td>14</td><td>12</td><td>2</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">85.7%</span></td></tr>
+              <tr><td><span class="nm">Botox Treatment</span></td><td>7</td><td>6</td><td>1</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">85.7%</span></td></tr>
+              <tr><td><span class="nm">Consultation</span></td><td>6</td><td>5</td><td>1</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">83.3%</span></td></tr>
+              <tr><td><span class="nm">Laser Resurfacing</span></td><td>4</td><td>3</td><td>1</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">75.0%</span></td></tr>
+              <tr><td><span class="nm">Chemical Peel</span></td><td>3</td><td>3</td><td>0</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">100%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Blog Performance</div><div class="chart-sub">Top articles this period</div></div></div>
+            <table>
+              <thead><tr><th>Article</th><th>Views</th><th>Reads</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">5 Skincare Myths Debunked</span></td><td>620</td><td class="amount">412</td></tr>
+                <tr><td><span class="nm">HydraFacial vs Regular Facial</span></td><td>540</td><td class="amount">389</td></tr>
+                <tr><td><span class="nm">Botox Aftercare Guide</span></td><td>320</td><td class="amount">218</td></tr>
+                <tr><td><span class="nm">Choosing the Right Sunscreen</span></td><td>280</td><td class="amount">192</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="chart-card donut-wrap">
+            <div class="chart-head" style="border-bottom:none;padding:0 0 16px"><div><div class="chart-title">Device Breakdown</div><div class="chart-sub">All sessions</div></div></div>
+            <div class="donut" style="background:conic-gradient(#2D6A9F 0% 64%, #5BC0EB 64% 92%, #A8CCE8 92% 100%);"></div>
+            <div class="legend">
+              <div class="lr"><div class="lt"><span class="dot" style="background:#2D6A9F"></span>Mobile</div><span class="val">64%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#5BC0EB"></span>Desktop</div><span class="val">28%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#A8CCE8"></span>Tablet</div><span class="val">8%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Reviews & Ratings tab ============ -->
+      <div class="tab-pane" data-tab="reviews" hidden>
+        <div class="kpi-row">
+          <div class="kpi primary"><div class="l">Average Rating</div><div class="v">4.8 ★</div><div class="d"><i data-lucide="trending-up" style="width:13px;height:13px"></i> +0.2 vs last period</div></div>
+          <div class="kpi"><div class="l">Total Reviews</div><div class="v">428</div><div class="d" style="color:#16A34A"><i data-lucide="message-circle" style="width:13px;height:13px"></i> +42 this period</div></div>
+          <div class="kpi"><div class="l">Response Rate</div><div class="v">92%</div><div class="d" style="color:#16A34A"><i data-lucide="check-circle" style="width:13px;height:13px"></i> +5 pts</div></div>
+          <div class="kpi"><div class="l">Reputation Score</div><div class="v">96</div><div class="d" style="color:#16A34A"><i data-lucide="award" style="width:13px;height:13px"></i> Excellent</div></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Star Rating Distribution</div><div class="chart-sub">All 428 reviews</div></div></div>
+          <div style="padding:18px 22px;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;width:36px;">5 ★</span><div style="flex:1;height:14px;background:#F0F6FC;border-radius:7px;overflow:hidden;"><div style="width:78%;height:100%;background:#16A34A;"></div></div><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#5A7A96;width:80px;text-align:right;">334 · 78%</span></div>
+            <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;width:36px;">4 ★</span><div style="flex:1;height:14px;background:#F0F6FC;border-radius:7px;overflow:hidden;"><div style="width:14%;height:100%;background:#2D6A9F;"></div></div><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#5A7A96;width:80px;text-align:right;">60 · 14%</span></div>
+            <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;width:36px;">3 ★</span><div style="flex:1;height:14px;background:#F0F6FC;border-radius:7px;overflow:hidden;"><div style="width:5%;height:100%;background:#F59E0B;"></div></div><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#5A7A96;width:80px;text-align:right;">22 · 5%</span></div>
+            <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;width:36px;">2 ★</span><div style="flex:1;height:14px;background:#F0F6FC;border-radius:7px;overflow:hidden;"><div style="width:2%;height:100%;background:#F59E0B;"></div></div><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#5A7A96;width:80px;text-align:right;">8 · 2%</span></div>
+            <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;width:36px;">1 ★</span><div style="flex:1;height:14px;background:#F0F6FC;border-radius:7px;overflow:hidden;"><div style="width:1%;height:100%;background:#DC2626;"></div></div><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#5A7A96;width:80px;text-align:right;">4 · 1%</span></div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Review Volume Per Month</div><div class="chart-sub">Last 7 months</div></div></div>
+          <div class="chart-body">
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar-value">38</div><div class="bar" style="height:55%"></div><div class="bar-label">Oct '25</div></div>
+              <div class="bar-col"><div class="bar-value">52</div><div class="bar" style="height:75%"></div><div class="bar-label">Nov '25</div></div>
+              <div class="bar-col"><div class="bar-value">61</div><div class="bar" style="height:88%"></div><div class="bar-label">Dec '25</div></div>
+              <div class="bar-col"><div class="bar-value">45</div><div class="bar" style="height:65%"></div><div class="bar-label">Jan '26</div></div>
+              <div class="bar-col"><div class="bar-value">58</div><div class="bar" style="height:84%"></div><div class="bar-label">Feb '26</div></div>
+              <div class="bar-col"><div class="bar-value">62</div><div class="bar" style="height:90%"></div><div class="bar-label">Mar '26</div></div>
+              <div class="bar-col"><div class="bar-value">68</div><div class="bar" style="height:98%"></div><div class="bar-label">Apr '26</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Top Rated Services</div><div class="chart-sub">By average rating</div></div></div>
+            <table>
+              <thead><tr><th>Service</th><th>Reviews</th><th>Avg Rating</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">HydraFacial</span></td><td>142</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">4.9 ★</span></td></tr>
+                <tr><td><span class="nm">Laser Resurfacing</span></td><td>56</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">4.9 ★</span></td></tr>
+                <tr><td><span class="nm">Botox Treatment</span></td><td>78</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">4.8 ★</span></td></tr>
+                <tr><td><span class="nm">Dermal Fillers</span></td><td>34</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">4.7 ★</span></td></tr>
+                <tr><td><span class="nm">Chemical Peel</span></td><td>62</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">4.6 ★</span></td></tr>
+                <tr><td><span class="nm">PRP Therapy</span></td><td>22</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">4.6 ★</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="chart-card donut-wrap">
+            <div class="chart-head" style="border-bottom:none;padding:0 0 16px"><div><div class="chart-title">Review Sources</div><div class="chart-sub">Where reviews come from</div></div></div>
+            <div class="donut" style="background:conic-gradient(#2D6A9F 0% 48%, #5BC0EB 48% 76%, #1A3A5C 76% 92%, #A8CCE8 92% 100%);"></div>
+            <div class="legend">
+              <div class="lr"><div class="lt"><span class="dot" style="background:#2D6A9F"></span>Google</div><span class="val">205 · 48%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#5BC0EB"></span>Facebook</div><span class="val">120 · 28%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#1A3A5C"></span>Website</div><span class="val">68 · 16%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#A8CCE8"></span>Walk-in / Other</div><span class="val">35 · 8%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Recent Reviews</div><div class="chart-sub">Latest customer feedback</div></div></div>
+          <table>
+            <thead><tr><th>Date</th><th>Reviewer</th><th>Service</th><th>Rating</th><th>Source</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Apr 27</td><td><span class="nm">Maria Cruz</span></td><td>HydraFacial</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">5 ★</span></td><td>Google</td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Replied</span></td></tr>
+              <tr><td>Apr 26</td><td><span class="nm">Sofia Reyes</span></td><td>Botox</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">5 ★</span></td><td>Facebook</td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Replied</span></td></tr>
+              <tr><td>Apr 25</td><td><span class="nm">Anonymous</span></td><td>Chemical Peel</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">4 ★</span></td><td>Google</td><td><span style="background:#FEF3C7;color:#B45309;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Pending</span></td></tr>
+              <tr><td>Apr 24</td><td><span class="nm">James Tan</span></td><td>Laser</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">5 ★</span></td><td>Website</td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Replied</span></td></tr>
+              <tr><td>Apr 23</td><td><span class="nm">Ana Garcia</span></td><td>HydraFacial</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">5 ★</span></td><td>Google</td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Replied</span></td></tr>
+              <tr><td>Apr 22</td><td><span class="nm">Anonymous</span></td><td>Filler</td><td><span style="color:#DC2626;font-family:var(--font-display);font-weight:700;">2 ★</span></td><td>Google</td><td><span style="background:#FEE2E2;color:#B91C1C;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Needs Response</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============ Top Clients tab ============ -->
+      <div class="tab-pane" data-tab="top-clients" hidden>
+        <div class="kpi-row">
+          <div class="kpi primary"><div class="l">Top Spender</div><div class="v">Maria Cruz</div><div class="d"><i data-lucide="crown" style="width:13px;height:13px"></i> ₱89,500 lifetime</div></div>
+          <div class="kpi"><div class="l">Avg Lifetime Value</div><div class="v">₱26,400</div><div class="d" style="color:#16A34A"><i data-lucide="trending-up" style="width:13px;height:13px"></i> +₱3,200 vs last</div></div>
+          <div class="kpi"><div class="l">VIP Clients</div><div class="v">38</div><div class="d" style="color:#5A7A96"><i data-lucide="star" style="width:13px;height:13px"></i> ≥ ₱50,000 spent</div></div>
+          <div class="kpi"><div class="l">Repeat Rate</div><div class="v">78%</div><div class="d" style="color:#16A34A"><i data-lucide="refresh-cw" style="width:13px;height:13px"></i> Booked again</div></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Top 10 Clients by Lifetime Spend</div><div class="chart-sub">All-time totals</div></div></div>
+          <table>
+            <thead><tr><th>Rank</th><th>Patient</th><th>Services Availed</th><th>Packages</th><th>Vouchers Used</th><th>Last Visit</th><th>Lifetime Spend</th></tr></thead>
+            <tbody>
+              <tr><td><span style="background:#FEF3C7;color:#B45309;padding:2px 9px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:11px;">👑 1</span></td><td><span class="nm">Maria Cruz</span></td><td>32</td><td>4</td><td>6</td><td>Apr 25, 2026</td><td class="amount">₱89,500</td></tr>
+              <tr><td><span style="background:#F0F6FC;color:#2D6A9F;padding:2px 9px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:11px;">2</span></td><td><span class="nm">Sarah Johnson</span></td><td>28</td><td>3</td><td>5</td><td>Apr 24, 2026</td><td class="amount">₱76,200</td></tr>
+              <tr><td><span style="background:#F0F6FC;color:#2D6A9F;padding:2px 9px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:11px;">3</span></td><td><span class="nm">Ana Garcia</span></td><td>24</td><td>3</td><td>4</td><td>Apr 23, 2026</td><td class="amount">₱67,800</td></tr>
+              <tr><td><span style="background:#F0F6FC;color:#2D6A9F;padding:2px 9px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:11px;">4</span></td><td><span class="nm">Isabella Santos</span></td><td>22</td><td>2</td><td>3</td><td>Apr 22, 2026</td><td class="amount">₱58,400</td></tr>
+              <tr><td><span style="background:#F0F6FC;color:#2D6A9F;padding:2px 9px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:11px;">5</span></td><td><span class="nm">Sofia Reyes</span></td><td>20</td><td>2</td><td>3</td><td>Apr 21, 2026</td><td class="amount">₱54,600</td></tr>
+              <tr><td><span style="background:#F0F6FC;color:#2D6A9F;padding:2px 9px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:11px;">6</span></td><td><span class="nm">Camille Torres</span></td><td>18</td><td>2</td><td>2</td><td>Apr 18, 2026</td><td class="amount">₱48,200</td></tr>
+              <tr><td><span style="background:#F0F6FC;color:#2D6A9F;padding:2px 9px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:11px;">7</span></td><td><span class="nm">Diana Reyes</span></td><td>17</td><td>1</td><td>3</td><td>Apr 17, 2026</td><td class="amount">₱42,800</td></tr>
+              <tr><td><span style="background:#F0F6FC;color:#2D6A9F;padding:2px 9px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:11px;">8</span></td><td><span class="nm">Angela Park</span></td><td>16</td><td>2</td><td>1</td><td>Apr 14, 2026</td><td class="amount">₱39,500</td></tr>
+              <tr><td><span style="background:#F0F6FC;color:#2D6A9F;padding:2px 9px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:11px;">9</span></td><td><span class="nm">Lisa Gomez</span></td><td>15</td><td>1</td><td>2</td><td>Apr 12, 2026</td><td class="amount">₱35,700</td></tr>
+              <tr><td><span style="background:#F0F6FC;color:#2D6A9F;padding:2px 9px;border-radius:9999px;font-family:var(--font-display);font-weight:700;font-size:11px;">10</span></td><td><span class="nm">Roberto Tan</span></td><td>14</td><td>1</td><td>2</td><td>Apr 10, 2026</td><td class="amount">₱32,400</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Top Clients by Services Availed</div><div class="chart-sub">Most sessions completed</div></div></div>
+            <table>
+              <thead><tr><th>Patient</th><th>Total Sessions</th><th>Favorite Service</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">Maria Cruz</span></td><td>32</td><td>HydraFacial</td></tr>
+                <tr><td><span class="nm">Sarah Johnson</span></td><td>28</td><td>HydraFacial</td></tr>
+                <tr><td><span class="nm">Ana Garcia</span></td><td>24</td><td>Botox</td></tr>
+                <tr><td><span class="nm">Isabella Santos</span></td><td>22</td><td>Chemical Peel</td></tr>
+                <tr><td><span class="nm">Sofia Reyes</span></td><td>20</td><td>Glutathione IV</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Top Clients by Packages Purchased</div><div class="chart-sub">Most package buys</div></div></div>
+            <table>
+              <thead><tr><th>Patient</th><th>Packages</th><th>Package Spend</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">Maria Cruz</span></td><td>4</td><td class="amount">₱58,000</td></tr>
+                <tr><td><span class="nm">Sarah Johnson</span></td><td>3</td><td class="amount">₱45,000</td></tr>
+                <tr><td><span class="nm">Ana Garcia</span></td><td>3</td><td class="amount">₱42,500</td></tr>
+                <tr><td><span class="nm">Isabella Santos</span></td><td>2</td><td class="amount">₱30,000</td></tr>
+                <tr><td><span class="nm">Sofia Reyes</span></td><td>2</td><td class="amount">₱24,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card donut-wrap">
+            <div class="chart-head" style="border-bottom:none;padding:0 0 16px"><div><div class="chart-title">Client Spend Tiers</div><div class="chart-sub">Segmentation by lifetime value</div></div></div>
+            <div class="donut" style="background:conic-gradient(#1A3A5C 0% 6%, #2D6A9F 6% 18%, #5BC0EB 18% 42%, #A8CCE8 42% 78%, #BFD8EB 78% 100%);"></div>
+            <div class="legend">
+              <div class="lr"><div class="lt"><span class="dot" style="background:#1A3A5C"></span>Platinum (≥₱100K)</div><span class="val">8 · 6%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#2D6A9F"></span>Gold (₱50–100K)</div><span class="val">15 · 12%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#5BC0EB"></span>Silver (₱20–50K)</div><span class="val">30 · 24%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#A8CCE8"></span>Regular (₱5–20K)</div><span class="val">45 · 36%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#BFD8EB"></span>New (&lt;₱5K)</div><span class="val">26 · 22%</span></div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Most Loyal Clients</div><div class="chart-sub">By visit frequency &amp; tenure</div></div></div>
+            <table>
+              <thead><tr><th>Patient</th><th>Avg Visits / Month</th><th>Patient Since</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">Maria Cruz</span></td><td>2.4</td><td>Mar 2024 · 26 mo</td></tr>
+                <tr><td><span class="nm">Ana Garcia</span></td><td>2.1</td><td>Jun 2024 · 23 mo</td></tr>
+                <tr><td><span class="nm">Sarah Johnson</span></td><td>1.9</td><td>Aug 2024 · 21 mo</td></tr>
+                <tr><td><span class="nm">Sofia Reyes</span></td><td>1.7</td><td>Jan 2025 · 16 mo</td></tr>
+                <tr><td><span class="nm">Isabella Santos</span></td><td>1.5</td><td>Feb 2025 · 15 mo</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">New → VIP Conversion</div><div class="chart-sub">How quickly first-visit patients reach VIP (₱50K+) status</div></div></div>
+          <div class="chart-body">
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar-value">2</div><div class="bar" style="height:15%"></div><div class="bar-label">&lt; 3 mo</div></div>
+              <div class="bar-col"><div class="bar-value">5</div><div class="bar" style="height:35%"></div><div class="bar-label">3–6 mo</div></div>
+              <div class="bar-col"><div class="bar-value">8</div><div class="bar" style="height:55%"></div><div class="bar-label">6–12 mo</div></div>
+              <div class="bar-col"><div class="bar-value">14</div><div class="bar" style="height:95%"></div><div class="bar-label">1–2 yr</div></div>
+              <div class="bar-col"><div class="bar-value">9</div><div class="bar" style="height:62%"></div><div class="bar-label">2+ yr</div></div>
+            </div>
+          </div>
+          <div style="padding:0 22px 18px;font-family:var(--font-body);font-size:12px;color:#5A7A96;">Average time to reach VIP: <b style="color:#1A2E40;font-family:var(--font-display);">14 months</b> · Sweet spot: 1–2 year tenure.</div>
+        </div>
+      </div>
+
+      <!-- ============ Active Patients tab ============ -->
+      <div class="tab-pane" data-tab="active-patients" hidden>
+        <div class="kpi-row">
+          <div class="kpi primary"><div class="l">Currently Active</div><div class="v">38</div><div class="d"><i data-lucide="activity" style="width:13px;height:13px"></i> Ongoing patients</div></div>
+          <div class="kpi"><div class="l">In Progress Today</div><div class="v">6</div><div class="d" style="color:#16A34A"><i data-lucide="clock" style="width:13px;height:13px"></i> Sessions today</div></div>
+          <div class="kpi"><div class="l">Active Packages</div><div class="v">42</div><div class="d" style="color:#5A7A96"><i data-lucide="package" style="width:13px;height:13px"></i> Running across patients</div></div>
+          <div class="kpi"><div class="l">Avg Sessions Left</div><div class="v">2.4</div><div class="d" style="color:#5A7A96"><i data-lucide="calendar" style="width:13px;height:13px"></i> Per active patient</div></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Active Patients — Currently In Progress</div><div class="chart-sub">Patients with active packages or upcoming sessions</div></div></div>
+          <table>
+            <thead><tr><th>Patient</th><th>Active Package</th><th>Sessions Done</th><th>Next Appointment</th><th>Practitioner</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><span class="nm">Sarah Johnson</span></td><td>Premium Facial Package</td><td>3 of 5</td><td>May 27, 2026 · 10:00 AM</td><td>Dr. Reyes</td><td><span style="background:#DBEAFE;color:#1D4ED8;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">In Progress</span></td></tr>
+              <tr><td><span class="nm">Maria Cruz</span></td><td>Anti-Aging Package</td><td>2 of 4</td><td>May 22, 2026 · 2:00 PM</td><td>Dr. Reyes</td><td><span style="background:#DBEAFE;color:#1D4ED8;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">In Progress</span></td></tr>
+              <tr><td><span class="nm">Sofia Reyes</span></td><td>Hair Restoration</td><td>4 of 6</td><td>May 24, 2026 · 11:00 AM</td><td>Dr. Lim</td><td><span style="background:#DBEAFE;color:#1D4ED8;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">In Progress</span></td></tr>
+              <tr><td><span class="nm">Ana Garcia</span></td><td>Premium Facial Package</td><td>2 of 5</td><td>May 20, 2026 · 3:00 PM</td><td>Dr. Reyes</td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Today</span></td></tr>
+              <tr><td><span class="nm">Isabella Santos</span></td><td>Anti-Aging Package</td><td>1 of 4</td><td>May 26, 2026 · 10:30 AM</td><td>Dr. Santos</td><td><span style="background:#DBEAFE;color:#1D4ED8;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">In Progress</span></td></tr>
+              <tr><td><span class="nm">Camille Torres</span></td><td>— Single Service</td><td>—</td><td>May 19, 2026 · 4:00 PM</td><td>Dr. Lim</td><td><span style="background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Today</span></td></tr>
+              <tr><td><span class="nm">Diana Reyes</span></td><td>Premium Facial Package</td><td>4 of 5</td><td>Jun 1, 2026 · 9:00 AM</td><td>Dr. Reyes</td><td><span style="background:#FEF3C7;color:#B45309;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Last Session</span></td></tr>
+              <tr><td><span class="nm">Lisa Gomez</span></td><td>Hair Restoration</td><td>5 of 6</td><td>May 23, 2026 · 12:00 PM</td><td>Dr. Lim</td><td><span style="background:#FEF3C7;color:#B45309;padding:2px 8px;border-radius:9999px;font-family:var(--font-display);font-weight:600;font-size:11px;">Last Session</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card donut-wrap">
+            <div class="chart-head" style="border-bottom:none;padding:0 0 16px"><div><div class="chart-title">Active Patient Status</div><div class="chart-sub">Current session state</div></div></div>
+            <div class="donut" style="background:conic-gradient(#2D6A9F 0% 60%, #5BC0EB 60% 76%, #F59E0B 76% 92%, #16A34A 92% 100%);"></div>
+            <div class="legend">
+              <div class="lr"><div class="lt"><span class="dot" style="background:#2D6A9F"></span>In Progress</div><span class="val">23 · 60%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#5BC0EB"></span>Scheduled</div><span class="val">6 · 16%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#F59E0B"></span>Last Session</div><span class="val">6 · 16%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#16A34A"></span>Today</div><span class="val">3 · 8%</span></div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Practitioner Load</div><div class="chart-sub">Active patients per practitioner</div></div></div>
+            <table>
+              <thead><tr><th>Practitioner</th><th>Active Patients</th><th>Sessions Today</th></tr></thead>
+              <tbody>
+                <tr><td><span class="nm">Dr. Reyes</span></td><td>16</td><td>3</td></tr>
+                <tr><td><span class="nm">Dr. Santos</span></td><td>9</td><td>1</td></tr>
+                <tr><td><span class="nm">Dr. Lim</span></td><td>8</td><td>2</td></tr>
+                <tr><td><span class="nm">Dr. Angela Lim</span></td><td>5</td><td>0</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Patient Retention tab ============ -->
+      <div class="tab-pane" data-tab="retention" hidden>
+        <div class="kpi-row">
+          <div class="kpi primary"><div class="l">Return Rate</div><div class="v">68%</div><div class="d"><i data-lucide="refresh-cw" style="width:13px;height:13px"></i> Patients who return</div></div>
+          <div class="kpi"><div class="l">Avg Sessions / Patient</div><div class="v">3.4</div><div class="d" style="color:#16A34A"><i data-lucide="trending-up" style="width:13px;height:13px"></i> +0.4 vs last quarter</div></div>
+          <div class="kpi"><div class="l">Inactive (90+ days)</div><div class="v" style="color:#C2410C;">14</div><div class="d" style="color:#C2410C"><i data-lucide="alert-triangle" style="width:13px;height:13px"></i> Win-back targets</div></div>
+          <div class="kpi"><div class="l">Churn Rate</div><div class="v">11%</div><div class="d" style="color:#16A34A"><i data-lucide="trending-down" style="width:13px;height:13px"></i> −2 pts vs last</div></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Return Rate by Cohort</div><div class="chart-sub">Patients returning within 60 days of first visit</div></div></div>
+          <table>
+            <thead><tr><th>First Visit Cohort</th><th>New Patients</th><th>Returned (60d)</th><th>Return Rate</th></tr></thead>
+            <tbody>
+              <tr><td><span class="nm">Jan 2026</span></td><td>22</td><td>17</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">77%</span></td></tr>
+              <tr><td><span class="nm">Feb 2026</span></td><td>28</td><td>20</td><td><span style="color:#16A34A;font-family:var(--font-display);font-weight:700;">71%</span></td></tr>
+              <tr><td><span class="nm">Mar 2026</span></td><td>24</td><td>16</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">67%</span></td></tr>
+              <tr><td><span class="nm">Apr 2026</span></td><td>31</td><td>19</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">61%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="two-col">
+          <div class="chart-card">
+            <div class="chart-head"><div><div class="chart-title">Sessions per Patient Distribution</div><div class="chart-sub">All-time visit count</div></div></div>
+            <div style="padding:18px 22px;display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;width:60px;">1 visit</span><div style="flex:1;height:14px;background:#F0F6FC;border-radius:7px;overflow:hidden;"><div style="width:32%;height:100%;background:#5BC0EB;"></div></div><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#5A7A96;width:80px;text-align:right;">40 · 32%</span></div>
+              <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;width:60px;">2–3</span><div style="flex:1;height:14px;background:#F0F6FC;border-radius:7px;overflow:hidden;"><div style="width:28%;height:100%;background:#2D6A9F;"></div></div><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#5A7A96;width:80px;text-align:right;">35 · 28%</span></div>
+              <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;width:60px;">4–6</span><div style="flex:1;height:14px;background:#F0F6FC;border-radius:7px;overflow:hidden;"><div style="width:22%;height:100%;background:#1A3A5C;"></div></div><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#5A7A96;width:80px;text-align:right;">28 · 22%</span></div>
+              <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;width:60px;">7–12</span><div style="flex:1;height:14px;background:#F0F6FC;border-radius:7px;overflow:hidden;"><div style="width:12%;height:100%;background:#7C3AED;"></div></div><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#5A7A96;width:80px;text-align:right;">15 · 12%</span></div>
+              <div style="display:flex;align-items:center;gap:12px;"><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#1A2E40;width:60px;">13+</span><div style="flex:1;height:14px;background:#F0F6FC;border-radius:7px;overflow:hidden;"><div style="width:6%;height:100%;background:#F59E0B;"></div></div><span style="font-family:var(--font-display);font-weight:600;font-size:12px;color:#5A7A96;width:80px;text-align:right;">8 · 6%</span></div>
+            </div>
+          </div>
+
+          <div class="chart-card donut-wrap">
+            <div class="chart-head" style="border-bottom:none;padding:0 0 16px"><div><div class="chart-title">Retention Categories</div><div class="chart-sub">Engagement health</div></div></div>
+            <div class="donut" style="background:conic-gradient(#16A34A 0% 38%, #2D6A9F 38% 64%, #F59E0B 64% 86%, #DC2626 86% 100%);"></div>
+            <div class="legend">
+              <div class="lr"><div class="lt"><span class="dot" style="background:#16A34A"></span>Highly Engaged</div><span class="val">48 · 38%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#2D6A9F"></span>Returning</div><span class="val">32 · 26%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#F59E0B"></span>At Risk (60–90d)</div><span class="val">28 · 22%</span></div>
+              <div class="lr"><div class="lt"><span class="dot" style="background:#DC2626"></span>Inactive (90+d)</div><span class="val">14 · 11%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Inactive Patients — Win-Back Opportunities</div><div class="chart-sub">Patients with no visit in 90+ days</div></div></div>
+          <table>
+            <thead><tr><th>Patient</th><th>Last Visit</th><th>Days Inactive</th><th>Last Service</th><th>Lifetime Spend</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td><span class="nm">Roberto Tan</span></td><td>Jan 8, 2026</td><td><span style="color:#C2410C;font-family:var(--font-display);font-weight:700;">128 days</span></td><td>HydraFacial</td><td class="amount">₱32,400</td><td><span style="color:#2D6A9F;font-family:var(--font-display);font-weight:600;font-size:12px;">Send re-engagement</span></td></tr>
+              <tr><td><span class="nm">Kevin Bautista</span></td><td>Jan 12, 2026</td><td><span style="color:#C2410C;font-family:var(--font-display);font-weight:700;">124 days</span></td><td>Chemical Peel</td><td class="amount">₱18,600</td><td><span style="color:#2D6A9F;font-family:var(--font-display);font-weight:600;font-size:12px;">Send re-engagement</span></td></tr>
+              <tr><td><span class="nm">Marco Villanueva</span></td><td>Jan 20, 2026</td><td><span style="color:#C2410C;font-family:var(--font-display);font-weight:700;">116 days</span></td><td>Botox</td><td class="amount">₱45,200</td><td><span style="color:#2D6A9F;font-family:var(--font-display);font-weight:600;font-size:12px;">VIP re-engage</span></td></tr>
+              <tr><td><span class="nm">Jose Dela Cruz</span></td><td>Feb 2, 2026</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">103 days</span></td><td>HydraFacial</td><td class="amount">₱27,800</td><td><span style="color:#2D6A9F;font-family:var(--font-display);font-weight:600;font-size:12px;">Send re-engagement</span></td></tr>
+              <tr><td><span class="nm">Angela Park</span></td><td>Feb 5, 2026</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">100 days</span></td><td>Glutathione IV</td><td class="amount">₱39,500</td><td><span style="color:#2D6A9F;font-family:var(--font-display);font-weight:600;font-size:12px;">VIP re-engage</span></td></tr>
+              <tr><td><span class="nm">Lisa Gomez</span></td><td>Feb 8, 2026</td><td><span style="color:#F59E0B;font-family:var(--font-display);font-weight:700;">97 days</span></td><td>PRP Therapy</td><td class="amount">₱35,700</td><td><span style="color:#2D6A9F;font-family:var(--font-display);font-weight:600;font-size:12px;">Send re-engagement</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head"><div><div class="chart-title">Avg Days Between Visits</div><div class="chart-sub">Trend over the last 6 months</div></div></div>
+          <div class="chart-body">
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar-value">38d</div><div class="bar" style="height:90%"></div><div class="bar-label">Nov '25</div></div>
+              <div class="bar-col"><div class="bar-value">35d</div><div class="bar" style="height:82%"></div><div class="bar-label">Dec '25</div></div>
+              <div class="bar-col"><div class="bar-value">32d</div><div class="bar" style="height:75%"></div><div class="bar-label">Jan '26</div></div>
+              <div class="bar-col"><div class="bar-value">29d</div><div class="bar" style="height:68%"></div><div class="bar-label">Feb '26</div></div>
+              <div class="bar-col"><div class="bar-value">28d</div><div class="bar" style="height:65%"></div><div class="bar-label">Mar '26</div></div>
+              <div class="bar-col"><div class="bar-value">26d</div><div class="bar" style="height:62%"></div><div class="bar-label">Apr '26</div></div>
+            </div>
+          </div>
+          <div style="padding:0 22px 18px;font-family:var(--font-body);font-size:12px;color:#5A7A96;">Improving — patients now return on avg <b style="color:#1A2E40;font-family:var(--font-display);">12 days sooner</b> than 6 months ago.</div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+</div>
+
+<script>
+  // Compatibility shim: keep code that referenced .type-pill working with sidebar-driven routing
+  (function(){
+    var t = new URLSearchParams(location.search).get('type') || 'sales';
+    // Activate the matching tab pane
+    document.querySelectorAll('.tab-pane').forEach(function (p) { p.classList.toggle('is-active', p.dataset.tab === t); });
+    // Update title + crumb
+    var titles = {
+      sales: ['Sales Report', 'Admin / Reports / Sales'],
+      'revenue-breakdown': ['Revenue Breakdown', 'Admin / Reports / Revenue Breakdown'],
+      appointments: ['Appointments Report', 'Admin / Reports / Appointments'],
+      inventory: ['Inventory Report', 'Admin / Reports / Inventory'],
+      vouchers: ['Vouchers Report', 'Admin / Reports / Vouchers'],
+      patients: ['Patients Report', 'Admin / Reports / Patients'],
+      services: ['Services Report', 'Admin / Reports / Services'],
+      packages: ['Packages Report', 'Admin / Reports / Packages'],
+      messages: ['Messages Report', 'Admin / Reports / Messages'],
+      website: ['Website &amp; Online Bookings', 'Admin / Reports / Website'],
+      reviews: ['Reviews &amp; Ratings', 'Admin / Reports / Reviews'],
+      'top-clients': ['Top Clients', 'Admin / Reports / Top Clients'],
+      'active-patients': ['Active Patients', 'Admin / Reports / Active Patients'],
+      retention: ['Patient Retention', 'Admin / Reports / Patient Retention'],
+    };
+    var ti = titles[t];
+    if (ti) {
+      document.querySelector('.topbar-title').textContent = ti[0];
+      document.querySelector('.topbar-crumb').textContent = ti[1];
+    }
+    // Voucher filter visibility
+    document.getElementById('voucher-filter').hidden = (t !== 'vouchers');
+    if (window.lucide) lucide.createIcons();
+  })();
+</script>
+<script>
+/* __MW_TOGGLE__ */
+(function(){
+  // Find every parent .nav-item that is followed by a [data-submenu-for] block and wire up click toggle
+  document.querySelectorAll('aside.sidebar .nav-item').forEach(function(item){
+    var next = item.nextElementSibling;
+    if (!next || !next.hasAttribute || !next.hasAttribute('data-submenu-for')) return;
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', function(e){
+      // Don't navigate if it's a link
+      if (item.tagName === 'A') e.preventDefault();
+      var isOpen = next.style.display !== 'none';
+      next.style.display = isOpen ? 'none' : 'block';
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+})();
+</script>
+<!-- ============ Custom Date Range Modal ============ -->
+<div class="modal-back" id="custom-modal" hidden>
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div class="modal-head">Custom Date Range <button id="custom-close"><i data-lucide="x" style="width:18px;height:18px;"></i></button></div>
+    <div class="modal-body">
+      <label class="fld">Select Type</label>
+      <div class="type-grid" id="type-grid">
+        <button class="type-btn on" data-t="day">Specific Day</button>
+        <button class="type-btn" data-t="days">Specific Days</button>
+        <button class="type-btn" data-t="month">Specific Month</button>
+        <button class="type-btn" data-t="months">Specific Months</button>
+        <button class="type-btn" data-t="year">Specific Year</button>
+        <button class="type-btn" data-t="years">Specific Years</button>
+      </div>
+      <div id="type-pane-day" class="field-pair"><label class="fld">Select Date</label><input type="date" id="cd-day"></div>
+      <div id="type-pane-days" hidden><div class="field-pair"><label class="fld">Start Date</label><input type="date" id="cd-start"></div><div class="field-pair"><label class="fld">End Date</label><input type="date" id="cd-end"></div></div>
+      <div id="type-pane-month" hidden class="field-pair"><label class="fld">Select Month</label><input type="month" id="cd-month"></div>
+      <div id="type-pane-months" hidden><div class="field-pair"><label class="fld">Start Month</label><input type="month" id="cd-mstart"></div><div class="field-pair"><label class="fld">End Month</label><input type="month" id="cd-mend"></div></div>
+      <div id="type-pane-year" hidden class="field-pair"><label class="fld">Select Year</label><input type="number" id="cd-year" placeholder="2026" min="2000" max="2100"></div>
+      <div id="type-pane-years" hidden><div class="field-pair"><label class="fld">Start Year</label><input type="number" id="cd-ystart" placeholder="2024" min="2000" max="2100"></div><div class="field-pair"><label class="fld">End Year</label><input type="number" id="cd-yend" placeholder="2026" min="2000" max="2100"></div></div>
+    </div>
+    <div class="modal-foot"><button class="btn-cancel" id="custom-cancel">Cancel</button><button class="btn-apply" id="custom-apply">Apply</button></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  // Range pills
+  var pills = document.querySelectorAll('.range-pill');
+  var customPill = document.getElementById('range-custom');
+  var modal = document.getElementById('custom-modal');
+  pills.forEach(function (p) {
+    p.addEventListener('click', function () {
+      if (p.dataset.range === 'custom') { modal.hidden = false; return; }
+      pills.forEach(function (x) { x.classList.toggle('active', x === p); });
+      customPill.textContent = 'Custom';
+    });
+  });
+  document.getElementById('custom-close').addEventListener('click', function () { modal.hidden = true; });
+  document.getElementById('custom-cancel').addEventListener('click', function () { modal.hidden = true; });
+  modal.addEventListener('click', function (e) { if (e.target === modal) modal.hidden = true; });
+
+  // Type selector inside modal
+  var typeBtns = document.querySelectorAll('#type-grid .type-btn');
+  var panes = ['day','days','month','months','year','years'];
+  typeBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      typeBtns.forEach(function (x) { x.classList.toggle('on', x === b); });
+      panes.forEach(function (k) { document.getElementById('type-pane-' + k).hidden = k !== b.dataset.t; });
+    });
+  });
+
+  // Apply custom
+  function fmtDate(s) { var d = new Date(s); return d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}); }
+  function fmtMonth(s) { var d = new Date(s + '-01'); return d.toLocaleDateString('en-US', {month:'long', year:'numeric'}); }
+  document.getElementById('custom-apply').addEventListener('click', function () {
+    var t = document.querySelector('#type-grid .type-btn.on').dataset.t;
+    var label = '';
+    if (t === 'day') { var v = document.getElementById('cd-day').value; if (v) label = fmtDate(v); }
+    else if (t === 'days') { var s = document.getElementById('cd-start').value, e = document.getElementById('cd-end').value; if (s && e) label = fmtDate(s) + ' – ' + fmtDate(e); }
+    else if (t === 'month') { var m = document.getElementById('cd-month').value; if (m) label = fmtMonth(m); }
+    else if (t === 'months') { var ms = document.getElementById('cd-mstart').value, me = document.getElementById('cd-mend').value; if (ms && me) label = fmtMonth(ms) + ' – ' + fmtMonth(me); }
+    else if (t === 'year') { var y = document.getElementById('cd-year').value; if (y) label = y; }
+    else if (t === 'years') { var ys = document.getElementById('cd-ystart').value, ye = document.getElementById('cd-yend').value; if (ys && ye) label = ys + ' – ' + ye; }
+    if (label) {
+      customPill.textContent = label;
+      pills.forEach(function (x) { x.classList.toggle('active', x === customPill); });
+      modal.hidden = true;
+    }
+  });
+
+  // Export dropdown
+  var expBtn = document.getElementById('export-btn');
+  var expMenu = document.getElementById('export-menu');
+  expBtn.addEventListener('click', function (e) { e.stopPropagation(); expMenu.hidden = !expMenu.hidden; });
+  document.addEventListener('click', function () { expMenu.hidden = true; });
+  document.querySelectorAll('.exp-opt').forEach(function (b) {
+    b.addEventListener('click', function () { alert('Exporting current report as ' + b.dataset.fmt.toUpperCase() + '…'); expMenu.hidden = true; });
+  });
+
+  function syncVoucherFilter() {
+    var t = new URLSearchParams(location.search).get('type') || 'sales';
+    document.getElementById('voucher-filter').hidden = (t !== 'vouchers');
+  }
+  syncVoucherFilter();
+  // Voucher row filtering
+  var vfs = document.getElementById('voucher-filter-select');
+  if (vfs) {
+    vfs.addEventListener('change', function () {
+      var v = vfs.value;
+      document.querySelectorAll('#voucher-table tbody tr').forEach(function (r) {
+        r.style.display = (v === 'all' || r.dataset.vstatus === v) ? '' : 'none';
+      });
+    });
+  }
+  if (window.lucide) lucide.createIcons();
+})();
+</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

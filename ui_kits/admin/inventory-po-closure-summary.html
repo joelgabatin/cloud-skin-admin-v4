@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Closure Summary — PO-2026-0042</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+* { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .page-hero h1 { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: #1A2E40; margin: 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .page-hero .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 6px; }
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media (max-width: 1024px) { .stat-row { grid-template-columns: repeat(2, 1fr); } }
+  .stat-card { background: #fff; border-radius: 10px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; flex-direction: column; gap: 8px; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-card .label { font-size: 11px; color: #5A7A96; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #2D6A9F; display: flex; align-items: center; justify-content: center; }
+  .stat-card .iplate.success { background: #DCFCE7; color: #15803D; }
+  .stat-card .iplate.danger  { background: #FEE2E2; color: #DC2626; }
+  .stat-card .iplate.slate   { background: #F1F5F9; color: #475569; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; }
+  .stat-card .value.success { color: #15803D; }
+  .stat-card .value.danger  { color: #DC2626; }
+  .stat-card .sub { font-size: 12px; color: #5A7A96; }
+  .badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .badge.closed-short { background: #475569; color: #fff; }
+  .section-card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  .section-card .sec-head { padding: 16px 22px; border-bottom: 1px solid #D0E8F5; display: flex; align-items: center; gap: 10px; }
+  .section-card .sec-head .icon-plate { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .section-card .sec-head .icon-plate.success { background: #DCFCE7; color: #15803D; }
+  .section-card .sec-head .icon-plate.danger  { background: #FEE2E2; color: #DC2626; }
+  .section-card .sec-head .icon-plate .lucide { width: 14px; height: 14px; }
+  .section-card .sec-head .ttl { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #1A2E40; text-transform: uppercase; letter-spacing: 0.05em; }
+  .section-card .sec-head .cnt { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-left: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 12px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .nm { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .sku { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; font-weight: 600; }
+  .mono { font-family: var(--font-mono); font-size: 13px; color: #5A7A96; }
+  .price { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .btn { height: 38px; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; text-decoration: none; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-outline { background: #fff; color: #2D6A9F; border-color: #D0E8F5; }
+  .back-link { background: none; border: none; cursor: pointer; color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; padding: 0; text-decoration: none; }
+  .audit-banner { background: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 10px; padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start; }
+  .audit-banner .lucide { width: 18px; height: 18px; color: #475569; flex-shrink: 0; margin-top: 1px; }
+  .audit-banner .title { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; }
+  .audit-banner .desc  { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 3px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 1024px) { .two-col { grid-template-columns: 1fr; } }
+  .check-cell { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; }
+  .check-cell.success { background: #DCFCE7; color: #15803D; }
+  .check-cell.danger  { background: #FEE2E2; color: #DC2626; }
+  .check-cell .lucide { width: 12px; height: 12px; }
+  .reason-block { padding: 14px 18px; background: #F8FBFD; border-top: 1px solid #E5EFF7; }
+  .reason-block .k { font-family: var(--font-display); font-size: 11px; font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .reason-block .v { font-family: var(--font-body); font-size: 13px; color: #1A2E40; }
+  .reason-block .v.notes { color: #5A7A96; font-style: italic; line-height: 1.5; margin-top: 6px; }
+  .totals-row td { font-family: var(--font-display); font-weight: 700; color: #1A2E40; background: #F0F6FC; }
+  .audit-foot { font-family: var(--font-body); font-size: 12px; color: #9BBAD4; text-align: center; padding-top: 8px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+  .audit-foot .lucide { width: 13px; height: 13px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Closure Summary</div>
+        <div class="topbar-crumb">Admin / Inventory / Purchase Orders / <span id="crumb-po">PO-2026-0042</span> / Closure Summary</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="05 Closure Summary">
+      <a class="back-link" id="back-link" href="inventory-po-detail.html?status=closed-short&po=PO-2026-0042"><i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Back to Purchase Order</a>
+
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div class="page-hero">
+          <h1>Closure Summary — <span style="font-family:var(--font-mono);" id="hero-po">PO-2026-0042</span> <span class="badge closed-short">Closed Short</span></h1>
+          <div class="sub">This record is for audit purposes only. No further actions are available on this PO.</div>
+        </div>
+        <button class="btn btn-outline" type="button"><i data-lucide="printer"></i> Print Summary</button>
+      </div>
+
+      <div class="audit-banner">
+        <i data-lucide="shield-check"></i>
+        <div>
+          <div class="title">Audit-locked record</div>
+          <div class="desc">Once closed short, a PO is permanently locked. Quantities, line items and totals on this page cannot be edited. Use Duplicate PO to re-order the written-off items in a new purchase order.</div>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="top"><span class="label">Items Ordered</span><div class="iplate"><i data-lucide="file-text"></i></div></div>
+          <div class="value">6</div>
+          <div class="sub">Across 3 product categories</div>
+        </div>
+        <div class="stat-card">
+          <div class="top"><span class="label">Items Received</span><div class="iplate success"><i data-lucide="check-circle"></i></div></div>
+          <div class="value success">3</div>
+          <div class="sub">Booked into inventory</div>
+        </div>
+        <div class="stat-card">
+          <div class="top"><span class="label">Items Written Off</span><div class="iplate danger"><i data-lucide="x-circle"></i></div></div>
+          <div class="value danger">3</div>
+          <div class="sub">Not delivered by agreement</div>
+        </div>
+        <div class="stat-card">
+          <div class="top"><span class="label">Value Written Off</span><div class="iplate danger"><i data-lucide="trending-down"></i></div></div>
+          <div class="value danger">₱65,400</div>
+          <div class="sub">78.5% of PO value</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+
+        <div class="section-card">
+          <div class="sec-head">
+            <div class="icon-plate success"><i data-lucide="check-circle"></i></div>
+            <div class="ttl">Items Received into Inventory</div>
+            <div class="cnt">3 line items</div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr>
+                <th></th>
+                <th>Product</th>
+                <th>SKU</th>
+                <th style="text-align:right;">Qty</th>
+                <th style="text-align:right;">Unit Cost</th>
+                <th style="text-align:right;">Total</th>
+              </tr></thead>
+              <tbody>
+                <tr>
+                  <td style="width:36px;"><span class="check-cell success"><i data-lucide="check"></i></span></td>
+                  <td><span class="nm">Retinol Cream</span></td>
+                  <td><span class="sku">SKIN-002</span></td>
+                  <td style="text-align:right;"><span class="mono" style="color:#1A2E40;font-weight:700;">50</span></td>
+                  <td style="text-align:right;"><span class="price">₱180</span></td>
+                  <td style="text-align:right;"><span class="price">₱9,000</span></td>
+                </tr>
+                <tr>
+                  <td><span class="check-cell success"><i data-lucide="check"></i></span></td>
+                  <td><span class="nm">SPF 50 Sunscreen</span></td>
+                  <td><span class="sku">SKIN-021</span></td>
+                  <td style="text-align:right;"><span class="mono" style="color:#1A2E40;font-weight:700;">30</span></td>
+                  <td style="text-align:right;"><span class="price">₱150</span></td>
+                  <td style="text-align:right;"><span class="price">₱4,500</span></td>
+                </tr>
+                <tr>
+                  <td><span class="check-cell success"><i data-lucide="check"></i></span></td>
+                  <td><span class="nm">Vitamin C Serum</span></td>
+                  <td><span class="sku">SKIN-015</span></td>
+                  <td style="text-align:right;"><span class="mono" style="color:#1A2E40;font-weight:700;">20</span></td>
+                  <td style="text-align:right;"><span class="price">₱220</span></td>
+                  <td style="text-align:right;"><span class="price">₱4,400</span></td>
+                </tr>
+                <tr class="totals-row">
+                  <td></td>
+                  <td colspan="4" style="text-align:right;">Total received into inventory</td>
+                  <td style="text-align:right;color:#15803D;font-size:15px;">₱17,900</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="sec-head">
+            <div class="icon-plate danger"><i data-lucide="x-circle"></i></div>
+            <div class="ttl">Items Written Off</div>
+            <div class="cnt">3 line items</div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr>
+                <th></th>
+                <th>Product</th>
+                <th>SKU</th>
+                <th style="text-align:right;">Qty</th>
+                <th style="text-align:right;">Unit Cost</th>
+                <th style="text-align:right;">Value Impact</th>
+              </tr></thead>
+              <tbody>
+                <tr>
+                  <td style="width:36px;"><span class="check-cell danger"><i data-lucide="x"></i></span></td>
+                  <td><span class="nm">Chemical Peel Solution</span></td>
+                  <td><span class="sku">TREAT-001</span></td>
+                  <td style="text-align:right;"><span class="mono" style="color:#DC2626;font-weight:700;">30</span></td>
+                  <td style="text-align:right;"><span class="price">₱280</span></td>
+                  <td style="text-align:right;"><span class="price" style="color:#DC2626;">₱8,400</span></td>
+                </tr>
+                <tr>
+                  <td><span class="check-cell danger"><i data-lucide="x"></i></span></td>
+                  <td><span class="nm">Filler 1mL</span></td>
+                  <td><span class="sku">INJ-002</span></td>
+                  <td style="text-align:right;"><span class="mono" style="color:#DC2626;font-weight:700;">20</span></td>
+                  <td style="text-align:right;"><span class="price">₱1,600</span></td>
+                  <td style="text-align:right;"><span class="price" style="color:#DC2626;">₱32,000</span></td>
+                </tr>
+                <tr>
+                  <td><span class="check-cell danger"><i data-lucide="x"></i></span></td>
+                  <td><span class="nm">Botox 50u</span></td>
+                  <td><span class="sku">INJ-001</span></td>
+                  <td style="text-align:right;"><span class="mono" style="color:#DC2626;font-weight:700;">10</span></td>
+                  <td style="text-align:right;"><span class="price">₱2,500</span></td>
+                  <td style="text-align:right;"><span class="price" style="color:#DC2626;">₱25,000</span></td>
+                </tr>
+                <tr class="totals-row">
+                  <td></td>
+                  <td colspan="4" style="text-align:right;">Total written off</td>
+                  <td style="text-align:right;color:#DC2626;font-size:15px;">₱65,400</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="reason-block">
+            <div class="k">Reason for closure</div>
+            <div class="v">Quantity Renegotiated with Supplier</div>
+            <div class="v notes">"Spoke with Maria Reyes on May 13. Remaining items unavailable until July — agreed to close this PO and re-issue when stock returns."</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="section-card">
+        <div class="sec-head">
+          <div class="icon-plate" style="background:#EBF6FD;color:#2D6A9F;"><i data-lucide="file-text"></i></div>
+          <div class="ttl">PO Reference</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:16px;padding:18px 22px;">
+          <div><div style="font-family:var(--font-display);font-size:11px;font-weight:600;color:#5A7A96;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">PO Number</div><div style="font-family:var(--font-mono);font-size:14px;font-weight:700;color:#2D6A9F;" id="ref-po">PO-2026-0042</div></div>
+          <div><div style="font-family:var(--font-display);font-size:11px;font-weight:600;color:#5A7A96;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Supplier</div><div style="font-family:var(--font-display);font-size:14px;font-weight:700;color:#1A2E40;">PharmaCo Manila</div></div>
+          <div><div style="font-family:var(--font-display);font-size:11px;font-weight:600;color:#5A7A96;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Order Date</div><div style="font-family:var(--font-display);font-size:14px;font-weight:700;color:#1A2E40;">May 10, 2026</div></div>
+          <div><div style="font-family:var(--font-display);font-size:11px;font-weight:600;color:#5A7A96;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">First Delivery</div><div style="font-family:var(--font-display);font-size:14px;font-weight:700;color:#1A2E40;">May 12, 2026</div></div>
+          <div><div style="font-family:var(--font-display);font-size:11px;font-weight:600;color:#5A7A96;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Closed On</div><div style="font-family:var(--font-display);font-size:14px;font-weight:700;color:#1A2E40;">May 13, 2026 · 2:45 PM</div></div>
+          <div><div style="font-family:var(--font-display);font-size:11px;font-weight:600;color:#5A7A96;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Closed By</div><div style="font-family:var(--font-display);font-size:14px;font-weight:700;color:#1A2E40;">Admin User</div></div>
+        </div>
+      </div>
+
+      <div class="audit-foot">
+        <i data-lucide="lock"></i>
+        Closed by <b style="color:#1A2E40;">Admin User</b> on May 13, 2026 at 2:45 PM · Record ID
+        <span style="font-family:var(--font-mono);color:#5A7A96;">CL-PO-2026-0042-001</span>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+  // Pick up ?po=… from the URL so this page can be reused for any closed-short PO.
+  (function () {
+    var po = (new URLSearchParams(window.location.search)).get('po');
+    if (!po) return;
+    po = po.toUpperCase();
+    document.getElementById('crumb-po').textContent = po;
+    document.getElementById('hero-po').textContent = po;
+    document.getElementById('ref-po').textContent = po;
+    document.title = 'Cloud Skin Admin — Closure Summary — ' + po;
+    var back = document.getElementById('back-link');
+    if (back) back.href = 'inventory-po-detail.html?status=closed-short&po=' + po;
+  })();
+</script>
+</body>
+</html>

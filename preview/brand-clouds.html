@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 0; background: radial-gradient(ellipse at 70% 40%, rgba(208,232,245,0.45) 0%, rgba(232,244,253,0.3) 40%, white 70%); height: 380px; position: relative; overflow: hidden; }
+  .cloud { position: absolute; pointer-events: none; }
+  .meta { position: absolute; bottom: 16px; left: 16px; right: 16px; font-family: var(--font-mono); font-size: 11px; color: var(--slate-500); }
+  @keyframes float1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(16px,-22px); } }
+  @keyframes float2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-16px,20px); } }
+  @keyframes float3 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-20px,-18px); } }
+  .a { top: 2%; left: -70px; animation: float1 5s ease-in-out infinite; opacity: 0.65; }
+  .b { top: 3%; right: 2%;  animation: float2 4.5s ease-in-out 1s infinite; opacity: 0.55; }
+  .c { bottom: 18%; left: 22%; animation: float3 6s ease-in-out 0.7s infinite; opacity: 0.45; }
+</style>
+</head>
+<body>
+<div class="cloud a">
+  <svg width="380" height="160" viewBox="0 0 420 180" fill="none"><path d="M360,148 H55 Q22,148 22,118 Q22,92 48,86 Q44,60 70,52 Q80,28 108,34 Q118,12 146,18 Q162,4 186,14 Q206,4 226,16 Q250,6 268,24 Q294,16 308,38 Q334,32 344,56 Q366,52 374,76 Q388,76 392,98 Q398,118 382,134 Q382,148 360,148Z" fill="rgba(208,232,245,0.7)"/></svg>
+</div>
+<div class="cloud b">
+  <svg width="240" height="140" viewBox="0 0 280 160" fill="none"><path d="M238,132 H42 Q16,132 16,104 Q16,80 36,74 Q32,50 56,42 Q64,18 92,24 Q104,6 128,12 Q150,2 168,18 Q192,10 206,32 Q228,28 238,52 Q256,50 260,72 Q268,92 256,110 Q256,132 238,132Z" fill="rgba(91,192,235,0.42)"/></svg>
+</div>
+<div class="cloud c">
+  <svg width="380" height="96" viewBox="0 0 440 110" fill="none"><path d="M385,88 H55 Q24,88 24,66 Q24,48 46,44 Q42,26 66,22 Q74,6 98,10 Q110,0 130,8 Q148,0 168,8 Q188,0 208,10 Q228,2 248,12 Q270,4 288,18 Q312,12 326,30 Q350,26 362,46 Q384,42 394,62 Q404,62 406,80 Q408,94 385,88Z" fill="rgba(45,106,159,0.16)"/></svg>
+</div>
+<div class="meta">FloatingClouds: 5 hand-tuned SVG paths (a–e) animated with Motion. Opacity 0.10–0.65, y±14–22, x±10–20, 4.5–7s ease-in-out. Always behind content.</div>
+</body>
+</html>

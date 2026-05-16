@@ -1,0 +1,1073 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Settings</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; }
+  .layout { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }
+
+  /* Subnav */
+  .subnav { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; position: sticky; top: 92px; }
+  .subnav .sub-head { padding: 16px 20px 10px; font-family: var(--font-display); font-size: 11px; font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #F0F6FC; }
+  .sub-btn { width: 100%; min-height: 42px; background: transparent; border: none; border-left: 3px solid transparent; cursor: pointer; text-align: left; padding: 10px 16px; font-family: var(--font-display); font-weight: 500; font-size: 13px; color: #5A7A96; display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .sub-btn:hover { background: #F8FBFD; color: #1A2E40; }
+  .sub-btn .lucide { width: 16px; height: 16px; color: #9BBAD4; }
+  .sub-btn.active { background: #EBF6FD; border-left-color: #2D6A9F; color: #2D6A9F; font-weight: 700; }
+  .sub-btn.active .lucide { color: #2D6A9F; }
+  .sub-btn[disabled], .sub-btn.coming-soon { opacity: 0.65; cursor: default; }
+  .tpl-row { background: #fff; border: 1px solid #E5EFF7; border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; transition: border-color 120ms; }
+  .tpl-row:hover { border-left: 3px solid #2D6A9F; }
+  .tpl-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+  .tpl-ti { font-family: var(--font-display); font-weight: 700; font-size: 14.5px; color: #1A2E40; }
+  .tpl-actions { margin-left: auto; display: flex; gap: 2px; }
+  .ic-btn { background: none; border: none; color: #5A7A96; cursor: pointer; padding: 5px; border-radius: 4px; }
+  .ic-btn:hover { background: #F0F6FC; color: #2D6A9F; }
+  .ic-btn.danger:hover { color: #DC2626; background: #FEF2F2; }
+  .ic-btn .lucide { width: 14px; height: 14px; }
+  .tpl-meta { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-bottom: 8px; }
+  .info-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .info-chips span { padding: 4px 10px; background: #F0F6FC; color: #2D6A9F; border-radius: 6px; font-family: var(--font-display); font-weight: 600; font-size: 11.5px; }
+  .ts-row { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; }
+  .type-badge { padding: 3px 9px; border-radius: 6px; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .type-badge.medical { background: #FEE2E2; color: #B91C1C; }
+  .type-badge.clinical { background: #DBEAFE; color: #1D4ED8; }
+  .type-badge.wellness { background: #DCFCE7; color: #15803D; }
+  .pill-green-sm { background: #DCFCE7; color: #15803D; padding: 3px 9px; border-radius: 9999px; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; }
+  .info-line-blue { background: #F0F6FC; border: 1px solid #BFD8EB; border-radius: 8px; padding: 10px 14px; font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; margin-bottom: 14px; display: flex; gap: 6px; align-items: center; }
+  .info-line-blue .lucide { width: 14px; height: 14px; color: #2D6A9F; }
+  .wf-tabs { display: flex; gap: 4px; border-bottom: 1px solid #E5EFF7; margin-bottom: 14px; }
+  .wf-tabs button { background: none; border: none; padding: 10px 16px; font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #5A7A96; cursor: pointer; border-bottom: 3px solid transparent; }
+  .wf-tabs button.on { color: #2D6A9F; border-bottom-color: #2D6A9F; }
+  .svc-wf-tbl { width: 100%; border-collapse: collapse; border: 1px solid #E5EFF7; border-radius: 8px; overflow: hidden; }
+  .svc-wf-tbl th { padding: 11px 14px; background: #F0F6FC; font-family: var(--font-display); font-size: 11px; font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.04em; text-align: left; }
+  .svc-wf-tbl td { padding: 12px 14px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; border-top: 1px solid #F0F6FC; }
+  .svc-wf-tbl tr:nth-child(even) td { background: #FAFAFA; }
+  .svc-wf-tbl b { font-family: var(--font-display); font-weight: 700; }
+  .step-count.green { color: #15803D; font-family: var(--font-display); font-weight: 700; }
+  .step-count.blue { color: #2D6A9F; font-family: var(--font-display); font-weight: 700; }
+  .btn-edit-link { background: none; border: none; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; cursor: pointer; padding: 4px 10px; }
+  .pagi-row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-family: var(--font-body); font-size: 12px; color: #5A7A96; }
+  .sub-btn .new-pill { margin-left: auto; background: #DCFCE7; color: #15803D; font-family: var(--font-display); font-size: 9.5px; font-weight: 700; padding: 1px 7px; border-radius: 9999px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+  /* Page hero (per section) */
+  .page-hero h1 { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .page-hero .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 6px; line-height: 1.5; max-width: 640px; }
+  .page-hero { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+
+  /* Reusable card */
+  .section-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  .section-card + .section-card { margin-top: 18px; }
+  .section-head { padding: 16px 22px; border-bottom: 1px solid #E5EFF7; }
+  .section-head .ttl { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #1A2E40; }
+  .section-head .ttl-emoji { margin-right: 6px; }
+  .section-head .sub { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 3px; }
+  .section-body { padding: 20px 22px; }
+
+  .info-banner { background: #EBF6FD; border: 1px solid #93C5FD; border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #1A3A5C; line-height: 1.45; margin-bottom: 18px; }
+  .info-banner .lucide { width: 16px; height: 16px; color: #2D6A9F; flex-shrink: 0; }
+
+  /* Buttons */
+  .btn { height: 38px; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; text-decoration: none; white-space: nowrap; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-outline { background: #fff; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-outline:hover { background: #F0F6FC; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 18px; }
+  .btn-primary:hover { background: #1A5685; }
+  .btn-success { background: #15803D; color: #fff; padding: 0 18px; }
+  .btn-ghost-red { background: none; color: #DC2626; border: none; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; padding: 0; }
+  .btn-ghost-red:hover { text-decoration: underline; }
+  .btn-sm { height: 32px; padding: 0 12px; font-size: 12px; }
+  .btn-icon { width: 32px; height: 32px; padding: 0; justify-content: center; }
+
+  /* Fields */
+  .field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .field-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  @media (max-width: 800px) { .field-grid-2, .field-grid-3 { grid-template-columns: 1fr; } }
+  .field label { display: block; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; }
+  .field input, .field textarea, .field select { width: 100%; height: 40px; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .field textarea { height: auto; padding: 10px 12px; resize: vertical; min-height: 80px; }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: #2D6A9F; }
+  .field-help { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; margin-top: 5px; line-height: 1.4; }
+  .field-prefix { display: flex; align-items: stretch; border: 1.5px solid #D0E8F5; border-radius: 8px; overflow: hidden; }
+  .field-prefix .prefix { padding: 0 12px; display: flex; align-items: center; background: #F0F6FC; font-family: var(--font-mono); font-size: 12px; color: #5A7A96; border-right: 1.5px solid #D0E8F5; }
+  .field-prefix input { border: none; border-radius: 0; height: 38px; }
+  .field.full { grid-column: 1 / -1; }
+
+  /* Notification rows */
+  .notif-row { display: grid; grid-template-columns: 1fr auto; gap: 18px; padding: 14px 0; border-bottom: 1px solid #F0F6FC; align-items: center; }
+  .notif-row:last-child { border-bottom: none; }
+  .notif-row .nm { font-family: var(--font-display); font-weight: 600; font-size: 13.5px; color: #1A2E40; }
+  .notif-row .desc { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 3px; line-height: 1.5; max-width: 520px; }
+  .notif-row .channels { display: flex; gap: 18px; align-items: center; }
+  .notif-row .chan { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 52px; }
+  .notif-row .chan-label { font-family: var(--font-display); font-size: 10px; font-weight: 600; color: #9BBAD4; text-transform: uppercase; letter-spacing: 0.05em; }
+  .channels-head { display: grid; grid-template-columns: 1fr auto; padding: 10px 0 14px; border-bottom: 1px solid #E5EFF7; margin-bottom: 6px; }
+  .channels-head .h-labels { display: flex; gap: 18px; }
+  .channels-head .h-labels span { min-width: 52px; text-align: center; font-family: var(--font-display); font-size: 10.5px; font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* Toggle switch */
+  .switch { width: 38px; height: 22px; border-radius: 9999px; background: #2D6A9F; cursor: pointer; position: relative; padding: 2px; display: flex; align-items: center; flex-shrink: 0; transition: background 150ms; border: none; }
+  .switch::after { content: ''; width: 18px; height: 18px; border-radius: 50%; background: #fff; margin-left: auto; transition: margin 150ms; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .switch.off { background: #D0E8F5; }
+  .switch.off::after { margin-left: 0; }
+  .switch.danger { background: #DC2626; }
+
+  /* Sticky save bar */
+  .save-bar { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #D0E8F5; padding: 14px 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 -22px -20px; border-radius: 0 0 12px 12px; }
+  .save-bar .note { font-family: var(--font-body); font-size: 12px; color: #9BBAD4; }
+  .save-bar .actions { display: flex; gap: 10px; }
+
+  /* Stats row */
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 18px; }
+  .stat-card { background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .stat-card .lbl { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-card .val { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; margin-top: 4px; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 12px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #E5EFF7; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  .nm { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .em { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; font-weight: 500; }
+  .mono { font-family: var(--font-mono); font-size: 12.5px; color: #5A7A96; }
+  .av-init { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 11.5px; color: #fff; flex-shrink: 0; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .badge.role-admin { background: #DBEAFE; color: #1D4ED8; }
+  .badge.role-recep { background: #EDE9FE; color: #7C3AED; }
+  .badge.role-staff { background: #F1F5F9; color: #475569; }
+  .badge.success { background: #DCFCE7; color: #15803D; }
+  .badge.slate { background: #F1F5F9; color: #475569; }
+  .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .row-actions { display: inline-flex; gap: 6px; }
+
+  /* Roles cards + perm matrix */
+  .roles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
+  @media (max-width: 900px) { .roles-grid { grid-template-columns: 1fr; } }
+  .role-card { padding: 16px 18px; border-radius: 12px; border: 1.5px solid #E5EFF7; background: #fff; }
+  .role-card .role-name { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #1A2E40; }
+  .role-card .role-name .iplate { width: 28px; height: 28px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; }
+  .role-card .role-name .iplate .lucide { width: 14px; height: 14px; }
+  .role-card .desc { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 6px; line-height: 1.5; min-height: 36px; }
+  .role-card .meta { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-family: var(--font-display); font-size: 11px; color: #5A7A96; }
+  .role-card .meta .num { font-weight: 700; color: #1A2E40; font-size: 13px; }
+
+  .perm-cell { display: inline-flex; align-items: center; justify-content: center; width: 100%; }
+  .perm-icon { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
+  .perm-icon.full { background: #DCFCE7; color: #15803D; }
+  .perm-icon.limited { background: #FEF3C7; color: #B45309; }
+  .perm-icon.none { background: #FEE2E2; color: #DC2626; }
+  .perm-icon .lucide { width: 12px; height: 12px; }
+  .perm-legend { display: flex; flex-wrap: wrap; gap: 18px; padding: 14px 22px; border-top: 1px solid #E5EFF7; background: #F8FBFD; font-family: var(--font-body); font-size: 12px; color: #5A7A96; }
+  .perm-legend .item { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* Payment cards */
+  .pay-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  @media (max-width: 800px) { .pay-grid { grid-template-columns: 1fr; } }
+  .pay-card { border: 1.5px solid #E5EFF7; border-radius: 12px; padding: 16px 18px; background: #fff; display: flex; flex-direction: column; gap: 10px; }
+  .pay-card.disabled { opacity: 0.55; }
+  .pay-card .top { display: flex; align-items: center; gap: 12px; }
+  .pay-card .logo { width: 44px; height: 44px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pay-card .logo.cash { background: #DCFCE7; color: #15803D; }
+  .pay-card .logo.card { background: #DBEAFE; color: #1D4ED8; }
+  .pay-card .logo.gcash { background: #EBF6FD; color: #2D6A9F; }
+  .pay-card .logo.maya { background: #EDE9FE; color: #7C3AED; }
+  .pay-card .logo .lucide { width: 22px; height: 22px; }
+  .pay-card .body { flex: 1; }
+  .pay-card .nm { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #1A2E40; }
+  .pay-card .desc { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 3px; line-height: 1.45; }
+  .pay-card .actions { display: flex; align-items: center; gap: 8px; }
+  .pay-settings { border-top: 1px dashed #E5EFF7; padding-top: 10px; font-family: var(--font-body); font-size: 12px; color: #5A7A96; display: flex; gap: 14px; flex-wrap: wrap; }
+  .pay-settings .k { color: #9BBAD4; font-family: var(--font-display); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .pay-settings .v { color: #1A2E40; font-family: var(--font-mono); font-weight: 600; }
+
+  /* Toggle row (used in POS settings + Inventory settings) */
+  .toggle-row { display: grid; grid-template-columns: 1fr auto; gap: 16px; padding: 14px 0; border-bottom: 1px solid #F0F6FC; align-items: center; }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-row .nm { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .toggle-row .desc { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 2px; line-height: 1.45; max-width: 520px; }
+
+  /* Stock thresholds */
+  .thresh-row { display: grid; grid-template-columns: 160px 1fr; gap: 14px; padding: 10px 0; border-bottom: 1px solid #F0F6FC; align-items: center; }
+  .thresh-row:last-child { border-bottom: none; }
+  .thresh-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .thresh-badge.full { background: #DCFCE7; color: #15803D; }
+  .thresh-badge.ok   { background: #DBEAFE; color: #1D4ED8; }
+  .thresh-badge.low  { background: #FEF3C7; color: #B45309; }
+  .thresh-badge.vlow { background: #FFEDD5; color: #C2410C; }
+  .thresh-badge.no   { background: #FEE2E2; color: #DC2626; }
+  .thresh-input { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-body); font-size: 13px; color: #5A7A96; }
+  .thresh-input input { width: 64px; height: 32px; padding: 0 8px; border: 1.5px solid #D0E8F5; border-radius: 6px; font-family: var(--font-mono); font-size: 13px; text-align: center; color: #1A2E40; outline: none; }
+  .thresh-input input:focus { border-color: #2D6A9F; }
+  .thresh-input .lock { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-display); font-size: 11.5px; color: #9BBAD4; }
+
+  /* Gmail card */
+  .gmail-icon { width: 56px; height: 56px; border-radius: 14px; background: #F8FBFD; border: 1.5px solid #D0E8F5; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .gmail-icon svg { width: 32px; height: 32px; }
+  .gmail-icon.muted { filter: grayscale(1); opacity: 0.55; }
+  .gmail-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  .gmail-row .body { flex: 1; min-width: 240px; }
+  .gmail-row .connected-pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; background: #DCFCE7; color: #15803D; border-radius: 9999px; font-family: var(--font-display); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .gmail-row .not-pill { background: #F1F5F9; color: #475569; }
+  .gmail-row .connected-pill .lucide { width: 12px; height: 12px; }
+  .gmail-row h3 { font-family: var(--font-mono); font-size: 17px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .gmail-row h3.not { font-family: var(--font-display); font-size: 17px; color: #5A7A96; }
+  .gmail-row .meta { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 4px; line-height: 1.55; }
+  .gmail-row .actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+
+  /* Modal */
+  .modal { position: fixed; inset: 0; background: rgba(15,30,48,0.55); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 200; }
+  .modal[hidden] { display: none !important; }
+  .modal-card { background: #fff; border-radius: 12px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(15,30,48,0.35); overflow: hidden; }
+  .modal-head { padding: 18px 22px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #E5EFF7; }
+  .modal-head h2 { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .modal-head .sub { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 2px; }
+  .modal-close { margin-left: auto; width: 32px; height: 32px; background: none; border: none; cursor: pointer; color: #5A7A96; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; }
+  .modal-close:hover { background: #F0F6FC; color: #1A2E40; }
+  .modal-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 14px; }
+  .modal-foot { padding: 14px 22px; border-top: 1px solid #E5EFF7; background: #F8FBFD; display: flex; justify-content: flex-end; gap: 10px; }
+  .toggle-inline { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid #D0E8F5; border-radius: 8px; background: #fff; }
+  .toggle-inline .copy { flex: 1; }
+  .toggle-inline .copy .t { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .toggle-inline .copy .d { font-family: var(--font-body); font-size: 11.5px; color: #5A7A96; margin-top: 2px; }
+
+  /* ============ System Audit Logs ============ */
+  .audit-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+  @media (max-width: 900px) { .audit-stats { grid-template-columns: repeat(2, 1fr); } }
+  .audit-stats .card { background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .audit-stats .card .lbl { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; }
+  .audit-stats .card .val { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; margin-top: 4px; }
+  .audit-stats .card .sub { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; margin-top: 4px; }
+  .audit-filters { background: #fff; padding: 14px 16px; border-radius: 12px 12px 0 0; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; border-bottom: 1px solid #E5EFF7; }
+  .audit-filters .search-input { position: relative; flex: 1; min-width: 220px; max-width: 320px; }
+  .audit-filters .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .audit-filters .search-input input { width: 100%; height: 36px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .audit-filters .field-select { height: 36px; padding: 0 30px 0 12px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 12.5px; color: #1A2E40; outline: none; background: #fff; min-width: 130px; }
+  .audit-filters .date-range { display: inline-flex; align-items: center; gap: 6px; }
+  .audit-filters .date-range input { height: 36px; padding: 0 10px; border: 1.5px solid #D0E8F5; border-radius: 7px; font-family: var(--font-mono); font-size: 12px; color: #1A2E40; outline: none; background: #fff; }
+  .audit-filters .date-range .lbl { font-family: var(--font-body); font-size: 11px; color: #9BBAD4; }
+  .audit-card { background: #fff; border-radius: 0 0 12px 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  .audit-card table { width: 100%; border-collapse: collapse; }
+  .audit-card th { padding: 11px 14px; text-align: left; font-family: var(--font-display); font-size: 10.5px; font-weight: 700; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+  .audit-card td { padding: 12px 14px; border-bottom: 1px solid #E5EFF7; font-size: 12.5px; color: #5A7A96; vertical-align: middle; }
+  .audit-card tbody tr:last-child td { border-bottom: none; }
+  .audit-card tbody tr:hover td { background: #F8FBFD; }
+  .ts-mono { font-family: var(--font-mono); font-size: 11.5px; color: #5A7A96; white-space: nowrap; }
+  .ip-mono { font-family: var(--font-mono); font-size: 11.5px; color: #9BBAD4; }
+  .ip-mono.suspicious { color: #DC2626; font-weight: 600; }
+  .user-cell { display: inline-flex; align-items: center; gap: 8px; }
+  .user-cell .av-init { width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; color: #fff; }
+  .user-cell .nm { font-family: var(--font-body); font-size: 12.5px; font-weight: 500; color: #1A2E40; }
+  .user-cell .nm.unknown { color: #DC2626; font-style: italic; }
+  .mod-badge, .act-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 9999px; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .mod-badge.auth { background: #F1F5F9; color: #475569; }
+  .mod-badge.settings { background: #DBEAFE; color: #1D4ED8; }
+  .mod-badge.pos { background: #DCFCE7; color: #15803D; }
+  .mod-badge.inventory { background: #FEF3C7; color: #B45309; }
+  .mod-badge.users { background: #EDE9FE; color: #7C3AED; }
+  .mod-badge.discounts { background: #CFFAFE; color: #0E7490; }
+  .mod-badge.messages { background: #E0E7FF; color: #4338CA; }
+  .mod-badge.payments { background: #D1FAE5; color: #047857; }
+  .mod-badge.appointments { background: #FCE7F3; color: #BE185D; }
+  .act-badge.login, .act-badge.logout { background: #F1F5F9; color: #475569; }
+  .act-badge.created, .act-badge.approved { background: #DCFCE7; color: #15803D; }
+  .act-badge.updated { background: #DBEAFE; color: #1D4ED8; }
+  .act-badge.deleted { background: #FEE2E2; color: #DC2626; }
+  .act-badge.rejected { background: #FED7AA; color: #C2410C; }
+  .act-badge.refunded { background: #FEF3C7; color: #B45309; }
+  .act-badge.assigned { background: #EDE9FE; color: #7C3AED; }
+  .act-badge.failed { background: #FEE2E2; color: #DC2626; }
+  .audit-desc { font-family: var(--font-body); font-size: 12.5px; color: #1A2E40; max-width: 420px; }
+  .audit-link { background: none; border: none; color: #2D6A9F; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; padding: 0; display: inline-flex; align-items: center; gap: 3px; text-decoration: none; }
+  .audit-link:hover { text-decoration: underline; }
+  tr.failed-row td { background: #FEF2F2 !important; box-shadow: inset 3px 0 0 #DC2626; }
+  .audit-pagination { padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid #E5EFF7; flex-wrap: wrap; }
+  .audit-pagination .info { font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; }
+  .audit-pagination .info b { color: #1A2E40; font-family: var(--font-display); font-weight: 600; }
+  .audit-pagination .pages { display: flex; gap: 4px; align-items: center; }
+  .audit-pagination .pages button { min-width: 32px; height: 32px; padding: 0 8px; border-radius: 7px; border: 1.5px solid #D0E8F5; background: #fff; color: #5A7A96; cursor: pointer; font-family: var(--font-display); font-size: 12px; font-weight: 600; }
+  .audit-pagination .pages button:hover { background: #F0F6FC; color: #2D6A9F; }
+  .audit-pagination .pages button.active { background: #2D6A9F; color: #fff; border-color: #2D6A9F; }
+  .audit-pagination .pages .ellipsis { color: #9BBAD4; padding: 0 4px; }
+
+  /* Auth-failed alert banner */
+  .auth-alert { background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 10px; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start; margin-bottom: 14px; }
+  .auth-alert[hidden] { display: none !important; }
+  .auth-alert .lucide { width: 16px; height: 16px; color: #DC2626; flex-shrink: 0; margin-top: 2px; }
+  .auth-alert .body { flex: 1; font-family: var(--font-body); font-size: 12.5px; color: #991B1B; line-height: 1.5; }
+  .auth-alert .body b { color: #7F1D1D; font-family: var(--font-display); font-weight: 700; }
+  .auth-alert .body a { color: #2D6A9F; font-family: var(--font-display); font-weight: 600; text-decoration: none; }
+  .auth-alert .body a:hover { text-decoration: underline; }
+
+  /* Detail drawer */
+  .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 400px; max-width: 96vw; background: #fff; border-left: 1px solid #E2ECF5; box-shadow: -12px 0 28px rgba(15,30,48,0.18); z-index: 300; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 220ms ease-out; }
+  .drawer.open { transform: translateX(0); }
+  .drawer-backdrop { position: fixed; inset: 0; background: rgba(15,30,48,0.30); z-index: 290; opacity: 0; pointer-events: none; transition: opacity 220ms; }
+  .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+  .drawer-head { padding: 18px 22px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #E5EFF7; }
+  .drawer-head h2 { margin: 0; font-family: var(--font-display); font-size: 16px; font-weight: 700; color: #1A2E40; }
+  .drawer-head .sub { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; margin-top: 2px; }
+  .drawer-close { margin-left: auto; width: 32px; height: 32px; background: none; border: none; cursor: pointer; color: #5A7A96; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; }
+  .drawer-close:hover { background: #F0F6FC; color: #1A2E40; }
+  .drawer-body { flex: 1; overflow-y: auto; padding: 18px 22px; display: flex; flex-direction: column; gap: 14px; }
+  .drawer-card { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 10px; padding: 14px 16px; }
+  .drawer-card .ttl { font-family: var(--font-display); font-size: 10.5px; font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #E5EFF7; }
+  .drawer-card .row { display: grid; grid-template-columns: 92px 1fr; gap: 8px; font-size: 12.5px; padding: 4px 0; }
+  .drawer-card .row .k { font-family: var(--font-display); font-weight: 600; color: #5A7A96; }
+  .drawer-card .row .v { font-family: var(--font-display); font-weight: 600; color: #1A2E40; }
+  .drawer-card .row .v.mono { font-family: var(--font-mono); color: #2D6A9F; }
+  .drawer-card .row .v.muted { color: #9BBAD4; font-family: var(--font-mono); }
+
+  /* Diff card (before/after) */
+  .diff-card { background: #fff; border: 1px solid #E5EFF7; border-radius: 10px; padding: 14px 16px; }
+  .diff-card .ttl { font-family: var(--font-display); font-size: 10.5px; font-weight: 700; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .diff-row { display: grid; grid-template-columns: 100px 1fr 16px 1fr; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px dashed #E5EFF7; font-size: 12.5px; }
+  .diff-row:last-child { border-bottom: none; }
+  .diff-row .k { font-family: var(--font-display); font-weight: 600; color: #5A7A96; }
+  .diff-row .before { font-family: var(--font-mono); color: #DC2626; text-decoration: line-through; text-decoration-color: rgba(220,38,38,0.5); }
+  .diff-row .arrow { color: #9BBAD4; text-align: center; }
+  .diff-row .after { font-family: var(--font-mono); color: #15803D; font-weight: 700; }
+  .related-links { display: flex; flex-direction: column; gap: 6px; }
+  .related-links a { font-family: var(--font-display); font-weight: 600; font-size: 12.5px; color: #2D6A9F; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+  .related-links a:hover { text-decoration: underline; }
+  .drawer-foot { padding: 14px 22px; border-top: 1px solid #E5EFF7; background: #F8FBFD; display: flex; justify-content: flex-end; gap: 8px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Settings</div>
+        <div class="topbar-crumb" id="topbar-crumb">Admin / Settings</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Settings">
+      <div class="layout">
+        <!-- Settings sub-sidebar -->
+        <div class="subnav" id="subnav">
+          <div class="sub-head">Settings</div>
+          <button class="sub-btn" data-s="clinic"><i data-lucide="building-2"></i> Clinic Information</button>
+          <button class="sub-btn" data-s="booking"><i data-lucide="calendar"></i> Appointment Configuration</button>
+          <button class="sub-btn" data-s="notifications"><i data-lucide="bell"></i> Notification Preferences</button>
+          <button class="sub-btn active" data-s="users"><i data-lucide="users"></i> User Management</button>
+          <button class="sub-btn" data-s="roles"><i data-lucide="shield"></i> Roles &amp; Permissions</button>
+          <button class="sub-btn" data-s="email"><i data-lucide="mail"></i> Email Integration</button>
+          <button class="sub-btn" data-s="payments"><i data-lucide="credit-card"></i> Payment Methods</button>
+          <button class="sub-btn" data-s="pos"><i data-lucide="shopping-cart"></i> POS Settings</button>
+          <button class="sub-btn" data-s="inventory"><i data-lucide="boxes"></i> Inventory Settings</button>
+          <button class="sub-btn" data-s="protocol-templates"><i data-lucide="file-text"></i> Protocol Templates <span class="new-pill">NEW</span></button>
+          <button class="sub-btn" data-s="service-workflows"><i data-lucide="workflow"></i> Service Workflows <span class="new-pill">NEW</span></button>
+          <button class="sub-btn" data-s="audit"><i data-lucide="activity"></i> Audit Logs</button>
+        </div>
+
+        <div id="sections">
+
+          <!-- ========== Clinic Information ========== -->
+          <div class="sec" id="sec-clinic" hidden>
+            <div class="page-hero">
+              <div><h1>Clinic Information</h1><div class="sub">Update your clinic's public details. These appear on receipts, the website, and patient communications.</div></div>
+            </div>
+            <div class="section-card">
+              <div class="section-body">
+                <div class="field-grid-2">
+                  <div class="field full"><label>Clinic Name</label><input value="Cloud Skin Clinic + Wellness"></div>
+                  <div class="field"><label>Phone Number</label><input value="+63 2-8XXX-XXXX"></div>
+                  <div class="field"><label>Email Address</label><input value="hello@cloudskin.com"></div>
+                  <div class="field full"><label>Address</label><textarea rows="2">123 Clinic Street, BGC, Taguig City, Metro Manila, Philippines</textarea></div>
+                  <div class="field"><label>TIN Number</label><input value="123-456-789-000"></div>
+                  <div class="field"><label>License Number</label><input value="DOH-2024-04412"></div>
+                </div>
+                <div class="save-bar">
+                  <span class="note">Changes apply across receipts, website footer, and emails.</span>
+                  <div class="actions"><button class="btn btn-outline">Discard</button><button class="btn btn-primary"><i data-lucide="save"></i> Save Clinic Info</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== Appointment Configuration ========== -->
+          <div class="sec" id="sec-booking" hidden>
+            <div class="page-hero">
+              <div><h1>Appointment Configuration</h1><div class="sub">Configure how patients can book appointments — time windows, slot duration, and confirmation rules.</div></div>
+            </div>
+            <div class="section-card">
+              <div class="section-body">
+                <div class="info-banner"><i data-lucide="info"></i><span>Changes take effect immediately for all new bookings.</span></div>
+                <div class="field-grid-2">
+                  <div class="field"><label>Booking Start Time</label><input type="time" value="10:00"></div>
+                  <div class="field"><label>Booking End Time</label><input type="time" value="18:00"></div>
+                  <div class="field"><label>Slot Interval</label>
+                    <select><option>20 minutes</option><option>30 minutes</option><option selected>60 minutes</option></select>
+                  </div>
+                  <div class="field"><label>Lead Time (min)</label><input type="number" value="60"><div class="field-help">Minimum notice required before booking.</div></div>
+                </div>
+                <div class="save-bar">
+                  <span class="note">Applied to all bookable services unless overridden.</span>
+                  <div class="actions"><button class="btn btn-outline">Discard</button><button class="btn btn-primary"><i data-lucide="save"></i> Save Settings</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== Notification Preferences ========== -->
+          <div class="sec" id="sec-notifications" hidden>
+            <div class="page-hero">
+              <div><h1>Notification Preferences</h1><div class="sub">Control which alerts and notifications you receive and how they are delivered. Changes apply only to your account.</div></div>
+            </div>
+            <div class="section-card">
+              <div class="section-head">
+                <div class="ttl"><span class="ttl-emoji">📅</span> Appointments</div>
+                <div class="sub">Alerts related to bookings and scheduling.</div>
+              </div>
+              <div class="section-body">
+                <div class="channels-head"><span></span><div class="h-labels"><span>In-App</span><span>Email</span><span>SMS</span></div></div>
+                <div id="notif-appt"></div>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="section-head">
+                <div class="ttl"><span class="ttl-emoji">📦</span> Inventory</div>
+                <div class="sub">Alerts for stock levels and purchase orders.</div>
+              </div>
+              <div class="section-body"><div class="channels-head"><span></span><div class="h-labels"><span>In-App</span><span>Email</span><span>SMS</span></div></div><div id="notif-inv"></div></div>
+            </div>
+            <div class="section-card">
+              <div class="section-head">
+                <div class="ttl"><span class="ttl-emoji">💳</span> Payments</div>
+                <div class="sub">Alerts for transactions and pending payments.</div>
+              </div>
+              <div class="section-body"><div class="channels-head"><span></span><div class="h-labels"><span>In-App</span><span>Email</span><span>SMS</span></div></div><div id="notif-pay"></div></div>
+            </div>
+            <div class="section-card">
+              <div class="section-head">
+                <div class="ttl"><span class="ttl-emoji">✉️</span> Messages</div>
+                <div class="sub">Alerts for new inbox messages and contact form submissions.</div>
+              </div>
+              <div class="section-body"><div class="channels-head"><span></span><div class="h-labels"><span>In-App</span><span>Email</span><span>SMS</span></div></div><div id="notif-msg"></div></div>
+            </div>
+            <div class="section-card">
+              <div class="section-head">
+                <div class="ttl"><span class="ttl-emoji">⚙️</span> System</div>
+                <div class="sub">System-level alerts and security notifications.</div>
+              </div>
+              <div class="section-body"><div class="channels-head"><span></span><div class="h-labels"><span>In-App</span><span>Email</span><span>SMS</span></div></div><div id="notif-sys"></div>
+                <div class="save-bar">
+                  <span class="note">Changes apply immediately after saving.</span>
+                  <div class="actions"><button class="btn btn-outline"><i data-lucide="rotate-ccw"></i> Reset to Defaults</button><button class="btn btn-primary"><i data-lucide="save"></i> Save Preferences</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== User Management ========== -->
+          <div class="sec" id="sec-users">
+            <div class="page-hero">
+              <div><h1>User Management</h1><div class="sub">Manage admin and staff accounts who have access to the dashboard.</div></div>
+              <button class="btn btn-primary" id="open-add-user"><i data-lucide="plus"></i> Add User</button>
+            </div>
+            <div class="stat-row">
+              <div class="stat-card"><div class="lbl">Total Users</div><div class="val">4</div></div>
+              <div class="stat-card"><div class="lbl">Admins</div><div class="val">1</div></div>
+              <div class="stat-card"><div class="lbl">Staff</div><div class="val">3</div></div>
+              <div class="stat-card"><div class="lbl">Inactive</div><div class="val">0</div></div>
+            </div>
+            <div class="section-card">
+              <table>
+                <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Last Active</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
+                <tbody>
+                  <tr><td><div style="display:flex;align-items:center;gap:10px;"><span class="av-init" style="background:#2D6A9F;">AU</span><span class="nm">Admin User</span></div></td><td><span class="em">admin@cloudskin.com</span></td><td><span class="badge role-admin">Admin</span></td><td><span class="mono">Just now</span></td><td><span class="badge success"><span class="dot"></span>Active</span></td><td style="text-align:right;"><div class="row-actions"><button class="btn btn-outline btn-sm"><i data-lucide="pencil"></i> Edit</button></div></td></tr>
+                  <tr><td><div style="display:flex;align-items:center;gap:10px;"><span class="av-init" style="background:#7C3AED;">AC</span><span class="nm">Ana Cruz</span></div></td><td><span class="em">ana.cruz@cloudskin.com</span></td><td><span class="badge role-recep">Receptionist</span></td><td><span class="mono">May 13 · 3:00 PM</span></td><td><span class="badge success"><span class="dot"></span>Active</span></td><td style="text-align:right;"><div class="row-actions"><button class="btn btn-outline btn-sm"><i data-lucide="pencil"></i> Edit</button><button class="btn btn-outline btn-sm" style="color:#DC2626;border-color:#FCA5A5;"><i data-lucide="user-x"></i> Deactivate</button></div></td></tr>
+                  <tr><td><div style="display:flex;align-items:center;gap:10px;"><span class="av-init" style="background:#7C3AED;">BS</span><span class="nm">Ben Santos</span></div></td><td><span class="em">ben.santos@cloudskin.com</span></td><td><span class="badge role-recep">Receptionist</span></td><td><span class="mono">May 13 · 1:30 PM</span></td><td><span class="badge success"><span class="dot"></span>Active</span></td><td style="text-align:right;"><div class="row-actions"><button class="btn btn-outline btn-sm"><i data-lucide="pencil"></i> Edit</button><button class="btn btn-outline btn-sm" style="color:#DC2626;border-color:#FCA5A5;"><i data-lucide="user-x"></i> Deactivate</button></div></td></tr>
+                  <tr><td><div style="display:flex;align-items:center;gap:10px;"><span class="av-init" style="background:#15803D;">ML</span><span class="nm">Maria Lim</span></div></td><td><span class="em">maria.lim@cloudskin.com</span></td><td><span class="badge role-staff">Staff</span></td><td><span class="mono">May 10 · 9:00 AM</span></td><td><span class="badge success"><span class="dot"></span>Active</span></td><td style="text-align:right;"><div class="row-actions"><button class="btn btn-outline btn-sm"><i data-lucide="pencil"></i> Edit</button><button class="btn btn-outline btn-sm" style="color:#DC2626;border-color:#FCA5A5;"><i data-lucide="user-x"></i> Deactivate</button></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ========== Roles & Permissions ========== -->
+          <div class="sec" id="sec-roles" hidden>
+            <div class="page-hero">
+              <div><h1>Roles &amp; Permissions</h1><div class="sub">Control what each role can access and do in the dashboard. Built-in roles cannot be deleted, only their permissions can be reviewed.</div></div>
+            </div>
+            <div class="roles-grid">
+              <div class="role-card">
+                <div class="role-name"><span class="iplate" style="background:#DBEAFE;color:#1D4ED8;"><i data-lucide="shield"></i></span> Admin</div>
+                <div class="desc">Full access to every module. Can manage users, view reports, and change settings.</div>
+                <div class="meta"><span class="num">1</span> member · Cannot be removed</div>
+              </div>
+              <div class="role-card">
+                <div class="role-name"><span class="iplate" style="background:#EDE9FE;color:#7C3AED;"><i data-lucide="user-cog"></i></span> Receptionist</div>
+                <div class="desc">Manages appointments, patients, POS, and payments. Read-only access to inventory and reports.</div>
+                <div class="meta"><span class="num">2</span> members</div>
+              </div>
+              <div class="role-card">
+                <div class="role-name"><span class="iplate" style="background:#F1F5F9;color:#475569;"><i data-lucide="user"></i></span> Staff</div>
+                <div class="desc">Limited access — physical counts, appointments view, and assigned messages only.</div>
+                <div class="meta"><span class="num">1</span> member</div>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="section-head">
+                <div class="ttl">Permissions matrix</div>
+                <div class="sub">What each role can do across modules.</div>
+              </div>
+              <table>
+                <thead><tr><th>Module</th><th style="text-align:center;">Admin</th><th style="text-align:center;">Receptionist</th><th style="text-align:center;">Staff</th></tr></thead>
+                <tbody id="perm-tbody"></tbody>
+              </table>
+              <div class="perm-legend">
+                <span class="item"><span class="perm-icon full"><i data-lucide="check"></i></span> Full Access</span>
+                <span class="item"><span class="perm-icon limited"><i data-lucide="alert-triangle"></i></span> Limited Access</span>
+                <span class="item"><span class="perm-icon none"><i data-lucide="x"></i></span> No Access</span>
+                <span style="margin-left:auto;color:#9BBAD4;">Contact support to customize permissions.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== Email Integration ========== -->
+          <div class="sec" id="sec-email" hidden>
+            <div class="page-hero">
+              <div><h1>Email Integration</h1><div class="sub">Connect your clinic's Gmail account to manage emails directly from the dashboard. Once connected, emails sent to your clinic's address appear in the unified Inbox.</div></div>
+            </div>
+            <div class="section-card">
+              <div class="section-head"><div class="ttl">Gmail Account</div><div class="sub">Receive and reply to emails sent to your clinic's Gmail directly from the inbox.</div></div>
+              <div class="section-body">
+                <div class="gmail-row">
+                  <div class="gmail-icon">
+                    <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#D44638" stroke-width="1.8" fill="#fff"/><path d="M3 6 L12 13 L21 6" stroke="#D44638" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 18 L9.5 12.5" stroke="#D44638" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M21 18 L14.5 12.5" stroke="#D44638" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+                  </div>
+                  <div class="body">
+                    <span class="connected-pill"><i data-lucide="check-circle"></i> Connected</span>
+                    <h3>support@cloudskin.com</h3>
+                    <div class="meta">Connected by <b style="color:#1A2E40;font-family:var(--font-display);">Admin User</b> · May 1, 2026<br>Last synced: <b style="color:#1A2E40;font-family:var(--font-display);">2 minutes ago</b> · Checks every <b style="color:#1A2E40;font-family:var(--font-display);">5 minutes</b></div>
+                  </div>
+                  <div class="actions">
+                    <button class="btn btn-outline"><i data-lucide="refresh-cw"></i> Sync Now</button>
+                    <button class="btn-ghost-red">Disconnect Gmail</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-head"><div class="ttl">Outgoing Email</div><div class="sub">Replies sent from the dashboard appear from this address.</div></div>
+              <div class="section-body">
+                <div class="field-grid-2">
+                  <div class="field"><label>From Name</label><input value="Cloud Skin Clinic + Wellness"></div>
+                  <div class="field"><label>From Email</label><input value="support@cloudskin.com"></div>
+                  <div class="field"><label>Reply-To</label><input value="support@cloudskin.com"></div>
+                  <div class="field"><label>BCC Audit Log</label><input value="audit@cloudskin.com" placeholder="Optional"><div class="field-help">All outbound replies are silently BCC'd here for compliance.</div></div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-end;margin-top:14px;flex-wrap:wrap;">
+                  <div class="field" style="flex:1;min-width:240px;"><label>Send Test Email</label><input placeholder="recipient@email.com"></div>
+                  <button class="btn btn-outline" style="height:40px;"><i data-lucide="send"></i> Send Test Email</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-head"><div class="ttl">Not connected — example state</div><div class="sub">For reference, this is how the page looks before a Gmail account is connected.</div></div>
+              <div class="section-body">
+                <div class="gmail-row">
+                  <div class="gmail-icon muted">
+                    <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#9BBAD4" stroke-width="1.8" fill="#fff"/><path d="M3 6 L12 13 L21 6" stroke="#9BBAD4" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </div>
+                  <div class="body">
+                    <span class="connected-pill not-pill"><i data-lucide="circle-slash"></i> Not Connected</span>
+                    <h3 class="not">No Gmail account connected</h3>
+                    <div class="meta">Connect your clinic's Gmail to read and reply to emails directly in the dashboard inbox. Cloud Skin only accesses messages — it cannot delete your Gmail or change settings.</div>
+                  </div>
+                  <div class="actions"><button class="btn btn-primary"><i data-lucide="link-2"></i> Connect Gmail →</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== Payment Methods ========== -->
+          <div class="sec" id="sec-payments" hidden>
+            <div class="page-hero">
+              <div><h1>Payment Methods</h1><div class="sub">Configure which payment methods are available at the POS. Turn methods on or off and update merchant details.</div></div>
+            </div>
+            <div class="section-card">
+              <div class="section-head"><div class="ttl">Accepted Methods</div><div class="sub">Toggle each method to control availability at checkout.</div></div>
+              <div class="section-body">
+                <div class="pay-grid">
+                  <div class="pay-card">
+                    <div class="top">
+                      <div class="logo cash"><i data-lucide="banknote"></i></div>
+                      <div class="body"><div class="nm">Cash</div><div class="desc">Accept physical cash payments. Change calculator enabled.</div></div>
+                      <div class="actions"><button class="switch" data-on="true"></button><button class="btn-icon btn btn-outline btn-sm" title="Settings"><i data-lucide="settings"></i></button></div>
+                    </div>
+                    <div class="pay-settings"><span class="k">Currency</span><span class="v">PHP (₱)</span><span class="k">Drawer count</span><span class="v">Daily</span></div>
+                  </div>
+                  <div class="pay-card">
+                    <div class="top">
+                      <div class="logo card"><i data-lucide="credit-card"></i></div>
+                      <div class="body"><div class="nm">Card</div><div class="desc">Credit and debit card payments via terminal.</div></div>
+                      <div class="actions"><button class="switch" data-on="true"></button><button class="btn-icon btn btn-outline btn-sm" title="Settings"><i data-lucide="settings"></i></button></div>
+                    </div>
+                    <div class="pay-settings"><span class="k">Terminal ID</span><span class="v">TERM-2410-001</span><span class="k">Processor</span><span class="v">BDO Network Bank</span></div>
+                  </div>
+                  <div class="pay-card">
+                    <div class="top">
+                      <div class="logo gcash"><i data-lucide="smartphone"></i></div>
+                      <div class="body"><div class="nm">GCash</div><div class="desc">GCash QR code payments.</div></div>
+                      <div class="actions"><button class="switch" data-on="true"></button><button class="btn-icon btn btn-outline btn-sm" title="Settings"><i data-lucide="settings"></i></button></div>
+                    </div>
+                    <div class="pay-settings"><span class="k">GCash number</span><span class="v">0917-555-0142</span><span class="k">QR</span><span class="v">Uploaded</span></div>
+                  </div>
+                  <div class="pay-card">
+                    <div class="top">
+                      <div class="logo maya"><i data-lucide="wallet"></i></div>
+                      <div class="body"><div class="nm">Maya</div><div class="desc">PayMaya digital wallet payments.</div></div>
+                      <div class="actions"><button class="switch" data-on="true"></button><button class="btn-icon btn btn-outline btn-sm" title="Settings"><i data-lucide="settings"></i></button></div>
+                    </div>
+                    <div class="pay-settings"><span class="k">Merchant ID</span><span class="v">MAYA-PH-08812</span><span class="k">QR</span><span class="v">Uploaded</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-head"><div class="ttl">VAT Settings</div><div class="sub">Tax configuration applied to all POS transactions.</div></div>
+              <div class="section-body">
+                <div class="field-grid-3">
+                  <div class="field"><label>VAT Rate (%)</label><input type="number" value="12"><div class="field-help">Current Philippine VAT rate.</div></div>
+                  <div class="field"><label>VAT Registration Number</label><input value="VAT-2024-04412"></div>
+                  <div class="field"><label>Receipt Format</label><select><option>BIR-compliant Official Receipt</option><option>Sales Invoice</option></select></div>
+                </div>
+                <div class="toggle-row" style="margin-top:8px;">
+                  <div><div class="nm">VAT-inclusive pricing</div><div class="desc">When on, displayed prices already include VAT. When off, VAT is added at checkout.</div></div>
+                  <button class="switch" data-on="true"></button>
+                </div>
+                <div class="save-bar">
+                  <span class="note">VAT settings affect every transaction. Apply with care.</span>
+                  <div class="actions"><button class="btn btn-outline">Discard</button><button class="btn btn-primary"><i data-lucide="save"></i> Save Changes</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== POS Settings ========== -->
+          <div class="sec" id="sec-pos" hidden>
+            <div class="page-hero">
+              <div><h1>POS Settings</h1><div class="sub">Configure how the Point of Sale behaves for your clinic — receipts, sales rules, and session policy.</div></div>
+            </div>
+            <div class="section-card">
+              <div class="section-head"><div class="ttl">Receipt Settings</div><div class="sub">Customize what prints on POS receipts.</div></div>
+              <div class="section-body">
+                <div class="field-grid-2">
+                  <div class="field"><label>Clinic Name on Receipt</label><input value="Cloud Skin Clinic + Wellness"></div>
+                  <div class="field"><label>TIN Number</label><input value="123-456-789-000"></div>
+                  <div class="field full"><label>Address (on receipt)</label><input value="123 Clinic Street, BGC, Taguig City"></div>
+                  <div class="field full"><label>Receipt Footer Message</label><textarea rows="2">Thank you for choosing Cloud Skin Clinic + Wellness. We hope to see you again soon.</textarea></div>
+                </div>
+                <div style="margin-top:6px;">
+                  <div class="toggle-row"><div><div class="nm">Show clinic logo on receipt</div><div class="desc">Prints your logo at the top of every receipt.</div></div><button class="switch" data-on="true"></button></div>
+                  <div class="toggle-row"><div><div class="nm">Auto-print receipt</div><div class="desc">Receipt is printed automatically when the sale is completed.</div></div><button class="switch" data-on="true"></button></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-head"><div class="ttl">Sale Settings</div><div class="sub">Rules for discounts, price overrides, and voids.</div></div>
+              <div class="section-body">
+                <div class="toggle-row"><div><div class="nm">Allow discounts</div><div class="desc">Enable percentage or amount discounts at checkout.</div></div><button class="switch" data-on="true"></button></div>
+                <div class="toggle-row"><div><div class="nm">Require discount reason</div><div class="desc">Cashier must enter a reason whenever a discount is applied.</div></div><button class="switch" data-on="true"></button></div>
+                <div class="toggle-row"><div><div class="nm">Maximum discount</div><div class="desc">Largest single-item discount allowed without manager approval.</div></div>
+                  <div style="display:flex;align-items:center;gap:6px;"><input type="number" value="30" style="width:64px;height:34px;text-align:center;border:1.5px solid #D0E8F5;border-radius:6px;font-family:var(--font-mono);font-size:13px;color:#1A2E40;outline:none;"><span style="font-family:var(--font-display);color:#5A7A96;font-weight:600;">%</span></div>
+                </div>
+                <div class="toggle-row"><div><div class="nm">Allow price override</div><div class="desc">Cashier can manually change unit price on individual line items.</div></div><button class="switch off" data-on="false"></button></div>
+                <div class="toggle-row"><div><div class="nm">Require manager approval for voids</div><div class="desc">Voiding a completed sale needs a manager passcode.</div></div><button class="switch" data-on="true"></button></div>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-head"><div class="ttl">Session Settings</div><div class="sub">Controls for cashier login and inactivity behavior.</div></div>
+              <div class="section-body">
+                <div class="toggle-row"><div><div class="nm">Require cashier login</div><div class="desc">Each cashier signs in with their own credentials before starting a sale.</div></div><button class="switch" data-on="true"></button></div>
+                <div class="toggle-row"><div><div class="nm">Auto-close session after inactivity</div><div class="desc">POS automatically locks when idle for this duration.</div></div>
+                  <select style="width:140px;height:36px;padding:0 10px;border:1.5px solid #D0E8F5;border-radius:7px;font-family:var(--font-body);font-size:12.5px;color:#1A2E40;outline:none;background:#fff;"><option>1 hour</option><option selected>4 hours</option><option>Never</option></select>
+                </div>
+                <div class="toggle-row"><div><div class="nm">Low stock warning during sale</div><div class="desc">Shows a warning if a low-stock item is added to the cart.</div></div><button class="switch" data-on="true"></button></div>
+                <div class="save-bar">
+                  <span class="note">POS settings apply to all registers and cashiers.</span>
+                  <div class="actions"><button class="btn btn-outline">Discard</button><button class="btn btn-primary"><i data-lucide="save"></i> Save Changes</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== Inventory Settings ========== -->
+          <div class="sec" id="sec-inventory" hidden>
+            <div class="page-hero">
+              <div><h1>Inventory Settings</h1><div class="sub">Configure stock thresholds, reorder alerts, and physical count rules.</div></div>
+            </div>
+            <div class="section-card">
+              <div class="section-head"><div class="ttl">Stock Level Thresholds</div><div class="sub">Define what stock levels trigger each status badge. Applied globally unless overridden per product.</div></div>
+              <div class="section-body">
+                <div class="thresh-row"><span class="thresh-badge full"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>Full Stock</span><span class="thresh-input">Above <input type="number" value="50"> units</span></div>
+                <div class="thresh-row"><span class="thresh-badge ok"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>OK Stock</span><span class="thresh-input"><input type="number" value="21"> to <input type="number" value="50"> units</span></div>
+                <div class="thresh-row"><span class="thresh-badge low"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>Low Stock</span><span class="thresh-input"><input type="number" value="11"> to <input type="number" value="20"> units</span></div>
+                <div class="thresh-row"><span class="thresh-badge vlow"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>Very Low</span><span class="thresh-input"><input type="number" value="1"> to <input type="number" value="10"> units</span></div>
+                <div class="thresh-row"><span class="thresh-badge no"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>No Stock</span><span class="thresh-input">0 units <span class="lock"><i data-lucide="lock" style="width:11px;height:11px;"></i> Fixed</span></span></div>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-head"><div class="ttl">Reorder Alerts</div><div class="sub">Who gets notified when stock runs low or out.</div></div>
+              <div class="section-body">
+                <div class="toggle-row"><div><div class="nm">Low stock email alert</div><div class="desc">Sends an email when a product crosses the Low Stock threshold.</div></div><button class="switch" data-on="true"></button></div>
+                <div class="toggle-row"><div><div class="nm">No stock email alert</div><div class="desc">Sends an email when a product hits 0 units.</div></div><button class="switch" data-on="true"></button></div>
+                <div class="field-grid-2" style="margin-top:14px;">
+                  <div class="field"><label>Alert recipient</label><input value="admin@cloudskin.com"></div>
+                  <div class="field"><label>Alert frequency</label><select><option>Immediately</option><option selected>Daily Digest</option><option>Weekly Summary</option></select></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-head"><div class="ttl">Physical Count Settings</div><div class="sub">Rules for in-person stock count sessions.</div></div>
+              <div class="section-body">
+                <div class="toggle-row"><div><div class="nm">Auto-close incomplete sessions</div><div class="desc">Sessions left open are closed automatically after this period.</div></div>
+                  <select style="width:140px;height:36px;padding:0 10px;border:1.5px solid #D0E8F5;border-radius:7px;font-family:var(--font-body);font-size:12.5px;color:#1A2E40;outline:none;background:#fff;"><option>7 days</option><option selected>14 days</option><option>30 days</option></select>
+                </div>
+                <div class="toggle-row"><div><div class="nm">Hide system quantity from counters</div><div class="desc">Counters do a true blind count — system quantity is revealed only on review. <b style="color:#15803D;">Recommended</b></div></div><button class="switch" data-on="true"></button></div>
+                <div class="toggle-row"><div><div class="nm">Require reason for variance approval</div><div class="desc">Admin must enter a reason when approving a count with a quantity variance.</div></div><button class="switch" data-on="true"></button></div>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-head"><div class="ttl">PO Queue Settings</div><div class="sub">Rules for items staged in the PO Queue before becoming purchase orders.</div></div>
+              <div class="section-body">
+                <div class="toggle-row"><div><div class="nm">Keep items in queue for</div><div class="desc">Queued items that aren't converted to a PO within this period are cleared.</div></div>
+                  <select style="width:140px;height:36px;padding:0 10px;border:1.5px solid #D0E8F5;border-radius:7px;font-family:var(--font-body);font-size:12.5px;color:#1A2E40;outline:none;background:#fff;"><option>7 days</option><option selected>14 days</option><option>30 days</option></select>
+                </div>
+                <div class="toggle-row"><div><div class="nm">Notify admin of stale queue items</div><div class="desc">Sends an alert when items have been in the queue for more than 3 days without PO creation.</div></div><button class="switch" data-on="true"></button></div>
+                <div class="save-bar">
+                  <span class="note">Inventory settings apply across all products.</span>
+                  <div class="actions"><button class="btn btn-outline">Discard</button><button class="btn btn-primary"><i data-lucide="save"></i> Save Changes</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== Protocol Templates ========== -->
+          <div class="sec" id="sec-protocol-templates" hidden>
+            <div class="page-hero"><div><h1>Protocol Templates</h1><div class="sub">Manage pre-filled order templates used in the Doctor's Order step. Templates auto-fill the order form when selected by the physician.</div></div></div>
+            <div class="section-card"><div class="section-body">
+              <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+                <select class="field-input" style="max-width:220px;"><option>All Categories</option><option>Slimming &amp; Body</option><option>Laser</option><option>Facial</option></select>
+                <select class="field-input" style="max-width:220px;"><option>All Services</option><option>CO2 Fractional Laser</option><option>Lipolytic Slimming Injection</option></select>
+                <input class="field-input" placeholder="Search templates…" style="flex:1;">
+                <a class="btn btn-primary" href="doctors-order-template-flow.html" style="margin-left:auto;"><i data-lucide="plus"></i> New Template</a>
+              </div>
+              <div class="tpl-row">
+                <div class="tpl-top"><span class="tpl-ti">Lipolytic Slimming — Standard Protocol</span><span class="pill-green-sm">Default</span><span class="type-badge medical">Medical Procedure</span><div class="tpl-actions"><button class="ic-btn"><i data-lucide="pencil"></i></button><button class="ic-btn"><i data-lucide="copy"></i></button><button class="ic-btn danger"><i data-lucide="trash-2"></i></button></div></div>
+                <div class="tpl-meta">Service: Lipolytic Slimming Injection · Category: Slimming &amp; Body</div>
+                <div class="info-chips"><span>10ml lipolytic</span><span>Mesotherapy</span><span>3 pre-steps</span><span>Abdomen + Thighs</span></div>
+                <div class="ts-row">Last updated May 10, 2026 · Dr. Delson Pacyaoen</div>
+              </div>
+              <div class="tpl-row">
+                <div class="tpl-top"><span class="tpl-ti">CO2 Laser — Standard Protocol</span><span class="type-badge medical">Medical Procedure</span><div class="tpl-actions"><button class="ic-btn"><i data-lucide="pencil"></i></button><button class="ic-btn"><i data-lucide="copy"></i></button><button class="ic-btn danger"><i data-lucide="trash-2"></i></button></div></div>
+                <div class="tpl-meta">Service: CO2 Fractional Laser · Category: Laser</div>
+                <div class="info-chips"><span>15mJ</span><span>15% density</span><span>2 passes</span><span>5 pre-steps</span></div>
+                <div class="ts-row">Last updated Apr 28, 2026 · Dr. Delson Pacyaoen</div>
+              </div>
+              <div class="tpl-row">
+                <div class="tpl-top"><span class="tpl-ti">Diamond Glow — Standard Protocol</span><span class="type-badge clinical">Clinical Aesthetic</span><div class="tpl-actions"><button class="ic-btn"><i data-lucide="pencil"></i></button><button class="ic-btn"><i data-lucide="copy"></i></button><button class="ic-btn danger"><i data-lucide="trash-2"></i></button></div></div>
+                <div class="tpl-meta">Service: Diamond Glow Facial · Category: Facial</div>
+                <div class="info-chips"><span>Diamond tip</span><span>3 passes</span><span>4 pre-steps</span></div>
+                <div class="ts-row">Last updated Mar 22, 2026 · Dr. Maria Santos</div>
+              </div>
+            </div></div>
+          </div>
+
+          <!-- ========== Service Workflows ========== -->
+          <div class="sec" id="sec-service-workflows" hidden>
+            <div class="page-hero"><div><h1>Service Workflows</h1><div class="sub">Configure the clinical documentation steps required for each service. The stepper shown to staff automatically adjusts based on these settings.</div></div></div>
+            <div class="section-card"><div class="section-body">
+              <div class="info-line-blue"><i data-lucide="info"></i> Changes here affect all future sessions. Active sessions already in progress are not affected.</div>
+              <div class="wf-tabs">
+                <button class="on">All Services</button><button>Medical Procedure</button><button>Clinical Aesthetic</button><button>Wellness</button>
+              </div>
+              <table class="svc-wf-tbl">
+                <thead><tr><th>Service Name</th><th>Category</th><th>Workflow Type</th><th>Steps Active</th><th></th></tr></thead>
+                <tbody>
+                  <tr><td><b>Lipolytic Slimming Injection</b></td><td>Slimming &amp; Body</td><td><span class="type-badge medical">Medical Procedure</span></td><td><span class="step-count green">9 / 9</span></td><td><button class="btn-edit-link">Edit</button></td></tr>
+                  <tr><td><b>CO2 Fractional Laser</b></td><td>Laser</td><td><span class="type-badge medical">Medical Procedure</span></td><td><span class="step-count green">9 / 9</span></td><td><button class="btn-edit-link">Edit</button></td></tr>
+                  <tr><td><b>RF Body Contouring</b></td><td>Slimming &amp; Body</td><td><span class="type-badge clinical">Clinical Aesthetic</span></td><td><span class="step-count blue">8 / 8</span></td><td><button class="btn-edit-link">Edit</button></td></tr>
+                  <tr><td><b>Diamond Glow Facial</b></td><td>Facials</td><td><span class="type-badge clinical">Clinical Aesthetic</span></td><td><span class="step-count blue">8 / 8</span></td><td><button class="btn-edit-link">Edit</button></td></tr>
+                  <tr><td><b>Slimming Body Wrap</b></td><td>Wellness</td><td><span class="type-badge wellness">Wellness</span></td><td><span class="step-count green">6 / 6</span></td><td><button class="btn-edit-link">Edit</button></td></tr>
+                  <tr><td><b>Relaxation Massage</b></td><td>Wellness</td><td><span class="type-badge wellness">Wellness</span></td><td><span class="step-count green">6 / 6</span></td><td><button class="btn-edit-link">Edit</button></td></tr>
+                </tbody>
+              </table>
+              <div class="pagi-row"><span>Showing 6 of 18 services</span><div><button class="btn-edit-link">Previous</button><button class="btn-edit-link">Next</button></div></div>
+            </div></div>
+          </div>
+
+          <!-- ========== System Audit Logs ========== -->
+          <div class="sec" id="sec-audit" hidden>
+            <div class="page-hero">
+              <div><h1>System Audit Logs</h1><div class="sub">A complete record of all actions performed across the dashboard by all users.</div></div>
+            </div>
+            <div class="info-banner"><i data-lucide="info"></i><div>This log tracks system-wide activity including logins, setting changes, and user actions. For inventory-specific history (stock movements, PO changes), see <a href="inventory-audit-logs.html" style="color:#2D6A9F;font-weight:600;text-decoration:none;">Inventory → Audit Logs</a>.</div></div>
+
+            <div class="audit-stats">
+              <div class="card"><div class="lbl">Total Events Today</div><div class="val">47</div><div class="sub">May 13, 2026</div></div>
+              <div class="card"><div class="lbl">Events This Month</div><div class="val">1,284</div><div class="sub">Across 9 modules</div></div>
+              <div class="card"><div class="lbl">Unique Users Active</div><div class="val">3</div><div class="sub">Last 7 days</div></div>
+              <div class="card"><div class="lbl">Last Activity</div><div class="val">2 min</div><div class="sub">Admin User · Settings</div></div>
+            </div>
+
+            <!-- Failed-login alert (visible only when module filter = Authentication) -->
+            <div class="auth-alert" id="auth-alert" hidden>
+              <i data-lucide="alert-circle"></i>
+              <div class="body"><b>1 failed login attempt</b> detected this month from an unrecognized IP address (203.177.12.45). Review for suspicious activity. <a href="#">View all failed logins →</a></div>
+            </div>
+
+            <div class="audit-filters">
+              <div class="search-input"><i data-lucide="search"></i><input placeholder="Search by user, action, or description…"></div>
+              <select class="field-select" id="audit-module">
+                <option value="all">All Modules</option>
+                <option value="authentication">Authentication</option>
+                <option value="appointments">Appointments</option>
+                <option value="inventory">Inventory</option>
+                <option value="pos">POS</option>
+                <option value="payments">Payments</option>
+                <option value="messages">Messages</option>
+                <option value="discounts">Discounts</option>
+                <option value="settings">Settings</option>
+                <option value="users">Users</option>
+              </select>
+              <select class="field-select" id="audit-action">
+                <option value="all">All Actions</option>
+                <option>Login</option><option>Logout</option><option>Created</option><option>Updated</option>
+                <option>Deleted</option><option>Approved</option><option>Rejected</option>
+                <option>Refunded</option><option>Assigned</option>
+              </select>
+              <select class="field-select" id="audit-user">
+                <option>All Users</option><option>Admin User</option><option>Ana Cruz</option><option>Ben Santos</option>
+              </select>
+              <div class="date-range">
+                <input type="date" value="2026-05-01">
+                <span class="lbl">to</span>
+                <input type="date" value="2026-05-13">
+              </div>
+              <button class="btn btn-outline" style="margin-left:auto;"><i data-lucide="download"></i> Export CSV</button>
+            </div>
+
+            <div class="audit-card">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Module</th>
+                    <th>Action</th>
+                    <th>Description</th>
+                    <th>IP Address</th>
+                    <th style="text-align:right;">Details</th>
+                  </tr>
+                </thead>
+                <tbody id="audit-tbody"></tbody>
+              </table>
+              <div class="audit-pagination">
+                <div class="info" id="audit-page-info">Showing <b>1–12</b> of <b>1,284</b> events</div>
+                <div class="pages">
+                  <button type="button" aria-label="Previous">‹</button>
+                  <button type="button" class="active">1</button>
+                  <button type="button">2</button>
+                  <button type="button">3</button>
+                  <span class="ellipsis">…</span>
+                  <button type="button">107</button>
+                  <button type="button" aria-label="Next">›</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Audit Log detail drawer -->
+<div class="drawer-backdrop" id="audit-drawer-backdrop"></div>
+<aside class="drawer" id="audit-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+  <div class="drawer-head">
+    <div>
+      <h2 id="drawer-title">Event Details</h2>
+      <div class="sub">Full record of this audit event</div>
+    </div>
+    <button class="drawer-close" type="button" id="drawer-close" aria-label="Close"><i data-lucide="x"></i></button>
+  </div>
+  <div class="drawer-body" id="drawer-body"><!-- rendered by JS --></div>
+  <div class="drawer-foot">
+    <button class="btn btn-outline" type="button"><i data-lucide="download"></i> Export This Event</button>
+  </div>
+</aside>
+
+<!-- Add User modal -->
+<div id="add-user-modal" class="modal" hidden role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div><h2>Add User</h2><div class="sub">Create a new admin or staff account.</div></div>
+      <button class="modal-close" type="button" id="add-user-close" aria-label="Close"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label>Full Name</label><input placeholder="e.g. Maria Santos"></div>
+      <div class="field"><label>Email Address</label><input type="email" placeholder="name@cloudskin.com"></div>
+      <div class="field"><label>Role</label><select><option>Receptionist</option><option>Staff</option><option>Admin</option></select></div>
+      <div class="field"><label>Temporary Password</label><input value="welcome2026!"><div class="field-help">User will be prompted to change this on first sign-in.</div></div>
+      <div class="toggle-inline">
+        <div class="copy"><div class="t">Send Welcome Email</div><div class="d">Email login instructions to the new user.</div></div>
+        <button class="switch" data-on="true"></button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" type="button" id="add-user-cancel">Cancel</button>
+      <button class="btn btn-primary" type="button"><i data-lucide="user-plus"></i> Create Account</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+
+<script src="settings-data.js"></script>
+<script src="settings-audit.js"></script>
+<script>
+(function () {
+  // ------- Section switching -------
+  function showSection(key) {
+    document.querySelectorAll('.sub-btn').forEach(function (b) {
+      if (b.tagName === 'A') return; // audit-logs link
+      b.classList.toggle('active', b.getAttribute('data-s') === key);
+    });
+    document.querySelectorAll('.sec').forEach(function (s) { s.hidden = (s.id !== 'sec-' + key); });
+    var crumbs = { clinic:'Clinic Information', booking:'Appointment Configuration', notifications:'Notification Preferences', users:'User Management', roles:'Roles & Permissions', email:'Email Integration', payments:'Payment Methods', pos:'POS Settings', inventory:'Inventory Settings', 'protocol-templates':'Protocol Templates', 'service-workflows':'Service Workflows', audit:'Audit Logs' };
+    document.getElementById('topbar-crumb').textContent = 'Admin / Settings / ' + (crumbs[key] || 'Settings');
+    // Update URL
+    var url = new URL(location.href);
+    if (key === 'users') url.searchParams.delete('s');
+    else url.searchParams.set('s', key);
+    history.replaceState({}, '', url);
+  }
+
+  document.querySelectorAll('.sub-btn').forEach(function (b) {
+    if (b.tagName === 'A') return;
+    b.addEventListener('click', function () { showSection(b.getAttribute('data-s')); });
+  });
+
+  // Initial section from URL
+  var initialKey = (new URLSearchParams(location.search)).get('s') || 'users';
+  showSection(initialKey);
+
+  // ------- Toggle switches -------
+  document.querySelectorAll('.switch').forEach(function (sw) {
+    sw.addEventListener('click', function () {
+      sw.classList.toggle('off');
+      sw.setAttribute('data-on', !sw.classList.contains('off'));
+    });
+  });
+
+  // ------- Add User modal -------
+  var modal = document.getElementById('add-user-modal');
+  document.getElementById('open-add-user').addEventListener('click', function () { modal.hidden = false; document.body.style.overflow = 'hidden'; if (window.lucide) window.lucide.createIcons(); });
+  function closeModal() { modal.hidden = true; document.body.style.overflow = ''; }
+  document.getElementById('add-user-close').addEventListener('click', closeModal);
+  document.getElementById('add-user-cancel').addEventListener('click', closeModal);
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+
+  // ------- Render Notification rows + Permissions matrix from settings-data.js -------
+  if (typeof renderNotifications === 'function') renderNotifications();
+  if (typeof renderPermMatrix === 'function') renderPermMatrix();
+  if (typeof initAuditPage === 'function') initAuditPage();
+
+  // Protocol Templates + Service Workflows actions
+  document.querySelectorAll('#sec-protocol-templates .ic-btn').forEach(function (b) {
+    b.addEventListener('click', function (e) {
+      e.preventDefault();
+      var row = b.closest('.tpl-row');
+      var name = row ? row.querySelector('.tpl-ti').textContent : 'this template';
+      var ic = b.querySelector('.lucide');
+      var action = ic && ic.getAttribute('data-lucide');
+      if (action === 'pencil') location.href = 'doctors-order-template-flow.html?edit=' + encodeURIComponent(name);
+      else if (action === 'copy') { if (row) { var clone = row.cloneNode(true); clone.querySelector('.tpl-ti').textContent = name + ' (Copy)'; row.parentNode.insertBefore(clone, row.nextSibling); }
+        if (window.lucide) window.lucide.createIcons(); }
+      else if (action === 'trash-2') { if (confirm('Delete "' + name + '"? This cannot be undone.') && row) row.remove(); }
+    });
+  });
+  document.querySelectorAll('#sec-service-workflows .btn-edit-link').forEach(function (b) {
+    b.addEventListener('click', function (e) {
+      e.preventDefault();
+      var row = b.closest('tr');
+      var svc = row ? row.querySelector('b').textContent : 'service';
+      alert('Configure workflow for: ' + svc + '\n\n(Workflow type + step visibility editor would open here.)');
+    });
+  });
+
+  if (window.lucide) window.lucide.createIcons();
+})();
+</script>
+</body>
+</html>

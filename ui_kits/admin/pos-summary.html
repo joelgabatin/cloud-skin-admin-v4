@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Daily Summary</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+* { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .stat-card { background: #fff; border-radius: 10px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; flex-direction: column; gap: 8px; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-card .label { font-size: 12px; color: #5A7A96; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #2D6A9F; display: flex; align-items: center; justify-content: center; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 28px; line-height: 1.1; color: #1A2E40; }
+  .stat-card .sub { font-size: 12px; color: #5A7A96; }
+  .section-card { background: #fff; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  .section-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: #1A2E40; }
+  .field-label { display: block; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; }
+  .field-input, .field-select { width: 100%; border: 1.5px solid #D0E8F5; border-radius: 8px; padding: 0 12px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; box-sizing: border-box; height: 40px; }
+  .btn { height: 40px; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-outline { background: #F0F6FC; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-outline:hover { background: #EBF6FD; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 18px; }
+  .btn-primary:hover { background: #1A5685; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .badge.success { background: #DCFCE7; color: #15803D; }
+  .badge.warning { background: #FEF3C7; color: #B45309; }
+  .badge.danger  { background: #FEE2E2; color: #DC2626; }
+  .badge.info    { background: #DBEAFE; color: #1D4ED8; }
+  .badge.slate   { background: #F1F5F9; color: #475569; }
+  .badge.violet  { background: #F3E8FF; color: #6D28D9; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 12px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr.row { cursor: pointer; transition: background 150ms; }
+  tr.row:hover td { background: #F8FBFF; }
+  tr.row:last-child td { border-bottom: none; }
+  .nm { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .sku { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; font-weight: 600; white-space: nowrap; }
+  .price { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .action-btn { width: 32px; height: 32px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #2D6A9F; margin-right: 4px; }
+  .action-btn.danger { background: #FEE2E2; color: #DC2626; }
+  .action-btn .lucide { width: 14px; height: 14px; }
+  .search-input { position: relative; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; box-sizing: border-box; }
+  .table-card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  .pagination { padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #D0E8F5; }
+  .pagination .info { font-size: 13px; color: #5A7A96; }
+  .pager { display: inline-flex; align-items: center; gap: 6px; }
+  .pager button { width: 32px; height: 32px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 500; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; }
+  .pager button.active { background: #2D6A9F; color: #fff; }
+  .pager .lucide { width: 14px; height: 14px; }
+  .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 16px 20px; border-bottom: 1px solid #D0E8F5; }
+
+  .summary-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: stretch; }
+  @media (max-width: 1100px) { .summary-grid { grid-template-columns: 1fr; } }
+  .donut-card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+  .donut-card h3 { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #1A2E40; margin: 0; text-transform: uppercase; letter-spacing: 0.04em; }
+  .donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .donut-total-lbl { font-family: var(--font-body); font-size: 11px; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.04em; }
+  .donut-total-val { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .legend { display: flex; flex-direction: column; gap: 8px; }
+  .legend-row { display: grid; grid-template-columns: 14px 1fr auto auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 8px; background: #F8FBFF; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .legend-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .legend-pct { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #2D6A9F; }
+  .legend-amt { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #1A2E40; }
+
+  .export-wrap { position: relative; }
+  #export-btn { gap: 8px; }
+  .export-menu { position: absolute; top: calc(100% + 6px); right: 0; min-width: 250px; background: #fff; border: 1px solid #D0E8F5; border-radius: 10px; box-shadow: 0 8px 24px rgba(26,58,92,0.12); padding: 6px; z-index: 50; display: flex; flex-direction: column; gap: 2px; }
+  .export-menu[hidden] { display: none; }
+  .export-opt { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: none; border: none; border-radius: 8px; cursor: pointer; text-align: left; font-family: var(--font-body); }
+  .export-opt:hover { background: #F8FBFF; }
+  .export-opt .lucide { width: 20px; height: 20px; color: #2D6A9F; flex-shrink: 0; }
+  .export-opt .opt-name { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #1A2E40; }
+  .export-opt .opt-sub { font-family: var(--font-body); font-size: 11px; color: #5A7A96; margin-top: 1px; }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #15803D; color: #fff; padding: 10px 18px; border-radius: 10px; font-family: var(--font-display); font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.18); z-index: 200; display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateY(8px); transition: opacity 200ms, transform 200ms; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast .lucide { width: 16px; height: 16px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Daily Summary</div>
+        <div class="topbar-crumb">Admin / POS / Daily Summary</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+    <section class="page" data-screen-label="01 Daily Summary">
+      <!-- Top bar: date + export -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button class="btn btn-outline" type="button" style="padding:0 10px;"><i data-lucide="chevron-left"></i></button>
+          <input type="date" class="field-input" value="2026-05-13" style="max-width:180px;">
+          <button class="btn btn-outline" type="button" style="padding:0 10px;"><i data-lucide="chevron-right"></i></button>
+        </div>
+        <div class="export-wrap">
+          <button class="btn btn-primary" type="button" id="export-btn"><i data-lucide="download"></i> Export <i data-lucide="chevron-down" style="width:14px;height:14px;"></i></button>
+          <div id="export-menu" class="export-menu" hidden>
+            <button type="button" class="export-opt" data-fmt="CSV"><i data-lucide="file-spreadsheet"></i><div><div class="opt-name">CSV</div><div class="opt-sub">For spreadsheets &amp; data tools</div></div></button>
+            <button type="button" class="export-opt" data-fmt="PDF"><i data-lucide="file-text"></i><div><div class="opt-name">PDF</div><div class="opt-sub">Printable summary report</div></div></button>
+            <button type="button" class="export-opt" data-fmt="Word"><i data-lucide="file"></i><div><div class="opt-name">Word</div><div class="opt-sub">Editable .docx document</div></div></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="stat-row" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+        <div class="stat-card"><div class="top"><span class="label">Total Sales</span><div class="iplate" style="background:#DCFCE7;color:#15803D;"><i data-lucide="trending-up"></i></div></div><div class="value">₱47,820</div><div class="sub">+12.4% vs. yesterday</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Transactions</span><div class="iplate"><i data-lucide="receipt"></i></div></div><div class="value">24</div><div class="sub">22 completed · 2 voided</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Average Order Value</span><div class="iplate" style="background:#FEF3C7;color:#B45309;"><i data-lucide="calculator"></i></div></div><div class="value">₱1,993</div><div class="sub">Across all payment methods</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Top Product</span><div class="iplate" style="background:#F3E8FF;color:#6D28D9;"><i data-lucide="trophy"></i></div></div><div class="value" style="font-size:18px;">HydraFacial Serum</div><div class="sub">12 units sold today</div></div>
+      </div>
+
+      <!-- Donut + Transactions -->
+      <div class="summary-grid">
+        <div class="table-card">
+          <div style="padding:18px 24px;border-bottom:1px solid #D0E8F5;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-family:var(--font-display);font-size:14px;font-weight:700;color:#1A2E40;text-transform:uppercase;letter-spacing:0.04em;">Today's Transactions</span>
+            <span class="badge info">7 of 24 shown</span>
+          </div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr><th>Order #</th><th>Time</th><th>Customer</th><th>Payment</th><th style="text-align:right;">Total</th></tr></thead>
+              <tbody>
+              <tr class="row">
+                <td><span class="sku">POS-2026-00184</span></td>
+                <td style="font-family:var(--font-mono);font-size:12px;">14:32</td>
+                <td><span class="nm">Maria Santos</span></td>
+                <td><span class="badge info">GCash</span></td>
+                <td style="text-align:right;"><span class="price">₱2,147</span></td>
+              </tr>
+              <tr class="row">
+                <td><span class="sku">POS-2026-00183</span></td>
+                <td style="font-family:var(--font-mono);font-size:12px;">13:18</td>
+                <td><span class="nm">Walk-in</span></td>
+                <td><span class="badge success">Cash</span></td>
+                <td style="text-align:right;"><span class="price">₱450</span></td>
+              </tr>
+              <tr class="row">
+                <td><span class="sku">POS-2026-00182</span></td>
+                <td style="font-family:var(--font-mono);font-size:12px;">11:55</td>
+                <td><span class="nm">Miguel Cruz</span></td>
+                <td><span class="badge violet">Card</span></td>
+                <td style="text-align:right;"><span class="price">₱1,730</span></td>
+              </tr>
+              <tr class="row">
+                <td><span class="sku">POS-2026-00181</span></td>
+                <td style="font-family:var(--font-mono);font-size:12px;">10:40</td>
+                <td><span class="nm">Jose Dela Cruz</span></td>
+                <td><span class="badge info">GCash</span></td>
+                <td style="text-align:right;"><span class="price">₱3,680</span></td>
+              </tr>
+              <tr class="row">
+                <td><span class="sku">POS-2026-00180</span></td>
+                <td style="font-family:var(--font-mono);font-size:12px;">10:12</td>
+                <td><span class="nm">Camille Torres</span></td>
+                <td><span class="badge info">GCash</span></td>
+                <td style="text-align:right;"><span class="price">₱980</span></td>
+              </tr>
+              <tr class="row">
+                <td><span class="sku">POS-2026-00179</span></td>
+                <td style="font-family:var(--font-mono);font-size:12px;">09:45</td>
+                <td><span class="nm">Walk-in</span></td>
+                <td><span class="badge success">Cash</span></td>
+                <td style="text-align:right;"><span class="price">₱1,200</span></td>
+              </tr>
+              <tr class="row">
+                <td><span class="sku">POS-2026-00178</span></td>
+                <td style="font-family:var(--font-mono);font-size:12px;">09:12</td>
+                <td><span class="nm">Bea Mendoza</span></td>
+                <td><span class="badge violet">Card</span></td>
+                <td style="text-align:right;"><span class="price">₱2,400</span></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="donut-card">
+          <h3>Revenue by Payment Method</h3>
+          <div class="donut-wrap">
+            <div style="position:relative;width:200px;height:200px;">
+              <svg width="200" height="200" viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r="70" fill="none" stroke="#F0F6FC" stroke-width="28"/>
+              <circle cx="100" cy="100" r="70" fill="none" stroke="#2D6A9F" stroke-width="28" stroke-dasharray="224.30971546631122 215.5132560362598" stroke-dashoffset="0" transform="rotate(-90 100 100)"/>
+              <circle cx="100" cy="100" r="70" fill="none" stroke="#15803D" stroke-width="28" stroke-dasharray="118.75220230569418 321.0707691968768" stroke-dashoffset="-224.30971546631122" transform="rotate(-90 100 100)"/>
+              <circle cx="100" cy="100" r="70" fill="none" stroke="#6D28D9" stroke-width="28" stroke-dasharray="96.76105373056562 343.0619177720054" stroke-dashoffset="-343.0619177720054" transform="rotate(-90 100 100)"/>
+              </svg>
+              <div class="donut-center">
+                <div class="donut-total-lbl">Total Sales</div>
+                <div class="donut-total-val">₱47,820</div>
+              </div>
+            </div>
+            <div class="legend" style="width:100%;">
+              <div class="legend-row">
+                <div class="legend-dot" style="background:#2D6A9F;"></div>
+                <div class="legend-name">GCash</div>
+                <div class="legend-pct">51%</div>
+                <div class="legend-amt">₱24,388</div>
+              </div>
+              <div class="legend-row">
+                <div class="legend-dot" style="background:#15803D;"></div>
+                <div class="legend-name">Cash</div>
+                <div class="legend-pct">27%</div>
+                <div class="legend-amt">₱12,911</div>
+              </div>
+              <div class="legend-row">
+                <div class="legend-dot" style="background:#6D28D9;"></div>
+                <div class="legend-name">Card</div>
+                <div class="legend-pct">22%</div>
+                <div class="legend-amt">₱10,520</div>
+              </div>
+            </div>
+          </div>
+        </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<div id="toast" class="toast"><i data-lucide="check-circle"></i><span id="toast-msg">Exported.</span></div>
+<script>
+lucide.createIcons();
+(function () {
+  var btn = document.getElementById('export-btn');
+  var menu = document.getElementById('export-menu');
+  var toast = document.getElementById('toast');
+  var toastMsg = document.getElementById('toast-msg');
+
+  btn.addEventListener('click', function (e) { e.stopPropagation(); menu.hidden = !menu.hidden; });
+  document.addEventListener('click', function (e) {
+    if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) menu.hidden = true;
+  });
+
+  document.querySelectorAll('.export-opt').forEach(function (o) {
+    o.addEventListener('click', function () {
+      var fmt = o.getAttribute('data-fmt');
+      menu.hidden = true;
+      toastMsg.textContent = 'Daily summary exported as ' + fmt + '.';
+      toast.classList.add('show');
+      setTimeout(function () { toast.classList.remove('show'); }, 2200);
+    });
+  });
+})();
+</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

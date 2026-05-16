@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Active Packages</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill-side { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 24px; }
+
+  /* TOOLBAR */
+  .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .sort-label { font-family: var(--font-display); font-size: 12px; font-weight: 600; color: #5A7A96; }
+  .sort-select { height: 36px; padding: 0 12px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; background: #fff; cursor: pointer; }
+  .btn-primary { height: 36px; padding: 0 16px; background: #2D6A9F; border: none; border-radius: 8px; color: #fff; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; text-decoration: none; }
+  .btn-secondary { height: 36px; padding: 0 16px; background: #F0F6FC; border: 1.5px solid #D0E8F5; border-radius: 8px; color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; text-decoration: none; }
+  .btn-primary .lucide, .btn-secondary .lucide { width: 16px; height: 16px; }
+  .spacer { flex: 1; }
+
+  /* GRID OF PACKAGE CARDS */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+  .card { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #D0E8F5; box-shadow: 0 1px 4px rgba(26,58,92,0.08); cursor: pointer; transition: all 200ms; display: flex; flex-direction: column; }
+  .card:hover { box-shadow: 0 4px 12px rgba(26,58,92,0.12); transform: translateY(-2px); }
+  .card-img { width: 100%; height: 160px; background: #F0F6FC; overflow: hidden; border-bottom: 1px solid #D0E8F5; }
+  .card-img img { width: 100%; height: 100%; object-fit: cover; }
+  .card-img .ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #9BBAD4; }
+  .card-bd { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+  .nm { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #1A2E40; flex: 1; }
+  .free-badge { display: inline-flex; align-items: center; gap: 2px; background: #FEF3C7; color: #B45309; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+  .free-badge .lucide { width: 10px; height: 10px; }
+  .type-label { font-family: var(--font-body); font-size: 11px; color: #5A7A96; margin-bottom: 10px; }
+  .stats-row { display: flex; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #E5EFF5; }
+  .stat-mini { text-align: center; flex: 1; }
+  .stat-mini .v { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: #2D6A9F; }
+  .stat-mini .l { font-family: var(--font-body); font-size: 10px; color: #5A7A96; }
+  .view-btn { width: 100%; height: 36px; background: #F0F6FC; border: 1.5px solid #D0E8F5; border-radius: 8px; color: #2D6A9F; font-family: var(--font-display); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 200ms; }
+  .view-btn:hover { background: #E0EEF9; }
+
+  .empty { text-align: center; padding: 40px 20px; color: #5A7A96; }
+  .empty .lucide { width: 32px; height: 32px; margin: 0 auto 16px; opacity: 0.3; }
+.pkg-search { background: #fff; border: 1px solid #D0E8F5; border-radius: 8px; padding: 0 14px; display: flex; align-items: center; gap: 10px; height: 44px; margin-bottom: 16px; }
+.pkg-search .lucide { width: 16px; height: 16px; color: #9BBAD4; flex-shrink: 0; }
+.pkg-search input { flex: 1; border: none; outline: none; height: 100%; background: none; font-family: var(--font-body); font-size: 14px; color: #1A2E40; }
+.pkg-search input::placeholder { color: #9BBAD4; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside id="sidebar-mount" class="sidebar"></aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Active Packages</div>
+        <div class="topbar-crumb">Manage your service packages</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Active Packages">
+      <div class="pkg-search"><i data-lucide="search"></i><input id="pkg-search-input" placeholder="Search by package name or category..."></div>
+      <div class="toolbar">
+        <label class="sort-label">Sort by Type:</label>
+        <select class="sort-select" id="type-sort">
+          <option value="All">All Types</option>
+          <option>Facial</option>
+          <option>Anti-Aging</option>
+          <option>Hair</option>
+          <option>Acne</option>
+          <option>Wellness</option>
+        </select>
+        <div class="spacer"></div>
+        <a class="btn-primary" href="#"><i data-lucide="plus"></i> Add Package</a>
+        <a class="btn-secondary" href="packages-view-all.html">View All</a>
+      </div>
+
+      <div class="grid" id="grid">
+        <div class="card" data-type="Facial">
+          <div class="card-img"><img src="../../assets/service-hydra-facial.jpg" alt=""></div>
+          <div class="card-bd">
+            <div class="card-top">
+              <div class="nm">5+1 Premium Facial Package</div>
+              <div class="free-badge"><i data-lucide="gift"></i> Free</div>
+            </div>
+            <div class="type-label">Facial</div>
+            <div class="stats-row">
+              <div class="stat-mini"><div class="v">6</div><div class="l">Sessions</div></div>
+              <div class="stat-mini"><div class="v">₱15K</div><div class="l">Price</div></div>
+            </div>
+            <a class="view-btn" href="package-view.html?id=premium-facial" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">View Details</a>
+          </div>
+        </div>
+
+        <div class="card" data-type="Anti-Aging">
+          <div class="card-img"><img src="../../assets/service-botox.jpg" alt=""></div>
+          <div class="card-bd">
+            <div class="card-top">
+              <div class="nm">Anti-Aging Package</div>
+            </div>
+            <div class="type-label">Anti-Aging</div>
+            <div class="stats-row">
+              <div class="stat-mini"><div class="v">4</div><div class="l">Sessions</div></div>
+              <div class="stat-mini"><div class="v">₱12K</div><div class="l">Price</div></div>
+            </div>
+            <a class="view-btn" href="package-view.html?id=premium-facial" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">View Details</a>
+          </div>
+        </div>
+
+        <div class="card" data-type="Hair">
+          <div class="card-img"><img src="../../assets/service-prp-hair.jpg" alt=""></div>
+          <div class="card-bd">
+            <div class="card-top">
+              <div class="nm">Hair Restoration Package</div>
+            </div>
+            <div class="type-label">Hair</div>
+            <div class="stats-row">
+              <div class="stat-mini"><div class="v">6</div><div class="l">Sessions</div></div>
+              <div class="stat-mini"><div class="v">₱18K</div><div class="l">Price</div></div>
+            </div>
+            <a class="view-btn" href="package-view.html?id=premium-facial" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">View Details</a>
+          </div>
+        </div>
+
+        <div class="card" data-type="Wellness">
+          <div class="card-img"><img src="../../assets/service-hydra-facial.jpg" alt=""></div>
+          <div class="card-bd">
+            <div class="card-top">
+              <div class="nm">Wellness Plus Package</div>
+              <div class="free-badge"><i data-lucide="gift"></i> Free</div>
+            </div>
+            <div class="type-label">Wellness</div>
+            <div class="stats-row">
+              <div class="stat-mini"><div class="v">4</div><div class="l">Sessions</div></div>
+              <div class="stat-mini"><div class="v">₱20K</div><div class="l">Price</div></div>
+            </div>
+            <a class="view-btn" href="package-view.html?id=premium-facial" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">View Details</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // Type sort dropdown — filters cards
+  document.getElementById('type-sort').addEventListener('change', e => {
+    const v = e.target.value;
+    document.querySelectorAll('#grid .card').forEach(card => {
+      card.style.display = (v === 'All' || card.dataset.type === v) ? '' : 'none';
+    });
+  });
+  lucide.createIcons();
+</script>
+<script>
+/* __MW_TOGGLE__ */
+(function(){
+  // Find every parent .nav-item that is followed by a [data-submenu-for] block and wire up click toggle
+  document.querySelectorAll('aside.sidebar .nav-item').forEach(function(item){
+    var next = item.nextElementSibling;
+    if (!next || !next.hasAttribute || !next.hasAttribute('data-submenu-for')) return;
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', function(e){
+      // Don't navigate if it's a link
+      if (item.tagName === 'A') e.preventDefault();
+      var isOpen = next.style.display !== 'none';
+      next.style.display = isOpen ? 'none' : 'block';
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+})();
+</script>
+<script src="_sidebar.js"></script>
+<script>
+(function(){
+  var input = document.getElementById("pkg-search-input");
+  if (!input) return;
+  input.addEventListener("input", function(){
+    var q = (input.value || "").trim().toLowerCase();
+    document.querySelectorAll("#grid .card").forEach(function(card){
+      var nm = (card.querySelector(".nm") || {}).textContent || "";
+      var type = (card.querySelector(".type-label") || card.getAttribute("data-type") || "") + "";
+      if (type && card.querySelector(".type-label")) type = card.querySelector(".type-label").textContent;
+      var hay = (nm + " " + type).toLowerCase();
+      card.style.display = !q || hay.indexOf(q) !== -1 ? "" : "none";
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Add Visiting Specialist</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: #1A2E40; }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; position: sticky; top: 0; max-height: 100vh; font-family: var(--font-display); }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg,#2D6A9F,#5BC0EB); display: flex; align-items: center; justify-content: center; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; }
+  aside.sidebar .side-collapse { height: 44px; padding: 0 16px; display: flex; justify-content: flex-end; align-items: center; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-crumb a { color: #2D6A9F; text-decoration: none; }
+
+  .page { padding: 24px 32px 60px; max-width: 960px; margin: 0 auto; width: 100%; }
+  .back-link { color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; text-decoration: none; margin-bottom: 14px; }
+  .back-link .lucide { width: 14px; height: 14px; }
+
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(26,58,92,0.06); border: 1px solid #E5EFF7; }
+
+  .sec { padding: 22px 28px; border-top: 1px solid #F0F6FC; }
+  .sec:first-of-type { border-top: none; }
+  .sec-lbl { font-family: var(--font-display); font-weight: 700; font-size: 11px; color: #2D6A9F; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+
+  .photo-row { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+  .photo-circle { width: 84px; height: 84px; border-radius: 50%; border: 2px dashed #CBD5E1; background: #F8FBFD; display: flex; align-items: center; justify-content: center; color: #5A7A96; cursor: pointer; flex-shrink: 0; }
+  .photo-circle .lucide { width: 30px; height: 30px; }
+  .photo-info .ttl { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #1A2E40; }
+  .photo-info .sub { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 4px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+  .field { margin-bottom: 14px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { display: block; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; margin-bottom: 6px; }
+  .field input, .field select, .field textarea { width: 100%; height: 40px; padding: 0 12px; border: 1px solid #CBD5E1; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .field input::placeholder { color: #9CA3AF; font-size: 12px; }
+  .field input:focus, .field select:focus { border-color: #2D6A9F; }
+  .helper { font-family: var(--font-body); font-size: 11.5px; color: #5A7A96; font-style: italic; margin-top: 6px; }
+
+  .info-strip { background: rgba(13,148,136,0.08); border-left: 3px solid #0D9488; padding: 10px 14px; border-radius: 6px; font-family: var(--font-body); font-size: 12.5px; color: #5A7A96; font-style: italic; margin-bottom: 14px; }
+
+  .tog-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0 6px; }
+  .tog-row .l { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: #1A2E40; }
+  .tog { width: 40px; height: 22px; border-radius: 9999px; background: #CBD5E1; cursor: pointer; position: relative; padding: 2px; transition: background 120ms; }
+  .tog.on { background: #15803D; }
+  .tog .knob { width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: margin 150ms; }
+  .tog.on .knob { margin-left: auto; }
+  .access-fields { margin-top: 10px; opacity: 0.5; pointer-events: none; transition: opacity 150ms; }
+  .access-fields.unlocked { opacity: 1; pointer-events: auto; }
+  .access-fields .field { position: relative; }
+  .access-fields .field input { background: #F8F9FA; padding-right: 36px; }
+  .access-fields.unlocked .field input { background: #fff; }
+  .access-fields .lock { position: absolute; right: 12px; bottom: 13px; color: #9CA3AF; }
+  .access-fields .lock .lucide { width: 14px; height: 14px; }
+  .access-fields.unlocked .lock { display: none; }
+
+  .foot-bar { background: #fff; border-top: 1px solid #E5EFF7; padding: 14px 28px; display: flex; justify-content: flex-end; gap: 10px; border-radius: 0 0 12px 12px; }
+  .btn { height: 40px; padding: 0 20px; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; text-decoration: none; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn.ghost { background: #fff; color: #5A7A96; border-color: #D0E8F5; }
+  .btn.ghost:hover { background: #F0F6FC; }
+  .btn.primary { background: #2D6A9F; color: #fff; }
+  .btn.primary:hover { background: #1A5685; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #15803D; color: #fff; padding: 12px 18px; border-radius: 8px; font-family: var(--font-display); font-weight: 600; font-size: 13px; box-shadow: 0 4px 14px rgba(0,0,0,0.18); opacity: 0; transform: translateY(10px); transition: opacity 200ms, transform 200ms; z-index: 1100; pointer-events: none; display: inline-flex; align-items: center; gap: 8px; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast .lucide { width: 16px; height: 16px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Add Visiting Specialist</div>
+        <div class="topbar-crumb">Admin / Staff / <a href="staff-visiting.html">Visiting Specialists</a> / Add Visiting Specialist</div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Add Visiting Specialist">
+      <a class="back-link" href="staff-visiting.html"><i data-lucide="arrow-left"></i> Back to Visiting Specialists</a>
+
+      <div class="card">
+
+        <div class="sec">
+          <div class="sec-lbl">Personal Information</div>
+          <div class="photo-row">
+            <div class="photo-circle"><i data-lucide="camera"></i></div>
+            <div class="photo-info">
+              <div class="ttl">Profile Photo</div>
+              <div class="sub">Upload a clear, professional headshot. PNG / JPG, max 2MB.</div>
+            </div>
+          </div>
+          <div class="field full"><label>Full Name</label><input id="f-name" placeholder="e.g., Dr. Olivia Bautista"></div>
+          <div class="grid-2">
+            <div class="field"><label>Email Address</label><input id="f-email" type="email" placeholder="name@example.com"></div>
+            <div class="field"><label>Contact Number</label><input id="f-phone" placeholder="0917-…"></div>
+            <div class="field"><label>Gender</label><select id="f-gender"><option value="">Select…</option><option>Male</option><option>Female</option><option>Prefer not to say</option></select></div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-lbl">Professional Credentials</div>
+          <div class="info-strip">Required for clinical privileges at the clinic.</div>
+          <div class="field full"><label>Specialty</label><input id="f-spec" placeholder="e.g., OB-Gyne / Aesthetic Gynecologist"></div>
+          <div class="grid-2">
+            <div class="field"><label>PRC License No.</label><input id="f-prc" placeholder="0123456"></div>
+            <div class="field"><label>License Expiry Date</label><input id="f-prc-exp" type="date"></div>
+          </div>
+          <div class="field full"><label>PTR No.</label><input id="f-ptr" placeholder="PTR-2026-…"></div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-lbl">Affiliation</div>
+          <div class="field full"><label>Affiliated Hospital or Clinic</label><input id="f-hosp" placeholder="e.g., St. Luke's Medical Center"></div>
+          <div class="field full"><label>Clinic / Hospital Address</label><input id="f-addr" placeholder="Optional"></div>
+          <div class="helper">This appears on the specialist's profile for reference.</div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-lbl">Visit Schedule</div>
+          <div class="grid-2">
+            <div class="field"><label>First Visit Date</label><input id="f-first" type="date"></div>
+            <div class="field"><label>Visit Frequency</label><select id="f-freq"><option>One-time Visit</option><option>Weekly</option><option>Bi-weekly</option><option>Monthly</option><option selected>As Needed</option></select></div>
+          </div>
+          <div class="helper">Upcoming visit dates can be managed from the specialist's profile after creation.</div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-lbl">System Access</div>
+          <div class="tog-row">
+            <span class="l">Grant system login access</span>
+            <div class="tog" id="access-tog"><div class="knob"></div></div>
+          </div>
+          <div class="helper">Enable if this specialist needs to view or update clinical notes during their visit. A login email and temporary password will be sent automatically.</div>
+          <div class="access-fields" id="access-fields">
+            <div class="field"><label>Login Email</label><input readonly placeholder="Auto-fills from email above"><span class="lock"><i data-lucide="lock"></i></span></div>
+            <div class="field"><label>Temporary Password</label><input readonly placeholder="Auto-generated when access is granted"><span class="lock"><i data-lucide="lock"></i></span></div>
+          </div>
+        </div>
+
+        <div class="foot-bar">
+          <a class="btn ghost" href="staff-visiting.html">Cancel</a>
+          <button class="btn primary" id="save-btn"><i data-lucide="check"></i> Add Specialist</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"><i data-lucide="check-circle"></i><span id="toast-text">Specialist added</span></div>
+
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+(function () {
+  var tog = document.getElementById('access-tog');
+  var fields = document.getElementById('access-fields');
+  tog.addEventListener('click', function () {
+    tog.classList.toggle('on');
+    fields.classList.toggle('unlocked', tog.classList.contains('on'));
+  });
+
+  var toast = document.getElementById('toast');
+  var toastText = document.getElementById('toast-text');
+  document.getElementById('save-btn').addEventListener('click', function () {
+    var n = document.getElementById('f-name').value.trim();
+    if (!n) {
+      toastText.textContent = 'Please enter the specialist name';
+      toast.style.background = '#DC2626'; toast.classList.add('show');
+      setTimeout(function () { toast.classList.remove('show'); toast.style.background = '#15803D'; }, 2200);
+      return;
+    }
+    try {
+      var list = JSON.parse(localStorage.getItem('cs.newVisitingSpecialists') || '[]');
+      list.push({ id: 'V' + Date.now(), name: n,
+        specialty: document.getElementById('f-spec').value,
+        email: document.getElementById('f-email').value,
+        phone: document.getElementById('f-phone').value,
+        prc: document.getElementById('f-prc').value,
+        hospital: document.getElementById('f-hosp').value,
+        firstVisit: document.getElementById('f-first').value,
+        frequency: document.getElementById('f-freq').value,
+        access: tog.classList.contains('on'),
+        createdAt: new Date().toISOString() });
+      localStorage.setItem('cs.newVisitingSpecialists', JSON.stringify(list));
+    } catch (e) {}
+    toastText.textContent = n + ' added';
+    toast.classList.add('show');
+    setTimeout(function () { toast.classList.remove('show'); location.href = 'staff-visiting.html'; }, 1500);
+  });
+})();
+</script>
+</body>
+</html>

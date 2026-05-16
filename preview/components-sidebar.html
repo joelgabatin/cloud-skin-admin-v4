@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 0; background: #fff; display: flex; height: 480px; }
+  aside { width: 240px; background: #152F4A; display: flex; flex-direction: column; font-family: var(--font-display); }
+  .head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); }
+  .logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden;}
+  .logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; }
+  .item:hover { background: #1E3F61; color: #fff; }
+  .item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .badge { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  .icon { width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+<aside>
+  <div class="head">
+    <div class="logo"><img src="../assets/logo-mark.png" alt=""></div>
+    <div>
+      <div class="brand-name">Cloud Skin</div>
+      <div class="brand-sub">Clinic + Wellness</div>
+    </div>
+  </div>
+  <nav>
+    <div class="item active"><span class="icon">▦</span> Dashboard</div>
+    <div class="item"><span class="icon">📅</span> Appointments <span class="badge">12</span></div>
+    <div class="item"><span class="icon">👥</span> Patients</div>
+    <div class="item"><span class="icon">⚕</span> Staff</div>
+    <div class="item"><span class="icon">✂</span> Services</div>
+    <div class="item"><span class="icon">📦</span> Inventory</div>
+    <div class="item"><span class="icon">💳</span> Payments <span class="badge">3</span></div>
+    <div class="item"><span class="icon">⚙</span> Settings</div>
+  </nav>
+</aside>
+</body>
+</html>

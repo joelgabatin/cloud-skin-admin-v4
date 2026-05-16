@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Transaction PO-2024-001</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+* { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .stat-card { background: #fff; border-radius: 16px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08), 0 2px 8px rgba(26,58,92,0.04); display: flex; flex-direction: column; gap: 8px; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-card .label { font-size: 13px; color: #5A7A96; }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #5BC0EB; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .stat-card .iplate.success { background: #DCFCE7; color: #15803D; }
+  .stat-card .iplate.info { background: #DBEAFE; color: #1D4ED8; }
+  .stat-card .iplate.warning { background: #FEF3C7; color: #B45309; }
+  .stat-card .iplate.danger { background: #FEE2E2; color: #DC2626; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 30px; line-height: 1.1; color: #1A2E40; }
+  .stat-card .sub { font-size: 12px; color: #5A7A96; }
+  .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .search-input { position: relative; flex: 1; max-width: 320px; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  .btn { height: 40px; padding: 0 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid transparent; }
+  .btn .lucide { width: 14px; height: 14px; }
+  .btn-outline { background: #F0F6FC; color: #2D6A9F; border-color: #D0E8F5; }
+  .btn-primary { background: #2D6A9F; color: #fff; padding: 0 18px; }
+  .btn-primary:hover { background: #1A5685; }
+  .section-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 800px; }
+  th { padding: 12px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr.row { cursor: pointer; transition: background 150ms; }
+  tr.row:hover td { background: #F8FBFF; }
+  tr.row:last-child td { border-bottom: none; }
+  .nm { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .sku { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; font-weight: 600; }
+  .price { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #1A2E40; }
+  .status-badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .action-btn { width: 32px; height: 32px; background: #F0F6FC; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #2D6A9F; }
+  .action-btn .lucide { width: 14px; height: 14px; }
+  .link-btn { background: none; border: none; color: #2D6A9F; font-family: var(--font-display); font-size: 13px; font-weight: 600; text-decoration: underline; cursor: pointer; }
+  .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; background: #F0F6FC; border: 1px solid #D0E8F5; border-radius: 12px; padding: 20px; }
+  .info-grid .k { font-family: var(--font-body); font-size: 11px; color: #5A7A96; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; letter-spacing: 0.06em; }
+  .info-grid .v { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #1A2E40; }
+  /* === Filter + sort dropdowns === */
+  .filter-wrap { position: relative; }
+  .filter-wrap .btn strong { font-weight: 700; color: #1A2E40; }
+  .drop-menu { position: absolute; top: calc(100% + 6px); left: 0; min-width: 230px; background: #fff; border: 1px solid #D0E8F5; border-radius: 10px; box-shadow: 0 8px 24px rgba(26,58,92,0.12); padding: 6px; z-index: 50; display: flex; flex-direction: column; gap: 2px; }
+  .drop-menu[hidden] { display: none; }
+  .drop-head { font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 10px 6px; }
+  .drop-opt { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: none; border: none; border-radius: 6px; font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; cursor: pointer; text-align: left; width: 100%; }
+  .drop-opt:hover { background: #F8FBFF; }
+  .drop-opt.active { background: #EBF6FD; color: #2D6A9F; font-weight: 600; }
+  .drop-opt .lucide { width: 14px; height: 14px; color: #5A7A96; flex-shrink: 0; }
+  .drop-opt.active .lucide { color: #2D6A9F; }
+  tr.row.hidden { display: none; }
+  .back-link { background: none; border: none; cursor: pointer; color: #2D6A9F; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 13px; font-weight: 600; padding: 0; }
+
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Transaction PO-2024-001</div>
+        <div class="topbar-crumb">Admin / Inventory / Suppliers / MediCare Supplies Ltd / PO-2024-001</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+    <section class="page" data-screen-label="01 Transaction PO-2024-001">
+      <button class="back-link" onclick="location.href='inventory-supplier-detail.html'"><i data-lucide="arrow-left" style="width:14px;height:14px"></i> Back</button>
+      <div class="stat-row" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+        <div class="stat-card"><div class="top"><span class="label">Total Items</span><div class="iplate success"><i data-lucide="package"></i></div></div><div class="value">14</div><div class="sub">4 distinct products</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Total Amount</span><div class="iplate info"><i data-lucide="banknote"></i></div></div><div class="value">$5,230</div><div class="sub">Excl. shipping &amp; tax</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Categories Covered</span><div class="iplate" style="background:#F3E8FF;color:#6D28D9;"><i data-lucide="layers"></i></div></div><div class="value">4</div><div class="sub">Top: Treatment ($530)</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Delivery Status</span><div class="iplate success"><i data-lucide="truck"></i></div></div><div class="value">13 / 14</div><div class="sub">1 returned · 0 damaged</div></div>
+      </div>
+      <div class="toolbar">
+        <div class="search-input" style="flex:1;max-width:300px;"><i data-lucide="search"></i><input id="it-search" placeholder="Search item name or SKU..."></div>
+        <div class="filter-wrap">
+          <button id="it-sort-btn" class="btn btn-outline" type="button"><i data-lucide="arrow-up-down"></i> <span>Sort: <strong id="it-sort-label">Default</strong></span> <i data-lucide="chevron-down" style="width:14px;height:14px;"></i></button>
+          <div id="it-sort-menu" class="drop-menu" hidden>
+            <div class="drop-head">Sort items by</div>
+            <button type="button" class="drop-opt active" data-sort="default" data-label="Default"><i data-lucide="list"></i>Default order</button>
+            <button type="button" class="drop-opt" data-sort="name-az" data-label="Name A–Z"><i data-lucide="a-arrow-down"></i>Name (A–Z)</button>
+            <button type="button" class="drop-opt" data-sort="name-za" data-label="Name Z–A"><i data-lucide="a-arrow-up"></i>Name (Z–A)</button>
+            <button type="button" class="drop-opt" data-sort="qty-desc" data-label="Most quantity"><i data-lucide="trending-up"></i>Quantity (high → low)</button>
+            <button type="button" class="drop-opt" data-sort="qty-asc" data-label="Least quantity"><i data-lucide="trending-down"></i>Quantity (low → high)</button>
+            <button type="button" class="drop-opt" data-sort="price-desc" data-label="Highest price"><i data-lucide="dollar-sign"></i>Unit price (high)</button>
+            <button type="button" class="drop-opt" data-sort="price-asc" data-label="Lowest price"><i data-lucide="dollar-sign"></i>Unit price (low)</button>
+            <button type="button" class="drop-opt" data-sort="total-desc" data-label="Highest total"><i data-lucide="layers"></i>Line total (high)</button>
+            <button type="button" class="drop-opt" data-sort="total-asc" data-label="Lowest total"><i data-lucide="layers"></i>Line total (low)</button>
+          </div>
+        </div>
+        <button class="btn btn-outline" style="margin-left:auto;"><i data-lucide="download"></i> Export</button>
+      </div>
+      <div class="section-card"><div class="table-wrap"><table>
+        <thead><tr><th>Item ID</th><th>SKU</th><th>Item Name</th><th>Category</th><th>Quantity</th><th>Unit Price</th><th>Total Price</th><th style="text-align:center;">Status</th></tr></thead>
+        <tbody>
+          <tr class="row"><td><span class="nm" style="font-weight:600">ITEM001</span></td><td><span class="sku">MED-HYD-001</span></td><td><span class="nm">HydraFacial Serums (12 pack)</span></td><td>Serum</td><td><span class="price">5</span></td><td><span class="price">$45</span></td><td><span class="price">$225</span></td><td style="text-align:center;"><span class="status-badge" style="background:#D1FAE5;color:#065F46;">Delivered</span></td></tr>
+          <tr class="row"><td><span class="nm" style="font-weight:600">ITEM002</span></td><td><span class="sku">MED-LAC-002</span></td><td><span class="nm">Laser Treatment Pads</span></td><td>Supplies</td><td><span class="price">3</span></td><td><span class="price">$120</span></td><td><span class="price">$360</span></td><td style="text-align:center;"><span class="status-badge" style="background:#D1FAE5;color:#065F46;">Delivered</span></td></tr>
+          <tr class="row"><td><span class="nm" style="font-weight:600">ITEM003</span></td><td><span class="sku">MED-GLY-003</span></td><td><span class="nm">Glycolic Acid Peel</span></td><td>Treatment</td><td><span class="price">2</span></td><td><span class="price">$85</span></td><td><span class="price">$170</span></td><td style="text-align:center;"><span class="status-badge" style="background:#FEE2E2;color:#991B1B;">Returned</span></td></tr>
+          <tr class="row"><td><span class="nm" style="font-weight:600">ITEM004</span></td><td><span class="sku">MED-RET-004</span></td><td><span class="nm">Retinol Night Cream</span></td><td>Cream</td><td><span class="price">4</span></td><td><span class="price">$65</span></td><td><span class="price">$260</span></td><td style="text-align:center;"><span class="status-badge" style="background:#D1FAE5;color:#065F46;">Delivered</span></td></tr>
+          <tr style="background:#F0F6FC;"><td colspan="6" style="text-align:right;font-family:var(--font-display);font-weight:700;color:#1A2E40;">Grand Total:</td><td style="font-family:var(--font-display);font-weight:700;font-size:14px;color:#2D6A9F;">$5,230</td><td></td></tr>
+        </tbody>
+      </table></div></div>
+    </section>
+  </main>
+</div>
+<script>lucide.createIcons();</script>
+<script>
+/* __MW_TOGGLE__ */
+(function(){
+  document.querySelectorAll('aside.sidebar .nav-item').forEach(function(item){
+    var next = item.nextElementSibling;
+    if (!next || !next.hasAttribute || !next.hasAttribute('data-submenu-for')) return;
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', function(e){
+      if (item.tagName === 'A') e.preventDefault();
+      var isOpen = next.style.display !== 'none';
+      next.style.display = isOpen ? 'none' : 'block';
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+})();
+</script>
+<script>
+(function () {
+  var tbody = document.querySelector('.section-card tbody');
+  if (!tbody) return;
+  var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr.row'));
+  rows.forEach(function (r, i) { r.setAttribute('data-orig', i); });
+  var state = { search: '', sort: 'default' };
+  var search = document.getElementById('it-search');
+  var sLbl = document.getElementById('it-sort-label');
+  function cellText(r, idx) { return (r.children[idx].textContent || '').trim().toLowerCase(); }
+  function cellNum(r, idx)  { return parseFloat((r.children[idx].textContent || '').replace(/[^0-9.-]/g, '')) || 0; }
+  function apply() {
+    var q = state.search.toLowerCase().trim();
+    rows.forEach(function (r) {
+      var txt = r.textContent.toLowerCase();
+      r.classList.toggle('hidden', !!q && txt.indexOf(q) === -1);
+    });
+    var sorted = rows.slice();
+    if (state.sort === 'name-az')        sorted.sort(function (a, b) { return cellText(a, 2).localeCompare(cellText(b, 2)); });
+    else if (state.sort === 'name-za')   sorted.sort(function (a, b) { return cellText(b, 2).localeCompare(cellText(a, 2)); });
+    else if (state.sort === 'qty-desc')  sorted.sort(function (a, b) { return cellNum(b, 4) - cellNum(a, 4); });
+    else if (state.sort === 'qty-asc')   sorted.sort(function (a, b) { return cellNum(a, 4) - cellNum(b, 4); });
+    else if (state.sort === 'price-desc')sorted.sort(function (a, b) { return cellNum(b, 5) - cellNum(a, 5); });
+    else if (state.sort === 'price-asc') sorted.sort(function (a, b) { return cellNum(a, 5) - cellNum(b, 5); });
+    else if (state.sort === 'total-desc')sorted.sort(function (a, b) { return cellNum(b, 6) - cellNum(a, 6); });
+    else if (state.sort === 'total-asc') sorted.sort(function (a, b) { return cellNum(a, 6) - cellNum(b, 6); });
+    else sorted.sort(function (a, b) { return parseInt(a.getAttribute('data-orig'), 10) - parseInt(b.getAttribute('data-orig'), 10); });
+    sorted.forEach(function (r) { tbody.appendChild(r); });
+  }
+  if (search) search.addEventListener('input', function () { state.search = search.value; apply(); });
+  var sBtn = document.getElementById('it-sort-btn');
+  var sMenu = document.getElementById('it-sort-menu');
+  if (sBtn && sMenu) {
+    sBtn.addEventListener('click', function (e) { e.stopPropagation(); sMenu.hidden = !sMenu.hidden; });
+    sMenu.querySelectorAll('.drop-opt').forEach(function (o) {
+      o.addEventListener('click', function () {
+        state.sort = o.getAttribute('data-sort');
+        sLbl.textContent = o.getAttribute('data-label');
+        sMenu.querySelectorAll('.drop-opt').forEach(function (x) { x.classList.toggle('active', x === o); });
+        sMenu.hidden = true;
+        apply();
+      });
+    });
+    document.addEventListener('click', function (e) {
+      if (!sMenu.hidden && !sMenu.contains(e.target) && !sBtn.contains(e.target)) sMenu.hidden = true;
+    });
+  }
+})();
+</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

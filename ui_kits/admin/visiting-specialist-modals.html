@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Visiting Specialist — Modal Interactions</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: #1A2E40; padding: 40px 32px; }
+  .stack { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+  .scene-label { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: #1A2E40; margin-bottom: 16px; }
+  .scene-label .num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #2D6A9F; color: #fff; font-size: 13px; margin-right: 10px; }
+  .scene { position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(15,30,48,0.15); }
+  .bg { background: #fff; padding: 28px; min-height: 480px; position: relative; filter: blur(1px); opacity: 0.4; }
+  .bg .crumb { font-size: 12px; color: #5A7A96; margin-bottom: 16px; }
+  .bg h1 { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1A2E40; margin: 0 0 16px; }
+  .bg .row { display: flex; gap: 18px; margin-bottom: 18px; }
+  .bg .who { width: 64px; height: 64px; border-radius: 50%; background: #14B8A6; color: #fff; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 20px; }
+  .bg .nm { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: #1A2E40; }
+  .bg .sp { font-size: 13px; color: #5A7A96; margin-top: 3px; }
+  .bg .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-top: 14px; }
+  .bg .stat { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; padding: 12px; text-align: center; }
+  .bg .stat .v { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: #1A2E40; }
+  .bg .stat .k { font-size: 11px; color: #9BBAD4; margin-top: 4px; }
+
+  .overlay { position: absolute; inset: 0; background: rgba(15,30,48,0.55); display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .modal { background: #fff; border-radius: 12px; width: 100%; max-width: 700px; box-shadow: 0 20px 60px rgba(15,30,48,0.35); max-height: 90%; display: flex; flex-direction: column; }
+  .modal-head { padding: 20px 24px; border-bottom: 1px solid #E5EFF7; }
+  .modal-head h2 { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: #1A2E40; margin: 0 0 4px; display: flex; align-items: center; gap: 10px; }
+  .modal-head .sub { font-size: 12.5px; color: #5A7A96; }
+  .modal-head .close { float: right; width: 30px; height: 30px; background: none; border: none; cursor: pointer; color: #5A7A96; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; margin-top: -4px; }
+  .modal-head .close:hover { background: #F0F6FC; color: #1A2E40; }
+  .modal-body { padding: 22px 24px; overflow-y: auto; }
+  .modal-foot { padding: 14px 22px; border-top: 1px solid #E5EFF7; background: #F8FBFD; display: flex; justify-content: flex-end; gap: 10px; align-items: center; }
+  .btn { padding: 9px 16px; border-radius: 7px; font-family: var(--font-display); font-weight: 600; font-size: 13px; cursor: pointer; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 5px; }
+  .btn.ghost { background: #fff; color: #5A7A96; border-color: #D0E8F5; }
+  .btn.ghost:hover { background: #F0F6FC; }
+  .btn.primary { background: #2D6A9F; color: #fff; }
+  .btn.primary:hover { background: #1A5685; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field + .field, .grid-2 + .field, .field + .grid-2 { margin-top: 14px; }
+  label { font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #1A2E40; }
+  label .opt { color: #9BBAD4; font-weight: 400; font-size: 11px; }
+  input[type="text"], input[type="email"], input[type="number"], select, textarea { width: 100%; height: 38px; padding: 0 11px; border: 1px solid #D1E3F3; border-radius: 7px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; }
+  textarea { height: auto; padding: 9px 11px; resize: vertical; line-height: 1.5; }
+  input.mono { font-family: var(--font-mono); }
+  input:focus, select:focus, textarea:focus { border-color: #2D6A9F; }
+
+  /* Status pills */
+  .pill-toggle { display: inline-flex; gap: 8px; }
+  .pill-toggle .opt { padding: 7px 18px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; cursor: pointer; border: 1.5px solid #D1E3F3; background: #fff; color: #5A7A96; display: inline-flex; align-items: center; gap: 5px; }
+  .pill-toggle .opt.on { background: #2D6A9F; color: #fff; border-color: #2D6A9F; }
+  .pill-toggle .opt .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+  /* Services modal */
+  .search-bar { position: relative; margin-bottom: 16px; }
+  .search-bar input { padding-left: 34px; }
+  .search-bar .lucide { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .svc-cat { font-family: var(--font-display); font-weight: 700; font-size: 11px; color: #0D7378; text-transform: uppercase; letter-spacing: 0.06em; margin: 14px 0 8px; padding-top: 12px; border-top: 1px solid #F0F6FC; }
+  .svc-cat:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+  .svc-row { display: flex; align-items: center; gap: 10px; padding: 8px 4px; }
+  .svc-row .cb { width: 18px; height: 18px; border: 1.5px solid #D1E3F3; border-radius: 4px; background: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; }
+  .svc-row.on .cb { background: #2D6A9F; border-color: #2D6A9F; }
+  .svc-row .cb .lucide { width: 11px; height: 11px; opacity: 0; }
+  .svc-row.on .cb .lucide { opacity: 1; }
+  .svc-row .nm { flex: 1; font-family: var(--font-body); font-size: 13px; color: #1A2E40; }
+  .svc-row .price { font-family: var(--font-display); font-weight: 600; font-size: 12px; color: #2D6A9F; }
+  .count-note { font-family: var(--font-body); font-size: 12px; color: #5A7A96; margin-top: 12px; padding: 10px 12px; background: #F0F6FC; border-radius: 7px; }
+  .count-note b { color: #2D6A9F; font-family: var(--font-display); font-weight: 700; }
+
+  /* Schedule modal */
+  .mini-cal { background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; padding: 14px; margin-top: 8px; }
+  .mini-cal .mc-head { display: flex; justify-content: space-between; align-items: center; font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #1A2E40; margin-bottom: 10px; }
+  .mini-cal .mc-head .nav { background: none; border: 1px solid #D1E3F3; width: 24px; height: 24px; border-radius: 6px; cursor: pointer; color: #5A7A96; display: inline-flex; align-items: center; justify-content: center; }
+  .mini-cal .grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+  .mini-cal .dow { font-family: var(--font-display); font-weight: 700; font-size: 9.5px; color: #9BBAD4; text-align: center; padding: 4px 0; text-transform: uppercase; }
+  .mini-cal .day { padding: 6px 0; text-align: center; font-family: var(--font-body); font-size: 12px; color: #1A2E40; border-radius: 5px; cursor: pointer; }
+  .mini-cal .day.muted { color: #C7D7E5; }
+  .mini-cal .day.sel { background: #2D6A9F; color: #fff; font-weight: 700; }
+  .mini-cal .day:hover:not(.sel) { background: #EBF6FD; }
+
+  .pill-chk { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill-chk .p { padding: 7px 12px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 12px; cursor: pointer; border: 1.5px solid #D1E3F3; background: #fff; color: #5A7A96; display: inline-flex; align-items: center; gap: 5px; }
+  .pill-chk .p.on { background: #2D6A9F; color: #fff; border-color: #2D6A9F; }
+  .pill-chk .p .lucide { width: 11px; height: 11px; }
+
+  .helper { font-size: 11.5px; color: #9BBAD4; margin-top: 4px; }
+  .toggle-row { display: flex; align-items: center; gap: 12px; padding: 12px; background: #F8FBFD; border: 1px solid #E5EFF7; border-radius: 8px; }
+  .toggle-row .body { flex: 1; }
+  .toggle-row .body .t { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .toggle-row .body .d { font-size: 11.5px; color: #5A7A96; margin-top: 3px; }
+  .switch { width: 38px; height: 22px; border-radius: 9999px; background: #2D6A9F; padding: 2px; position: relative; cursor: pointer; border: none; flex-shrink: 0; }
+  .switch::after { content: ''; width: 18px; height: 18px; border-radius: 50%; background: #fff; position: absolute; top: 2px; right: 2px; }
+  .foot-note { font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; margin-right: auto; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="stack">
+
+  <!-- SCENE 1 -->
+  <section>
+    <div class="scene-label"><span class="num">1</span>Edit Profile</div>
+    <div class="scene">
+      <div class="bg">
+        <div class="crumb">Admin / Staff / Visiting Specialists / Dr. Olivia Bautista</div>
+        <div class="row"><div class="who">OB</div><div><div class="nm">Dr. Olivia Bautista</div><div class="sp">OB-Gyne / Aesthetic Gynecologist</div></div></div>
+        <div class="stats"><div class="stat"><div class="v">8</div><div class="k">Total Visits</div></div><div class="stat"><div class="v">14</div><div class="k">Patients</div></div><div class="stat"><div class="v">May 20</div><div class="k">Next Visit</div></div><div class="stat"><div class="v">3</div><div class="k">Services</div></div></div>
+      </div>
+      <div class="overlay">
+        <div class="modal" style="max-width: 740px;">
+          <div class="modal-head">
+            <button class="close"><i data-lucide="x"></i></button>
+            <h2>Edit Visiting Specialist Profile</h2>
+            <div class="sub">Update specialist details and contact information.</div>
+          </div>
+          <div class="modal-body">
+            <div class="grid-2">
+              <div class="field"><label>Full Name</label><input type="text" value="Dr. Olivia Bautista"></div>
+              <div class="field"><label>Phone</label><input type="text" value="0917-456-7890"></div>
+              <div class="field"><label>Specialty</label><input type="text" value="OB-Gyne / Aesthetic Gynecologist"></div>
+              <div class="field"><label>Email</label><input type="email" value="olivia.bautista@gmail.com"></div>
+              <div class="field"><label>PRC License No.</label><input type="text" class="mono" value="0123456"></div>
+              <div class="field"><label>Clinic / Hospital Affiliation</label><input type="text" value="Baguio General Hospital"></div>
+              <div class="field"><label>PTR No.</label><input type="text" class="mono" value="7654321"></div>
+              <div class="field"><label>Availability Note</label><input type="text" value="By appointment only"></div>
+            </div>
+            <div class="field"><label>Status</label>
+              <div class="pill-toggle"><span class="opt on"><span class="dot"></span>Active</span><span class="opt"><span class="dot" style="background:#9BBAD4;"></span>Inactive</span></div>
+            </div>
+            <div class="field"><label>Internal Notes <span class="opt">(optional)</span></label><textarea rows="3" placeholder="Add any notes about this specialist..."></textarea></div>
+          </div>
+          <div class="modal-foot"><button class="btn ghost">Cancel</button><button class="btn primary"><i data-lucide="save"></i> Save Changes</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 2 -->
+  <section>
+    <div class="scene-label"><span class="num">2</span>Manage Authorized Services</div>
+    <div class="scene">
+      <div class="bg">
+        <div class="crumb">Admin / Staff / Visiting Specialists / Dr. Olivia Bautista</div>
+        <div class="row"><div class="who">OB</div><div><div class="nm">Dr. Olivia Bautista</div><div class="sp">OB-Gyne / Aesthetic Gynecologist</div></div></div>
+      </div>
+      <div class="overlay">
+        <div class="modal" style="max-width: 620px;">
+          <div class="modal-head">
+            <button class="close"><i data-lucide="x"></i></button>
+            <h2>Manage Authorized Services <span style="font-weight:500;color:#5A7A96;">— Dr. Olivia Bautista</span></h2>
+            <div class="sub">Select the procedures this specialist is authorized to perform at Cloud Skin Clinic.</div>
+          </div>
+          <div class="modal-body">
+            <div class="search-bar"><i data-lucide="search"></i><input type="text" placeholder="Search procedures..."></div>
+
+            <div class="svc-cat">Adam &amp; Eve Specialist</div>
+            <div class="svc-row on"><span class="cb"><i data-lucide="check"></i></span><span class="nm">CO2 Vaginal Tightening</span><span class="price">₱35,000/session</span></div>
+            <div class="svc-row on"><span class="cb"><i data-lucide="check"></i></span><span class="nm">HimPlant (Daks Therapy)</span><span class="price">₱25,000/session</span></div>
+
+            <div class="svc-cat">Intimate Rejuvenation Series</div>
+            <div class="svc-row on"><span class="cb"><i data-lucide="check"></i></span><span class="nm">Labia Majora Rejuvenation</span></div>
+            <div class="svc-row on"><span class="cb"><i data-lucide="check"></i></span><span class="nm">Intimate Hydration Boost</span></div>
+            <div class="svc-row"><span class="cb"><i data-lucide="check"></i></span><span class="nm">Penile Girth Enhancement</span></div>
+            <div class="svc-row"><span class="cb"><i data-lucide="check"></i></span><span class="nm">Glans Enhancement</span></div>
+
+            <div class="svc-cat">Machines &amp; Lasers</div>
+            <div class="svc-row"><span class="cb"><i data-lucide="check"></i></span><span class="nm">eCO2 Laser Body Fix</span></div>
+            <div class="svc-row"><span class="cb"><i data-lucide="check"></i></span><span class="nm">eCO2 + Subcision</span></div>
+            <div class="svc-row"><span class="cb"><i data-lucide="check"></i></span><span class="nm">eCO2 + Subcision + PRP</span></div>
+
+            <div class="svc-cat">Treatments</div>
+            <div class="svc-row"><span class="cb"><i data-lucide="check"></i></span><span class="nm">Plasma Scar / Keloid Neutralizer</span></div>
+            <div class="svc-row"><span class="cb"><i data-lucide="check"></i></span><span class="nm">Spider / Varicose Veins Sclerotherapy</span></div>
+            <div class="svc-row"><span class="cb"><i data-lucide="check"></i></span><span class="nm">Threadlift for Sagging Skin</span></div>
+
+            <div class="count-note"><b>4</b> services currently authorized</div>
+          </div>
+          <div class="modal-foot"><button class="btn ghost">Cancel</button><button class="btn primary"><i data-lucide="save"></i> Save Authorized Services</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 3 -->
+  <section>
+    <div class="scene-label"><span class="num">3</span>Schedule New Visit</div>
+    <div class="scene">
+      <div class="bg">
+        <div class="crumb">Admin / Staff / Visiting Specialists / Dr. Olivia Bautista</div>
+        <div class="row"><div class="who">OB</div><div><div class="nm">Dr. Olivia Bautista</div><div class="sp">OB-Gyne / Aesthetic Gynecologist</div></div></div>
+      </div>
+      <div class="overlay">
+        <div class="modal" style="max-width: 560px;">
+          <div class="modal-head">
+            <button class="close"><i data-lucide="x"></i></button>
+            <h2>Schedule Visit <span style="font-weight:500;color:#5A7A96;">— Dr. Olivia Bautista</span></h2>
+            <div class="sub">Set the date, time, and procedures for this specialist's clinic visit.</div>
+          </div>
+          <div class="modal-body">
+            <div class="field">
+              <label>Visit Date</label>
+              <input type="text" value="May 27, 2026" placeholder="Select visit date">
+              <div class="mini-cal">
+                <div class="mc-head"><button class="nav"><i data-lucide="chevron-left" style="width:13px;height:13px;"></i></button><span>May 2026</span><button class="nav"><i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button></div>
+                <div class="grid">
+                  <div class="dow">Su</div><div class="dow">Mo</div><div class="dow">Tu</div><div class="dow">We</div><div class="dow">Th</div><div class="dow">Fr</div><div class="dow">Sa</div>
+                  <div class="day muted">26</div><div class="day muted">27</div><div class="day muted">28</div><div class="day muted">29</div><div class="day muted">30</div><div class="day">1</div><div class="day">2</div>
+                  <div class="day">3</div><div class="day">4</div><div class="day">5</div><div class="day">6</div><div class="day">7</div><div class="day">8</div><div class="day">9</div>
+                  <div class="day">10</div><div class="day">11</div><div class="day">12</div><div class="day">13</div><div class="day">14</div><div class="day">15</div><div class="day">16</div>
+                  <div class="day">17</div><div class="day">18</div><div class="day">19</div><div class="day">20</div><div class="day">21</div><div class="day">22</div><div class="day">23</div>
+                  <div class="day">24</div><div class="day">25</div><div class="day">26</div><div class="day sel">27</div><div class="day">28</div><div class="day">29</div><div class="day">30</div>
+                  <div class="day">31</div><div class="day muted">1</div><div class="day muted">2</div><div class="day muted">3</div><div class="day muted">4</div><div class="day muted">5</div><div class="day muted">6</div>
+                </div>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="field"><label>Start Time</label><select><option>10:00 AM</option></select></div>
+              <div class="field"><label>End Time</label><select><option>2:00 PM</option></select></div>
+            </div>
+            <div class="field">
+              <label>Procedures for this visit</label>
+              <div class="helper" style="margin-top:0;margin-bottom:6px;color:#5A7A96;">Which procedures will be performed during this visit?</div>
+              <div class="pill-chk">
+                <span class="p on"><i data-lucide="check"></i> CO2 Vaginal Tightening</span>
+                <span class="p">Female Intimate Fillers</span>
+                <span class="p">HimPlant</span>
+                <span class="p">Labia Majora Rejuvenation</span>
+              </div>
+              <div class="helper">Only showing procedures Dr. Bautista is authorized for.</div>
+            </div>
+            <div class="field"><label>Maximum patients for this visit</label><input type="number" value="3"><div class="helper">Receptionist will only be able to book up to this number of patients for this visit date.</div></div>
+            <div class="field">
+              <div class="toggle-row">
+                <div class="body"><div class="t">Require specialist confirmation before visit is confirmed</div><div class="d">Specialist will be notified via email to confirm this visit.</div></div>
+                <button class="switch"></button>
+              </div>
+            </div>
+            <div class="field"><label>Internal notes <span class="opt">(optional)</span></label><textarea rows="2" placeholder="Any special setup or notes for this visit..."></textarea></div>
+          </div>
+          <div class="modal-foot">
+            <span class="foot-note">The specialist will receive an email notification about this scheduled visit.</span>
+            <button class="btn ghost">Cancel</button>
+            <button class="btn primary"><i data-lucide="calendar-plus"></i> Schedule Visit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Admin — Archive Services</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 240px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  .brand-name { color: #fff; font-weight: 700; font-size: 14px; line-height: 1.2; }
+  .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; line-height: 1.2; font-family: var(--font-body); }
+  .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  .nav-item:hover { background: #1E3F61; color: #fff; }
+  .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; line-height: 1.6; }
+  .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  .nav-item.open .chev { transform: rotate(90deg); }
+  .submenu { background: rgba(0,0,0,0.20); }
+  .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .side-user .name { color: #fff; font-weight: 600; font-size: 13px; line-height: 1.2; }
+  .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; background: rgba(91,192,235,0.20); color: #5BC0EB; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #1A2E40; line-height: 1.2; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; line-height: 1.2; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; line-height: 1.2; }
+  .user-pill .role-pill-light { background: #EBF6FD; color: #2D6A9F; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+
+  .info-bar { background: #F0F6FC; border: 1px solid #BFD8EB; border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; font-family: var(--font-body); font-size: 13px; color: #5A7A96; }
+  .info-bar .lucide { width: 16px; height: 16px; color: #2D6A9F; }
+
+  /* ============ TOOLBAR ============ */
+  .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .search-input { flex: 1; position: relative; min-width: 220px; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 36px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #9BBAD4; pointer-events: none; }
+  .cat-pill { height: 36px; padding: 0 14px; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 500; color: #5A7A96; }
+  .cat-pill.active { background: #2D6A9F; border-color: #2D6A9F; color: #fff; }
+
+  /* ============ CARD GRID ============ */
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); border: 1px solid #D0E8F5; overflow: hidden; display: flex; flex-direction: column; opacity: 0.95; }
+  .card-img { width: 100%; height: 180px; background: #F0F6FC; overflow: hidden; border-bottom: 1px solid #D0E8F5; position: relative; filter: grayscale(0.4); }
+  .card-img img { width: 100%; height: 100%; object-fit: cover; }
+  .card-img .ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #9BBAD4; }
+  .archived-overlay { position: absolute; top: 12px; left: 12px; background: rgba(15,30,48,0.85); color: #fff; padding: 4px 10px; border-radius: 6px; font-family: var(--font-display); font-weight: 700; font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
+  .archived-overlay .lucide { width: 11px; height: 11px; }
+  .card-hd { background: linear-gradient(135deg, #F1F5F9 0%, #F8FAFC 100%); padding: 16px 20px; border-bottom: 1px solid #D0E8F5; display: flex; justify-content: space-between; align-items: flex-start; }
+  .card-hd .nm { font-family: var(--font-display); font-weight: 600; font-size: 15px; color: #1A2E40; margin-bottom: 6px; }
+  .chip-cat { background: #F1F5F9; color: #5A7A96; font-family: var(--font-display); font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 9999px; }
+  .chip-dur { background: #F0F6FC; color: #5A7A96; font-family: var(--font-body); font-size: 11px; padding: 2px 8px; border-radius: 9999px; }
+  .chip-row { display: inline-flex; gap: 6px; align-items: center; }
+  .status-badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; background: #F1F5F9; color: #475569; }
+  .card-bd { padding: 16px 20px; flex: 1; display: flex; flex-direction: column; }
+  .card-desc { font-size: 12px; color: #5A7A96; line-height: 1.6; margin: 0 0 14px; flex: 1; }
+  .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .price { font-family: var(--font-display); font-weight: 700; font-size: 20px; color: #5A7A96; }
+  .meta-line { display: flex; flex-direction: column; gap: 4px; font-family: var(--font-body); font-size: 11.5px; color: #9BBAD4; margin-bottom: 14px; padding: 10px 12px; background: #F8FBFD; border-radius: 6px; }
+  .meta-line .ln { display: flex; justify-content: space-between; }
+  .meta-line .k { font-family: var(--font-display); font-weight: 600; color: #5A7A96; }
+  .meta-line .v { color: #1A2E40; }
+  .card-ft { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btn-restore { height: 36px; background: #DBEAFE; border: 1.5px solid #93C5FD; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; font-family: var(--font-display); font-size: 12px; font-weight: 600; color: #1D4ED8; }
+  .btn-restore:hover { background: #BFDBFE; }
+  .btn-restore .lucide { width: 13px; height: 13px; }
+  .btn-delete { height: 36px; background: #FEE2E2; border: 1.5px solid #FCA5A5; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; font-family: var(--font-display); font-size: 12px; font-weight: 600; color: #DC2626; }
+  .btn-delete:hover { background: #FECACA; }
+  .btn-delete .lucide { width: 13px; height: 13px; }
+
+  /* ============ MODAL ============ */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(26,58,92,0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 24px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: 16px; max-width: 420px; width: 100%; box-shadow: 0 8px 32px rgba(26,58,92,0.18); overflow: hidden; }
+  .confirm-body { padding: 28px 24px 16px; text-align: center; }
+  .confirm-icon { width: 60px; height: 60px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+  .confirm-icon.restore { background: #DBEAFE; color: #1D4ED8; }
+  .confirm-icon.delete { background: #FEE2E2; color: #DC2626; }
+  .confirm-icon .lucide { width: 28px; height: 28px; }
+  .confirm-title { font-family: var(--font-display); font-weight: 700; font-size: 17px; color: #1A2E40; margin-bottom: 8px; }
+  .confirm-text { font-size: 13px; color: #5A7A96; line-height: 1.55; }
+  .modal-foot { padding: 16px 24px; border-top: 1px solid #D0E8F5; background: #F8FBFD; display: flex; justify-content: flex-end; gap: 10px; }
+  .btn-cancel { height: 38px; padding: 0 18px; background: #fff; border: 1.5px solid #D0E8F5; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #5A7A96; }
+  .btn-confirm-restore { height: 38px; padding: 0 18px; background: #2D6A9F; border: none; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #fff; }
+  .btn-confirm-delete { height: 38px; padding: 0 18px; background: #DC2626; border: none; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #fff; }
+.meta-line, .archived-overlay { display: none !important; }
+.svc-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.svc-bar-row .svc-search { flex: 1; margin-bottom: 0; }
+.svc-bar-row .icon-square { width: 44px; height: 44px; background: #F0F6FC; color: #2D6A9F; border: 1px solid #D0E8F5; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.svc-bar-row .icon-square .lucide { width: 16px; height: 16px; }
+.svc-bar-row .btn-add-service { height: 44px; padding: 0 18px; background: #2D6A9F; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Archive Services</div>
+        <div class="topbar-crumb">Admin / Services / Archive Services</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">5</span></button>
+        <div class="user-pill">
+          <div class="avatar" style="width:36px;height:36px;border-radius:50%;background:#2D6A9F;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;">AU</div>
+          <div class="meta"><span class="name">Admin User</span><span class="role-pill-light">Admin</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+
+    <section class="page" data-screen-label="01 Archive Services">
+
+      <div class="svc-bar-row"><div class="svc-search"><i data-lucide="search"></i><input id="svc-search-input" placeholder="Search by service name or category..."></div><button class="icon-square" title="Export"><i data-lucide="download"></i></button><a class="btn-add-service" href="services-active.html#new"><i data-lucide="plus"></i> Add Service</a></div>
+      <div class="grid" id="grid">
+
+        <div class="card" data-cat="Injectables" data-name="Dermal Fillers — Legacy Formula">
+          <div class="card-img"><div class="ph">No image</div><span class="archived-overlay"><i data-lucide="archive"></i> Archived</span></div>
+          <div class="card-hd">
+            <div>
+              <div class="nm">Dermal Fillers — Legacy Formula</div>
+              <div class="chip-row"><span class="chip-cat">Injectables</span><span class="chip-dur">60 min</span></div>
+            </div>
+            <span class="status-badge">Archived</span>
+          </div>
+          <div class="card-bd">
+            <p class="card-desc">Older hyaluronic acid filler formulation. Replaced by the new Volbella line in March 2026.</p>
+            <div class="price-row"><div class="price">₱18,000</div></div>
+            <div class="meta-line">
+              <div class="ln"><span class="k">Archived on</span><span class="v">Mar 10, 2026</span></div>
+              <div class="ln"><span class="k">Archived by</span><span class="v">Admin User</span></div>
+              <div class="ln"><span class="k">Lifetime sessions</span><span class="v">142</span></div>
+            </div>
+            <div class="card-ft">
+              <button class="btn-restore" data-act="restore"><i data-lucide="rotate-ccw"></i> Restore</button>
+              <button class="btn-delete" data-act="delete"><i data-lucide="trash-2"></i> Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" data-cat="Skin Treatments" data-name="Microdermabrasion (Classic)">
+          <div class="card-img"><div class="ph">No image</div><span class="archived-overlay"><i data-lucide="archive"></i> Archived</span></div>
+          <div class="card-hd">
+            <div>
+              <div class="nm">Microdermabrasion (Classic)</div>
+              <div class="chip-row"><span class="chip-cat">Skin Treatments</span><span class="chip-dur">45 min</span></div>
+            </div>
+            <span class="status-badge">Archived</span>
+          </div>
+          <div class="card-bd">
+            <p class="card-desc">Classic crystal-based microdermabrasion. Discontinued — replaced by Diamond Tip Facial.</p>
+            <div class="price-row"><div class="price">₱2,200</div></div>
+            <div class="meta-line">
+              <div class="ln"><span class="k">Archived on</span><span class="v">Feb 22, 2026</span></div>
+              <div class="ln"><span class="k">Archived by</span><span class="v">Admin User</span></div>
+              <div class="ln"><span class="k">Lifetime sessions</span><span class="v">286</span></div>
+            </div>
+            <div class="card-ft">
+              <button class="btn-restore" data-act="restore"><i data-lucide="rotate-ccw"></i> Restore</button>
+              <button class="btn-delete" data-act="delete"><i data-lucide="trash-2"></i> Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" data-cat="Laser" data-name="Q-Switch Laser (Old Protocol)">
+          <div class="card-img"><div class="ph">No image</div><span class="archived-overlay"><i data-lucide="archive"></i> Archived</span></div>
+          <div class="card-hd">
+            <div>
+              <div class="nm">Q-Switch Laser (Old Protocol)</div>
+              <div class="chip-row"><span class="chip-cat">Laser</span><span class="chip-dur">30 min</span></div>
+            </div>
+            <span class="status-badge">Archived</span>
+          </div>
+          <div class="card-bd">
+            <p class="card-desc">Pre-2026 Q-switch laser protocol. Superseded by Pico Laser. Records retained for audit.</p>
+            <div class="price-row"><div class="price">₱4,800</div></div>
+            <div class="meta-line">
+              <div class="ln"><span class="k">Archived on</span><span class="v">Jan 18, 2026</span></div>
+              <div class="ln"><span class="k">Archived by</span><span class="v">Dr. Reyes</span></div>
+              <div class="ln"><span class="k">Lifetime sessions</span><span class="v">94</span></div>
+            </div>
+            <div class="card-ft">
+              <button class="btn-restore" data-act="restore"><i data-lucide="rotate-ccw"></i> Restore</button>
+              <button class="btn-delete" data-act="delete"><i data-lucide="trash-2"></i> Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" data-cat="Wellness" data-name="Aromatherapy Massage">
+          <div class="card-img"><div class="ph">No image</div><span class="archived-overlay"><i data-lucide="archive"></i> Archived</span></div>
+          <div class="card-hd">
+            <div>
+              <div class="nm">Aromatherapy Massage</div>
+              <div class="chip-row"><span class="chip-cat">Wellness</span><span class="chip-dur">60 min</span></div>
+            </div>
+            <span class="status-badge">Archived</span>
+          </div>
+          <div class="card-bd">
+            <p class="card-desc">Relaxation massage with essential oils. Service phased out in Q1 2026.</p>
+            <div class="price-row"><div class="price">₱1,500</div></div>
+            <div class="meta-line">
+              <div class="ln"><span class="k">Archived on</span><span class="v">Jan 5, 2026</span></div>
+              <div class="ln"><span class="k">Archived by</span><span class="v">Admin User</span></div>
+              <div class="ln"><span class="k">Lifetime sessions</span><span class="v">48</span></div>
+            </div>
+            <div class="card-ft">
+              <button class="btn-restore" data-act="restore"><i data-lucide="rotate-ccw"></i> Restore</button>
+              <button class="btn-delete" data-act="delete"><i data-lucide="trash-2"></i> Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" data-cat="Skin Treatments" data-name="Glycolic Acid Peel (Old)">
+          <div class="card-img"><div class="ph">No image</div><span class="archived-overlay"><i data-lucide="archive"></i> Archived</span></div>
+          <div class="card-hd">
+            <div>
+              <div class="nm">Glycolic Acid Peel (Old)</div>
+              <div class="chip-row"><span class="chip-cat">Skin Treatments</span><span class="chip-dur">30 min</span></div>
+            </div>
+            <span class="status-badge">Archived</span>
+          </div>
+          <div class="card-bd">
+            <p class="card-desc">Older glycolic acid peel formulation, replaced by the unified Chemical Peel service.</p>
+            <div class="price-row"><div class="price">₱1,800</div></div>
+            <div class="meta-line">
+              <div class="ln"><span class="k">Archived on</span><span class="v">Dec 12, 2025</span></div>
+              <div class="ln"><span class="k">Archived by</span><span class="v">Admin User</span></div>
+              <div class="ln"><span class="k">Lifetime sessions</span><span class="v">312</span></div>
+            </div>
+            <div class="card-ft">
+              <button class="btn-restore" data-act="restore"><i data-lucide="rotate-ccw"></i> Restore</button>
+              <button class="btn-delete" data-act="delete"><i data-lucide="trash-2"></i> Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" data-cat="Injectables" data-name="Mesotherapy (Discontinued)">
+          <div class="card-img"><div class="ph">No image</div><span class="archived-overlay"><i data-lucide="archive"></i> Archived</span></div>
+          <div class="card-hd">
+            <div>
+              <div class="nm">Mesotherapy (Discontinued)</div>
+              <div class="chip-row"><span class="chip-cat">Injectables</span><span class="chip-dur">45 min</span></div>
+            </div>
+            <span class="status-badge">Archived</span>
+          </div>
+          <div class="card-bd">
+            <p class="card-desc">Standard mesotherapy injections. Discontinued in favor of new lipolytic mesotherapy.</p>
+            <div class="price-row"><div class="price">₱3,200</div></div>
+            <div class="meta-line">
+              <div class="ln"><span class="k">Archived on</span><span class="v">Nov 30, 2025</span></div>
+              <div class="ln"><span class="k">Archived by</span><span class="v">Dr. Reyes</span></div>
+              <div class="ln"><span class="k">Lifetime sessions</span><span class="v">187</span></div>
+            </div>
+            <div class="card-ft">
+              <button class="btn-restore" data-act="restore"><i data-lucide="rotate-ccw"></i> Restore</button>
+              <button class="btn-delete" data-act="delete"><i data-lucide="trash-2"></i> Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" data-cat="Wellness" data-name="Hot Stone Therapy">
+          <div class="card-img"><div class="ph">No image</div><span class="archived-overlay"><i data-lucide="archive"></i> Archived</span></div>
+          <div class="card-hd">
+            <div>
+              <div class="nm">Hot Stone Therapy</div>
+              <div class="chip-row"><span class="chip-cat">Wellness</span><span class="chip-dur">75 min</span></div>
+            </div>
+            <span class="status-badge">Archived</span>
+          </div>
+          <div class="card-bd">
+            <p class="card-desc">Heated stone massage therapy. Service paused — may be reintroduced in Q3 2026.</p>
+            <div class="price-row"><div class="price">₱2,400</div></div>
+            <div class="meta-line">
+              <div class="ln"><span class="k">Archived on</span><span class="v">Oct 14, 2025</span></div>
+              <div class="ln"><span class="k">Archived by</span><span class="v">Admin User</span></div>
+              <div class="ln"><span class="k">Lifetime sessions</span><span class="v">62</span></div>
+            </div>
+            <div class="card-ft">
+              <button class="btn-restore" data-act="restore"><i data-lucide="rotate-ccw"></i> Restore</button>
+              <button class="btn-delete" data-act="delete"><i data-lucide="trash-2"></i> Delete</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ Restore Modal ============ -->
+<div class="modal-overlay" id="modal-restore">
+  <div class="modal">
+    <div class="confirm-body">
+      <div class="confirm-icon restore"><i data-lucide="rotate-ccw"></i></div>
+      <div class="confirm-title">Restore this service?</div>
+      <p class="confirm-text">"<span id="restore-name"></span>" will be moved back to <b>Active Services</b> and made bookable again.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" data-close>Cancel</button>
+      <button class="btn-confirm-restore" id="confirm-restore"><i data-lucide="rotate-ccw" style="width:13px;height:13px;"></i> Restore</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Delete Modal ============ -->
+<div class="modal-overlay" id="modal-delete">
+  <div class="modal">
+    <div class="confirm-body">
+      <div class="confirm-icon delete"><i data-lucide="trash-2"></i></div>
+      <div class="confirm-title">Delete service permanently?</div>
+      <p class="confirm-text">"<span id="delete-name"></span>" will be permanently removed. This action <b>cannot be undone</b>. Existing patient records that reference this service will remain intact.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" data-close>Cancel</button>
+      <button class="btn-confirm-delete" id="confirm-delete"><i data-lucide="trash-2" style="width:13px;height:13px;"></i> Delete Permanently</button>
+    </div>
+  </div>
+</div>
+
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+<script>
+(function () {
+  var search = document.getElementById('search');
+  var pills = document.querySelectorAll('.cat-pill');
+  var cards = document.querySelectorAll('#grid .card');
+  var activeCat = 'All';
+
+  function apply() {
+    var q = (search.value || '').trim().toLowerCase();
+    cards.forEach(function (c) {
+      var matchesCat = activeCat === 'All' || c.dataset.cat === activeCat;
+      var matchesQ = !q || c.dataset.name.toLowerCase().indexOf(q) !== -1;
+      c.style.display = (matchesCat && matchesQ) ? '' : 'none';
+    });
+  }
+  pills.forEach(function (p) {
+    p.addEventListener('click', function () {
+      pills.forEach(function (x) { x.classList.toggle('active', x === p); });
+      activeCat = p.dataset.c;
+      apply();
+    });
+  });
+  search.addEventListener('input', apply);
+
+  var modalRestore = document.getElementById('modal-restore');
+  var modalDelete = document.getElementById('modal-delete');
+  var targetCard = null;
+
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-act]');
+    if (btn) {
+      targetCard = btn.closest('.card');
+      var name = targetCard.dataset.name;
+      if (btn.dataset.act === 'restore') {
+        document.getElementById('restore-name').textContent = name;
+        modalRestore.classList.add('open');
+      } else {
+        document.getElementById('delete-name').textContent = name;
+        modalDelete.classList.add('open');
+      }
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
+    if (e.target.matches('[data-close]') || e.target.classList.contains('modal-overlay')) {
+      modalRestore.classList.remove('open');
+      modalDelete.classList.remove('open');
+    }
+  });
+
+  document.getElementById('confirm-restore').addEventListener('click', function () {
+    if (targetCard) targetCard.remove();
+    modalRestore.classList.remove('open');
+  });
+  document.getElementById('confirm-delete').addEventListener('click', function () {
+    if (targetCard) targetCard.remove();
+    modalDelete.classList.remove('open');
+  });
+})();
+</script>
+</body>
+</html>

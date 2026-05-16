@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cloud Skin Reception — Audit Logs</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F0F6FC; font-family: var(--font-body); color: var(--navy-800); }
+  .app { display: flex; min-height: 100vh; }
+  aside.sidebar { width: 260px; background: #152F4A; min-height: 100vh; flex-shrink: 0; display: flex; flex-direction: column; font-family: var(--font-display); position: sticky; top: 0; max-height: 100vh; }
+  aside.sidebar .side-head { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  aside.sidebar .side-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #2D6A9F 0%, #5BC0EB 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  aside.sidebar .side-logo img { width: 28px; height: 28px; object-fit: contain; }
+  aside.sidebar .brand-name { color: #fff; font-weight: 700; font-size: 14px; }
+  aside.sidebar .brand-sub { color: #B8D4EC; font-weight: 400; font-size: 11px; font-family: var(--font-body); }
+  aside.sidebar .side-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  aside.sidebar .nav-item { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; color: #B8D4EC; font-weight: 500; font-size: 14px; cursor: pointer; border-left: 3px solid transparent; user-select: none; text-decoration: none; }
+  aside.sidebar .nav-item:hover { background: #1E3F61; color: #fff; }
+  aside.sidebar .nav-item.active { background: #2D6A9F; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .nav-item .badge-red { margin-left: auto; background: #EF4444; color: #fff; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 9999px; }
+  aside.sidebar .nav-item .lucide { width: 20px; height: 20px; flex-shrink: 0; }
+  aside.sidebar .nav-item .chev { margin-left: auto; transition: transform 200ms; }
+  aside.sidebar .nav-item.open .chev { transform: rotate(90deg); }
+  aside.sidebar .submenu { background: rgba(0,0,0,0.20); }
+  aside.sidebar .submenu .nav-item { height: 40px; padding-left: 48px; font-size: 13px; color: #A0C4E0; font-weight: 400; }
+  aside.sidebar .submenu .nav-item.active { background: #1E3F61; color: #fff; border-left-color: #5BC0EB; }
+  aside.sidebar .submenu .nav-item .lucide { width: 16px; height: 16px; }
+  aside.sidebar .side-collapse { height: 44px; display: flex; align-items: center; justify-content: flex-end; padding: 0 16px; gap: 6px; border-top: 1px solid rgba(184,212,236,0.10); color: #B8D4EC; font-size: 12px; cursor: pointer; }
+  aside.sidebar .side-user { height: 64px; padding: 0 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(184,212,236,0.10); flex-shrink: 0; }
+  aside.sidebar .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2D6A9F; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  aside.sidebar .side-user .name { color: #fff; font-weight: 600; font-size: 13px; }
+  aside.sidebar .role-pill { display: inline-block; padding: 1px 6px; border-radius: 9999px; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+  aside.sidebar .side-user .logout { margin-left: auto; color: #B8D4EC; background: none; border: none; cursor: pointer; padding: 4px; display: flex; }
+  main.content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  header.topbar { background: #fff; box-shadow: 0 1px 3px rgba(26,58,92,0.08); display: flex; align-items: center; padding: 18px 32px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: #1A2E40; }
+  .topbar-crumb { font-size: 13px; color: #5A7A96; margin-top: 2px; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; color: #5A7A96; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+  .icon-btn .dot { position: absolute; top: 4px; right: 4px; width: 16px; height: 16px; background: #EF4444; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); }
+  .user-pill { display: flex; align-items: center; gap: 10px; padding: 4px; cursor: pointer; }
+  .user-pill .meta { display: flex; flex-direction: column; }
+  .user-pill .name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: #1A2E40; }
+  .user-pill .role-pill-light { background: #FEF3C7; color: #B45309; display: inline-block; padding: 1px 6px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; width: fit-content; }
+  .page { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .page-hero h1 { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: #1A2E40; margin: 0; }
+  .page-hero .sub { font-family: var(--font-body); font-size: 13px; color: #5A7A96; margin-top: 4px; }
+  .info-banner { background: #EBF6FD; border: 1px solid #93C5FD; border-radius: 10px; padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start; }
+  .info-banner .lucide { width: 18px; height: 18px; color: #2D6A9F; flex-shrink: 0; margin-top: 1px; }
+  .info-banner .title { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #1E40AF; }
+  .info-banner .desc { font-family: var(--font-body); font-size: 13px; color: #1E40AF; margin-top: 2px; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .stat-card { background: #fff; border-radius: 10px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); display: flex; flex-direction: column; gap: 8px; }
+  .stat-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-card .label { font-size: 12px; color: #5A7A96; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-card .iplate { width: 36px; height: 36px; border-radius: 9999px; background: #EBF6FD; color: #2D6A9F; display: flex; align-items: center; justify-content: center; }
+  .stat-card .iplate.success { background: #DCFCE7; color: #15803D; }
+  .stat-card .iplate.warning { background: #FEF3C7; color: #B45309; }
+  .stat-card .value { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: #1A2E40; }
+  .stat-card .sub { font-size: 12px; color: #5A7A96; }
+  .section-card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(26,58,92,0.08); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 12px 16px; text-align: left; font-family: var(--font-display); font-size: 11px; font-weight: 600; color: #5A7A96; background: #F0F6FC; border-bottom: 1px solid #D0E8F5; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  td { padding: 14px 16px; border-bottom: 1px solid #D0E8F5; font-size: 13px; color: #5A7A96; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .nm { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: #1A2E40; }
+  .sku { font-family: var(--font-mono); font-size: 12px; color: #2D6A9F; font-weight: 600; white-space: nowrap; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  .badge.green { background: #ECFDF5; color: #065F46; }
+  .badge.amber { background: #FFFBEB; color: #B45309; }
+  .badge.red   { background: #FEF2F2; color: #991B1B; }
+  .badge.blue  { background: #DBEAFE; color: #1E40AF; }
+  .badge.slate { background: #F1F5F9; color: #475569; }
+  .search-input { position: relative; }
+  .search-input .lucide { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9BBAD4; }
+  .search-input input { width: 100%; height: 40px; padding: 0 12px 0 34px; border: 1.5px solid #D0E8F5; border-radius: 8px; font-family: var(--font-body); font-size: 13px; color: #1A2E40; outline: none; background: #fff; box-sizing: border-box; }
+  .role-context-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: #FEF3C7; color: #B45309; border-radius: 9999px; font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .role-context-pill .lucide { width: 12px; height: 12px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar-mount" class="sidebar"></aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title">Audit Logs</div>
+        <div class="topbar-crumb">Reception / Inventory / Audit Logs</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn"><i data-lucide="search"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i><span class="dot">2</span></button>
+        <div class="user-pill">
+          <div class="avatar" style="background:#B45309;">AC</div>
+          <div class="meta"><span class="name">A. Cruz</span><span class="role-pill-light">Reception</span></div>
+          <i data-lucide="chevron-down" style="width:15px;height:15px;color:#5A7A96"></i>
+        </div>
+      </div>
+    </header>
+    <section class="page" data-screen-label="01 Receptionist Audit Logs">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div class="page-hero">
+          <h1>Audit Logs</h1>
+          <div class="sub">Stock movements I've recorded or that involve my counts. Read-only view.</div>
+        </div>
+        <span class="role-context-pill"><i data-lucide="eye"></i> Read-only · Reception</span>
+      </div>
+
+      <div class="info-banner">
+        <i data-lucide="info"></i>
+        <div>
+          <div class="title">You're viewing the reception audit log</div>
+          <div class="desc">This list shows only entries you personally recorded plus stock-in receipts for sessions you've participated in. Contact the admin if a correction is needed.</div>
+        </div>
+      </div>
+
+      <div class="stat-row" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+        <div class="stat-card"><div class="top"><span class="label">My Movements</span><div class="iplate"><i data-lucide="shuffle"></i></div></div><div class="value">6</div><div class="sub">Last 30 days</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Stock In Received</span><div class="iplate success"><i data-lucide="arrow-down"></i></div></div><div class="value">2</div><div class="sub">Deliveries you signed for</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Retail Sales</span><div class="iplate"><i data-lucide="shopping-bag"></i></div></div><div class="value">3</div><div class="sub">Patient purchases rung up</div></div>
+        <div class="stat-card"><div class="top"><span class="label">Last Activity</span><div class="iplate warning"><i data-lucide="clock"></i></div></div><div class="value" style="font-size:18px;">May 12, 16:05</div><div class="sub">Probiotics Beauty sale</div></div>
+      </div>
+
+      <div class="section-card">
+        <div style="padding:16px 20px;border-bottom:1px solid #D0E8F5;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div class="search-input" style="flex:1;max-width:300px;"><i data-lucide="search"></i><input placeholder="Search item or SKU..."></div>
+          <span style="margin-left:auto;font-family:var(--font-body);font-size:12px;color:#9BBAD4;">Showing 6 entries</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="min-width:1000px;">
+            <thead><tr><th>Date &amp; Time</th><th>Item</th><th>SKU</th><th>Movement</th><th>Quantity</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr>
+                <td style="font-family:var(--font-mono);font-size:12px;">2024-05-12 16:05</td>
+                <td><span class="nm">Probiotics Beauty</span></td>
+                <td><span class="sku">SUP-003</span></td>
+                <td><span class="badge red"><i data-lucide="shopping-bag" style="width:11px;height:11px;display:inline;margin-right:3px;"></i>Retail Sale</span></td>
+                <td><span style="font-family:var(--font-display);font-weight:700;color:#991B1B;">−2</span></td>
+                <td style="font-size:12px;">Sold to walk-in patient · POS-2024-00178</td>
+              </tr>
+              <tr>
+                <td style="font-family:var(--font-mono);font-size:12px;">2024-05-12 09:45</td>
+                <td><span class="nm">Glycolic Acid Peel</span></td>
+                <td><span class="sku">MED-GLY-003</span></td>
+                <td><span class="badge red"><i data-lucide="shopping-bag" style="width:11px;height:11px;display:inline;margin-right:3px;"></i>Retail Sale</span></td>
+                <td><span style="font-family:var(--font-display);font-weight:700;color:#991B1B;">−1</span></td>
+                <td style="font-size:12px;">Walk-in purchase</td>
+              </tr>
+              <tr>
+                <td style="font-family:var(--font-mono);font-size:12px;">2024-05-11 14:18</td>
+                <td><span class="nm">Hydrating Mask</span></td>
+                <td><span class="sku">MED-HYD-008</span></td>
+                <td><span class="badge red"><i data-lucide="shopping-bag" style="width:11px;height:11px;display:inline;margin-right:3px;"></i>Retail Sale</span></td>
+                <td><span style="font-family:var(--font-display);font-weight:700;color:#991B1B;">−3</span></td>
+                <td style="font-size:12px;">Sold to 3 patients during clinic hours</td>
+              </tr>
+              <tr>
+                <td style="font-family:var(--font-mono);font-size:12px;">2024-05-10 11:30</td>
+                <td><span class="nm">Microdermabrasion Crystals</span></td>
+                <td><span class="sku">MED-MIC-006</span></td>
+                <td><span class="badge green"><i data-lucide="arrow-down" style="width:11px;height:11px;display:inline;margin-right:3px;"></i>Stock In</span></td>
+                <td><span style="font-family:var(--font-display);font-weight:700;color:#065F46;">+5</span></td>
+                <td style="font-size:12px;">Received from Global Health Products</td>
+              </tr>
+              <tr>
+                <td style="font-family:var(--font-mono);font-size:12px;">2024-05-09 16:42</td>
+                <td><span class="nm">Collagen Peptides</span></td>
+                <td><span class="sku">SUP-001</span></td>
+                <td><span class="badge blue"><i data-lucide="gift" style="width:11px;height:11px;display:inline;margin-right:3px;"></i>Professional Sampling</span></td>
+                <td><span style="font-family:var(--font-display);font-weight:700;color:#991B1B;">−1</span></td>
+                <td style="font-size:12px;">Take-home sample for VIP consultation</td>
+              </tr>
+              <tr>
+                <td style="font-family:var(--font-mono);font-size:12px;">2024-05-08 10:15</td>
+                <td><span class="nm">HydraFacial Serums</span></td>
+                <td><span class="sku">MED-HYD-001</span></td>
+                <td><span class="badge green"><i data-lucide="arrow-down" style="width:11px;height:11px;display:inline;margin-right:3px;"></i>Stock In</span></td>
+                <td><span style="font-family:var(--font-display);font-weight:700;color:#065F46;">+10</span></td>
+                <td style="font-size:12px;">Purchase from MediCare Supplies</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script src="_sidebar.js"></script>
+</body>
+</html>

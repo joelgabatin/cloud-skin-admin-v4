@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 28px; background: #fff; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(26,58,92,0.08); }
+  th { background: #F0F6FC; padding: 10px 16px; text-align: left; font-family: var(--font-display); font-weight: 600; font-size: 11px; color: #5A7A96; letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid #D0E8F5; }
+  td { padding: 12px 16px; border-bottom: 1px solid #D0E8F5; font-family: var(--font-body); font-size: 13px; color: #5A7A96; }
+  td.name { color: #1A2E40; font-weight: 500; }
+  td.time { font-family: var(--font-mono); font-size: 12px; color: #1A2E40; }
+  tr:last-child td { border-bottom: none; }
+  tr.hover td { background: #F8FBFF; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-family: var(--font-display); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<table>
+  <thead><tr><th>Client</th><th>Service</th><th>Time</th><th>Practitioner</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td class="name">Sarah Johnson</td><td>Hydra Facial</td><td class="time">10:00 AM</td><td>Dr. Santos</td><td><span class="badge" style="background:#DCFCE7;color:#15803D">Confirmed</span></td></tr>
+    <tr class="hover"><td class="name">Miguel Cruz</td><td>Botox Treatment</td><td class="time">11:00 AM</td><td>Dr. Reyes</td><td><span class="badge" style="background:#DBEAFE;color:#1D4ED8">In Progress</span></td></tr>
+    <tr><td class="name">Camille Torres</td><td>Chemical Peel</td><td class="time">1:00 PM</td><td>Dr. Santos</td><td><span class="badge" style="background:#FEF9C3;color:#A16207">Pending</span></td></tr>
+    <tr><td class="name">Jose Dela Cruz</td><td>PRP Therapy</td><td class="time">2:30 PM</td><td>Dr. Lim</td><td><span class="badge" style="background:#DCFCE7;color:#15803D">Confirmed</span></td></tr>
+  </tbody>
+</table>
+</body>
+</html>
