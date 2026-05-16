@@ -1,7 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { useRouter, useEffect } from 'next/navigation';
 
 export default function Home() {
   const { isAuthenticated, isLoading } = useAuth();
