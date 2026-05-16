@@ -30,6 +30,15 @@ const mockAppointments = [
     time: '10:00 AM',
     status: 'confirmed',
   },
+  {
+    id: '4',
+    patientName: 'Lisa Chen',
+    practitioner: 'Dr. Alex',
+    service: 'Laser Treatment',
+    date: '2024-05-17',
+    time: '1:00 PM',
+    status: 'inProgress',
+  },
 ];
 
 export default function AppointmentsPage() {

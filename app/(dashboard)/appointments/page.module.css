@@ -100,9 +100,14 @@
   color: #10A960;
 }
 
-.badge['in-progress'] {
+.badge.inProgress {
   background: rgba(45, 106, 159, 0.15);
   color: #2D6A9F;
+}
+
+.badge.cancelled {
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
 }
 
 .actionLink {
